@@ -1,0 +1,55 @@
+server:
+    port: 8028
+    compression:
+        enabled: true
+        mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
+        min-response-size: 1024
+    session:
+        timeout: 1800
+spring:
+   profiles.active: dev
+   freemarker.cache: false
+   resources.cache-period: 0
+   datasource:
+         url: jdbc:mysql://127.0.0.1:3306/ubi?characterEncoding=utf8&useSSL=false
+         username: root
+         password: 123456
+         hikari:
+             minimumIdle: 5
+             maximumPoolSize: 15
+             data-source-properties:
+                 cachePrepStmts: true
+                 prepStmtCacheSize: 250
+                 prepStmtCacheSqlLimit: 2048
+                 useServerPrepStmts: true
+   jpa:
+      show-sql: true
+      hibernate:
+          # Hibernate DDL  auto: create, create-drop, update, validate
+          ddl-auto: validate
+      properties:
+          hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+          hibernate.current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
+   messages:
+      basename: i18n/base/messages,i18n/ubi/messages,i18n/ubi/sys/messages,i18n/ubi/car/messages
+      cache-seconds: -1
+      encoding: UTF-8
+   rabbitmq:
+      host: 121.40.157.200
+      port: 5672
+      username: briair
+      password: briair
+
+sim:
+    ChinaMobile:
+        host: http://api.cmpyun.com
+        appid: LYWLn5RQXaXsr5v8IPnO
+        secret: tdddvBTXMsdQ6pknSpMJDBnMVXZ3qdjU
+        solt: 5Ktul9tEP2
+        api:
+            getAllCardCount: /api/serviceAccept/getAllCardCount
+            findCardInfo: /api/serviceAccept/findCardInfo
+            getCardList: /api/serviceAccept/getCardList
+            findCardMonthUseDataInfo: /api/serviceAccept/findCardMonthUseDataInfo
+            sendSms: /api/serviceAccept/sendSms
+
