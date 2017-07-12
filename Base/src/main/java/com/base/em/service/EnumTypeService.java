@@ -1,4 +1,4 @@
-package com.base.em.bo;
+package com.base.em.service;
 
 import com.base.service.BaseService;
 import com.base.em.dto.EnumTypeBean;

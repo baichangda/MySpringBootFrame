@@ -1,8 +1,7 @@
-package com.base.dto;
+package com.base.bean;
 
 
 import com.base.util.BeanUtil;
-import org.apache.commons.beanutils.BeanUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;

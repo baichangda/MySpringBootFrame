@@ -1,4 +1,4 @@
-package com.base.dto;
+package com.base.bean;
 
 import javax.persistence.MappedSuperclass;
 import java.util.Date;

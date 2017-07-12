@@ -1,7 +1,7 @@
-package com.base.em.dao;
+package com.base.em.repository;
 
 import com.base.repository.BaseRepository;
-import com.base.em.dto.EnumTypeBean;
+import com.base.em.bean.EnumTypeBean;
 import org.springframework.stereotype.Repository;
 
 /**

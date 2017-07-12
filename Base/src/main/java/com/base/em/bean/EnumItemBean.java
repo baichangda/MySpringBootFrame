@@ -1,7 +1,7 @@
-package com.base.em.dto;
+package com.base.em.bean;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.dto.SuperBaseBean;
+import com.base.bean.SuperBaseBean;
 
 import javax.persistence.*;
 
