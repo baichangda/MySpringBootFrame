@@ -65,7 +65,7 @@ public class MyShiroRealm extends AuthorizingRealm {
      * 当访问到页面的时候，使用了相应的注解或者shiro标签才会执行此方法否则不会执行，  
      * 所以如果只是简单的身份认证没有权限的控制的话，那么这个方法可以不进行实现，直接返回null即可  
      */  
-    @Override  
+    @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         UserBean user = (UserBean) super.getAvailablePrincipal(principals);
         if(user!=null){
