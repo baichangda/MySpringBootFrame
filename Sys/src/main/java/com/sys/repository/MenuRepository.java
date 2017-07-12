@@ -2,10 +2,8 @@ package com.sys.repository;
 
 import com.base.repository.BaseRepository;
 import com.sys.bean.MenuBean;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
 /**
  * 菜单操作
