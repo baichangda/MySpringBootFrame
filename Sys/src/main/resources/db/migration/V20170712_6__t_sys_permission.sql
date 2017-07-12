@@ -1,4 +1,4 @@
-create table IF NOT EXISTS t_sys_role_permission
+create table IF NOT EXISTS t_sys_permission
 (
    id                   bigint unsigned not null auto_increment comment 'id',
       name                 varchar(20) comment '角色名称',
@@ -12,4 +12,4 @@ create table IF NOT EXISTS t_sys_role_permission
    primary key (id)
 );
 
-alter table t_sys_role_permission comment '角色与权限关系表';
+alter table t_sys_permission comment '角色与权限关系表';

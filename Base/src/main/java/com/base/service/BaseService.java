@@ -31,7 +31,7 @@ public class BaseService<T,K extends Serializable> {
     public EntityManager em;
 
     @Autowired
-    public com.base.dao.BaseRepository<T,K> repository;
+    public com.base.repository.BaseRepository<T,K> repository;
 
     @Transactional
     public void deleteAll(){

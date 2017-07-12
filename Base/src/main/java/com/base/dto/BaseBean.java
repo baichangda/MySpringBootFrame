@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by Administrator on 2017/4/11.
  */
 @MappedSuperclass
-public class BaseBean extends AbstractBaseDTO {
+public class BaseBean extends SuperBaseBean {
 
     public Date createTime;
 

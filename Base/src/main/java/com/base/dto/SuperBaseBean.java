@@ -1,6 +1,9 @@
 package com.base.dto;
 
 
+import com.base.util.BeanUtil;
+import org.apache.commons.beanutils.BeanUtils;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -20,5 +23,15 @@ public abstract class SuperBaseBean implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id==null?0:id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return BeanUtil.checkIsEqual(this,obj);
     }
 }

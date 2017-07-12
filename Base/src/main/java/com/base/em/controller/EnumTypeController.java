@@ -5,10 +5,9 @@ import com.base.condition.impl.NullCondition;
 import com.base.condition.impl.NumberCondition;
 import com.base.condition.impl.StringCondition;
 import com.base.controller.BaseController;
-import com.base.em.bo.EnumItemBO;
-import com.base.em.bo.EnumTypeBO;
-import com.base.em.dto.EnumItemDTO;
-import com.base.em.dto.EnumTypeDTO;
+import com.base.em.bo.EnumItemService;
+import com.base.em.bo.EnumTypeService;
+import com.base.em.dto.EnumTypeBean;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
@@ -28,10 +27,10 @@ import java.util.stream.Stream;
 @RequestMapping("/api/enumType")
 public class EnumTypeController extends BaseController{
     @Autowired
-    private EnumTypeBO enumTypeBO;
+    private EnumTypeService enumTypeBO;
 
     @Autowired
-    private EnumItemBO enumItemBO;
+    private EnumItemService enumItemBO;
     /**
      * 查询所有枚举类型
      * @param id
@@ -64,9 +63,9 @@ public class EnumTypeController extends BaseController{
                 new NumberCondition("id",id,NumberCondition.Handler.EQUAL)
         ).collect(Collectors.toList());
         if(pageNum==null || pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList), EnumTypeDTO.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList), EnumTypeBean.getOneDeepJsonFilter()));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList,new PageRequest(pageNum-1,pageSize)), EnumTypeDTO.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList,new PageRequest(pageNum-1,pageSize)), EnumTypeBean.getOneDeepJsonFilter()));
         }
     }
 
@@ -81,7 +80,7 @@ public class EnumTypeController extends BaseController{
             @ApiImplicitParam(name = "enumTypeDTO",value = "枚举类型实体",dataType = "EnumTypeDTO",paramType = "body",required = true),
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存枚举类型")})
-    public JsonMessage<Object> save(@RequestBody EnumTypeDTO enumTypeDTO){
+    public JsonMessage<Object> save(@RequestBody EnumTypeBean enumTypeDTO){
         enumTypeBO.save(enumTypeDTO);
         //清空无关系的枚举项
         enumItemBO.delete(new NullCondition("typeId"));
@@ -118,7 +117,7 @@ public class EnumTypeController extends BaseController{
     public JsonMessage checkNameIsAvailable(
             @RequestParam(value = "name") String name
     ){
-        List<EnumTypeDTO> list= enumTypeBO.findAll(new StringCondition("name",name, StringCondition.Handler.EQUAL));
+        List<EnumTypeBean> list= enumTypeBO.findAll(new StringCondition("name",name, StringCondition.Handler.EQUAL));
         if(list==null||list.size()==0){
             return JsonMessage.successed(null);
         }else{
@@ -140,7 +139,7 @@ public class EnumTypeController extends BaseController{
     public JsonMessage checkCodeIsAvailable(
             @RequestParam(value = "code") String code
     ){
-        List<EnumTypeDTO> list= enumTypeBO.findAll(new StringCondition("code",code, StringCondition.Handler.EQUAL));
+        List<EnumTypeBean> list= enumTypeBO.findAll(new StringCondition("code",code, StringCondition.Handler.EQUAL));
         if(list==null||list.size()==0){
             return JsonMessage.successed(null);
         }else{

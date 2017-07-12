@@ -618,6 +618,9 @@ public class BeanUtil {
         if(obj1==null||obj2==null){
             return false;
         }
+        if(obj1.getClass()!=obj2.getClass()){
+            return false;
+        }
         return obj1.equals(obj2);
     }
 }

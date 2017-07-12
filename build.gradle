@@ -1,5 +1,5 @@
 allprojects {
-    group 'UBI'
+    group 'MySpringBootFrame'
     version '1.0-SNAPSHOT'
 
     apply plugin: 'java'
@@ -21,26 +21,38 @@ allprojects {
 
 
     dependencies {
+        //springboot web支持
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+        //springboot jpa支持
         compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+        //springboot websocket支持
         compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
+        //springboot rabbitmq支持
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
+        //springboot kafka支持
+        compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
 
-        compile "io.springfox:springfox-swagger2:2.6.1"
-        compile "io.springfox:springfox-swagger-ui:2.6.1"
-        compile("com.alibaba:fastjson:1.2.+")
+        //swagger集成
+        compile "io.springfox:springfox-swagger2:${swaggerVersion}"
+        compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
 
-        compile("org.apache.shiro:shiro-spring:1.3.+")
-        compile("org.apache.shiro:shiro-ehcache:1.3.+")
-        compile("org.apache.shiro:shiro-cas:1.3.+")
+        //alibaba fastjson集成
+        compile("com.alibaba:fastjson:${fastjsonVersion}")
 
-        compile("commons-lang:commons-lang:2.6")
+        //shiro权限框架集成
+        compile("org.apache.shiro:shiro-spring:${shiroVersion}")
+        compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
+        compile("org.apache.shiro:shiro-cas:${shiroVersion}")
 
-        compile("org.apache.poi:poi:3.8")
-        compile("org.apache.poi:poi-ooxml:3.8")
+        //commons lang通用包集成
+        compile("commons-lang:commons-lang:${commonslangVersion}")
+
+        //poi 集成
+        compile("org.apache.poi:poi:${poiVersion}")
+        compile("org.apache.poi:poi-ooxml:${poiVersion}")
         
-
-        runtime 'mysql:mysql-connector-java:5.+'
+        //mysql驱动包
+        runtime "mysql:mysql-connector-java:${mysqlVersion}"
     }
 
     gradle.projectsEvaluated {
@@ -54,20 +66,30 @@ allprojects {
 
 buildscript {
     ext {
-        springBootVersion = '1.5.+'
+        springBootVersion = '1.+'
+        flywayVersion='3.2.1'
+        swaggerVersion='2.+'
+        commonslangVersion='2.6'
+        shiroVersion='1.+'
+        fastjsonVersion='1.+'
+        poiVersion='3.+'
+        mysqlVersion='5.+'
+        kafkaVersion='1.+'
     }
     repositories {
         mavenLocal();
         mavenCentral();
     }
     dependencies {
-        //使用1.4.2.RELEASE版本的Spring框架
+        //使用springboot框架
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath 'org.flywaydb:flyway-gradle-plugin:3.2.1'
+        //使用flyway插件
+        classpath "org.flywaydb:flyway-gradle-plugin:${flywayVersion}"
     }
 
 }
 
 dependencies {
     compile project(':Base')
+    compile project(':Sys')
 }
