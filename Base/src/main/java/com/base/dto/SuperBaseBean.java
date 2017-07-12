@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by Administrator on 2017/5/2.
  */
 @MappedSuperclass
-public abstract class AbstractBaseDTO implements Serializable {
+public abstract class SuperBaseBean implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

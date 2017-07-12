@@ -1,28 +1,36 @@
 package com.base.em.dto;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.dto.AbstractBaseDTO;
+import com.base.dto.SuperBaseBean;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by Administrator on 2017/5/18.
  */
 @Entity
-@Table(name = "t_enum_type")
-public class EnumTypeDTO extends AbstractBaseDTO{
+@Table(name = "t_enum_item")
+public class EnumItemBean extends SuperBaseBean {
+
+    private Long typeId;
     private String name;
     private String code;
     private String remark;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="typeId")
-    private Set<EnumItemDTO> enumItemDTOSet=new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name="typeId",insertable = false,updatable = false)
+    private EnumTypeBean enumTypeDTO;
 
     public String getName() {
         return name;
+    }
+
+    public Long getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(Long typeId) {
+        this.typeId = typeId;
     }
 
     public void setName(String name) {
@@ -45,23 +53,23 @@ public class EnumTypeDTO extends AbstractBaseDTO{
         this.remark = remark;
     }
 
-    public Set<EnumItemDTO> getEnumItemDTOSet() {
-        return enumItemDTOSet;
+    public void setEnumTypeDTO(EnumTypeBean enumTypeDTO) {
+        this.enumTypeDTO = enumTypeDTO;
     }
 
-    public void setEnumItemDTOSet(Set<EnumItemDTO> enumItemDTOSet) {
-        this.enumItemDTOSet = enumItemDTOSet;
+    public EnumTypeBean getEnumTypeDTO() {
+        return enumTypeDTO;
     }
 
     public static SimplePropertyPreFilter getSimpleJsonFilter(){
-        SimplePropertyPreFilter simplePropertyPreFilter=new SimplePropertyPreFilter(EnumTypeDTO.class);
-        simplePropertyPreFilter.getExcludes().add("enumItemDTOSet");
+        SimplePropertyPreFilter simplePropertyPreFilter=new SimplePropertyPreFilter(EnumItemBean.class);
+        simplePropertyPreFilter.getExcludes().add("enumTypeDTO");
         return simplePropertyPreFilter;
     }
 
     public static SimplePropertyPreFilter[] getOneDeepJsonFilter(){
         return new SimplePropertyPreFilter[]{
-                EnumItemDTO.getSimpleJsonFilter()
+                EnumTypeBean.getSimpleJsonFilter()
         };
     }
 }

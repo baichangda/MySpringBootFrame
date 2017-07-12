@@ -1,9 +1,8 @@
-package com.base.bo;
+package com.base.service;
 
 import com.base.annotation.ReferCollection;
 import com.base.annotation.ReferredCollection;
 import com.base.condition.BaseCondition;
-import com.base.dao.BaseDAO;
 import com.base.util.BeanUtil;
 import com.base.util.ConditionUtil;
 import com.base.util.I18nUtil;
@@ -27,12 +26,12 @@ import java.util.*;
  * Created by Administrator on 2017/4/11.
  */
 @SuppressWarnings("unchecked")
-public class BaseBO<T,K extends Serializable> {
+public class BaseService<T,K extends Serializable> {
     @PersistenceContext
     public EntityManager em;
 
     @Autowired
-    public BaseDAO<T,K> repository;
+    public com.base.dao.BaseRepository<T,K> repository;
 
     @Transactional
     public void deleteAll(){

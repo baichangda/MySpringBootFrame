@@ -1,4 +1,4 @@
-package com.base.dao;
+package com.base.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -11,6 +11,6 @@ import java.io.Serializable;
  * Created by Administrator on 2017/4/11.
  */
 @NoRepositoryBean
-public interface BaseDAO<T,K extends Serializable> extends JpaRepository<T,K>,JpaSpecificationExecutor<T> {
+public interface BaseRepository<T,K extends Serializable> extends JpaRepository<T,K>,JpaSpecificationExecutor<T> {
 
 }
