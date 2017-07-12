@@ -1,6 +1,6 @@
 package com.sys.bean;
 
-import com.base.dto.BaseBean;
+import com.base.bean.BaseBean;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

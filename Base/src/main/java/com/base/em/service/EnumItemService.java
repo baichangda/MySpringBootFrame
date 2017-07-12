@@ -1,7 +1,7 @@
 package com.base.em.service;
 
 import com.base.service.BaseService;
-import com.base.em.dto.EnumItemBean;
+import com.base.em.bean.EnumItemBean;
 import org.springframework.stereotype.Service;
 
 /**

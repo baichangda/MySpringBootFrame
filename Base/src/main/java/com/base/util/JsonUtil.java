@@ -39,7 +39,7 @@ public class JsonUtil {
 
 
     public static String toDefaultJSONString(Object obj) {
-        return toDefaultJSONString(obj,null);
+        return toDefaultJSONString(obj);
     }
 
     /**

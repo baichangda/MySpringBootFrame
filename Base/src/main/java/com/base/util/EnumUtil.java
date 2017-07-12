@@ -1,10 +1,10 @@
 package com.base.util;
 
 import com.base.condition.impl.StringCondition;
-import com.base.em.bo.EnumItemService;
-import com.base.em.bo.EnumTypeService;
-import com.base.em.dto.EnumItemBean;
-import com.base.em.dto.EnumTypeBean;
+import com.base.em.service.EnumItemService;
+import com.base.em.service.EnumTypeService;
+import com.base.em.bean.EnumItemBean;
+import com.base.em.bean.EnumTypeBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

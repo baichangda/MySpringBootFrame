@@ -1,6 +1,6 @@
 package com.config.aop;
 
-import com.base.dto.BaseBean;
+import com.base.bean.BaseBean;
 import com.base.util.ProxyUtil;
 import com.base.util.SpringUtil;
 import com.sys.bean.LogBean;

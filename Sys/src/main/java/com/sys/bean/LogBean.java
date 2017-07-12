@@ -1,6 +1,6 @@
 package com.sys.bean;
 
-import com.base.dto.SuperBaseBean;
+import com.base.bean.SuperBaseBean;
 
 import javax.persistence.*;
 import java.util.Date;

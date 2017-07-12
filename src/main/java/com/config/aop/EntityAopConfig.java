@@ -1,6 +1,6 @@
 package com.config.aop;
 
-import com.base.dto.BaseBean;
+import com.base.bean.BaseBean;
 import com.sys.bean.UserBean;
 import com.sys.util.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
