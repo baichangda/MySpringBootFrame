@@ -4,8 +4,8 @@ import com.base.condition.BaseCondition;
 import com.base.condition.impl.NumberCondition;
 import com.base.condition.impl.StringCondition;
 import com.base.controller.BaseController;
-import com.base.em.bo.EnumItemBO;
-import com.base.em.dto.EnumItemDTO;
+import com.base.em.service.EnumItemService;
+import com.base.em.bean.EnumItemBean;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 @RequestMapping("/api/enumItem")
 public class EnumItemController extends BaseController{
     @Autowired
-    private EnumItemBO enumItemBO;
+    private EnumItemService enumItemBO;
     /**
      * 查询所有枚举项
      * @param id
@@ -62,9 +62,9 @@ public class EnumItemController extends BaseController{
                 new NumberCondition("id",id,NumberCondition.Handler.EQUAL)
         ).collect(Collectors.toList());
         if(pageNum==null || pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(conditionList),EnumItemDTO.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(conditionList), EnumItemBean.getOneDeepJsonFilter()));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(conditionList,new PageRequest(pageNum-1,pageSize)),EnumItemDTO.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(conditionList,new PageRequest(pageNum-1,pageSize)), EnumItemBean.getOneDeepJsonFilter()));
         }
     }
 
@@ -79,7 +79,7 @@ public class EnumItemController extends BaseController{
             @ApiImplicitParam(name = "enumItemDTO",value = "枚举项实体",dataType = "EnumItemDTO",paramType = "body",required = true),
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存枚举项")})
-    public JsonMessage<Object> save(@RequestBody EnumItemDTO enumItemDTO){
+    public JsonMessage<Object> save(@RequestBody EnumItemBean enumItemDTO){
         enumItemBO.save(enumItemDTO);
         return new JsonMessage<>(true, I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
     }
@@ -114,7 +114,7 @@ public class EnumItemController extends BaseController{
     public JsonMessage checkNameIsAvailable(
             @RequestParam(value = "name") String name
     ){
-        List<EnumItemDTO> list= enumItemBO.findAll(new StringCondition("name",name, StringCondition.Handler.EQUAL));
+        List<EnumItemBean> list= enumItemBO.findAll(new StringCondition("name",name, StringCondition.Handler.EQUAL));
         if(list==null||list.size()==0){
             return JsonMessage.successed(null);
         }else{
@@ -136,7 +136,7 @@ public class EnumItemController extends BaseController{
     public JsonMessage checkCodeIsAvailable(
             @RequestParam(value = "code") String code
     ){
-        List<EnumItemDTO> list= enumItemBO.findAll(new StringCondition("code",code, StringCondition.Handler.EQUAL));
+        List<EnumItemBean> list= enumItemBO.findAll(new StringCondition("code",code, StringCondition.Handler.EQUAL));
         if(list==null||list.size()==0){
             return JsonMessage.successed(null);
         }else{

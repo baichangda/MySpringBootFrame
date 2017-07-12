@@ -5,6 +5,8 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -31,13 +33,13 @@ public class JsonUtil {
      * @param obj
      * @return
      */
-    public static String toDefaultJSONString(Object obj, SerializeFilter[] filters) {
+    public static String toDefaultJSONString(Object obj, SerializeFilter... filters) {
         return JSONObject.toJSONString(obj, SerializeConfig.globalInstance, filters, SerializerFeature.DisableCircularReferenceDetect);
     }
 
 
     public static String toDefaultJSONString(Object obj) {
-        return toDefaultJSONString(obj,null);
+        return toDefaultJSONString(obj);
     }
 
     /**
@@ -184,9 +186,8 @@ public class JsonUtil {
             //3.2 得到该集合里参数对象的类型
             Class fieldClazz = (Class)(((ParameterizedType) genericType).getActualTypeArguments()[0]);
             if (fieldClazz!=clazz) {
-                //3.3 获取集合里参数对象类型的过滤器，放入simplePropertyPreFilterList中
-                SimplePropertyPreFilter[] simpleJsonFilter = getSimpleJsonFilter(fieldClazz);
-                simplePropertyPreFilterList.addAll(Arrays.asList(simpleJsonFilter));
+                //3.3 获取集合里参数对象类型的简单属性过滤器，放入simplePropertyPreFilterList中
+                simplePropertyPreFilterList.add(getSimpleJsonFilter(fieldClazz));
             }
         }
         //4.遍历所有带ManyToOne和OneToOne的注解的属性集合
@@ -194,15 +195,8 @@ public class JsonUtil {
             //4.1 得到该属性的对象类型
             Class objectFieldClazz = objectField.getType();
             if (objectFieldClazz!=clazz) {
-                SimplePropertyPreFilter objectFilter=new SimplePropertyPreFilter(objectFieldClazz);
-                //4.2 获取该属性对象类型中所有带ManyToMany,OneToMany,ManyToOne和OneToOne注解的属性集合
-                List<Field> allReferencedFieldList = BeanUtil.getFieldList(objectFieldClazz,
-                        new Class[]{ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class});
-                //4.3 遍历集合,将属性名称放入过滤器中
-                allReferencedFieldList.forEach(allReferencedField -> {
-                    objectFilter.getExcludes().add(allReferencedField.getName());
-                });
-                simplePropertyPreFilterList.add(objectFilter);
+                //4.2 添加简单属性过滤器`
+                CollectionUtils.addAll(simplePropertyPreFilterList,getZeroDeepJsonFilter(clazz));
             }
         });
         //5、合并多次调用的返回结果,将相同类的filter整合在一起
@@ -219,6 +213,21 @@ public class JsonUtil {
     }
 
     /**
+     * 过滤掉所有 ManyToOne、OneToOne、ManyToMany、OneToMany注解的属性
+     * @param clazz
+     * @return
+     */
+    public static SimplePropertyPreFilter getSimpleJsonFilter(Class clazz){
+        SimplePropertyPreFilter filter=new SimplePropertyPreFilter(clazz);
+        List<Field> fieldList = BeanUtil.getFieldList(clazz,
+                new Class[]{ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class});
+        fieldList.forEach(field -> {
+            filter.getExcludes().add(field.getName());
+        });
+        return filter;
+    }
+
+    /**
      * 深度为0的过滤器,此过滤器的目的是只留下当前对象的简单属性以及带ManyToOne和OneToOne引用关系的属性
      * 根据当前对象类型：
      * 1、将当前对象类型中带ManyToMany和OneToMany注解的属性过滤；
@@ -226,7 +235,7 @@ public class JsonUtil {
      * @param clazz
      * @return
      */
-    public static SimplePropertyPreFilter[] getSimpleJsonFilter(Class clazz){
+    public static SimplePropertyPreFilter[] getZeroDeepJsonFilter(Class clazz){
         List<SimplePropertyPreFilter> simplePropertyPreFilterList = new ArrayList<>();
         //1、获取当前类型所有带ManyToMany和OneToMany注解的属性集合
         List<Field> collectionFieldList = BeanUtil.getFieldList(clazz,new Class[]{ManyToMany.class, OneToMany.class});
@@ -235,28 +244,15 @@ public class JsonUtil {
         SimplePropertyPreFilter collectionFilter=new SimplePropertyPreFilter(clazz);
         //3.遍历所有带ManyToMany和OneToMany注解的属性集合,将属性名称放入过滤器
         collectionFieldList.forEach(collectionField -> {
-            Type genericType = collectionField.getGenericType();
-            Class collectionFieldClazz = (Class)(((ParameterizedType) genericType).getActualTypeArguments()[0]);
-            if (collectionFieldClazz!=clazz) {
-                collectionFilter.getExcludes().add(collectionField.getName());
-            }
+            collectionFilter.getExcludes().add(collectionField.getName());
         });
         simplePropertyPreFilterList.add(collectionFilter);
         //4.遍历所有带ManyToOne和OneToOne的注解的属性集合
         objectFieldList.forEach(objectField -> {
             //4.1 得到该属性的对象类型
             Class fieldClazz = objectField.getType();
-            if (fieldClazz!=clazz) {
-                SimplePropertyPreFilter objectFilter = new SimplePropertyPreFilter(fieldClazz);
-                //4.2 获取该属性对象类型中所有带ManyToMany,OneToMany,ManyToOne和OneToOne注解的属性集合
-                List<Field> allReferencedFieldList = BeanUtil.getFieldList(fieldClazz,
-                        new Class[]{ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class});
-                //4.3 遍历集合,将属性名称放入过滤器中
-                allReferencedFieldList.forEach(allReferencedField -> {
-                    objectFilter.getExcludes().add(allReferencedField.getName());
-                });
-                simplePropertyPreFilterList.add(objectFilter);
-            }
+            //4.2 得到该属性的对象类型的简单属性过滤器
+            simplePropertyPreFilterList.add(getSimpleJsonFilter(fieldClazz));
         });
         //5、合并多次调用的返回结果,将相同类的filter整合在一起
         Map<String,SimplePropertyPreFilter> filterMap= simplePropertyPreFilterList.stream().collect(Collectors.toMap(
