@@ -1,0 +1,1 @@
+INSERT INTO `t_user` VALUES ('1', 'admin', '+WILKZLZE0Qh/SkviDSvOw==');
