@@ -167,8 +167,11 @@ public class JsonUtil {
      * 深度为1的过滤器
      * 根据当前对象类型：
      * 1.将当前对象中带ManyToMany和OneToMany注解的属性获取,这些属性的对象类型为集合类型,
-     *   然后根据集合里的参数对象类型得到此对象类型深度为0的过滤器；
-     * 2.将当前对象中带ManyToOne和OneToOne注解的属性获取,并过滤掉该属性对象类型中所有带引用关系的属性.
+     *   然后根据集合里的参数对象类型得到此对象类型的简单属性过滤器；
+     * 2.将当前对象中带ManyToOne和OneToOne注解的属性获取,获取这些类型的深度为0属性过滤器
+     *
+     * remarks:如果遇到自关联属性、则忽略当前属性过滤器
+     *
      * @param clazz
      * @return
      */
@@ -185,19 +188,23 @@ public class JsonUtil {
             Type genericType = collectionField.getGenericType();
             //3.2 得到该集合里参数对象的类型
             Class fieldClazz = (Class)(((ParameterizedType) genericType).getActualTypeArguments()[0]);
-            if (fieldClazz!=clazz) {
-                //3.3 获取集合里参数对象类型的简单属性过滤器，放入simplePropertyPreFilterList中
-                simplePropertyPreFilterList.add(getSimpleJsonFilter(fieldClazz));
+            //3.3 如果遇到自关联属性、则忽略当前属性过滤器
+            if(fieldClazz==clazz){
+                continue;
             }
+            //3.4 获取集合里参数对象类型的简单属性过滤器，放入simplePropertyPreFilterList中
+            simplePropertyPreFilterList.add(getSimpleJsonFilter(fieldClazz));
         }
         //4.遍历所有带ManyToOne和OneToOne的注解的属性集合
         objectFieldList.forEach(objectField -> {
             //4.1 得到该属性的对象类型
-            Class objectFieldClazz = objectField.getType();
-            if (objectFieldClazz!=clazz) {
-                //4.2 添加简单属性过滤器`
-                CollectionUtils.addAll(simplePropertyPreFilterList,getZeroDeepJsonFilter(clazz));
+            Class fieldClazz = objectField.getType();
+            //4.2 如果遇到自关联属性、则忽略当前属性过滤器
+            if(fieldClazz==clazz){
+                return;
             }
+            //4.3 添加简单属性过滤器`
+            CollectionUtils.addAll(simplePropertyPreFilterList,getZeroDeepJsonFilter(clazz));
         });
         //5、合并多次调用的返回结果,将相同类的filter整合在一起
         Map<String,SimplePropertyPreFilter> filterMap= simplePropertyPreFilterList.stream().collect(Collectors.toMap(
@@ -231,7 +238,10 @@ public class JsonUtil {
      * 深度为0的过滤器,此过滤器的目的是只留下当前对象的简单属性以及带ManyToOne和OneToOne引用关系的属性
      * 根据当前对象类型：
      * 1、将当前对象类型中带ManyToMany和OneToMany注解的属性过滤；
-     * 2、将当前对象类型中带ManyToOne和OneToOne的属性的获取，并过滤掉该属性对象类型中所有带引用关系的属性.
+     * 2、将当前对象类型中带ManyToOne和OneToOne的属性的获取,获取这些类型的简单属性过滤器
+     *
+     * remarks:如果遇到自关联属性、则忽略当前属性过滤器
+     *
      * @param clazz
      * @return
      */
@@ -251,7 +261,11 @@ public class JsonUtil {
         objectFieldList.forEach(objectField -> {
             //4.1 得到该属性的对象类型
             Class fieldClazz = objectField.getType();
-            //4.2 得到该属性的对象类型的简单属性过滤器
+            //4.2 如果遇到自关联属性、则忽略当前属性过滤器
+            if(fieldClazz==clazz){
+                return;
+            }
+            //4.3 得到该属性的对象类型的简单属性过滤器
             simplePropertyPreFilterList.add(getSimpleJsonFilter(fieldClazz));
         });
         //5、合并多次调用的返回结果,将相同类的filter整合在一起
