@@ -16,28 +16,28 @@ public class DefaultRuntimeException extends BaseRuntimeException {
     //对应的是message的I18NData
     private I18NData i18NData;
 
-    DefaultRuntimeException() {
+    protected DefaultRuntimeException() {
     }
 
-    DefaultRuntimeException(String message) {
+    protected DefaultRuntimeException(String message) {
         this.msg = message;
     }
 
-    DefaultRuntimeException(I18NData i18NData) {
+    protected DefaultRuntimeException(I18NData i18NData) {
         this.i18NData = i18NData;
     }
 
-    DefaultRuntimeException(String code, String msg) {
+    protected DefaultRuntimeException(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    DefaultRuntimeException(String code, I18NData i18NData) {
+    protected DefaultRuntimeException(String code, I18NData i18NData) {
         this.code = code;
         this.i18NData = i18NData;
     }
 
-    DefaultRuntimeException(ErrorMessage errorMessage){
+    protected DefaultRuntimeException(ErrorMessage errorMessage){
         this(errorMessage.getCode(),errorMessage.getMsg());
     }
 

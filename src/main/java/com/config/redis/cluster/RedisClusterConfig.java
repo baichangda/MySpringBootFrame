@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
-@ConditionalOnClass(RedisClusterConfig.class)
 @EnableConfigurationProperties(RedisClusterProperties.class)
 public class RedisClusterConfig {
     private final int DEFAULT_TIMEOUT = 2000;
