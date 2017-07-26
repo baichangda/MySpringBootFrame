@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/1/9.
@@ -603,6 +604,77 @@ public class BeanUtil {
             return returnVal;
         }
 
+    }
+
+    /**
+     * 执行对象的方法
+     * @param obj
+     * @param methodName
+     * @param params
+     * @return
+     */
+    public static Object executeFunc(Object obj,String methodName,Object...params) throws Exception{
+        Class clazz=obj.getClass();
+        Method method=null;
+        List<Class> paramTypeList= Arrays.stream(params).map(param->param.getClass()).collect(Collectors.toList());
+        Class[] paramTypeArr= paramTypeList.toArray(new Class[paramTypeList.size()]);
+        try {
+            method=clazz.getMethod(methodName,paramTypeArr);
+        } catch (NoSuchMethodException e) {
+            try {
+                method=clazz.getDeclaredMethod(methodName,paramTypeArr);
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(method==null){
+            return null;
+        }
+        method.setAccessible(true);
+        try {
+            return method.invoke(obj,params);
+        } catch (IllegalAccessException e) {
+            throw e;
+        } catch (InvocationTargetException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * 执行对象的方法
+     * @param clazz
+     * @param methodName
+     * @param params
+     * @return
+     */
+    public static Object executeFunc(Class clazz,String methodName,Object...params){
+        Method method=null;
+        List<Class> paramTypeList= Arrays.stream(params).map(param->param.getClass()).collect(Collectors.toList());
+        Class[] paramTypeArr= paramTypeList.toArray(new Class[paramTypeList.size()]);
+        try {
+            method=clazz.getMethod(methodName,paramTypeArr);
+        } catch (NoSuchMethodException e) {
+            try {
+                method=clazz.getDeclaredMethod(methodName,paramTypeArr);
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(method==null){
+            return null;
+        }
+        method.setAccessible(true);
+        try {
+            Object obj=clazz.newInstance();
+            return method.invoke(obj,params);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
