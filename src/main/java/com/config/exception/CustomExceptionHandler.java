@@ -1,4 +1,4 @@
-package com.config.shiro;
+package com.config.exception;
 
 import com.alibaba.fastjson.JSONObject;
 import com.base.json.JsonMessage;
