@@ -1,5 +1,6 @@
 package com.base.message;
 
+import com.base.exception.BaseRuntimeException;
 import com.base.i18n.I18NData;
 import com.base.json.JsonMessage;
 
@@ -8,6 +9,7 @@ import com.base.json.JsonMessage;
  */
 public abstract class BaseErrorMessage {
     public abstract JsonMessage toJsonMessage();
+    public abstract BaseRuntimeException toBaseRuntimeException();
 
     public static BaseErrorMessage getMessage(String msg){
         return new DefaultErrorMessage(msg);

@@ -3,6 +3,7 @@ package com.base.service;
 import com.base.annotation.ReferCollection;
 import com.base.annotation.ReferredCollection;
 import com.base.condition.BaseCondition;
+import com.base.define.BaseErrorDefine;
 import com.base.util.BeanUtil;
 import com.base.util.ConditionUtil;
 import com.base.util.I18nUtil;
@@ -18,6 +19,7 @@ import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.util.*;
@@ -141,16 +143,17 @@ public class BaseService<T,K extends Serializable> {
     @Transactional
     public T saveIngoreNull(T t){
         T returnVal;
-        Object val= BeanUtil.getPKValByJPAAnnotation(t);
-        if(val==null){
-            returnVal=save(t);
-        }else{
-            T dbt=findOne((K)val);
-            if(dbt==null){
-                throw new RuntimeException("未找到对应Id的记录，无法进行更新!");
+        try {
+            Object val= BeanUtil.getPKValByJPAAnnotation(t);
+            if(val==null){
+                returnVal=save(t);
+            }else{
+                T dbt=findOne((K)val);
+                BeanUtil.autoInversionForBaseAttrForNull(dbt,t);
+                returnVal=save(t);
             }
-            BeanUtil.autoInversionForBaseAttrForNull(dbt,t);
-            returnVal=save(t);
+        } catch (Exception e) {
+            throw BaseErrorDefine.ERROR_EXECUTE_SAVEINGORENULL.toBaseRuntimeException();
         }
         return returnVal;
     }
