@@ -1,7 +1,6 @@
 package com.base.exception;
 
-import com.base.exception.BaseRuntimeException;
-import com.base.message.ErrorMessage;
+import com.base.message.DefaultErrorMessage;
 import com.base.i18n.I18NData;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
@@ -16,28 +15,28 @@ public class DefaultRuntimeException extends BaseRuntimeException {
     //对应的是message的I18NData
     private I18NData i18NData;
 
-    protected DefaultRuntimeException() {
+    public DefaultRuntimeException() {
     }
 
-    protected DefaultRuntimeException(String message) {
+    public DefaultRuntimeException(String message) {
         this.msg = message;
     }
 
-    protected DefaultRuntimeException(I18NData i18NData) {
+    public DefaultRuntimeException(I18NData i18NData) {
         this.i18NData = i18NData;
     }
 
-    protected DefaultRuntimeException(String code, String msg) {
+    public DefaultRuntimeException(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    protected DefaultRuntimeException(String code, I18NData i18NData) {
+    public DefaultRuntimeException(String code, I18NData i18NData) {
         this.code = code;
         this.i18NData = i18NData;
     }
 
-    protected DefaultRuntimeException(ErrorMessage errorMessage){
+    public DefaultRuntimeException(DefaultErrorMessage errorMessage){
         this(errorMessage.getCode(),errorMessage.getMsg());
     }
 

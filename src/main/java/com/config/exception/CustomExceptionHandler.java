@@ -3,21 +3,16 @@ package com.config.exception;
 import com.alibaba.fastjson.JSONObject;
 import com.base.exception.BaseRuntimeException;
 import com.base.json.JsonMessage;
-import com.base.message.ErrorMessage;
-import com.base.util.I18nUtil;
+import com.base.message.BaseErrorMessage;
+import com.base.message.DefaultErrorMessage;
 import com.config.shiro.ShiroConst;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.authz.UnauthenticatedException;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 
 @Configuration
 public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
@@ -36,7 +31,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
                 }else{
                     //2.2、非自定义异常处理
                     //2.2.1、先验证是否属于shiro的异常类型
-                    ErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(exception.getClass().getName());
+                    BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(exception.getClass().getName());
                     if(errorMessage!=null){
                         result=errorMessage.toJsonMessage();
                     }else{

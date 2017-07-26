@@ -29,12 +29,12 @@ public class JsonMessage<T> {
         this.error = error;
     }
 
-    public JsonMessage(boolean result, String message, String error, String code) {
+    public JsonMessage(boolean result, String message,String code, String error) {
         this(result, message, error);
         this.code = code;
     }
 
-    public JsonMessage(boolean result, String message, String error, String code, T data) {
+    public JsonMessage(boolean result, String message,String code, String error, T data) {
         this(result, message, error,code);
         this.data = data;
     }
@@ -67,7 +67,7 @@ public class JsonMessage<T> {
         return jsonMessage;
     }
 
-    public static <T> JsonMessage<T> failed(String message,String error,String code) {
+    public static <T> JsonMessage<T> failed(String message,String code,String error) {
         JsonMessage<T> jsonMessage = new JsonMessage<>(false, message,error,code);
         return jsonMessage;
     }

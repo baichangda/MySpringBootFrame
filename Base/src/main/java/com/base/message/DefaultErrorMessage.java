@@ -8,7 +8,7 @@ import org.springframework.util.StringUtils;
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class DefaultErrorMessage {
+public class DefaultErrorMessage extends BaseErrorMessage{
     private String code;
     private String msg;
     //对应的是message的I18NData
@@ -25,12 +25,12 @@ public class DefaultErrorMessage {
         this.i18NData = i18NData;
     }
 
-    public DefaultErrorMessage(String code, String msg) {
+    public DefaultErrorMessage(String msg,String code) {
         this.code = code;
         this.msg = msg;
     }
 
-    public DefaultErrorMessage(String code, I18NData i18NData) {
+    public DefaultErrorMessage(I18NData i18NData,String code) {
         this.code = code;
         this.i18NData = i18NData;
     }
@@ -58,6 +58,8 @@ public class DefaultErrorMessage {
     public void setMsg(String msg) {
         this.msg = msg;
     }
+
+    @Override
     public JsonMessage toJsonMessage() {
         //如果message为空且i18nData不为空,则使用i18nData
         if(StringUtils.isEmpty(msg)&& i18NData!=null){
