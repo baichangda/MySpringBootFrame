@@ -8,29 +8,29 @@ import org.springframework.util.StringUtils;
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class ErrorMessage{
+public class DefaultErrorMessage {
     private String code;
     private String msg;
     //对应的是message的I18NData
     private I18NData i18NData;
 
-    public ErrorMessage() {
+    public DefaultErrorMessage() {
     }
 
-    public ErrorMessage(String msg) {
+    public DefaultErrorMessage(String msg) {
         this.msg = msg;
     }
 
-    public ErrorMessage(I18NData i18NData) {
+    public DefaultErrorMessage(I18NData i18NData) {
         this.i18NData = i18NData;
     }
 
-    public ErrorMessage(String code, String msg) {
+    public DefaultErrorMessage(String code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
-    public ErrorMessage(String code, I18NData i18NData) {
+    public DefaultErrorMessage(String code, I18NData i18NData) {
         this.code = code;
         this.i18NData = i18NData;
     }
