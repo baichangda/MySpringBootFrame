@@ -2,6 +2,7 @@ package com.base.util;
 
 import org.apache.shiro.SecurityUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -31,7 +32,7 @@ public class DateUtil {
      * @param format
      * @return
      */
-    public static String dateToStringWithUserTimeZone(Date date,String format){
+    public static String dateToStringWithUserTimeZone(Date date,String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         //1、格式化日期
         return getUserTimeZoneSimpleDateFormat(format).format(date);
     }
@@ -42,12 +43,12 @@ public class DateUtil {
      * @param format
      * @return
      */
-    public static Date stringToDateWithUserTimeZone(String dateStr,String format) throws ParseException {
+    public static Date stringToDateWithUserTimeZone(String dateStr,String format) throws ParseException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         //1、格式化日期
         return getUserTimeZoneSimpleDateFormat(format).parse(dateStr);
     }
 
-    private static SimpleDateFormat getUserTimeZoneSimpleDateFormat(String format){
+    private static SimpleDateFormat getUserTimeZoneSimpleDateFormat(String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         //1、获取当前用户的时区
         Object user= SecurityUtils.getSubject().getSession().getAttribute("user");
         String timeZone=(String) BeanUtil.getFieldVal(user,"timeZone");
