@@ -1,5 +1,6 @@
 package com.config.convert;
 
+import com.base.exception.BaseRuntimeException;
 import com.base.util.DateUtil;
 import com.base.util.I18nUtil;
 import org.springframework.core.convert.converter.Converter;
@@ -29,7 +30,7 @@ public class DateConvert implements Converter<String,Date> {
                     throw new RuntimeException();
                 }
             } catch (Exception e1) {
-                throw new RuntimeException(I18nUtil.getMessage("DateConvert.convert.FAILED"));
+                throw BaseRuntimeException.getException(I18nUtil.getMessage("DateConvert.convert.FAILED"));
             }
         }
     }

@@ -7,6 +7,7 @@ import com.base.define.BaseErrorDefine;
 import com.base.exception.BaseRuntimeException;
 import com.base.util.BeanUtil;
 import com.base.util.ConditionUtil;
+import com.base.util.ExceptionUtil;
 import com.base.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -160,7 +161,7 @@ public class BaseService<T,K extends Serializable> {
                 returnVal=save(t);
             }
         } catch (Exception e) {
-            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEINGORENULL.toRuntimeException());
+            ExceptionUtil.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEINGORENULL.toRuntimeException());
         }
         return returnVal;
     }
@@ -253,7 +254,7 @@ public class BaseService<T,K extends Serializable> {
                 }
             }
         }catch (Exception e){
-            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEBATCH.toRuntimeException());
+            ExceptionUtil.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEBATCH.toRuntimeException());
         }
     }
 
@@ -472,7 +473,7 @@ public class BaseService<T,K extends Serializable> {
             //4、如果所有的验证均没有抛出异常、则说明没有重复绑定关系;则进行保存
             save(t);
         }catch(Exception e){
-            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEWITHNOREPEATREFER.toRuntimeException());
+            ExceptionUtil.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEWITHNOREPEATREFER.toRuntimeException());
         }
 
     }
@@ -539,7 +540,7 @@ public class BaseService<T,K extends Serializable> {
             //3、如果所有验证都没有抛出异常,则删除
             delete(t);
         }catch (Exception e){
-            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_DELETEWITHNOREFERRED.toRuntimeException());
+            ExceptionUtil.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_DELETEWITHNOREFERRED.toRuntimeException());
         }
     }
 
@@ -563,9 +564,8 @@ public class BaseService<T,K extends Serializable> {
     @Transactional
     public boolean isUnique(String fieldName,String val){
         boolean flag = true;
-        List<T> resultList = repository.findAll(new Specification<T>() {
-            @Override
-            public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+        List<T> resultList = repository.findAll((Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder)-> {
+            {
                 Predicate predicate = criteriaBuilder.conjunction();
                 List<Expression<Boolean>> expressions = predicate.getExpressions();
                 expressions.add(criteriaBuilder.equal(root.get(fieldName),val));
