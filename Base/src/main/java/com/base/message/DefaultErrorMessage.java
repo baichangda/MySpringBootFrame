@@ -1,6 +1,7 @@
 package com.base.message;
 
 import com.base.exception.BaseRuntimeException;
+import com.base.exception.DefaultRuntimeException;
 import com.base.i18n.I18NData;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
@@ -71,6 +72,6 @@ public class DefaultErrorMessage extends BaseErrorMessage{
 
     @Override
     public BaseRuntimeException toRuntimeException() {
-        return BaseRuntimeException.getException(this);
+        return new DefaultRuntimeException(this);
     }
 }

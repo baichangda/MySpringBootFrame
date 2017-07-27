@@ -2,6 +2,7 @@ package com.base.exception;
 
 import com.base.i18n.I18NData;
 import com.base.json.JsonMessage;
+import com.base.message.BaseErrorMessage;
 import com.base.message.DefaultErrorMessage;
 
 /**
@@ -23,8 +24,8 @@ public abstract class BaseRuntimeException extends RuntimeException{
     public static BaseRuntimeException getException(I18NData i18NData,String code){
         return new DefaultRuntimeException(code,i18NData);
     }
-    public static BaseRuntimeException getException(DefaultErrorMessage errorMessage){
-        return new DefaultRuntimeException(errorMessage);
+    public static BaseRuntimeException getException(BaseErrorMessage errorMessage){
+        return errorMessage.toRuntimeException();
     }
 
 }
