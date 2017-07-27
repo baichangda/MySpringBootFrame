@@ -522,7 +522,7 @@ public class BaseService<T,K extends Serializable> {
                     String msgKey = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
                     msgVal=I18nUtil.getMessage(msgKey);
                 }else{
-                    msgVal = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
+                    msgVal = ((ReferredCollection) annotation).deleteHasRelationMessageValue();
                 }
                 //2.4、如果是属于集合类、则验证集合类元素是否为空
                 if (Collection.class.isAssignableFrom(objVal.getClass())) {
