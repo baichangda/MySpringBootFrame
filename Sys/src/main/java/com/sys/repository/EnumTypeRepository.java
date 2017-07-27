@@ -1,4 +1,4 @@
-package com.base.em.repository;
+package com.sys.repository;
 
 import com.base.repository.BaseRepository;
 import com.base.em.bean.EnumTypeBean;

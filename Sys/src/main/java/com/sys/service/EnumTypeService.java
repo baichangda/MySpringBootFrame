@@ -1,12 +1,12 @@
-package com.base.em.service;
+package com.sys.service;
 
 import com.base.service.BaseService;
-import com.base.em.bean.EnumItemBean;
+import com.base.em.bean.EnumTypeBean;
 import org.springframework.stereotype.Service;
 
 /**
  * Created by Administrator on 2017/5/18.
  */
 @Service
-public class EnumItemService extends BaseService<EnumItemBean,Long> {
+public class EnumTypeService extends BaseService<EnumTypeBean,Long> {
 }

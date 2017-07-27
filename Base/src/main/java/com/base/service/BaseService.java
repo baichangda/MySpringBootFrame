@@ -33,10 +33,6 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class BaseService<T,K extends Serializable> {
-
-    @Value("${base.i18n.active}")
-    public boolean isI18NActive;
-
     @PersistenceContext
     public EntityManager em;
 
@@ -393,13 +389,8 @@ public class BaseService<T,K extends Serializable> {
                     return;
                 }
 
-                String msgValue;
-                if(isI18NActive){
-                    String msgKey = ((ReferCollection) ccAnnotation).saveHasRepeatMessageKey();
-                    msgValue=I18nUtil.getMessage(msgKey);
-                }else{
-                    msgValue=((ReferCollection) ccAnnotation).saveHasRepeatMessageValue();
-                }
+                String msgKey = ((ReferCollection) ccAnnotation).saveHasRepeatMessageKey();
+                String msgValue=I18nUtil.getMessage(msgKey);
 
                 //3.2、获取字段的JoinTable注解
                 Annotation annotation = field.getAnnotation(JoinTable.class);
@@ -518,13 +509,8 @@ public class BaseService<T,K extends Serializable> {
                 }
 
                 //2.3、获取对应注解的异常信息
-                String msgVal;
-                if(isI18NActive){
-                    String msgKey = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
-                    msgVal=I18nUtil.getMessage(msgKey);
-                }else{
-                    msgVal = ((ReferredCollection) annotation).deleteHasRelationMessageValue();
-                }
+                String msgKey = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
+                String msgVal=I18nUtil.getMessage(msgKey);
                 //2.4、如果是属于集合类、则验证集合类元素是否为空
                 if (Collection.class.isAssignableFrom(objVal.getClass())) {
                     if (((Collection) objVal).size() > 0) {
