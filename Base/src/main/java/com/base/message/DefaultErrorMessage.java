@@ -70,7 +70,7 @@ public class DefaultErrorMessage extends BaseErrorMessage{
     }
 
     @Override
-    public BaseRuntimeException toBaseRuntimeException() {
+    public BaseRuntimeException toRuntimeException() {
         return BaseRuntimeException.getException(this);
     }
 }

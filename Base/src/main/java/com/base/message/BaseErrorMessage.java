@@ -9,7 +9,7 @@ import com.base.json.JsonMessage;
  */
 public abstract class BaseErrorMessage {
     public abstract JsonMessage toJsonMessage();
-    public abstract BaseRuntimeException toBaseRuntimeException();
+    public abstract BaseRuntimeException toRuntimeException();
 
     public static BaseErrorMessage getMessage(String msg){
         return new DefaultErrorMessage(msg);
