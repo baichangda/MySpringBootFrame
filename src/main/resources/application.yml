@@ -63,20 +63,20 @@ spring:
 #          maxTotal: 8
 
 #  redis集群配置
-   redis:
-      distributed:
-          nodes[0]:
-              host: 10.10.35.99
-              port: 6379
-              connectionTimeout:
-          nodes[1]:
-              host: 10.10.35.100
-              port: 6379
-              connectionTimeout:
-          maxAttempts: -1
-          maxIdle: 8
-          minIdle: 0
-          maxTotal: 8
+#   redis:
+#      distributed:
+#          nodes[0]:
+#              host: 10.10.35.99
+#              port: 6379
+#              connectionTimeout:
+#          nodes[1]:
+#              host: 10.10.35.100
+#              port: 6379
+#              connectionTimeout:
+#          maxAttempts: -1
+#          maxIdle: 8
+#          minIdle: 0
+#          maxTotal: 8
 
 #   rabbitmq配置
 #   rabbitmq:
@@ -93,7 +93,3 @@ spring:
 #      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 #      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
-
-base:
-    i18n.active: true #默认为false

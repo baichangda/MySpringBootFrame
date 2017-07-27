@@ -33,7 +33,6 @@ public class DefaultSuccessMessage extends BaseSuccessMessage{
         this.i18NData = i18NData;
     }
 
-
     @Override
     public JsonMessage toJsonMessage() {
         return null;

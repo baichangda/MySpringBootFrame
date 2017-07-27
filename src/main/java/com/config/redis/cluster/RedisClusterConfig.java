@@ -12,8 +12,8 @@ import redis.clients.jedis.JedisCluster;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Configuration
-@EnableConfigurationProperties(RedisClusterProperties.class)
+//@Configuration
+//@EnableConfigurationProperties(RedisClusterProperties.class)
 public class RedisClusterConfig {
     private final int DEFAULT_TIMEOUT = 2000;
     private final int DEFAULT_MAX_REDIRECTIONS = 5;

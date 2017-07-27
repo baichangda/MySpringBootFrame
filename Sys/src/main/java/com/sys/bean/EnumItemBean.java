@@ -3,7 +3,10 @@ package com.sys.bean;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.base.bean.SuperBaseBean;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Created by Administrator on 2017/5/18.

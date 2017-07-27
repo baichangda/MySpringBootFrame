@@ -1,7 +1,7 @@
 package com.sys.repository;
 
 import com.base.repository.BaseRepository;
-import com.base.em.bean.EnumTypeBean;
+import com.sys.bean.EnumTypeBean;
 import org.springframework.stereotype.Repository;
 
 /**

@@ -4,7 +4,6 @@ package com.sys.bean;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.base.annotation.ReferredCollection;
 import com.base.bean.BaseBean;
-import com.base.em.bean.EnumItemBean;
 
 import javax.persistence.*;
 import java.util.ArrayList;

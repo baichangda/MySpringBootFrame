@@ -9,6 +9,5 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReferCollection {
-    String saveHasRepeatMessageKey() default "BaseBO.saveWithNoRepeatRefer.FAILED";
-    String saveHasRepeatMessageValue() default "不能重复绑定!";
+    String saveHasRepeatMessageKey() default "BaseService.saveWithNoRepeatRefer.noRepeatBind";
 }

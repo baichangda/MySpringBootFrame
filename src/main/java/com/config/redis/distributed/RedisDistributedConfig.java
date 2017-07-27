@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 /**
  * Created by Administrator on 2017/7/22.
  */
-@Configuration
-@EnableConfigurationProperties(RedisDistributedProperties.class)
+//@Configuration
+//@EnableConfigurationProperties(RedisDistributedProperties.class)
 public class RedisDistributedConfig {
     @Autowired
     private RedisDistributedProperties redisDistributedProperties;

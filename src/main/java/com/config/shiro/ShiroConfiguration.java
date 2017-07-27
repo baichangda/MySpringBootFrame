@@ -144,7 +144,7 @@ public class ShiroConfiguration {
         //authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问
         filterChainMap.put("/api/security/getPublicKey", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
-        filterChainMap.put("/api/**","authc");
+//        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 

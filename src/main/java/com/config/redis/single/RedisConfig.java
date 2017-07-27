@@ -9,8 +9,8 @@ import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-@EnableAutoConfiguration
+//@Configuration
+//@EnableAutoConfiguration
 public class RedisConfig {
     /**
      * 注入 RedisConnectionFactory

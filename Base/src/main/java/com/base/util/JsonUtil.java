@@ -37,11 +37,6 @@ public class JsonUtil {
         return JSONObject.toJSONString(obj, SerializeConfig.globalInstance, filters, SerializerFeature.DisableCircularReferenceDetect);
     }
 
-
-    public static String toDefaultJSONString(Object obj) {
-        return toDefaultJSONString(obj);
-    }
-
     /**
      * 解析过滤字符串数组成json过滤器
      * 依次循环过滤字符串数组，找当前 clazz 参数对应的字段，最后形成找到结果的过滤器
