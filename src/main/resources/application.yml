@@ -93,3 +93,7 @@ spring:
 #      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 #      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+
+base:
+    i18n.active: true #默认为false

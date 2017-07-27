@@ -5,7 +5,7 @@ import com.base.message.BaseErrorMessage;
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class BaseErrorDefine {
+public final class BaseErrorDefine {
     //BaseService
     public final static BaseErrorMessage ERROR_EXECUTE_SAVEINGORENULL=BaseErrorMessage.getMessage("执行非空保存方法失败","601");
     public final static BaseErrorMessage ERROR_EXECUTE_SAVEBATCH=BaseErrorMessage.getMessage("执行批量方法失败","602");

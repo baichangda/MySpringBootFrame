@@ -12,4 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReferredCollection {
     String deleteHasRelationMessageKey() default "BaseBO.deleteWithNoReferred.FAILED";
+    String deleteHasRelationMessageValue() default "删除失败,已被引用!";
 }

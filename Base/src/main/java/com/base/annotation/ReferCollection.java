@@ -10,4 +10,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ReferCollection {
     String saveHasRepeatMessageKey() default "BaseBO.saveWithNoRepeatRefer.FAILED";
+    String saveHasRepeatMessageValue() default "不能重复绑定!";
 }

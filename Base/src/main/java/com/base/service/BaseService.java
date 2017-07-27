@@ -4,10 +4,12 @@ import com.base.annotation.ReferCollection;
 import com.base.annotation.ReferredCollection;
 import com.base.condition.BaseCondition;
 import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 import com.base.util.BeanUtil;
 import com.base.util.ConditionUtil;
 import com.base.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +32,10 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class BaseService<T,K extends Serializable> {
+
+    @Value("${base.i18n.active}")
+    public boolean isI18NActive;
+
     @PersistenceContext
     public EntityManager em;
 
@@ -143,7 +149,7 @@ public class BaseService<T,K extends Serializable> {
      */
     @Transactional
     public T saveIngoreNull(T t){
-        T returnVal;
+        T returnVal=null;
         try {
             Object val= BeanUtil.getPKValByJPAAnnotation(t);
             if(val==null){
@@ -154,7 +160,7 @@ public class BaseService<T,K extends Serializable> {
                 returnVal=save(t);
             }
         } catch (Exception e) {
-            throw BaseErrorDefine.ERROR_EXECUTE_SAVEINGORENULL.toRuntimeException();
+            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEINGORENULL.toRuntimeException());
         }
         return returnVal;
     }
@@ -247,7 +253,7 @@ public class BaseService<T,K extends Serializable> {
                 }
             }
         }catch (Exception e){
-            throw BaseErrorDefine.ERROR_EXECUTE_SAVEBATCH.toRuntimeException();
+            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEBATCH.toRuntimeException());
         }
     }
 
@@ -377,7 +383,7 @@ public class BaseService<T,K extends Serializable> {
             List<Field> fieldList = BeanUtil.getFieldList(clazz, ManyToMany.class);
             //3、遍历字段集合
             for(Field field:fieldList){
-                //3.1、获取父关系的注解msg key值
+                //3.1、获取对应注解的异常信息
                 Annotation ccAnnotation = field.getAnnotation(ReferCollection.class);
                 if (ccAnnotation == null) {
                     ccAnnotation = field.getDeclaredAnnotation(ReferCollection.class);
@@ -385,7 +391,14 @@ public class BaseService<T,K extends Serializable> {
                 if (ccAnnotation == null) {
                     return;
                 }
-                String msgKey = ((ReferCollection) ccAnnotation).saveHasRepeatMessageKey();
+
+                String msgValue;
+                if(isI18NActive){
+                    String msgKey = ((ReferCollection) ccAnnotation).saveHasRepeatMessageKey();
+                    msgValue=I18nUtil.getMessage(msgKey);
+                }else{
+                    msgValue=((ReferCollection) ccAnnotation).saveHasRepeatMessageValue();
+                }
 
                 //3.2、获取字段的JoinTable注解
                 Annotation annotation = field.getAnnotation(JoinTable.class);
@@ -437,19 +450,19 @@ public class BaseService<T,K extends Serializable> {
                     //3.7.3、如果当前操作是新增
                     if (id == null) {
                         if (query.getMaxResults() > 0) {
-                            throw new RuntimeException(I18nUtil.getMessage(msgKey));
+                            throw BaseRuntimeException.getException(msgValue);
                         }
                     } else {
                         //3.7.4、如果是编辑
                         List result = query.getResultList();
                         //3.7.5、如果关联关系结果大于1条、则说明数据库绑定记录存在错误
                         if (result.size() > 1) {
-                            throw new RuntimeException(I18nUtil.getMessage(msgKey));
+                            throw BaseRuntimeException.getException(msgValue);
                         } else if (result.size() == 1) {
                             //3.7.6、如果是1条、则验证绑定关系另一端是不是当前对象
                             Object dbId = ((BigInteger) result.get(0)).longValue();
                             if (dbId != id) {
-                                throw new RuntimeException(I18nUtil.getMessage(msgKey));
+                                throw BaseRuntimeException.getException(msgValue);
                             }
                         }
                     }
@@ -459,7 +472,7 @@ public class BaseService<T,K extends Serializable> {
             //4、如果所有的验证均没有抛出异常、则说明没有重复绑定关系;则进行保存
             save(t);
         }catch(Exception e){
-            throw BaseErrorDefine.ERROR_EXECUTE_SAVEWITHNOREPEATREFER.toRuntimeException();
+            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_SAVEWITHNOREPEATREFER.toRuntimeException());
         }
 
     }
@@ -503,16 +516,22 @@ public class BaseService<T,K extends Serializable> {
                     return;
                 }
 
-                //2.3、获取父关系的注解msg key值
-                String msgKey = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
+                //2.3、获取对应注解的异常信息
+                String msgVal;
+                if(isI18NActive){
+                    String msgKey = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
+                    msgVal=I18nUtil.getMessage(msgKey);
+                }else{
+                    msgVal = ((ReferredCollection) annotation).deleteHasRelationMessageKey();
+                }
                 //2.4、如果是属于集合类、则验证集合类元素是否为空
                 if (Collection.class.isAssignableFrom(objVal.getClass())) {
                     if (((Collection) objVal).size() > 0) {
-                        throw new RuntimeException(I18nUtil.getMessage(msgKey));
+                        throw BaseRuntimeException.getException(msgVal);
                     }
                 } else {
                     //2.5、如果不为空也不为集合类,则说明存在对象引用关联,直接抛出异常
-                    throw new RuntimeException(I18nUtil.getMessage(msgKey));
+                    throw BaseRuntimeException.getException(msgVal);
                 }
 
             }
@@ -520,7 +539,7 @@ public class BaseService<T,K extends Serializable> {
             //3、如果所有验证都没有抛出异常,则删除
             delete(t);
         }catch (Exception e){
-            throw BaseErrorDefine.ERROR_EXECUTE_DELETEWITHNOREFERRED.toRuntimeException();
+            BaseRuntimeException.catchNonBaseRuntimeException(e,BaseErrorDefine.ERROR_EXECUTE_DELETEWITHNOREFERRED.toRuntimeException());
         }
     }
 
