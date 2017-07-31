@@ -1,0 +1,11 @@
+
+import com.base.service.BaseService;
+import org.springframework.stereotype.Service;
+
+/**
+ *
+ */
+@Service
+public class ${moduleName}Service extends BaseService<${moduleName}Bean,Long> {
+
+}

@@ -1,0 +1,21 @@
+
+import com.base.bean.BaseBean;
+import java.lang.String;
+import java.lang.Long;
+import java.lang.Integer;
+import java.util.Date;
+
+
+import javax.persistence.*;
+
+/**
+ *  ${moduleDesc}
+ */
+@Entity
+@Table(name = "${tableName}")
+public class ${moduleName}Bean extends ${superBean} {
+    //field
+    ${field}
+    //method
+    ${method}
+}

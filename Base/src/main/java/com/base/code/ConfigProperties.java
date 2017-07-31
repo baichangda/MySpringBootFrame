@@ -1,37 +1,16 @@
 package com.base.code;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Administrator on 2017/7/28.
  */
 public class ConfigProperties {
-    private String tableName;
-    private String moduleName;
-    private String moduleDesc;
     private String dirPath;
     private boolean needCreateInfo=true;
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
-
-    public String getModuleDesc() {
-        return moduleDesc;
-    }
-
-    public void setModuleDesc(String moduleDesc) {
-        this.moduleDesc = moduleDesc;
-    }
+    private Map<String,String> valueMap=new HashMap<>();
+    private Map<String,Object> dataMap=new HashMap<>();
 
     public String getDirPath() {
         return dirPath;
@@ -47,5 +26,21 @@ public class ConfigProperties {
 
     public void setNeedCreateInfo(boolean needCreateInfo) {
         this.needCreateInfo = needCreateInfo;
+    }
+
+    public Map<String, String> getValueMap() {
+        return valueMap;
+    }
+
+    public void setValueMap(Map<String, String> valueMap) {
+        this.valueMap = valueMap;
+    }
+
+    public Map<String, Object> getDataMap() {
+        return dataMap;
+    }
+
+    public void setDataMap(Map<String, Object> dataMap) {
+        this.dataMap = dataMap;
     }
 }
