@@ -9,13 +9,13 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- *  ${moduleDesc}
+ *  @{moduleDesc}
  */
 @Entity
-@Table(name = "${tableName}")
-public class ${moduleName}Bean extends ${superBean} {
+@Table(name = "@{tableName}")
+public class @{upperModuleName}Bean extends @{superBean} {
     //field
-    ${field}
+    @{beanFields}
     //method
-    ${method}
+    @{beanMethods}
 }

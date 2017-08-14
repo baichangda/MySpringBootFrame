@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface ${moduleName}Repository extends BaseRepository<${moduleName}Bean, Long> {
+public interface @{upperModuleName}Repository extends BaseRepository<@{upperModuleName}Bean, Long> {
 
 }

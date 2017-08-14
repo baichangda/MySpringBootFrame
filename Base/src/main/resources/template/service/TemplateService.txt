@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class ${moduleName}Service extends BaseService<${moduleName}Bean,Long> {
+public class @{upperModuleName}Service extends BaseService<@{upperModuleName}Bean,Long> {
 
 }

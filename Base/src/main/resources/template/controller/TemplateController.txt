@@ -1,0 +1,111 @@
+package template.controller;
+
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.base.condition.*;
+import com.base.controller.BaseController;
+import com.base.json.JsonMessage;
+import com.base.util.I18nUtil;
+import com.base.util.JsonUtil;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+
+@SuppressWarnings(value = "unchecked")
+@RestController
+@RequestMapping("/api/@{lowerModuleName}")
+public class @{upperModuleName}Controller extends BaseController {
+
+    @Autowired
+    private @{upperModuleName}Service @{lowerModuleName}Service;
+
+
+
+    /**
+     * 查询@{moduleNameCN}列表
+     * @param username
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @ApiOperation(value="查询@{moduleNameCN}列表",notes = "查询@{moduleNameCN}列表")
+    @ApiImplicitParams({
+            @{controllerListSwaggerParams}
+            @ApiImplicitParam(name = "pageNum",value = "当前页数(分页参数)",dataType = "int",paramType = "query"),
+            @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
+    })
+    @ApiResponses(value={@ApiResponse(code=200,message = "查询@{moduleNameCN}列表")})
+    public JsonMessage<String> list(
+            @{controllerListParams}
+            @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
+            @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize
+            ){
+        SimplePropertyPreFilter [] filters=JsonUtil.getOneDeepJsonFilter(@{upperModuleName}Bean.class);
+        BaseCondition condition= BaseCondition.and(
+                @{controllerListConditions}
+        );
+        if(pageNum==null||pageSize==null){
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(@{lowerModuleName}Service.findAll(condition),filters));
+        }else{
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(@{lowerModuleName}Service.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+        }
+
+    }
+
+    /**
+     * 保存@{moduleNameCN}
+     * @param @{lowerModuleName}
+     * @return
+     */
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @ApiOperation(value = "保存@{moduleNameCN}",notes = "保存@{moduleNameCN}")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "@{lowerModuleName}",value = "@{moduleNameCN}实体",dataType = "@{upperModuleName}Bean",paramType = "body"),
+    })
+    @ApiResponses(value = {@ApiResponse(code = 200,message = "保存@{moduleNameCN}")})
+    public JsonMessage<String> save(@RequestBody @{upperModuleName}Bean @{lowerModuleName}){
+        @{lowerModuleName}Service.save(@{lowerModuleName})
+        return JsonMessage.successed(I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+    }
+
+
+    /**
+     * 删除@{moduleNameCN}
+     * @param @{lowerModuleName}IdArr
+     * @return
+     */
+    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除@{moduleNameCN}",notes = "删除@{moduleNameCN}")
+    @ApiImplicitParam(name = "@{lowerModuleName}IdArr",value = "@{moduleNameCN}id数组",paramType = "query")
+    @ApiResponses(value = {@ApiResponse(code = 200,message = "删除@{moduleNameCN}")})
+    public JsonMessage<String> delete(@RequestParam Long[] @{lowerModuleName}IdArr){
+        @{lowerModuleName}Service.delete(@{lowerModuleName}IdArr);
+        return JsonMessage.successed(I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+    }
+
+    /**
+     * 字段唯一性验证
+     * @param fieldName
+     * @param val
+     * @return
+     */
+    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
+    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
+    })
+    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
+    public JsonMessage<Object> isUniqueCheck(
+            @RequestParam(value = "fieldName",required = true) String fieldName,
+            @RequestParam(value = "fieldValue",required = true) String val){
+        boolean flag = @{lowerModuleName}Service.isUnique(fieldName, val);
+        if (flag==false){
+            return JsonMessage.failed(I18nUtil.getMessage("IsAvailable_FALSE"));
+        }else {
+            return JsonMessage.successed();
+        }
+    }
+
+}
