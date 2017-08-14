@@ -1,7 +1,8 @@
-package template.controller;
+package @{package}.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.condition.*;
+import com.base.condition.BaseCondition;
+import com.base.condition.impl.*;
 import com.base.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
@@ -10,6 +11,9 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import java.util.Date;
+import @{package}.bean.*;
+import @{package}.service.*;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -23,27 +27,24 @@ public class @{upperModuleName}Controller extends BaseController {
 
     /**
      * 查询@{moduleNameCN}列表
-     * @param username
-     * @param pageNum
-     * @param pageSize
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询@{moduleNameCN}列表",notes = "查询@{moduleNameCN}列表")
     @ApiImplicitParams({
-            @{controllerListSwaggerParams}
+@{controllerListSwaggerParams}
             @ApiImplicitParam(name = "pageNum",value = "当前页数(分页参数)",dataType = "int",paramType = "query"),
             @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "查询@{moduleNameCN}列表")})
     public JsonMessage<String> list(
-            @{controllerListParams}
+@{controllerListParams}
             @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
             @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize
             ){
         SimplePropertyPreFilter [] filters=JsonUtil.getOneDeepJsonFilter(@{upperModuleName}Bean.class);
         BaseCondition condition= BaseCondition.and(
-                @{controllerListConditions}
+@{controllerListConditions}
         );
         if(pageNum==null||pageSize==null){
             return JsonMessage.successed(JsonUtil.toDefaultJSONString(@{lowerModuleName}Service.findAll(condition),filters));
@@ -65,7 +66,7 @@ public class @{upperModuleName}Controller extends BaseController {
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存@{moduleNameCN}")})
     public JsonMessage<String> save(@RequestBody @{upperModuleName}Bean @{lowerModuleName}){
-        @{lowerModuleName}Service.save(@{lowerModuleName})
+        @{lowerModuleName}Service.save(@{lowerModuleName});
         return JsonMessage.successed(I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
     }
 

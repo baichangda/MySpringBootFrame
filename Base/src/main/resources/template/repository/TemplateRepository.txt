@@ -1,7 +1,8 @@
-
+package @{package}.repository;
 
 import com.base.repository.BaseRepository;
 import org.springframework.stereotype.Repository;
+import @{package}.bean.*;
 
 
 @Repository

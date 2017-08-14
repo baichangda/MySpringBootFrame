@@ -7,13 +7,6 @@ import java.util.Map;
  * Created by Administrator on 2017/7/31.
  */
 public class DBColumn {
-    private final static Map<String,String> TYPE_MAPPING=new HashMap<>();
-    static{
-        TYPE_MAPPING.put("bigint","Long");
-        TYPE_MAPPING.put("varchar","String");
-        TYPE_MAPPING.put("int","Integer");
-        TYPE_MAPPING.put("timestamp","Date");
-    }
     private String name;
     private String type;
     private String comment;
@@ -52,7 +45,7 @@ public class DBColumn {
                     jName.substring(curIndex+2);
         }
         javaColumn.setName(jName);
-        javaColumn.setType(TYPE_MAPPING.get(type));
+        javaColumn.setType(CodeConst.TYPE_MAPPING.get(type));
         javaColumn.setComment(comment);
         return javaColumn;
     }

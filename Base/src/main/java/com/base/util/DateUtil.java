@@ -124,7 +124,7 @@ public class DateUtil {
      * 将开始时间、结束时间 根据日期单位划分成 时间段
      * @param startDate
      * @param endDate
-     * @param calendarUnit Calendar.MONTH,Calendar.WEEK_OF_YEAR,Calendar.DATE
+     * @param calendarUnit Calendar.MONTH,Calendar.DATE
      * @param dateNum 当 Calendar.DATE 时候指定天数
      * @return
      */

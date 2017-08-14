@@ -1,9 +1,11 @@
+package @{package}.bean;
 
-import com.base.bean.BaseBean;
+import com.base.bean.@{superBean};
 import java.lang.String;
 import java.lang.Long;
 import java.lang.Integer;
 import java.util.Date;
+
 
 
 import javax.persistence.*;
@@ -15,7 +17,7 @@ import javax.persistence.*;
 @Table(name = "@{tableName}")
 public class @{upperModuleName}Bean extends @{superBean} {
     //field
-    @{beanFields}
+@{beanFields}
     //method
-    @{beanMethods}
+@{beanMethods}
 }

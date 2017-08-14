@@ -1,6 +1,8 @@
+package @{package}.service;
 
 import com.base.service.BaseService;
 import org.springframework.stereotype.Service;
+import @{package}.bean.*;
 
 /**
  *
