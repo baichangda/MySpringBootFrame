@@ -65,7 +65,7 @@ public class CodeGenerator {
                         }
                         pw.flush();
                     }
-                    System.err.println(newPathObj.getFileName() + " generate successed!");
+                    System.err.println(newPathObj.toString() + " generate successed!");
                     return FileVisitResult.CONTINUE;
                 }
 
