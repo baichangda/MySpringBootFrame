@@ -1,6 +1,9 @@
 package com.base.code;
 
 
+import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -15,11 +18,47 @@ public class CodeGenerator {
     private static Connection conn;
 
 
-    private static String url="jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false";
-    private static String username="root";
-    private static String password="root";
+    private static String url;
+    private static String username;
+    private static String password;
 
-    private final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir")+"/Base/src/main/resources/template";
+    private final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/Base/src/main/resources/template";
+    private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
+
+
+    static {
+        initProperties();
+    }
+
+    /**
+     * 初始化spring配置文件
+     */
+    private static void initProperties(){
+        try {
+            Yaml yaml = new Yaml();
+            //1、加载spring配置
+            LinkedHashMap dataMap = (LinkedHashMap) yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
+            LinkedHashMap springMap = (LinkedHashMap) dataMap.get("spring");
+            LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
+            //1.1、取出配置文件后缀
+            String suffix = springMap.get("profiles.active").toString();
+            if (!StringUtils.isEmpty(suffix)) {
+                //1.2、如果有激活的配置文件,则加载
+                Path activePath = Paths.get(SPRING_PROPERTIES_PATH + "-" + suffix);
+                if (Files.exists(activePath)) {
+                    dataMap = (LinkedHashMap) yaml.load(new FileInputStream(activePath.toFile()));
+                    springMap = (LinkedHashMap) dataMap.get("spring");
+                    dataSourceMap = (LinkedHashMap) springMap.get("datasource");
+                }
+            }
+            //2、取出值
+            url = dataSourceMap.get("url").toString();
+            username = dataSourceMap.get("username").toString();
+            password = dataSourceMap.get("password").toString();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 
     public static void generate(List<ConfigProperties> configList) {
         configList.forEach(config -> generate(config));
@@ -27,9 +66,10 @@ public class CodeGenerator {
 
     /**
      * 需要如下参数
+     *
      * @param config
      */
-    private  static void generate(ConfigProperties config) {
+    private static void generate(ConfigProperties config) {
         initConfig(config);
         String dirPath = config.getDirPath();
         Map<String, String> valueMap = config.getValueMap();
@@ -49,7 +89,7 @@ public class CodeGenerator {
                     newPath.append(dirPath.toString());
                     newPath.append(File.separator);
                     newPath.append(sub.toString());
-                    String newPathStr=newPath.toString().replace(".txt",".java").replace("Template",config.getModuleName());
+                    String newPathStr = newPath.toString().replace(".txt", ".java").replace("Template", config.getModuleName());
                     Path newPathObj = Paths.get(newPathStr);
                     Files.deleteIfExists(newPathObj);
                     createPath(newPathObj, 1);
@@ -105,12 +145,12 @@ public class CodeGenerator {
         }
         try {
             if (flag == 1) {
-                createPath(pathObj.getParent(),2);
+                createPath(pathObj.getParent(), 2);
                 Files.createFile(pathObj);
             } else {
-                Path parentPathObj=pathObj.getParent();
-                if(!Files.exists(parentPathObj)){
-                    createPath(parentPathObj,2);
+                Path parentPathObj = pathObj.getParent();
+                if (!Files.exists(parentPathObj)) {
+                    createPath(parentPathObj, 2);
                 }
                 Files.createDirectories(pathObj);
             }
@@ -122,6 +162,7 @@ public class CodeGenerator {
 
     /**
      * 初始化配置
+     *
      * @param config
      */
     private static void initConfig(ConfigProperties config) {
@@ -139,54 +180,57 @@ public class CodeGenerator {
      * 2、初始化模块名中文
      * 3、初始化模块名大小写
      * 4、初始化Bean的父类
+     *
      * @param config
      */
-    private static void initBefore(ConfigProperties config){
+    private static void initBefore(ConfigProperties config) {
         //1、获取java字段并且存储
         String tableName = config.getTableName();
         List<DBColumn> dbColumnList = findColumns(tableName);
         List<JavaColumn> javaColumnList = dbColumnList.stream().map(dbColumn -> dbColumn.toJavaColumn()).collect(Collectors.toList());
         config.getDataMap().put("fieldList", javaColumnList);
         //2、初始化模块名中文
-        config.getValueMap().put("moduleNameCN",config.getModuleNameCN());
+        config.getValueMap().put("moduleNameCN", config.getModuleNameCN());
         //3、初始化模块名大小写
         initModuleName(config);
         //4、初始化bean父类 ; 忽视的属性set
-        Set<String> ignoreColumnSet=new HashSet<>();
+        Set<String> ignoreColumnSet = new HashSet<>();
         ignoreColumnSet.add("id");
-        if(config.isNeedCreateInfo()){
-            config.getValueMap().put("superBean","BaseBean");
+        if (config.isNeedCreateInfo()) {
+            config.getValueMap().put("superBean", "BaseBean");
             ignoreColumnSet.add("createTime");
             ignoreColumnSet.add("updateTime");
             ignoreColumnSet.add("createUserId");
             ignoreColumnSet.add("updateUserId");
-        }else{
-            config.getValueMap().put("superBean","SuperBaseBean");
+        } else {
+            config.getValueMap().put("superBean", "SuperBaseBean");
         }
-        config.getDataMap().put("ignoreColumnSet",ignoreColumnSet);
+        config.getDataMap().put("ignoreColumnSet", ignoreColumnSet);
         //5、解析形成包名
         initPackage(config);
     }
 
-    private static void initPackage(ConfigProperties config){
-        String springSrcPath="src/main/java/";
-        String formatDirPath=config.getDirPath().replaceAll("\\\\","/");
-        if(formatDirPath.contains(springSrcPath)){
-            String pgk=formatDirPath.split(springSrcPath)[1].replaceAll("/",".");
-            config.getValueMap().put("package",pgk);
+    private static void initPackage(ConfigProperties config) {
+        String springSrcPath = "src/main/java/";
+        String formatDirPath = config.getDirPath().replaceAll("\\\\", "/");
+        if (formatDirPath.contains(springSrcPath)) {
+            String pgk = formatDirPath.split(springSrcPath)[1].replaceAll("/", ".");
+            config.getValueMap().put("package", pgk);
         }
     }
 
     /**
      * 后置初始化
+     *
      * @param config
      */
-    private static void initAfter(ConfigProperties config){
+    private static void initAfter(ConfigProperties config) {
 
     }
 
     /**
      * 初始化service
+     *
      * @param config
      */
     private static void initServiceConfig(ConfigProperties config) {
@@ -194,6 +238,7 @@ public class CodeGenerator {
 
     /**
      * 初始化repository
+     *
      * @param config
      */
     private static void initRepositoryConfig(ConfigProperties config) {
@@ -201,61 +246,62 @@ public class CodeGenerator {
 
     /**
      * 初始化controller
+     *
      * @param config
      */
     private static void initControllerConfig(ConfigProperties config) {
         //缩进
-        final String blank="            ";
-        List<JavaColumn> javaColumnList =(List<JavaColumn>)config.getDataMap().get("fieldList");
-        StringBuffer swaggerParamsSb=new StringBuffer();
-        StringBuffer paramsSb=new StringBuffer();
-        StringBuffer conditionsSb=new StringBuffer();
-        for (int i=0;i<=javaColumnList.size()-1;i++){
-            JavaColumn column= javaColumnList.get(i);
-            String type=column.getType();
-            String param=column.getName();
-            String paramBegin=column.getName()+"Begin";
-            String paramEnd=column.getName()+"End";
+        final String blank = "            ";
+        List<JavaColumn> javaColumnList = (List<JavaColumn>) config.getDataMap().get("fieldList");
+        StringBuffer swaggerParamsSb = new StringBuffer();
+        StringBuffer paramsSb = new StringBuffer();
+        StringBuffer conditionsSb = new StringBuffer();
+        for (int i = 0; i <= javaColumnList.size() - 1; i++) {
+            JavaColumn column = javaColumnList.get(i);
+            String type = column.getType();
+            String param = column.getName();
+            String paramBegin = column.getName() + "Begin";
+            String paramEnd = column.getName() + "End";
             //1、controllerListSwaggerParams
-            if(type.equals("Date")){
+            if (type.equals("Date")) {
                 swaggerParamsSb.append(blank);
-                swaggerParamsSb.append("@ApiImplicitParam(name = \""+paramBegin+"\",value = \""+column.getComment()+"开始\", dataType = \""+type+"\",paramType = \"query\")");
+                swaggerParamsSb.append("@ApiImplicitParam(name = \"" + paramBegin + "\",value = \"" + column.getComment() + "开始\", dataType = \"" + type + "\",paramType = \"query\")");
                 swaggerParamsSb.append(",");
                 swaggerParamsSb.append("\n");
                 swaggerParamsSb.append(blank);
-                swaggerParamsSb.append("@ApiImplicitParam(name = \""+paramEnd+"\",value = \""+column.getComment()+"截至\", dataType = \""+type+"\",paramType = \"query\")");
-            }else{
+                swaggerParamsSb.append("@ApiImplicitParam(name = \"" + paramEnd + "\",value = \"" + column.getComment() + "截至\", dataType = \"" + type + "\",paramType = \"query\")");
+            } else {
                 swaggerParamsSb.append(blank);
-                swaggerParamsSb.append("@ApiImplicitParam(name = \""+param+"\",value = \""+column.getComment()+"\", dataType = \""+type+"\",paramType = \"query\")");
+                swaggerParamsSb.append("@ApiImplicitParam(name = \"" + param + "\",value = \"" + column.getComment() + "\", dataType = \"" + type + "\",paramType = \"query\")");
             }
             swaggerParamsSb.append(",");
             //2、controllerListParams
-            if(type.equals("Date")){
+            if (type.equals("Date")) {
                 paramsSb.append(blank);
-                paramsSb.append("@RequestParam(value = \""+paramBegin+"\",required = false) "+type+" "+paramBegin);
+                paramsSb.append("@RequestParam(value = \"" + paramBegin + "\",required = false) " + type + " " + paramBegin);
                 paramsSb.append(",");
                 paramsSb.append("\n");
                 paramsSb.append(blank);
-                paramsSb.append("@RequestParam(value = \""+paramEnd+"\",required = false) "+type+" "+paramEnd);
-            }else{
+                paramsSb.append("@RequestParam(value = \"" + paramEnd + "\",required = false) " + type + " " + paramEnd);
+            } else {
                 paramsSb.append(blank);
-                paramsSb.append("@RequestParam(value = \""+param+"\",required = false) "+type+" "+param);
+                paramsSb.append("@RequestParam(value = \"" + param + "\",required = false) " + type + " " + param);
             }
             paramsSb.append(",");
             //3、controllerListConditions
-            String condition= CodeConst.TYPE_CONDITION_MAPPING.get(column.getType());
-            if(type.equals("Date")){
+            String condition = CodeConst.TYPE_CONDITION_MAPPING.get(column.getType());
+            if (type.equals("Date")) {
                 conditionsSb.append(blank);
-                conditionsSb.append("new "+condition+"(\""+param+"\","+paramBegin+", "+condition+".Handler.GE)");
+                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramBegin + ", " + condition + ".Handler.GE)");
                 conditionsSb.append(",");
                 conditionsSb.append("\n");
                 conditionsSb.append(blank);
-                conditionsSb.append("new "+condition+"(\""+param+"\","+paramEnd+", "+condition+".Handler.LE)");
-            }else{
+                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramEnd + ", " + condition + ".Handler.LE)");
+            } else {
                 conditionsSb.append(blank);
-                conditionsSb.append("new "+condition+"(\""+param+"\","+param+", "+condition+".Handler.EQUAL)");
+                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.EQUAL)");
             }
-            if(i!=javaColumnList.size()-1){
+            if (i != javaColumnList.size() - 1) {
                 conditionsSb.append(",");
                 swaggerParamsSb.append("\n");
                 paramsSb.append("\n");
@@ -263,21 +309,22 @@ public class CodeGenerator {
             }
 
 
-            config.getValueMap().put("controllerListSwaggerParams",swaggerParamsSb.toString());
-            config.getValueMap().put("controllerListParams",paramsSb.toString());
-            config.getValueMap().put("controllerListConditions",conditionsSb.toString());
+            config.getValueMap().put("controllerListSwaggerParams", swaggerParamsSb.toString());
+            config.getValueMap().put("controllerListParams", paramsSb.toString());
+            config.getValueMap().put("controllerListConditions", conditionsSb.toString());
         }
     }
 
     /**
      * 初始化模块名大小写
+     *
      * @param config
      */
-    private static void initModuleName(ConfigProperties config){
-        String moduleName=config.getModuleName();
-        Character firstChar=moduleName.charAt(0);
-        config.getValueMap().put("upperModuleName",Character.toUpperCase(firstChar)+moduleName.substring(1));
-        config.getValueMap().put("lowerModuleName",Character.toLowerCase(firstChar)+moduleName.substring(1));
+    private static void initModuleName(ConfigProperties config) {
+        String moduleName = config.getModuleName();
+        Character firstChar = moduleName.charAt(0);
+        config.getValueMap().put("upperModuleName", Character.toUpperCase(firstChar) + moduleName.substring(1));
+        config.getValueMap().put("lowerModuleName", Character.toLowerCase(firstChar) + moduleName.substring(1));
     }
 
     /**
@@ -287,13 +334,13 @@ public class CodeGenerator {
      * @return
      */
     private static void initBeanConfig(ConfigProperties config) {
-        Set<String> ignoreColumnSet= (Set<String>)config.getDataMap().get("ignoreColumnSet");
-        String blank="    ";
-        List<JavaColumn> javaColumnList =(List<JavaColumn>)config.getDataMap().get("fieldList");
+        Set<String> ignoreColumnSet = (Set<String>) config.getDataMap().get("ignoreColumnSet");
+        String blank = "    ";
+        List<JavaColumn> javaColumnList = (List<JavaColumn>) config.getDataMap().get("fieldList");
         StringBuffer fieldSb = new StringBuffer();
         StringBuffer methodSb = new StringBuffer();
         javaColumnList.forEach(javaColumn -> {
-            if(ignoreColumnSet.contains(javaColumn.getName())){
+            if (ignoreColumnSet.contains(javaColumn.getName())) {
                 return;
             }
             fieldSb.append(blank);
@@ -311,7 +358,7 @@ public class CodeGenerator {
         });
 
         javaColumnList.forEach(javaColumn -> {
-            if(ignoreColumnSet.contains(javaColumn.getName())){
+            if (ignoreColumnSet.contains(javaColumn.getName())) {
                 return;
             }
             String setMethodName = "set" + javaColumn.getName().substring(0, 1).toUpperCase() + javaColumn.getName().substring(1);
@@ -360,6 +407,7 @@ public class CodeGenerator {
 
     /**
      * 根据表名和db连接找到对应db字段
+     *
      * @param tableName
      * @return
      */
@@ -379,10 +427,10 @@ public class CodeGenerator {
                 e.printStackTrace();
             }
         }
-        PreparedStatement pstsm=null;
-        ResultSet rs=null;
+        PreparedStatement pstsm = null;
+        ResultSet rs = null;
         try {
-            pstsm= conn.prepareStatement(sql);
+            pstsm = conn.prepareStatement(sql);
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             rs = pstsm.executeQuery();
@@ -393,15 +441,15 @@ public class CodeGenerator {
                 dbColumn.setComment(rs.getString("COLUMN_COMMENT"));
                 columnList.add(dbColumn);
             }
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-        } finally{
+        } finally {
             try {
-                if(pstsm!=null){
+                if (pstsm != null) {
                     pstsm.close();
 
                 }
-                if(rs!=null){
+                if (rs != null) {
                     rs.close();
                 }
             } catch (SQLException e) {
@@ -412,17 +460,17 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path="D:\\workSpace\\MySpringBootFrame\\Base\\src\\main\\java\\com\\base\\code";
-        List<ConfigProperties> list= Arrays.asList(
-            new ConfigProperties(path,"User","t_sys_user","用户")
-            ,
-            new ConfigProperties(path,"Org","t_sys_org","组织机构")
+        String path = "D:\\workSpace\\MySpringBootFrame\\Base\\src\\main\\java\\com\\base\\code";
+        List<ConfigProperties> list = Arrays.asList(
+                new ConfigProperties(path, "User", "t_sys_user", "用户")
                 ,
-                new ConfigProperties(path,"Role","t_sys_role","角色",false)
+                new ConfigProperties(path, "Org", "t_sys_org", "组织机构")
                 ,
-                new ConfigProperties(path,"Menu","t_sys_menu","菜单")
+                new ConfigProperties(path, "Role", "t_sys_role", "角色", false)
                 ,
-                new ConfigProperties(path,"UserRoleRelation","t_sys_user_role","用户角色关联")
+                new ConfigProperties(path, "Menu", "t_sys_menu", "菜单")
+                ,
+                new ConfigProperties(path, "UserRoleRelation", "t_sys_user_role", "用户角色关联")
         );
         CodeGenerator.generate(list);
 //        createPath(Paths.get("d:/test/path/a.txt"),1);
