@@ -138,7 +138,7 @@ public class DateUtil {
      * @param dateNum 指定的单位日期数量
      * @return
      */
-    public static List<Date[]> parseSplitDate(Date startDate, Date endDate, int calendarUnit,int dateNum){
+    public static List<Date[]> splitDate(Date startDate, Date endDate, int calendarUnit,int dateNum){
         List<Date[]> returnList=new ArrayList<>();
         if(startDate.getTime()>endDate.getTime()){
             return null;
