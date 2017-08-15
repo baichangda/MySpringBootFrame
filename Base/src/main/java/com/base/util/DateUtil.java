@@ -29,7 +29,7 @@ public class DateUtil {
     }
 
     /**
-     *
+     * 将日期转换为 字符串(转换的时间按照当前登录用户的时区)
      * @param date
      * @param format
      * @return
