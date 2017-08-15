@@ -177,7 +177,7 @@ public class DateUtil {
      */
     public static int getDiff(Date d1,Date d2,int calendarUnit)
     {
-        double diff=0D;
+        double diff;
         switch (calendarUnit){
             case Calendar.DATE:{
                 diff=1000*60*60*24;
