@@ -1,5 +1,7 @@
 package com.base.util;
 
+import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 import org.apache.shiro.SecurityUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +40,7 @@ public class DateUtil {
     }
 
     /**
-     *
+     * 将日期字符串转换为 时间类型(转换的时间为当前登录用户的时区)
      * @param dateStr
      * @param format
      * @return
@@ -48,6 +50,14 @@ public class DateUtil {
         return getUserTimeZoneSimpleDateFormat(format).parse(dateStr);
     }
 
+    /**
+     * 获取当前登录用户的 日期格式化对象
+     * @param format
+     * @return
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
     private static SimpleDateFormat getUserTimeZoneSimpleDateFormat(String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         //1、获取当前用户的时区
         Object user= SecurityUtils.getSubject().getSession().getAttribute("user");
@@ -125,7 +135,7 @@ public class DateUtil {
      * @param startDate
      * @param endDate
      * @param calendarUnit Calendar.MONTH,Calendar.DATE
-     * @param dateNum 当 Calendar.DATE 时候指定天数
+     * @param dateNum 指定的单位日期数量
      * @return
      */
     public static List<Date[]> parseSplitDate(Date startDate, Date endDate, int calendarUnit,int dateNum){
@@ -160,17 +170,39 @@ public class DateUtil {
 
 
     /**
-     * 计算两个时间相差多少天
-     * @param dateBegin 开始时间
-     * @param dateEnd 结束时间
-     * @return 相差天数
+     * 计算两个时间相差多少日期单位(不足一个日期单位的的按一个日期单位算)
+     * @param d1 开始时间
+     * @param d2 结束时间
+     * @return 相差日期单位数
      */
-    public static int getDateDiff(Date dateBegin,Date dateEnd)
+    public static int getDiff(Date d1,Date d2,int calendarUnit)
     {
-        Long begin = dateBegin.getTime();
-        Long end = dateEnd.getTime();
-
-        return (int)((end-begin)/(1000*60*60*24));
+        double diff=0D;
+        switch (calendarUnit){
+            case Calendar.DATE:{
+                diff=1000*60*60*24;
+                break;
+            }
+            case Calendar.HOUR_OF_DAY:{
+                diff=1000*60*60;
+                break;
+            }
+            case Calendar.MINUTE:{
+                diff=1000*60;
+                break;
+            }
+            case Calendar.SECOND:{
+                diff=1000;
+                break;
+            }
+            default:{
+                throw BaseRuntimeException.getException(BaseErrorDefine.ERROR_CALENDAR_UNIT_NOT_SUPPORT);
+            }
+        }
+        Long begin = d1.getTime();
+        Long end = d2.getTime();
+        Double res= (end-begin)/diff;
+        return (int)Math.ceil(res);
     }
 
 
@@ -194,40 +226,5 @@ public class DateUtil {
             endC.add(Calendar.SECOND,-1);
             endDate.setTime(endC.getTimeInMillis());
         }
-    }
-
-
-    /**
-     * 将格式为yyyy-M-d,yyyy-MM-d,yyyy-M-dd,yyyy-MM-dd
-     * 统一转换成yyyy-MM-dd
-     * @param str
-     * @return
-     */
-    public static Date stringToDate(String str){
-        Date date = null;
-        String[] splitStr = str.split("-");
-        if (splitStr[1].length()==1){
-            splitStr[1] = "0"+splitStr[1];
-        }
-        if (splitStr[2].length()==1){
-            splitStr[2] = "0"+splitStr[2];
-        }
-        StringBuffer sb = new StringBuffer();
-        for (int i=0;i<splitStr.length;i++){
-            if (i==splitStr.length-1){
-                sb.append(splitStr[i]);
-            }else {
-                sb.append(splitStr[i]);
-                sb.append("-");
-            }
-        }
-        String dateStr = sb.toString();
-        SimpleDateFormat simpleDateFormat= new SimpleDateFormat(DATE_FORMAT_DAY);
-        try {
-            date = simpleDateFormat.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date;
     }
 }

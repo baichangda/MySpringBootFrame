@@ -16,4 +16,8 @@ public final class BaseErrorDefine {
 
     //Condition
     public final static BaseErrorMessage ERROR_CONDITION_NOT_SUPPORT_OPERATION=BaseErrorMessage.getMessage(new I18NData("BaseService.condition.operationNotSupport"),"605");
+
+
+    //DateUtil
+    public final static BaseErrorMessage ERROR_CALENDAR_UNIT_NOT_SUPPORT=BaseErrorMessage.getMessage(new I18NData("DateUtil.getDiff.calendarUnitNotSupport"),"605");
 }

@@ -162,7 +162,7 @@ public class BeanUtil {
 
 
     /**
-     * 自动将sourceObj和targetObj相同属性的值进行注入，忽略不同属性
+     * 自动将sourceObj和targetObj相同属性的值进行注入，只注入目标对象属性为空的属性
      * {判断一个属性是否赋值：
      * 1、targetObj和sourceObj都有这个属性
      * 2、targetObj中对应属性值为空,sourceObj中不为空
@@ -387,32 +387,6 @@ public class BeanUtil {
             }
         }
         return list;
-    }
-
-    /**
-     * 将对象转换成为Map对象
-     * 需要转换的属性必须 实现get方法
-     *
-     * @param obj
-     * @param skipFieldArr 忽略的字段
-     * @return
-     */
-    public static Map<String, Object> transferObjToMap(Object obj, String[] skipFieldArr) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
-        Class clazz = obj.getClass();
-        List<Field> fieldList = getAllFieldListByClass(clazz, skipFieldArr, null);
-
-        for (int i = 0; i <= fieldList.size() - 1; i++) {
-            Field field = fieldList.get(i);
-            String fieldName = field.getName();
-            String getMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-            Method getMethod = getMethod(clazz, getMethodName);
-            if (getMethod != null) {
-                map.put(fieldName, getMethod.invoke(obj));
-            }
-        }
-        return map;
-
     }
 
     /**
