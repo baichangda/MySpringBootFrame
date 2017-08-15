@@ -2,6 +2,8 @@ package com.base.condition.impl;
 
 
 import com.base.condition.BaseCondition;
+import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
@@ -70,6 +72,9 @@ public class StringCondition extends BaseCondition{
                 case RIGHT_LIKE: {
                     predicate=cb.like(path, val.toString() + "%");
                     break;
+                }
+                default :{
+                    throw BaseRuntimeException.getException(BaseErrorDefine.ERROR_CONDITION_NOT_SUPPORT_OPERATION);
                 }
             }
         }

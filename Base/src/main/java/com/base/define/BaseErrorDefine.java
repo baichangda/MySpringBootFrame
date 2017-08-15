@@ -12,4 +12,8 @@ public final class BaseErrorDefine {
     public final static BaseErrorMessage ERROR_EXECUTE_SAVEBATCH=BaseErrorMessage.getMessage(new I18NData("BaseService.saveBatch.FAILED"),"602");
     public final static BaseErrorMessage ERROR_EXECUTE_DELETEWITHNOREFERRED=BaseErrorMessage.getMessage(new I18NData("BaseService.saveWithNoRepeatRefer.FAILED"),"603");
     public final static BaseErrorMessage ERROR_EXECUTE_SAVEWITHNOREPEATREFER=BaseErrorMessage.getMessage(new I18NData("BaseService.deleteWithNoReferred.FAILED"),"604");
+
+
+    //Condition
+    public final static BaseErrorMessage ERROR_CONDITION_NOT_SUPPORT_OPERATION=BaseErrorMessage.getMessage(new I18NData("BaseService.condition.operationNotSupport"),"605");
 }

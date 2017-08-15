@@ -1,6 +1,8 @@
 package com.base.condition.impl;
 
 import com.base.condition.BaseCondition;
+import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
@@ -130,6 +132,9 @@ public class DateCondition extends BaseCondition {
                     predicateList.add(cb.lessThan(path, endCalendar.getTime()));
                     predicate = cb.and(predicateList.toArray(new Predicate[predicateList.size()]));
                     break;
+                }
+                default :{
+                    throw BaseRuntimeException.getException(BaseErrorDefine.ERROR_CONDITION_NOT_SUPPORT_OPERATION);
                 }
             }
         }

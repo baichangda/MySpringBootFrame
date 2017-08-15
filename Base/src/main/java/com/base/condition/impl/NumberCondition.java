@@ -2,6 +2,8 @@ package com.base.condition.impl;
 
 
 import com.base.condition.BaseCondition;
+import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 
 import javax.persistence.criteria.*;
 
@@ -78,6 +80,9 @@ public class NumberCondition extends BaseCondition {
                 case NOT_EQUAL: {
                     predicate=cb.notEqual(path,  val);
                     break;
+                }
+                default :{
+                    throw BaseRuntimeException.getException(BaseErrorDefine.ERROR_CONDITION_NOT_SUPPORT_OPERATION);
                 }
             }
         }

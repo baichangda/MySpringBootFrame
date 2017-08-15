@@ -1,6 +1,8 @@
 package com.base.condition.impl;
 
 import com.base.condition.BaseCondition;
+import com.base.define.BaseErrorDefine;
+import com.base.exception.BaseRuntimeException;
 
 import javax.persistence.criteria.*;
 
@@ -43,6 +45,9 @@ public class NullCondition extends BaseCondition{
             case NOT_NULL: {
                 predicate=cb.isNotNull(path);
                 break;
+            }
+            default :{
+                throw BaseRuntimeException.getException(BaseErrorDefine.ERROR_CONDITION_NOT_SUPPORT_OPERATION);
             }
         }
         return predicate;

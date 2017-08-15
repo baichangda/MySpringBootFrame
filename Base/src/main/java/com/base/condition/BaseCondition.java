@@ -45,7 +45,6 @@ public abstract class BaseCondition {
         return new BaseConditionImpl(BaseConditionImpl.ConcatWay.OR, Arrays.asList(conditionArr));
     }
 
-
     public <T>Path parseRootPath(Root<T> root, String attrName){
         Path path=null;
         if(attrName.indexOf(".")!=-1){
