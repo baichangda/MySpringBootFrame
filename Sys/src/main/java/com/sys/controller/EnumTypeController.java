@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * Created by Administrator on 2017/5/18.
  */
 @RestController
-@RequestMapping("/api/enumType")
+@RequestMapping("/api/sys/enumType")
 public class EnumTypeController extends BaseController{
     @Autowired
     private EnumTypeService enumTypeBO;

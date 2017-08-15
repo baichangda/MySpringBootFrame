@@ -1,6 +1,7 @@
 package com.config.convert;
 
 import com.base.exception.BaseRuntimeException;
+import com.base.i18n.I18NData;
 import com.base.util.DateUtil;
 import com.base.util.I18nUtil;
 import org.springframework.core.convert.converter.Converter;
@@ -23,14 +24,14 @@ public class DateConvert implements Converter<String,Date> {
         }catch (NumberFormatException e){
             try {
                 if(source.length()==DateUtil.DATE_FORMAT_DAY.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY);
+                    return DateUtil.stringToDateWithUserTimeZone(source,DateUtil.DATE_FORMAT_DAY);
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND);
+                    return DateUtil.stringToDateWithUserTimeZone(source,DateUtil.DATE_FORMAT_SECOND);
                 }else{
-                    throw new RuntimeException();
+                    throw BaseRuntimeException.getException(new I18NData("DateConvert.convert.FAILED"));
                 }
             } catch (Exception e1) {
-                throw BaseRuntimeException.getException(I18nUtil.getMessage("DateConvert.convert.FAILED"));
+                throw BaseRuntimeException.getException(new I18NData("DateConvert.convert.FAILED"));
             }
         }
     }
