@@ -68,8 +68,8 @@ public class MyShiroRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         UserBean user = (UserBean) super.getAvailablePrincipal(principals);
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         if(user!=null){
-            SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
             userService.findOne(new NumberCondition("id",user.getId(), NumberCondition.Handler.EQUAL));
             Set<String> roleSet=new HashSet<>();
             Set<String> permissionSet=new HashSet<>();
@@ -80,10 +80,9 @@ public class MyShiroRealm extends AuthorizingRealm {
             });
             info.setRoles(roleSet);
             info.setStringPermissions(permissionSet);
-            return info;
         }
          //返回null将会导致用户访问任何被拦截的请求时都会自动跳转到unauthorizedUrl指定的地址
-        return null;  
+        return info;
     }
 
     /**

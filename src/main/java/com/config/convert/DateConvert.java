@@ -18,8 +18,6 @@ public class DateConvert implements Converter<String,Date> {
     public Date convert(String source) {
         try {
             long t = Long.parseLong(source);
-            //将浏览器时区时间转换成当前时区时间
-//            t=DateUtil.transferGMTToLocalTimeZone(t, ShiroUtil.getCurrentUser().getTimeZoneOffsetGMT());
             return new Date(t);
         }catch (NumberFormatException e){
             try {
