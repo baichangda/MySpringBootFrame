@@ -372,6 +372,7 @@ public class BaseService<T,K extends Serializable> {
      *   2、所有实体属性主键必须是id且为long类型
      * @param t
      */
+    @Transactional
     public void saveWithNoRepeatRefer(T t){
         try {
             //1、获取当前对象类型
@@ -547,7 +548,6 @@ public class BaseService<T,K extends Serializable> {
      * @param val 属性值
      * @return
      */
-    @Transactional
     public boolean isUnique(String fieldName,String val){
         boolean flag = true;
         List<T> resultList = repository.findAll((Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder)-> {

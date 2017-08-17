@@ -5,9 +5,11 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,7 +48,7 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean
-    public EhCacheManager getEhCacheManager(){
+    public EhCacheManager ehCacheManager(){
         EhCacheManager ehcacheManager = new EhCacheManager();
         ehcacheManager.setCacheManagerConfigFile("classpath:config/ehcache-shiro.xml");
         return ehcacheManager;
@@ -100,9 +102,14 @@ public class ShiroConfiguration {
         return securityManager;
     }
 
+    /**
+     * 自定义权限注解解析器
+     * @param securityManager
+     * @return
+     */
     @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager){
-        AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
+    public MyAuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager){
+        MyAuthorizationAttributeSourceAdvisor advisor = new MyAuthorizationAttributeSourceAdvisor();
         advisor.setSecurityManager(securityManager);
         return advisor;
     }

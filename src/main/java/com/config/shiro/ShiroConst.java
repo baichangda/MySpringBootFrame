@@ -6,6 +6,7 @@ import com.base.message.BaseErrorMessage;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -25,6 +26,5 @@ public class ShiroConst {
         EXCEPTION_ERRORMESSAGE_MAP.put(UnauthenticatedException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.UnauthenticatedException")));
         EXCEPTION_ERRORMESSAGE_MAP.put(ExpiredCredentialsException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.ExpiredCredentialsException")));
         EXCEPTION_ERRORMESSAGE_MAP.put(AuthorizationException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.AuthorizationException")));
-
     }
 }
