@@ -5,8 +5,6 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -199,7 +197,7 @@ public class JsonUtil {
                 return;
             }
             //4.3 添加简单属性过滤器`
-            CollectionUtils.addAll(simplePropertyPreFilterList,getZeroDeepJsonFilter(clazz));
+            simplePropertyPreFilterList.addAll(Arrays.asList(getZeroDeepJsonFilter(clazz)));
         });
         //5、合并多次调用的返回结果,将相同类的filter整合在一起
         Map<String,SimplePropertyPreFilter> filterMap= simplePropertyPreFilterList.stream().collect(Collectors.toMap(

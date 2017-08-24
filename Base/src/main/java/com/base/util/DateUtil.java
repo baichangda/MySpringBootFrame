@@ -30,39 +30,46 @@ public class DateUtil {
 
     /**
      * 将日期转换为 字符串(转换的时间按照当前登录用户的时区)
+     * @param timeZone
      * @param date
-     * @param format
-     * @return
-     */
-    public static String dateToStringWithUserTimeZone(Date date,String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        //1、格式化日期
-        return getUserTimeZoneSimpleDateFormat(format).format(date);
-    }
-
-    /**
-     * 将日期字符串转换为 时间类型(转换的时间为当前登录用户的时区)
-     * @param dateStr
-     * @param format
-     * @return
-     */
-    public static Date stringToDateWithUserTimeZone(String dateStr,String format) throws ParseException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        //1、格式化日期
-        return getUserTimeZoneSimpleDateFormat(format).parse(dateStr);
-    }
-
-    /**
-     * 获取当前登录用户的 日期格式化对象
      * @param format
      * @return
      * @throws IllegalAccessException
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      */
-    private static SimpleDateFormat getUserTimeZoneSimpleDateFormat(String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        //1、获取当前用户的时区
-        Object user= SecurityUtils.getSubject().getSession().getAttribute("user");
-        String timeZone=(String) BeanUtil.getFieldVal(user,"timeZone");
-        //2、获取对应时区的格式化器
+    public static String dateToStringWithUserTimeZone(String timeZone,Date date,String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        //1、格式化日期
+        return getUserTimeZoneSimpleDateFormat(timeZone,format).format(date);
+    }
+
+    /**
+     * 将日期字符串转换为 时间类型(转换的时间为当前登录用户的时区)
+     * @param timeZone
+     * @param dateStr
+     * @param format
+     * @return
+     * @throws ParseException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+    public static Date stringToDateWithUserTimeZone(String timeZone,String dateStr,String format) throws ParseException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        //1、格式化日期
+        return getUserTimeZoneSimpleDateFormat(timeZone,format).parse(dateStr);
+    }
+
+    /**
+     * 获取当前登录用户的 日期格式化对象
+     * @param timeZone
+     * @param format
+     * @return
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+    private static SimpleDateFormat getUserTimeZoneSimpleDateFormat(String timeZone,String format) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        //1、获取对应时区的格式化器
         SimpleDateFormat simpleDateFormat= new SimpleDateFormat(format);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
         return simpleDateFormat;
