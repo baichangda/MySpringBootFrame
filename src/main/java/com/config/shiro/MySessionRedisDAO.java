@@ -1,7 +1,5 @@
 package com.config.shiro;
 
-import com.alibaba.fastjson.JSONObject;
-import com.zd.downlinkcontrol.redis.RedisOp;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
@@ -19,7 +17,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      */
     protected Serializable doCreate(Session session) {
         Serializable sessionId= super.doCreate(session);
-        RedisOp.getSessionOp().setBytes(sessionId.toString(), JSONObject.toJSONBytes(session));
+        //在这里创建session到redis中
         return sessionId;
     }
 
@@ -31,7 +29,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
     protected Session doReadSession(Serializable sessionId) {
         Session session= super.doReadSession(sessionId);
         if(session==null){
-            session= JSONObject.parseObject(RedisOp.getSessionOp().getBytes(sessionId.toString()),Session.class);
+            //在这里从redis中获取session
         }
         return session;
     }
@@ -42,7 +40,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      */
     protected void doUpdate(Session session) {
         super.doUpdate(session);
-        RedisOp.getSessionOp().setBytes(session.getId().toString(), JSONObject.toJSONBytes(session));
+        //在这里执行session的更新操作
     }
 
     /**
@@ -50,7 +48,8 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      * @param session
      */
     protected void doDelete(Session session) {
-        RedisOp.getSessionOp().remove(session.getId().toString());
+        super.doDelete(session);
+        //在这里从redis中移除session
     }
 
 }

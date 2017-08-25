@@ -5,10 +5,12 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -93,13 +95,22 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean(name = "securityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm){
+    public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm,SessionManager sessionManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealm(realm);
         //设置为空、否则将使用默认的;会产生异常
         securityManager.setRememberMeManager(null);
+        //设置sessionManager从redis中获取
+        securityManager.setSessionManager(sessionManager);
         return securityManager;
+    }
+
+    @Bean
+    public SessionManager sessionManager(){
+        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
+        sessionManager.setSessionDAO(new MySessionRedisDAO());
+        return sessionManager;
     }
 
     /**
