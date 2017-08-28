@@ -27,6 +27,8 @@ allprojects {
         compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
         //springboot redis支持
         compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
+        //springboot mongodb支持
+        compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
         //springboot websocket支持
         compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
         //springboot rabbitmq支持

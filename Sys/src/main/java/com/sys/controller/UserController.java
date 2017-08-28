@@ -4,14 +4,12 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.base.condition.BaseCondition;
 import com.base.condition.impl.NumberCondition;
 import com.base.condition.impl.StringCondition;
-import com.base.controller.BaseController;
+import com.base.db.rdb.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
-import com.sys.bean.RoleBean;
 import com.sys.bean.UserBean;
 import com.sys.service.UserService;
-import com.sys.util.ShiroUtil;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -19,9 +17,6 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author acemma

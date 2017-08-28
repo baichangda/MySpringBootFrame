@@ -1,7 +1,7 @@
 package com.sys.bean;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.bean.SuperBaseBean;
+import com.base.db.rdb.bean.SuperBaseBean;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

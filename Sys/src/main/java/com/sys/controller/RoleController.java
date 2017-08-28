@@ -4,21 +4,16 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.base.condition.BaseCondition;
 import com.base.condition.impl.NumberCondition;
 import com.base.condition.impl.StringCondition;
-import com.base.controller.BaseController;
+import com.base.db.rdb.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
-import com.sys.bean.MenuBean;
 import com.sys.bean.RoleBean;
-import com.sys.bean.UserBean;
 import com.sys.service.RoleService;
-import com.sys.util.ShiroUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 /**
  * Created by Administrator on 2017/5/10.

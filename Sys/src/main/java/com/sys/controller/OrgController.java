@@ -1,20 +1,15 @@
 package com.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.condition.impl.StringCondition;
-import com.base.controller.BaseController;
+import com.base.db.rdb.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
 import com.sys.bean.OrgBean;
-import com.sys.bean.UserBean;
 import com.sys.service.OrgService;
-import com.sys.util.ShiroUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author acemma
