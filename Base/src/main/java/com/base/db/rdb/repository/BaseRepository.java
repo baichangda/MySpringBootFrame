@@ -1,4 +1,4 @@
-package com.base.repository;
+package com.base.db.rdb.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

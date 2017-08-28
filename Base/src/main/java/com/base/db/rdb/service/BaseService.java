@@ -1,21 +1,20 @@
-package com.base.service;
+package com.base.db.rdb.service;
 
 import com.base.annotation.ReferCollection;
 import com.base.annotation.ReferredCollection;
 import com.base.condition.BaseCondition;
 import com.base.define.BaseErrorDefine;
 import com.base.exception.BaseRuntimeException;
+import com.base.db.rdb.repository.BaseRepository;
 import com.base.util.BeanUtil;
 import com.base.util.ConditionUtil;
 import com.base.util.ExceptionUtil;
 import com.base.util.I18nUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
@@ -23,7 +22,6 @@ import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 import java.util.*;
@@ -37,7 +35,7 @@ public class BaseService<T,K extends Serializable> {
     public EntityManager em;
 
     @Autowired
-    public com.base.repository.BaseRepository<T,K> repository;
+    public BaseRepository<T,K> repository;
 
     @Transactional
     public void deleteAll(){

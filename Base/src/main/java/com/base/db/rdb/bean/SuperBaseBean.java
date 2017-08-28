@@ -1,4 +1,4 @@
-package com.base.bean;
+package com.base.db.rdb.bean;
 
 
 import com.base.util.BeanUtil;
