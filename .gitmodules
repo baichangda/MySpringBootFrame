@@ -1,3 +1,9 @@
 [submodule "RDB"]
 	path = RDB
 	url = ../RDB.git
+[submodule "Base"]
+	path = Base
+	url = ../Base.git
+[submodule "MongoDB"]
+	path = MongoDB
+	url = ../MongoDB.git
