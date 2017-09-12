@@ -1,6 +1,6 @@
 package com.sys.service;
 
-import com.base.db.rdb.service.BaseService;
+import com.bcd.rdb.service.BaseService;
 import com.sys.bean.MenuBean;
 import org.springframework.stereotype.Service;
 
@@ -10,5 +10,5 @@ import org.springframework.stereotype.Service;
  * Created by Administrator on 2017/4/11.
  */
 @Service
-public class MenuService extends BaseService<MenuBean,Long>{
+public class MenuService extends BaseService<MenuBean,Long> {
 }

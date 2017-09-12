@@ -1,9 +1,9 @@
 package com.sys.service;
 
-import com.base.condition.BaseCondition;
-import com.base.condition.impl.StringCondition;
+import com.bcd.rdb.condition.BaseCondition;
+import com.bcd.rdb.condition.impl.StringCondition;
 import com.base.security.RSASecurity;
-import com.base.db.rdb.service.BaseService;
+import com.bcd.rdb.service.BaseService;
 import com.sys.bean.UserBean;
 import com.sys.repository.UserRepository;
 import org.apache.commons.codec.binary.Base64;

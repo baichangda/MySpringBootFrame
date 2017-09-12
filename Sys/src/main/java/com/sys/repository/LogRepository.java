@@ -1,6 +1,6 @@
 package com.sys.repository;
 
-import com.base.db.rdb.repository.BaseRepository;
+import com.bcd.rdb.repository.BaseRepository;
 import com.sys.bean.LogBean;
 import org.springframework.stereotype.Repository;
 

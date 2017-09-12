@@ -1,6 +1,6 @@
 package com.sys.service;
 
-import com.base.db.rdb.service.BaseService;
+import com.bcd.rdb.service.BaseService;
 import com.sys.bean.EnumItemBean;
 import org.springframework.stereotype.Service;
 

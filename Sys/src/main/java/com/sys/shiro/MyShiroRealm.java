@@ -1,8 +1,8 @@
 package com.sys.shiro;
 
-import com.base.condition.BaseCondition;
-import com.base.condition.impl.NumberCondition;
-import com.base.condition.impl.StringCondition;
+import com.bcd.rdb.condition.BaseCondition;
+import com.bcd.rdb.condition.impl.NumberCondition;
+import com.bcd.rdb.condition.impl.StringCondition;
 import com.sys.bean.MenuBean;
 import com.sys.bean.UserBean;
 import com.sys.service.UserService;

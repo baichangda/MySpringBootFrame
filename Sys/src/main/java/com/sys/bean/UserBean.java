@@ -3,7 +3,7 @@ package com.sys.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.base.annotation.ReferCollection;
-import com.base.db.rdb.bean.BaseBean;
+import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
 import java.util.Date;

@@ -1,10 +1,11 @@
 package com.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.db.rdb.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
+import com.bcd.rdb.controller.BaseController;
+import com.bcd.rdb.util.RDBUtil;
 import com.sys.bean.OrgBean;
 import com.sys.service.OrgService;
 import io.swagger.annotations.*;
@@ -67,7 +68,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage<String> list(@RequestParam(value = "orgId",required = false) Long orgId){
-        SimplePropertyPreFilter[] filters= JsonUtil.getOneDeepJsonFilter(OrgBean.class);
+        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(OrgBean.class);
         return JsonMessage.successed(JsonUtil.toDefaultJSONString(orgService.findOne(orgId),filters));
     }
 

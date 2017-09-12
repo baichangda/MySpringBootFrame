@@ -3,7 +3,7 @@ package com.sys.bean;
 
 import com.base.annotation.ReferCollection;
 import com.base.annotation.ReferredCollection;
-import com.base.db.rdb.bean.BaseBean;
+import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
 import java.util.HashSet;

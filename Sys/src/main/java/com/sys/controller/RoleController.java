@@ -1,13 +1,14 @@
 package com.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.condition.BaseCondition;
-import com.base.condition.impl.NumberCondition;
-import com.base.condition.impl.StringCondition;
-import com.base.db.rdb.controller.BaseController;
+import com.bcd.rdb.condition.BaseCondition;
+import com.bcd.rdb.condition.impl.NumberCondition;
+import com.bcd.rdb.condition.impl.StringCondition;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
+import com.bcd.rdb.controller.BaseController;
+import com.bcd.rdb.util.RDBUtil;
 import com.sys.bean.RoleBean;
 import com.sys.service.RoleService;
 import io.swagger.annotations.*;
@@ -47,7 +48,7 @@ public class RoleController extends BaseController{
                                         @RequestParam(value = "code",required = false) String code,
                                         @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
                                         @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
-        SimplePropertyPreFilter[] filters=JsonUtil.getOneDeepJsonFilter(RoleBean.class);
+        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(RoleBean.class);
         BaseCondition condition= BaseCondition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),

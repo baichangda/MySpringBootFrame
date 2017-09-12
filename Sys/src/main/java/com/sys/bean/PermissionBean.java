@@ -1,6 +1,6 @@
 package com.sys.bean;
 
-import com.base.db.rdb.bean.BaseBean;
+import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

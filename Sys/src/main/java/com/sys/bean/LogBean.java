@@ -1,6 +1,6 @@
 package com.sys.bean;
 
-import com.base.db.rdb.bean.SuperBaseBean;
+import com.bcd.rdb.bean.SuperBaseBean;
 
 import javax.persistence.*;
 import java.util.Date;

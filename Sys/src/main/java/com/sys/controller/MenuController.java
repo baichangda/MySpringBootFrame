@@ -1,10 +1,11 @@
 package com.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.base.db.rdb.controller.BaseController;
 import com.base.json.JsonMessage;
 import com.base.util.I18nUtil;
 import com.base.util.JsonUtil;
+import com.bcd.rdb.controller.BaseController;
+import com.bcd.rdb.util.RDBUtil;
 import com.sys.bean.MenuBean;
 import com.sys.service.MenuService;
 import io.swagger.annotations.*;
@@ -66,7 +67,7 @@ public class MenuController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
     public JsonMessage<String> list(@RequestParam(value = "menuId",required = false) Long menuId){
-        SimplePropertyPreFilter[] filters= JsonUtil.getOneDeepJsonFilter(MenuBean.class);
+        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(MenuBean.class);
         return JsonMessage.successed(JsonUtil.toDefaultJSONString(menuService.findOne(menuId),filters));
     }
 

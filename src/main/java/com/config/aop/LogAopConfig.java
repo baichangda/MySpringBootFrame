@@ -1,8 +1,9 @@
 package com.config.aop;
 
-import com.base.db.rdb.bean.BaseBean;
 import com.base.util.ProxyUtil;
 import com.base.util.SpringUtil;
+import com.bcd.rdb.bean.BaseBean;
+import com.bcd.rdb.util.RDBUtil;
 import com.sys.bean.LogBean;
 import com.sys.service.LogService;
 import com.sys.util.ShiroUtil;
@@ -121,7 +122,7 @@ public class LogAopConfig {
      *
      */
     public void doLogHandleOnDelete(JoinPoint joinPoint)  throws Exception {
-        Class clazz= SpringUtil.getSimpleJpaRepositoryBeanClass(ProxyUtil.getSource(joinPoint.getTarget()));
+        Class clazz= RDBUtil.getSimpleJpaRepositoryBeanClass(ProxyUtil.getSource(joinPoint.getTarget()));
         Object[] paramArr=joinPoint.getArgs();
         Arrays.stream(paramArr).forEach(param->{
             saveDeleteLogForAll(param,clazz);

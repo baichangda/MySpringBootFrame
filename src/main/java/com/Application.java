@@ -11,7 +11,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @SpringBootApplication
-@Import({com.base.Application.class, com.sys.Application.class})
+@Import({ com.sys.Application.class})
 public class Application {
 
     public static void main(String[] args) throws Exception {
