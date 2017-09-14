@@ -1,7 +1,7 @@
 package com.bcd.controller;
 
-import com.base.json.JsonMessage;
-import com.base.util.I18nUtil;
+import com.bcd.base.json.JsonMessage;
+import com.bcd.base.util.I18nUtil;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

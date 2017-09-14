@@ -1,8 +1,8 @@
 package com.bcd.config.shiro;
 
-import com.base.json.JsonMessage;
-import com.base.util.I18nUtil;
-import com.base.util.JsonUtil;
+import com.bcd.base.json.JsonMessage;
+import com.bcd.base.util.I18nUtil;
+import com.bcd.base.util.JsonUtil;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 
 import javax.servlet.ServletRequest;

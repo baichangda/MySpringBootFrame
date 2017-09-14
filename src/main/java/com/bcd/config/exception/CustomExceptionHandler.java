@@ -1,10 +1,9 @@
 package com.bcd.config.exception;
 
 import com.alibaba.fastjson.JSONObject;
-import com.base.exception.BaseRuntimeException;
-import com.base.json.JsonMessage;
-import com.base.message.BaseErrorMessage;
-import com.base.message.DefaultErrorMessage;
+import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.json.JsonMessage;
+import com.bcd.base.message.BaseErrorMessage;
 import com.bcd.config.shiro.ShiroConst;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ModelAndView;

@@ -1,8 +1,8 @@
 package com.bcd.config.shiro;
 
 
-import com.base.i18n.I18NData;
-import com.base.message.BaseErrorMessage;
+import com.bcd.base.i18n.I18NData;
+import com.bcd.base.message.BaseErrorMessage;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;

@@ -1,7 +1,7 @@
 package com.bcd.controller;
 
-import com.base.json.JsonMessage;
-import com.base.security.RSASecurity;
+import com.bcd.base.json.JsonMessage;
+import com.bcd.base.security.RSASecurity;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -1,12 +1,11 @@
 package com.bcd.config.aop;
 
-import com.base.util.ProxyUtil;
-import com.base.util.SpringUtil;
+import com.bcd.base.util.ProxyUtil;
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.rdb.util.RDBUtil;
-import com.sys.bean.LogBean;
-import com.sys.service.LogService;
-import com.sys.util.ShiroUtil;
+import com.bcd.sys.bean.LogBean;
+import com.bcd.sys.service.LogService;
+import com.bcd.sys.util.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;

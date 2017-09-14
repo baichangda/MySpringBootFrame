@@ -1,6 +1,6 @@
 package com.bcd.config.shiro;
 
-import com.sys.shiro.MyShiroRealm;
+import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;

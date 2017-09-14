@@ -1,8 +1,8 @@
 package com.bcd.config.aop;
 
 import com.bcd.rdb.bean.BaseBean;
-import com.sys.bean.UserBean;
-import com.sys.util.ShiroUtil;
+import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.util.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
