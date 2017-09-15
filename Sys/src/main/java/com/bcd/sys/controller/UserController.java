@@ -1,12 +1,13 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.bcd.rdb.condition.BaseCondition;
-import com.bcd.rdb.condition.impl.NumberCondition;
-import com.bcd.rdb.condition.impl.StringCondition;
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.NumberCondition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
+import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.UserBean;
@@ -147,7 +148,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
             @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
         SimplePropertyPreFilter [] filters=RDBUtil.getOneDeepJsonFilter(UserBean.class);
-        BaseCondition condition= BaseCondition.and(
+        Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("org.name",orgName, StringCondition.Handler.ALL_LIKE)

@@ -1,12 +1,13 @@
 package com.bcd.sys.controller;
 
-import com.bcd.rdb.condition.BaseCondition;
-import com.bcd.rdb.condition.impl.NullCondition;
-import com.bcd.rdb.condition.impl.NumberCondition;
-import com.bcd.rdb.condition.impl.StringCondition;
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.NullCondition;
+import com.bcd.base.condition.impl.NumberCondition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
+import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.sys.bean.EnumTypeBean;
 import com.bcd.sys.service.EnumItemService;
@@ -17,8 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by Administrator on 2017/5/18.
@@ -57,15 +56,15 @@ public class EnumTypeController extends BaseController{
             @RequestParam(value = "code",required = false) String code,
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        List<BaseCondition> conditionList = Stream.of(
-                new StringCondition("name",name,StringCondition.Handler.ALL_LIKE),
-                new StringCondition("code",code,StringCondition.Handler.ALL_LIKE),
-                new NumberCondition("id",id,NumberCondition.Handler.EQUAL)
-        ).collect(Collectors.toList());
+        Condition condition = Condition.and(
+                new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
+        );
         if(pageNum==null || pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList), EnumTypeBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(condition), EnumTypeBean.getOneDeepJsonFilter()));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(conditionList,new PageRequest(pageNum-1,pageSize)), EnumTypeBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeBO.findAll(condition,new PageRequest(pageNum-1,pageSize)), EnumTypeBean.getOneDeepJsonFilter()));
         }
     }
 

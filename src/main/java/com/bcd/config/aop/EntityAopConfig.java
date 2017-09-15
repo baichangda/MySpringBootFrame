@@ -1,5 +1,6 @@
 package com.bcd.config.aop;
 
+import com.bcd.base.util.BeanUtil;
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.util.ShiroUtil;
@@ -8,6 +9,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -21,7 +24,7 @@ public class EntityAopConfig {
     /**
      * 切面:所有 Repository 层的save开头的方法
      */
-    @Pointcut("execution(* com..repository.*Repository.save*(..)) && !execution(* com..repository.LogRepository.save*(..))")
+    @Pointcut("execution(* com.bcd..service.*Service.save*(..)) && !execution(* com.bcd..service.LogService.save*(..))")
     public void savePointCut(){
 
     }
@@ -34,21 +37,18 @@ public class EntityAopConfig {
     public void doBeforeDAOSave(JoinPoint pjp){
         Object[] paramArr= pjp.getArgs();
         UserBean user= ShiroUtil.getCurrentUser();
-        if(user==null){
-            return;
-        }
         Arrays.stream(paramArr).forEach(param->{
             if(param==null){
                 return;
             }
             if(param instanceof BaseBean){
-                setValueBeforeSave((BaseBean)param,user);
+                setValueBeforeSave(param,user);
             }else if(param instanceof Iterable){
                 Iterator it= ((Iterable) param).iterator();
                 while(it.hasNext()){
                     Object obj= it.next();
                     if(obj instanceof BaseBean){
-                        setValueBeforeSave((BaseBean)obj,user);
+                        setValueBeforeSave(obj,user);
                     }
                 }
             }
@@ -57,20 +57,27 @@ public class EntityAopConfig {
 
     /**
      * 保存前设置创建人创建时间 更新人更新时间
-     * @param baseBean
+     * @param bean
      * @param user
      */
-    private void setValueBeforeSave(BaseBean baseBean, UserBean user){
-        Long id= baseBean.getId();
+    private void setValueBeforeSave(Object bean, UserBean user){
+        //1、判断主键id是否为null,因此判断其为新增还是修改
+        Object id;
+        try {
+            id = BeanUtil.getFieldVal(bean,"id");
+        } catch(Exception e){
+            return;
+        }
+        //2、属性注入
         if(id==null){
-            baseBean.setCreateTime(new Date());
+            BeanUtil.setFieldVal(bean,"createTime",new Date());
             if(user!=null){
-                baseBean.setCreateUserId(user.getId());
+                BeanUtil.setFieldVal(bean,"createUserId",user.getId());
             }
         }else{
-            baseBean.setUpdateTime(new Date());
+            BeanUtil.setFieldVal(bean,"updateTime",new Date());
             if(user!=null){
-                baseBean.setUpdateUserId(user.getId());
+                BeanUtil.setFieldVal(bean,"updateUserId",user.getId());
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.bcd.sys.shiro;
 
-import com.bcd.rdb.condition.BaseCondition;
-import com.bcd.rdb.condition.impl.NumberCondition;
-import com.bcd.rdb.condition.impl.StringCondition;
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.NumberCondition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
@@ -37,7 +37,7 @@ public class MyShiroRealm extends AuthorizingRealm {
         //UsernamePasswordToken用于存放提交的登录信息
         UsernamePasswordToken token = (UsernamePasswordToken)authenticationToken;
         UserBean user = userService.findOne(
-                BaseCondition.and(
+                Condition.and(
                     new StringCondition("username",token.getUsername(), StringCondition.Handler.EQUAL)
                 )
         );

@@ -73,4 +73,5 @@ buildscript {
 
 dependencies {
     compile project(':Sys')
+    compile project(':MongoDB')
 }

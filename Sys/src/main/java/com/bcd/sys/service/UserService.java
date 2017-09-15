@@ -1,11 +1,10 @@
 package com.bcd.sys.service;
 
-import com.bcd.rdb.condition.BaseCondition;
-import com.bcd.rdb.condition.impl.StringCondition;
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.repository.UserRepository;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -24,9 +23,6 @@ import java.security.PrivateKey;
 public class UserService  extends BaseService<UserBean,Long> {
     @Autowired
     private RoleService roleService;
-
-    @Autowired
-    private UserRepository repository;
 
     @Autowired
     private OrgService orgService;
@@ -55,7 +51,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         //4、设置过期时间
         currentUser.getSession().setTimeout(-1000l);
         //5、设置用户信息到session中
-        UserBean user= findOne(BaseCondition.and(
+        UserBean user= findOne(Condition.and(
                 new StringCondition("username",username, StringCondition.Handler.EQUAL)
         ));
         //5.1、设置当前登录用户的时区
