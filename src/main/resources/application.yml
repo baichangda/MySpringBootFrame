@@ -25,7 +25,7 @@ spring:
    data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
 #  jpa配置
    jpa:
-      show-sql: true
+      show-sql: false
       hibernate:
           # Hibernate DDL  auto: create, create-drop, update, validate
           ddl-auto: validate

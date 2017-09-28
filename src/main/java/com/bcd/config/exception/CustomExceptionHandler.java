@@ -35,7 +35,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
                         result=errorMessage.toJsonMessage();
                     }else{
                         //2.2.2、否则当作普通异常处理,直接返回
-                        result=JsonMessage.failed(exception.getMessage());
+                        result=JsonMessage.failed(exception.getMessage(),null,exception.toString());
                     }
                 }
 
