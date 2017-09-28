@@ -54,7 +54,6 @@ buildscript {
         springBootVersion = '1.+'
         flywayVersion='3.2.1'
         swaggerVersion='2.+'
-        commonslangVersion='2.6'
         shiroVersion='1.+'
         kafkaVersion='1.+'
     }

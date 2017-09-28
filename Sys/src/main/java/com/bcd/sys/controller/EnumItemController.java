@@ -3,18 +3,18 @@ package com.bcd.sys.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.sys.bean.EnumItemBean;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.service.EnumItemService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Created by Administrator on 2017/5/18.
@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/sys/enumItem")
 public class EnumItemController extends BaseController{
     @Autowired
-    private EnumItemService enumItemBO;
+    private EnumItemService enumItemService;
     /**
      * 查询所有枚举项
      * @param id
@@ -60,9 +60,9 @@ public class EnumItemController extends BaseController{
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
         );
         if(pageNum==null || pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(condition), EnumItemBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemService.findAll(condition), EnumItemBean.getOneDeepJsonFilter()));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemBO.findAll(condition,new PageRequest(pageNum-1,pageSize)), EnumItemBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumItemService.findAll(condition,new PageRequest(pageNum-1,pageSize)), EnumItemBean.getOneDeepJsonFilter()));
         }
     }
 
@@ -78,8 +78,8 @@ public class EnumItemController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存枚举项")})
     public JsonMessage<Object> save(@RequestBody EnumItemBean enumItemDTO){
-        enumItemBO.save(enumItemDTO);
-        return new JsonMessage<>(true, I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+        enumItemService.save(enumItemDTO);
+        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
 
 
@@ -93,52 +93,32 @@ public class EnumItemController extends BaseController{
     @ApiImplicitParam(name = "idArr",value = "枚举项id数组",paramType = "query",required = true)
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除枚举项")})
     public JsonMessage<Object> delete(@RequestParam Long[] idArr){
-        enumItemBO.delete(idArr);
-        return new JsonMessage<>(true, I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+        enumItemService.delete(idArr);
+        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
 
     /**
-     * 验证枚举项名称是否可用
-     * @param name
+     * 字段唯一性验证
+     * @param fieldName
+     * @param val
      * @return
      */
-    @RequestMapping(value = "/checkNameIsAvailable", method = RequestMethod.GET)
-    @ApiOperation(value="验证枚举项名称",notes = "验证枚举项名称")
+    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
+    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name",value = "枚举项名称", dataType = "String",paramType = "query")
+            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
     })
-    @ApiResponses(value={@ApiResponse(code=200,message = "true(可用) false(不可用)")})
-    public JsonMessage checkNameIsAvailable(
-            @RequestParam(value = "name") String name
-    ){
-        List<EnumItemBean> list= enumItemBO.findAll(new StringCondition("name",name, StringCondition.Handler.EQUAL));
-        if(list==null||list.size()==0){
-            return JsonMessage.successed(null);
-        }else{
-            return JsonMessage.failed(I18nUtil.getMessage("EnumItemController.checkNameIsAvailable.exists"));
-        }
-    }
-
-    /**
-     * 验证枚举项编码是否可用
-     * @param code
-     * @return
-     */
-    @RequestMapping(value = "/checkCodeIsAvailable", method = RequestMethod.GET)
-    @ApiOperation(value="验证枚举项编码",notes = "验证枚举项编码")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "code",value = "枚举项编码", dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value={@ApiResponse(code=200,message = "true(可用) false(不可用)")})
-    public JsonMessage checkCodeIsAvailable(
-            @RequestParam(value = "code") String code
-    ){
-        List<EnumItemBean> list= enumItemBO.findAll(new StringCondition("code",code, StringCondition.Handler.EQUAL));
-        if(list==null||list.size()==0){
-            return JsonMessage.successed(null);
-        }else{
-            return JsonMessage.failed(I18nUtil.getMessage("EnumItemController.checkCodeIsAvailable.exists"));
+    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
+    public JsonMessage isUniqueCheck(
+            @RequestParam(value = "fieldName",required = true) String fieldName,
+            @RequestParam(value = "fieldValue",required = true) String val){
+        boolean flag = enumItemService.isUnique(fieldName, val);
+        if (flag==false){
+            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
+        }else {
+            return JsonMessage.successed();
         }
     }
 

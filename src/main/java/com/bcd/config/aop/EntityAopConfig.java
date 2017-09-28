@@ -1,6 +1,5 @@
 package com.bcd.config.aop;
 
-import com.bcd.base.util.BeanUtil;
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.util.ShiroUtil;
@@ -10,7 +9,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -42,13 +40,13 @@ public class EntityAopConfig {
                 return;
             }
             if(param instanceof BaseBean){
-                setValueBeforeSave(param,user);
+                setValueBeforeSave((BaseBean) param,user);
             }else if(param instanceof Iterable){
                 Iterator it= ((Iterable) param).iterator();
                 while(it.hasNext()){
                     Object obj= it.next();
                     if(obj instanceof BaseBean){
-                        setValueBeforeSave(obj,user);
+                        setValueBeforeSave((BaseBean)obj,user);
                     }
                 }
             }
@@ -60,24 +58,19 @@ public class EntityAopConfig {
      * @param bean
      * @param user
      */
-    private void setValueBeforeSave(Object bean, UserBean user){
+    private void setValueBeforeSave(BaseBean bean, UserBean user){
         //1、判断主键id是否为null,因此判断其为新增还是修改
-        Object id;
-        try {
-            id = BeanUtil.getFieldVal(bean,"id");
-        } catch(Exception e){
-            return;
-        }
+        Long id=bean.getId();
         //2、属性注入
         if(id==null){
-            BeanUtil.setFieldVal(bean,"createTime",new Date());
+            bean.setCreateTime(new Date());
             if(user!=null){
-                BeanUtil.setFieldVal(bean,"createUserId",user.getId());
+                bean.setCreateUserId(user.getId());
             }
         }else{
-            BeanUtil.setFieldVal(bean,"updateTime",new Date());
+            bean.setUpdateTime(new Date());
             if(user!=null){
-                BeanUtil.setFieldVal(bean,"updateUserId",user.getId());
+                bean.setUpdateUserId(user.getId());
             }
         }
     }

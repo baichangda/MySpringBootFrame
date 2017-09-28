@@ -3,6 +3,7 @@ package com.bcd.config.rabbitmq;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bcd.base.util.I18nUtil;
+import com.bcd.define.ErrorDefine;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConversionException;
@@ -46,7 +47,7 @@ public class MyMessageConverter implements MessageConverter{
         try {
             content=new String(message.getBody(),encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(I18nUtil.getMessage("MyMessageConverter.fromMessage.StringEncodingFailed"));
+            throw ErrorDefine.ERROR_RABBITMQ_MESSAGECONVERT_UNSUPPORTEDENCODING.toRuntimeException();
         }
         Class clazz= (Class)properties.getInferredArgumentType();
         if(clazz.isAssignableFrom(String.class)){

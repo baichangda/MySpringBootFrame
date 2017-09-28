@@ -1,13 +1,12 @@
 package com.bcd.config.shiro;
 
 
-import com.bcd.base.i18n.I18NData;
 import com.bcd.base.message.BaseErrorMessage;
+import com.bcd.define.ErrorDefine;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 /**
@@ -18,12 +17,12 @@ public class ShiroConst {
 
     static {
         //配置shiro的异常对应的ErrorMessage
-        EXCEPTION_ERRORMESSAGE_MAP.put(UnknownAccountException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.UnknownAccountException"),String.valueOf(HttpServletResponse.SC_UNAUTHORIZED)));
-        EXCEPTION_ERRORMESSAGE_MAP.put(IncorrectCredentialsException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.IncorrectCredentialsException")));
-        EXCEPTION_ERRORMESSAGE_MAP.put(DisabledAccountException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.DisabledAccountException")));
-        EXCEPTION_ERRORMESSAGE_MAP.put(AuthenticationException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.AuthenticationException")));
-        EXCEPTION_ERRORMESSAGE_MAP.put(UnauthenticatedException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.UnauthenticatedException")));
-        EXCEPTION_ERRORMESSAGE_MAP.put(ExpiredCredentialsException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.ExpiredCredentialsException")));
-        EXCEPTION_ERRORMESSAGE_MAP.put(AuthorizationException.class.getName(), BaseErrorMessage.getMessage(new I18NData("CustomExceptionHandler.AuthorizationException")));
+        EXCEPTION_ERRORMESSAGE_MAP.put(UnknownAccountException.class.getName(), ErrorDefine.ERROR_SHIRO_UNKNOWN_ACCOUNT);
+        EXCEPTION_ERRORMESSAGE_MAP.put(IncorrectCredentialsException.class.getName(), ErrorDefine.ERROR_SHIRO_INCORRECT_CREDENTIALS);
+        EXCEPTION_ERRORMESSAGE_MAP.put(DisabledAccountException.class.getName(), ErrorDefine.ERROR_SHIRO_DISABLED_ACCOUNT);
+        EXCEPTION_ERRORMESSAGE_MAP.put(AuthenticationException.class.getName(), ErrorDefine.ERROR_SHIRO_AUTHENTICATION);
+        EXCEPTION_ERRORMESSAGE_MAP.put(UnauthenticatedException.class.getName(), ErrorDefine.ERROR_SHIRO_UNAUTHENTICATED);
+        EXCEPTION_ERRORMESSAGE_MAP.put(ExpiredCredentialsException.class.getName(), ErrorDefine.ERROR_SHIRO_EXPIRED_CREDENTIALS);
+        EXCEPTION_ERRORMESSAGE_MAP.put(AuthorizationException.class.getName(), ErrorDefine.ERROR_SHIRO_AUTHORIZATION);
     }
 }

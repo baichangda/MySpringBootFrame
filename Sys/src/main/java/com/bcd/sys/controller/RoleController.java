@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
@@ -11,6 +12,7 @@ import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.RoleBean;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.service.RoleService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,7 @@ public class RoleController extends BaseController{
             @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "所有角色列表")})
-    public JsonMessage<String> list(@RequestParam(value = "id",required = false) Long id,
+    public JsonMessage list(@RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "name",required = false) String name,
                                         @RequestParam(value = "code",required = false) String code,
                                         @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
@@ -73,9 +75,9 @@ public class RoleController extends BaseController{
             @ApiImplicitParam(name = "role",value = "角色实体",dataType = "SysRoleDTO",paramType = "body"),
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存角色")})
-    public JsonMessage<String> save(@RequestBody RoleBean role){
+    public JsonMessage save(@RequestBody RoleBean role){
         roleService.save(role);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
 
     }
 
@@ -91,9 +93,9 @@ public class RoleController extends BaseController{
             @ApiImplicitParam(name = "roleIdArr",value = "角色id数组",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除角色")})
-    public JsonMessage<String> delete(@RequestParam Long[] roleIdArr){
+    public JsonMessage delete(@RequestParam Long[] roleIdArr){
         roleService.deleteWithNoReferred(roleIdArr);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
 
@@ -110,14 +112,14 @@ public class RoleController extends BaseController{
             @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage<Object> isUniqueCheck(
+    public JsonMessage isUniqueCheck(
             @RequestParam(value = "fieldName",required = true) String fieldName,
             @RequestParam(value = "fieldValue",required = true) String val){
         boolean flag = roleService.isUnique(fieldName, val);
         if (flag==false){
-            return JsonMessage.failed(I18nUtil.getMessage("IsAvailable_FALSE"));
+            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
         }else {
-            return JsonMessage.successed(null);
+            return JsonMessage.successed();
         }
     }
 

@@ -1,12 +1,14 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.MenuBean;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.service.MenuService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,9 @@ public class MenuController extends BaseController{
             @ApiImplicitParam(name = "menu",value = "菜单实体",dataType = "SysMenuDTO",paramType = "body")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "保存的菜单")})
-    public JsonMessage<String> save(@RequestBody MenuBean menu){
+    public JsonMessage save(@RequestBody MenuBean menu){
         menuService.save(menu);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
 
     /**
@@ -50,9 +52,9 @@ public class MenuController extends BaseController{
             @ApiImplicitParam(name = "menuIdArr",value = "菜单id数组",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除菜单")})
-    public JsonMessage<String> delete(@RequestParam Long[] menuIdArr){
+    public JsonMessage delete(@RequestParam Long[] menuIdArr){
         menuService.deleteWithNoReferred(menuIdArr);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
 
@@ -66,7 +68,7 @@ public class MenuController extends BaseController{
             @ApiImplicitParam(name = "menuId",value = "菜单id",dataType = "Long",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
-    public JsonMessage<String> list(@RequestParam(value = "menuId",required = false) Long menuId){
+    public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
         SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(MenuBean.class);
         return JsonMessage.successed(JsonUtil.toDefaultJSONString(menuService.findOne(menuId),filters));
     }
@@ -85,14 +87,14 @@ public class MenuController extends BaseController{
             @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage<Object> isUniqueCheck(
+    public JsonMessage isUniqueCheck(
             @RequestParam(value = "fieldName",required = true) String fieldName,
             @RequestParam(value = "fieldValue",required = true) String val){
         boolean flag = menuService.isUnique(fieldName, val);
         if (flag==false){
-            return JsonMessage.failed(I18nUtil.getMessage("IsAvailable_FALSE"));
+            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
         }else {
-            return JsonMessage.successed(null);
+            return JsonMessage.successed();
         }
     }
 

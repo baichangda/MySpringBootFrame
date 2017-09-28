@@ -1,12 +1,14 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.OrgBean;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +37,9 @@ public class OrgController extends BaseController{
             @ApiImplicitParam(name = "org",value = "机构实体",dataType = "SysOrgDTO",paramType = "body")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存机构")})
-    public JsonMessage<String> save(@RequestBody OrgBean org){
+    public JsonMessage save(@RequestBody OrgBean org){
         orgService.save(org);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
 
     /**
@@ -53,7 +55,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除机构")})
     public JsonMessage delete(@RequestParam Long[] orgIdArr){
         orgService.deleteWithNoReferred(orgIdArr);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
     /**
@@ -67,7 +69,7 @@ public class OrgController extends BaseController{
             @ApiImplicitParam(name = "orgId",value = "机构id",dataType = "Long",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
-    public JsonMessage<String> list(@RequestParam(value = "orgId",required = false) Long orgId){
+    public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
         SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(OrgBean.class);
         return JsonMessage.successed(JsonUtil.toDefaultJSONString(orgService.findOne(orgId),filters));
     }
@@ -85,14 +87,14 @@ public class OrgController extends BaseController{
             @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage<Object> isUniqueCheck(
+    public JsonMessage isUniqueCheck(
             @RequestParam(value = "fieldName",required = true) String fieldName,
             @RequestParam(value = "fieldValue",required = true) String val){
         boolean flag = orgService.isUnique(fieldName, val);
         if (flag==false){
-            return JsonMessage.failed(I18nUtil.getMessage("IsAvailable_FALSE"));
+            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
         }else {
-            return JsonMessage.successed(null);
+            return JsonMessage.successed();
         }
     }
 

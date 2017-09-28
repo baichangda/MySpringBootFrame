@@ -3,6 +3,7 @@ package com.bcd.config.convert;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.i18n.I18NData;
 import com.bcd.base.util.DateUtil;
+import com.bcd.define.ErrorDefine;
 import com.bcd.sys.util.ShiroUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -27,10 +28,10 @@ public class DateConvert implements Converter<String,Date> {
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
                     return DateUtil.stringToDateWithUserTimeZone(timeZone,source,DateUtil.DATE_FORMAT_SECOND);
                 }else{
-                    throw BaseRuntimeException.getException(new I18NData("DateConvert.convert.FAILED"));
+                    throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
                 }
             } catch (Exception e1) {
-                throw BaseRuntimeException.getException(new I18NData("DateConvert.convert.FAILED"));
+                throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
             }
         }
     }

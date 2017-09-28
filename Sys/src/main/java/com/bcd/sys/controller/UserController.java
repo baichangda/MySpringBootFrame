@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
@@ -11,6 +12,7 @@ import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
@@ -141,7 +143,7 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "所有用户列表")})
-    public JsonMessage<String> list(
+    public JsonMessage list(
             @RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "username",required = false) String username,
             @RequestParam(value = "orgName",required = false) String orgName,
@@ -172,13 +174,13 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "user",value = "用户实体",dataType = "SysUserDTO",paramType = "body"),
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存用户")})
-    public JsonMessage<String> save(@RequestBody UserBean user){
+    public JsonMessage save(@RequestBody UserBean user){
         //如果为新增操作、则赋予初始密码
         if(user.getId()==null){
             user.setPassword(new Md5Hash(initialPassword,user.getUsername()).toBase64());
         }
         userService.saveIngoreNull(user);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.SAVE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
 
 
@@ -191,9 +193,9 @@ public class UserController extends BaseController {
     @ApiOperation(value = "删除用户",notes = "删除用户")
     @ApiImplicitParam(name = "userIdArr",value = "用户id数组",paramType = "query")
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除用户")})
-    public JsonMessage<String> delete(@RequestParam Long[] userIdArr){
+    public JsonMessage delete(@RequestParam Long[] userIdArr){
         userService.delete(userIdArr);
-        return JsonMessage.successed(null,I18nUtil.getMessage("COMMON.DELETE_SUCCESSED"));
+        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
     /**
@@ -209,14 +211,14 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage<Object> isUniqueCheck(
+    public JsonMessage isUniqueCheck(
             @RequestParam(value = "fieldName",required = true) String fieldName,
             @RequestParam(value = "fieldValue",required = true) String val){
         boolean flag = userService.isUnique(fieldName, val);
         if (flag==false){
-            return JsonMessage.failed(I18nUtil.getMessage("IsAvailable_FALSE"));
+            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
         }else {
-            return JsonMessage.successed(null);
+            return JsonMessage.successed();
         }
     }
 
