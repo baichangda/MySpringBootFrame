@@ -13,7 +13,7 @@ import java.util.HashMap;
  * Created by Administrator on 2017/7/26.
  */
 public class ShiroConst {
-    public static HashMap<String, BaseErrorMessage> EXCEPTION_ERRORMESSAGE_MAP = new HashMap<>();
+    public final static HashMap<String, BaseErrorMessage> EXCEPTION_ERRORMESSAGE_MAP = new HashMap<>();
 
     static {
         //配置shiro的异常对应的ErrorMessage

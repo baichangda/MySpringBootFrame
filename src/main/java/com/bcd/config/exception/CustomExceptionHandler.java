@@ -1,9 +1,9 @@
 package com.bcd.config.exception;
 
-import com.alibaba.fastjson.JSONObject;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.message.BaseErrorMessage;
+import com.bcd.base.util.JsonUtil;
 import com.bcd.config.shiro.ShiroConst;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,7 +40,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
                 }
 
                 response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(JSONObject.toJSONString(result));
+                response.getWriter().print(JsonUtil.toDefaultJSONString(result));
             } catch (IOException e) {
                 e.printStackTrace();
             }
