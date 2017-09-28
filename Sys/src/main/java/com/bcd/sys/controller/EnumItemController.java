@@ -77,7 +77,7 @@ public class EnumItemController extends BaseController{
             @ApiImplicitParam(name = "enumItemDTO",value = "枚举项实体",dataType = "EnumItemDTO",paramType = "body",required = true),
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存枚举项")})
-    public JsonMessage<Object> save(@RequestBody EnumItemBean enumItemDTO){
+    public JsonMessage save(@RequestBody EnumItemBean enumItemDTO){
         enumItemService.save(enumItemDTO);
         return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
@@ -92,7 +92,7 @@ public class EnumItemController extends BaseController{
     @ApiOperation(value = "删除枚举项",notes = "删除枚举项")
     @ApiImplicitParam(name = "idArr",value = "枚举项id数组",paramType = "query",required = true)
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除枚举项")})
-    public JsonMessage<Object> delete(@RequestParam Long[] idArr){
+    public JsonMessage delete(@RequestParam Long[] idArr){
         enumItemService.delete(idArr);
         return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }

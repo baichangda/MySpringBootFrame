@@ -147,8 +147,8 @@ public class UserController extends BaseController {
             @RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "username",required = false) String username,
             @RequestParam(value = "orgName",required = false) String orgName,
-            @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
-            @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
+            @RequestParam(value = "pageNum",required = false)Integer pageNum,
+            @RequestParam(value = "pageSize",required = false) Integer pageSize){
         SimplePropertyPreFilter [] filters=RDBUtil.getOneDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),

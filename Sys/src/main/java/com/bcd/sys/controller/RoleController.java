@@ -49,8 +49,8 @@ public class RoleController extends BaseController{
     public JsonMessage list(@RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "name",required = false) String name,
                                         @RequestParam(value = "code",required = false) String code,
-                                        @RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,
-                                        @RequestParam(value = "pageSize",defaultValue = "20") Integer pageSize){
+                                        @RequestParam(value = "pageNum",required = false)Integer pageNum,
+                                        @RequestParam(value = "pageSize",required = false) Integer pageSize){
         SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(RoleBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
