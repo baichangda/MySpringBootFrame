@@ -11,7 +11,7 @@ spring:
    freemarker.cache: false
    resources.cache-period: 0
    datasource:
-         url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
+         url: jdbc:mysql://127.0.0.1:3306/boyu?characterEncoding=utf8&useSSL=false
          username: root
          password: root
          hikari:
@@ -22,6 +22,7 @@ spring:
                  prepStmtCacheSize: 250
                  prepStmtCacheSqlLimit: 2048
                  useServerPrepStmts: true
+#  mongodb配置
    data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
 #  jpa配置
    jpa:
