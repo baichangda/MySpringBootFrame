@@ -55,14 +55,11 @@ public class ShiroConfiguration {
 
     /**
      * 验证域对象
-     * @param ehCacheManager
      * @return
      */
     @Bean(name = "myShiroRealm")
-    public MyShiroRealm myShiroRealm(EhCacheManager ehCacheManager){
+    public MyShiroRealm myShiroRealm(){
         MyShiroRealm realm = new MyShiroRealm();
-        realm.setCachingEnabled(true);
-        realm.setCacheManager(ehCacheManager);
         //采用hash加密算法
         HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
         hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
@@ -92,14 +89,16 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean(name = "securityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm,SessionManager sessionManager){
+    public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm,SessionManager sessionManager,EhCacheManager ehCacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealm(realm);
         //设置为空、否则将使用默认的;会产生异常
-        securityManager.setRememberMeManager(null);
+//        securityManager.setRememberMeManager(null);
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
+        //设置缓存管理器
+        securityManager.setCacheManager(ehCacheManager);
         return securityManager;
     }
 

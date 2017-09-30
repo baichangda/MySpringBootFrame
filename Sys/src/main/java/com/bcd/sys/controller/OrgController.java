@@ -8,7 +8,7 @@ import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.OrgBean;
-import com.bcd.sys.define.ErrorDefine;
+import com.bcd.rdb.define.ErrorDefine;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;

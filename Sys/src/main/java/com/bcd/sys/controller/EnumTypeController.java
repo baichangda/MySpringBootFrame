@@ -10,7 +10,7 @@ import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.sys.bean.EnumTypeBean;
-import com.bcd.sys.define.ErrorDefine;
+import com.bcd.rdb.define.ErrorDefine;
 import com.bcd.sys.service.EnumItemService;
 import com.bcd.sys.service.EnumTypeService;
 import io.swagger.annotations.*;

@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Map;
 
 /**
  * @author acemma
@@ -41,7 +44,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         //1、构造shiro登录对象
         //1.1、使用私钥解密密码
         PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
-        String password= RSASecurity.RSADecode(privateKey, Base64.decodeBase64(encryptPassword));
+        String password= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
         //1.2、构造登录对象
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         //2、获取当前subject
@@ -72,8 +75,8 @@ public class UserService  extends BaseService<UserBean,Long> {
         //2、获取私钥
         PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
         //3、解密密码
-        String oldPassword= RSASecurity.RSADecode(privateKey, Base64.decodeBase64(encryptOldPassword));
-        String newPassword= RSASecurity.RSADecode(privateKey, Base64.decodeBase64(encryptNewPassword));
+        String oldPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
+        String newPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
         //4、将原始密码MD5加密后与数据库中进行对比
         if(sysUserDTO.getPassword().equals(encryptPassword(sysUserDTO.getUsername(), oldPassword))) {
             //5、使用MD5加密、盐值使用用户名
@@ -95,4 +98,20 @@ public class UserService  extends BaseService<UserBean,Long> {
         return new Md5Hash(password,username).toBase64();
     }
 
+
+    public static void main(String [] args){
+        Map<String, byte[]> keyMap = RSASecurity.generateKeyBytes();
+        String pwd="123qwe";
+        String publicKeyStr="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAighwVytpiItt2nqesNkS12uxr575syUJXk+bwZqQteRCgCRfOjV+bCrLNTEAP4JozyAzbTYF8lEbOn86V5nq9SDqxBCN/+m6kysGrGOTFcHbBA8oCdykhgMUdok7rUBu2b4TLy29dYg9560xsku1g4i4+P8cv0Z2+T7TgeqaganlGQF5wJZ3NmIvVztSTn8HLLZOyy6QHQh1xTeYOq+3O9GbOUwwJK3i62115V2jHWhykhlt+wxkq5YSQGsZzT0VDevjfDZa37QWySitBg9K1YwC5Rqfe3tA+ezPR8yfj/cm2eOeeZw1gPohDy1CNuCDUUMlu8qr5PGBUq99Hdd2wQIDAQAB";
+        String privateKeyStr="";
+        PublicKey publicKey= RSASecurity.restorePublicKey(Base64.decodeBase64(publicKeyStr));
+        // 加密
+        byte[] encodedText = RSASecurity.encode(publicKey, pwd.getBytes());
+        System.out.println("RSA encoded: " + Base64.encodeBase64String(encodedText));
+
+        // 解密
+//        PrivateKey privateKey = RSASecurity.restorePrivateKey(Base64.decodeBase64(privateKeyStr));
+//        System.out.println("RSA decoded: "
+//                + RSASecurity.decode(privateKey, Base64.decodeBase64(Base64.encodeBase64String(encodedText))));
+    }
 }
