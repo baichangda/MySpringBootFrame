@@ -1,14 +1,13 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.bcd.base.define.ErrorDefine;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
-import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.RDBUtil;
 import com.bcd.sys.bean.OrgBean;
-import com.bcd.rdb.define.ErrorDefine;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
