@@ -1,6 +1,6 @@
-group 'MySpringBootFrame'
-version '1.0-SNAPSHOT'
 allprojects{
+    group 'MySpringBootFrame'
+    version '1.0-SNAPSHOT'
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
