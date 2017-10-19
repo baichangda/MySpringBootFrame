@@ -178,7 +178,7 @@ public class UserController extends BaseController {
         if(user.getId()==null){
             user.setPassword(new Md5Hash(initialPassword,user.getUsername()).toBase64());
         }
-        userService.saveIngoreNull(user);
+        userService.saveIgnoreNull(user);
         return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
     }
 
