@@ -40,7 +40,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
                 }
 
                 response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(JsonUtil.toDefaultJSONString(result));
+                response.getWriter().print(JsonUtil.toJSONResult(result));
             } catch (IOException e) {
                 e.printStackTrace();
             }
