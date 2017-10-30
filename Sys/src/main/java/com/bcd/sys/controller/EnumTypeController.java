@@ -60,9 +60,9 @@ public class EnumTypeController extends BaseController{
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
         );
         if(pageNum==null || pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeService.findAll(condition), EnumTypeBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toJSONResult(enumTypeService.findAll(condition), EnumTypeBean.getOneDeepJsonFilter()));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(enumTypeService.findAll(condition,new PageRequest(pageNum-1,pageSize)), EnumTypeBean.getOneDeepJsonFilter()));
+            return JsonMessage.successed(JsonUtil.toJSONResult(enumTypeService.findAll(condition,new PageRequest(pageNum-1,pageSize)), EnumTypeBean.getOneDeepJsonFilter()));
         }
     }
 

@@ -56,9 +56,9 @@ public class RoleController extends BaseController{
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(roleService.findAll(condition),filters));
+            return JsonMessage.successed(JsonUtil.toJSONResult(roleService.findAll(condition),filters));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(roleService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.successed(JsonUtil.toJSONResult(roleService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
         }
     }
 

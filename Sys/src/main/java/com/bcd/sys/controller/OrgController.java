@@ -70,7 +70,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
         SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(OrgBean.class);
-        return JsonMessage.successed(JsonUtil.toDefaultJSONString(orgService.findOne(orgId),filters));
+        return JsonMessage.successed(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
     }
 
     /**

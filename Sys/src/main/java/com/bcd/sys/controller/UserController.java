@@ -57,7 +57,7 @@ public class UserController extends BaseController {
 
             UserBean user= userService.login(username,password,timeZone);
             SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(UserBean.class);
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(user,filters));
+            return JsonMessage.successed(JsonUtil.toJSONResult(user,filters));
     }
 
     /**
@@ -155,9 +155,9 @@ public class UserController extends BaseController {
                 new StringCondition("org.name",orgName, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(userService.findAll(condition),filters));
+            return JsonMessage.successed(JsonUtil.toJSONResult(userService.findAll(condition),filters));
         }else{
-            return JsonMessage.successed(JsonUtil.toDefaultJSONString(userService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.successed(JsonUtil.toJSONResult(userService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
         }
 
     }

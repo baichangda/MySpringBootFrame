@@ -16,7 +16,7 @@ public class MyAuthenticationFilter extends AuthenticationFilter{
         if(!response.isCommitted()){
             response.setCharacterEncoding("UTF-8");
             response.getWriter().print(
-                    JsonUtil.toDefaultJSONString(JsonUtil.toDefaultJSONString(ErrorDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage()))
+                    JsonUtil.toJSONResult(ErrorDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage())
             );
         }
         return false;
