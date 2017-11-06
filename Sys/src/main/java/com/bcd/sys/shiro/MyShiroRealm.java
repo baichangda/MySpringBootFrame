@@ -38,17 +38,19 @@ public class MyShiroRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken)authenticationToken;
         UserBean user = userService.findOne(
                 Condition.and(
-                    new StringCondition("username",token.getUsername(), StringCondition.Handler.EQUAL)
+                        new StringCondition("username",token.getUsername(), StringCondition.Handler.EQUAL)
                 )
         );
 
         if(user !=null){
             if(user.getStatus()==0){
-                throw new DisabledAccountException();
+                throw new DisabledAccountException("Account Is Disabled!");
             }
             // 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
             SimpleAuthenticationInfo simpleAuthenticationInfo= new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), getName());
-            simpleAuthenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getUsername()));
+            if(UserService.IS_PASSWORD_ENCODED){
+                simpleAuthenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getUsername()));
+            }
             return simpleAuthenticationInfo;
         }
         return null;

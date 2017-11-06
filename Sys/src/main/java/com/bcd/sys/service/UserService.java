@@ -1,6 +1,5 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
 /**
@@ -24,6 +22,8 @@ import java.util.Map;
  */
 @Service
 public class UserService  extends BaseService<UserBean,Long> {
+    public static boolean IS_PASSWORD_ENCODED=true;
+
     @Autowired
     private RoleService roleService;
 
@@ -42,22 +42,28 @@ public class UserService  extends BaseService<UserBean,Long> {
      */
     public UserBean login(String username,String encryptPassword,String timeZone){
         //1、构造shiro登录对象
-        //1.1、使用私钥解密密码
-        PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
-        String password= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
-        //1.2、构造登录对象
-        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-        //2、获取当前subject
+        UsernamePasswordToken token;
+        //根据是否加密处理选择不同处理方式
+        if(IS_PASSWORD_ENCODED){
+            //2.1、使用私钥解密密码
+            PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
+            String password= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
+            //2.2、构造登录对象
+            token = new UsernamePasswordToken(username, password);
+        }else{
+            token = new UsernamePasswordToken(username, encryptPassword);
+        }
+        //3、获取当前subject
         Subject currentUser = SecurityUtils.getSubject();
-        //3、进行登录操作
+        //4、进行登录操作
         currentUser.login(token);
-        //4、设置过期时间
+        //5、设置过期时间
         currentUser.getSession().setTimeout(-1000l);
-        //5、设置用户信息到session中
-        UserBean user= findOne(Condition.and(
+        //6、设置用户信息到session中
+        UserBean user= findOne(
                 new StringCondition("username",username, StringCondition.Handler.EQUAL)
-        ));
-        //5.1、设置当前登录用户的时区
+        );
+        //6.1、设置当前登录用户的时区
         user.setTimeZone(timeZone);
         currentUser.getSession().setAttribute("user",user);
         return user;
@@ -72,19 +78,31 @@ public class UserService  extends BaseService<UserBean,Long> {
     public boolean updatePassword(Long userId,String encryptOldPassword,String encryptNewPassword){
         //1、查找当前用户
         UserBean sysUserDTO= findOne(userId);
-        //2、获取私钥
-        PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
-        //3、解密密码
-        String oldPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
-        String newPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
-        //4、将原始密码MD5加密后与数据库中进行对比
-        if(sysUserDTO.getPassword().equals(encryptPassword(sysUserDTO.getUsername(), oldPassword))) {
-            //5、使用MD5加密、盐值使用用户名
-            sysUserDTO.setPassword(encryptPassword(sysUserDTO.getUsername(), newPassword));
-            save(sysUserDTO);
-            return true;
+        //2、根据是否加密处理选择不同处理方式
+        if(IS_PASSWORD_ENCODED){
+            //2.1、获取私钥
+            PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
+            //2.2、解密密码
+            String oldPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
+            String newPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
+            //2.3、将原始密码MD5加密后与数据库中进行对比
+            if(sysUserDTO.getPassword().equals(encryptPassword(sysUserDTO.getUsername(), oldPassword))) {
+                //2.4、使用MD5加密、盐值使用用户名
+                sysUserDTO.setPassword(encryptPassword(sysUserDTO.getUsername(), newPassword));
+                save(sysUserDTO);
+                return true;
+            }else{
+                return false;
+            }
         }else{
-            return false;
+            //3、如果不加密,则直接对比
+            if(sysUserDTO.getPassword().equals(encryptOldPassword)){
+                sysUserDTO.setPassword(encryptNewPassword);
+                save(sysUserDTO);
+                return true;
+            }else{
+                return false;
+            }
         }
     }
 

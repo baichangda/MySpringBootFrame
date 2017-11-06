@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.sys.service.UserService;
 import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -61,9 +62,11 @@ public class ShiroConfiguration {
     public MyShiroRealm myShiroRealm(){
         MyShiroRealm realm = new MyShiroRealm();
         //采用hash加密算法
-        HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
-        hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
-        realm.setCredentialsMatcher(hashedCredentialsMatcher);
+        if(UserService.IS_PASSWORD_ENCODED){
+            HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
+            hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
+            realm.setCredentialsMatcher(hashedCredentialsMatcher);
+        }
         return realm;
     }
 
