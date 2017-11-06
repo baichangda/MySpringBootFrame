@@ -19,7 +19,7 @@ public class EnumTypeBean extends SuperBaseBean {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name="typeId")
-    private Set<EnumItemBean> enumItemDTOSet=new HashSet<>();
+    private Set<EnumItemBean> enumItemBeanSet=new HashSet<>();
 
     public String getName() {
         return name;
@@ -45,23 +45,11 @@ public class EnumTypeBean extends SuperBaseBean {
         this.remark = remark;
     }
 
-    public Set<EnumItemBean> getEnumItemDTOSet() {
-        return enumItemDTOSet;
+    public Set<EnumItemBean> getEnumItemBeanSet() {
+        return enumItemBeanSet;
     }
 
-    public void setEnumItemDTOSet(Set<EnumItemBean> enumItemDTOSet) {
-        this.enumItemDTOSet = enumItemDTOSet;
-    }
-
-    public static SimplePropertyPreFilter getSimpleJsonFilter(){
-        SimplePropertyPreFilter simplePropertyPreFilter=new SimplePropertyPreFilter(EnumTypeBean.class);
-        simplePropertyPreFilter.getExcludes().add("enumItemDTOSet");
-        return simplePropertyPreFilter;
-    }
-
-    public static SimplePropertyPreFilter[] getOneDeepJsonFilter(){
-        return new SimplePropertyPreFilter[]{
-                EnumItemBean.getSimpleJsonFilter()
-        };
+    public void setEnumItemBeanSet(Set<EnumItemBean> enumItemBeanSet) {
+        this.enumItemBeanSet = enumItemBeanSet;
     }
 }

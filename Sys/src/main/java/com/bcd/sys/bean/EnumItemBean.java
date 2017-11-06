@@ -64,15 +64,4 @@ public class EnumItemBean extends SuperBaseBean {
         return enumTypeDTO;
     }
 
-    public static SimplePropertyPreFilter getSimpleJsonFilter(){
-        SimplePropertyPreFilter simplePropertyPreFilter=new SimplePropertyPreFilter(EnumItemBean.class);
-        simplePropertyPreFilter.getExcludes().add("enumTypeDTO");
-        return simplePropertyPreFilter;
-    }
-
-    public static SimplePropertyPreFilter[] getOneDeepJsonFilter(){
-        return new SimplePropertyPreFilter[]{
-                EnumTypeBean.getSimpleJsonFilter()
-        };
-    }
 }
