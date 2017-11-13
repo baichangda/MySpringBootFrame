@@ -22,7 +22,7 @@ public class EntityAopConfig {
     /**
      * 切面:所有 Repository 层的save开头的方法
      */
-    @Pointcut("execution(* com.bcd..service.*Service.save) && !execution(* com.bcd..service.LogService.save)")
+    @Pointcut("execution(* com.bcd..service.*Service.save(*)) && !execution(* com.bcd..service.LogService.save(*))")
     public void savePointCut(){
 
     }
