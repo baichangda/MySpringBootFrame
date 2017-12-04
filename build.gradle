@@ -20,6 +20,8 @@ allprojects{
     dependencies{
         //springboot web支持
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+        //springboot test支持
+        compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
         //springboot redis支持
         compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
         //springboot websocket支持
@@ -28,6 +30,8 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+        //activiti支持
+        compile("org.activiti:activiti-spring-boot-starter-basic:${activitiVersion}")
         //swagger集成
         compile "io.springfox:springfox-swagger2:${swaggerVersion}"
         compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
@@ -35,6 +39,8 @@ allprojects{
         compile("org.apache.shiro:shiro-spring:${shiroVersion}")
         compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
         compile("org.apache.shiro:shiro-cas:${shiroVersion}")
+        //rocketmq集成
+        compile("com.aliyun.openservices:ons-client:1.7.0.Final")
     }
 
     gradle.projectsEvaluated {
@@ -56,6 +62,7 @@ buildscript {
         swaggerVersion='2.+'
         shiroVersion='1.+'
         kafkaVersion='1.+'
+        activitiVersion='6.0.+'
     }
     repositories {
         mavenLocal();
@@ -72,6 +79,6 @@ buildscript {
 
 dependencies {
     compile project(':Sys')
-    compile project(':MongoDB')
+//    compile project(':MongoDB')
     compile project(':NettyServer')
 }

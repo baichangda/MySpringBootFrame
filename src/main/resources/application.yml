@@ -42,27 +42,27 @@ spring:
 
 #  redis单例配置
 #   redis:
-#      hostName: 10.10.35.99
-#      port: 6379
-#      timeout: 0
-#      pool:
-#          max-idle: 8
-#          min-idle: 0
-#          max-active: 8
-#          max-wait: -1
+#       hostName: 10.10.35.99
+#       port: 6379
+#       timeout: 0
+#       pool:
+#           max-idle: 8
+#           min-idle: 0
+#           max-active: 8
+#           max-wait: -1
 
 #  redis分布式配置
 #   redis:
-#      cluster:
-#          nodes:
-#            - 10.10.35.99:6379
-#            - 10.10.35.100:6379
-#          connectionTimeout: 2000
-#          soTimeout: 2000
-#          maxAttempts: -1
-#          maxIdle: 8
-#          minIdle: 0
-#          maxTotal: 8
+#       cluster:
+#           nodes:
+#             - 10.10.35.99:6379
+#             - 10.10.35.100:6379
+#           connectionTimeout: 2000
+#           soTimeout: 2000
+#           maxAttempts: -1
+#           maxIdle: 8
+#           minIdle: 0
+#           maxTotal: 8
 
 #  redis集群配置
 #   redis:
@@ -80,14 +80,14 @@ spring:
 #          minIdle: 0
 #          maxTotal: 8
 
-#   rabbitmq配置
+#  rabbitmq配置
 #   rabbitmq:
 #      host: 121.40.157.200
 #      port: 5672
 #      username: briair
 #      password: briair
 
-#   kafka配置
+#  kafka配置
 #   kafka:
 #      bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
 #      consumer.group-id: zd
@@ -95,3 +95,7 @@ spring:
 #      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 #      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+#  activiti配置
+#  processDefinitionLocationPrefix 默认为 src/main/resources/processes
+#   activiti:
+#       processDefinitionLocationPrefix: classpath:/com/bcd/config/activiti/example/
