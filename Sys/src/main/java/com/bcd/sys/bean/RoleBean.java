@@ -1,8 +1,8 @@
 package com.bcd.sys.bean;
 
 
-import com.bcd.rdb.annotation.ReferCollection;
-import com.bcd.rdb.annotation.ReferredCollection;
+import com.bcd.rdb.annotation.CheckRepeatReferOnSave;
+import com.bcd.rdb.annotation.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
@@ -22,7 +22,7 @@ public class RoleBean extends BaseBean {
     private String code; //角色编码(必须以Role_开头)
     private String remark;  //备注
 
-    @ReferredCollection
+    @CheckReferredOnDelete
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "t_sys_user_role",
@@ -32,7 +32,7 @@ public class RoleBean extends BaseBean {
     private Set<UserBean> userBeanSet = new HashSet<>();
 
     //角色关联菜单
-    @ReferCollection
+    @CheckRepeatReferOnSave
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "t_sys_role_menu",
@@ -42,7 +42,7 @@ public class RoleBean extends BaseBean {
     private Set<MenuBean> menuBeanSet = new HashSet<MenuBean>();
 
     //角色关联机构
-    @ReferCollection
+    @CheckRepeatReferOnSave
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "t_sys_org_role",
@@ -51,7 +51,7 @@ public class RoleBean extends BaseBean {
     )
     private Set<OrgBean> orgBeanSet = new HashSet<OrgBean>();
 
-    @ReferredCollection
+    @CheckReferredOnDelete
     @OneToMany(mappedBy = "roleId")
     private Set<PermissionBean> permissionBeanSet = new HashSet<>();
 

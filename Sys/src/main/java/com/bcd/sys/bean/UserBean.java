@@ -2,7 +2,7 @@ package com.bcd.sys.bean;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.bcd.rdb.annotation.ReferCollection;
+import com.bcd.rdb.annotation.CheckRepeatReferOnSave;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
@@ -33,7 +33,7 @@ public class UserBean extends BaseBean {
 	private String password;  //密码凭证
 
 	//用户关联角色
-	@ReferCollection
+	@CheckRepeatReferOnSave
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "t_sys_user_role",

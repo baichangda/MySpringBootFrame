@@ -2,7 +2,7 @@ package com.bcd.sys.bean;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.bcd.rdb.annotation.ReferredCollection;
+import com.bcd.rdb.annotation.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
@@ -30,7 +30,7 @@ public class OrgBean extends BaseBean {
     @JoinColumn(insertable = false,updatable = false,name = "orgItemId")
     private EnumItemBean enumItemDTO;
 
-    @ReferredCollection
+    @CheckReferredOnDelete
     @ManyToMany
     @JoinTable(
             name = "t_sys_org_role",
@@ -39,12 +39,12 @@ public class OrgBean extends BaseBean {
     )
     private Set<RoleBean> roleBeanSet = new HashSet<RoleBean>();
 
-    @ReferredCollection
+    @CheckReferredOnDelete
     @OneToMany(mappedBy = "orgId")
     private Set<UserBean> userBeanSet = new HashSet<>();
 
     @JSONField(serialize = false ,deserialize = false)
-    @ReferredCollection
+    @CheckReferredOnDelete
     @OneToMany(mappedBy = "parentId")
     private Set<OrgBean> orgBeanSet = new HashSet<>();
 

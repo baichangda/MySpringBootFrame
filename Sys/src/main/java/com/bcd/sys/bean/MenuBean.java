@@ -2,7 +2,7 @@ package com.bcd.sys.bean;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.bcd.rdb.annotation.ReferredCollection;
+import com.bcd.rdb.annotation.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
@@ -28,7 +28,7 @@ public class MenuBean extends BaseBean {
     private Long menuItemId;
 
     //角色关联菜单
-    @ReferredCollection
+    @CheckReferredOnDelete
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "t_sys_role_menu",
@@ -41,7 +41,7 @@ public class MenuBean extends BaseBean {
     @JoinColumn(insertable = false,updatable = false,name = "menuItemId")
     private EnumItemBean enumItemDTO;
 
-    @ReferredCollection
+    @CheckReferredOnDelete
     @JSONField(serialize=false,deserialize = false)
     @OneToMany(mappedBy = "parentId")
     @OrderBy("orderNum ASC")
