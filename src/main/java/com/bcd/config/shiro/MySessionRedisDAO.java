@@ -4,6 +4,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
 import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -40,7 +41,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      */
     protected void doUpdate(Session session) {
         super.doUpdate(session);
-        //在这里执行session的更新操作
+        //每个该session的请求都会调用
     }
 
     /**
@@ -49,7 +50,6 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      */
     protected void doDelete(Session session) {
         super.doDelete(session);
-        //在这里从redis中移除session
     }
 
 }

@@ -3,6 +3,7 @@ package com.bcd.config.exception;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.message.BaseErrorMessage;
+import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.config.shiro.ShiroConst;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,8 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
                         result=JsonMessage.failed(exception.getMessage(),null,exception.toString());
                     }
                 }
+                //2.3、获取异常堆栈信息
+                result.setError(ExceptionUtil.getStackTraceMessage(exception));
 
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().print(JsonUtil.toJSONResult(result));

@@ -71,8 +71,10 @@ public class UserController extends BaseController {
     @ApiResponses(value={@ApiResponse(code=200,message = "是否注销成功")})
     public JsonMessage logout() {
         Subject currentUser = SecurityUtils.getSubject();
+        String successMsg=I18nUtil.getMessage("UserController.logout.SUCCESSED");
+        //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
         currentUser.logout();
-        return new JsonMessage(true, I18nUtil.getMessage("UserController.logout.SUCCESSED"));
+        return new JsonMessage(true, successMsg);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -48,7 +49,7 @@ public class MyShiroRealm extends AuthorizingRealm {
             }
             // 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
             SimpleAuthenticationInfo simpleAuthenticationInfo= new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), getName());
-            if(UserService.IS_PASSWORD_ENCODED){
+            if(CommonConst.IS_PASSWORD_ENCODED){
                 simpleAuthenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getUsername()));
             }
             return simpleAuthenticationInfo;

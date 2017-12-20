@@ -1,6 +1,12 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
+import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.service.UserService;
+import com.bcd.sys.util.ShiroUtil;
+import org.apache.shiro.aop.MethodInvocation;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.spring.aop.SpringAnnotationResolver;
 import org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor;
 
@@ -12,5 +18,19 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
         super();
         //自定义注解拦截器配置
         this.methodInterceptors.add(new ActionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
+    }
+
+    /**
+     * 跳过admin的权限验证
+     * @param methodInvocation
+     * @throws AuthorizationException
+     */
+    @Override
+    protected void assertAuthorized(MethodInvocation methodInvocation) throws AuthorizationException {
+        UserBean userBean= ShiroUtil.getCurrentUser();
+        if(userBean!=null && CommonConst.ADMIN_ID.equals(userBean.getId())){
+            return;
+        }
+        super.assertAuthorized(methodInvocation);
     }
 }

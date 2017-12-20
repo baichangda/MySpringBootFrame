@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
 import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.log4j.Logger;
@@ -62,7 +63,7 @@ public class ShiroConfiguration {
     public MyShiroRealm myShiroRealm(){
         MyShiroRealm realm = new MyShiroRealm();
         //采用hash加密算法
-        if(UserService.IS_PASSWORD_ENCODED){
+        if(CommonConst.IS_PASSWORD_ENCODED){
             HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
             hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
             realm.setCredentialsMatcher(hashedCredentialsMatcher);
@@ -108,7 +109,7 @@ public class ShiroConfiguration {
     @Bean
     public SessionManager sessionManager(){
         DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
-        sessionManager.setSessionDAO(new MySessionRedisDAO());
+//        sessionManager.setSessionDAO(new MySessionRedisDAO());
         return sessionManager;
     }
 

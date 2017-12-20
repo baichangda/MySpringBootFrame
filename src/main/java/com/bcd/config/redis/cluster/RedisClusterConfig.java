@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 //@EnableConfigurationProperties(RedisClusterProperties.class)
 public class RedisClusterConfig {
     private final int DEFAULT_TIMEOUT = 2000;
-    private final int DEFAULT_MAX_REDIRECTIONS = 5;
+    private final int DEFAULT_MAX_ATTEMPTS = 5;
     @Autowired
     private RedisClusterProperties redisClusterProperties;
 
@@ -29,7 +29,7 @@ public class RedisClusterConfig {
                 nodes,
                 redisClusterProperties.getConnectionTimeout()==null?DEFAULT_TIMEOUT:redisClusterProperties.getConnectionTimeout(),
                 redisClusterProperties.getSoTimeout()==null?DEFAULT_TIMEOUT:redisClusterProperties.getSoTimeout(),
-                redisClusterProperties.getMaxAttempts()==null?DEFAULT_MAX_REDIRECTIONS:redisClusterProperties.getMaxAttempts(),
+                redisClusterProperties.getMaxAttempts()==null?DEFAULT_MAX_ATTEMPTS:redisClusterProperties.getMaxAttempts(),
                 redisClusterProperties.getPassword(),
                 redisClusterProperties
         );

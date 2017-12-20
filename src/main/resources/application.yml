@@ -51,7 +51,7 @@ spring:
 #           max-active: 8
 #           max-wait: -1
 
-#  redis分布式配置
+#  redis分布式配置(redis3.x提供的redis cluster)
 #   redis:
 #       cluster:
 #           nodes:
@@ -59,12 +59,12 @@ spring:
 #             - 10.10.35.100:6379
 #           connectionTimeout: 2000
 #           soTimeout: 2000
-#           maxAttempts: -1
+#           maxAttempts: 5
 #           maxIdle: 8
 #           minIdle: 0
 #           maxTotal: 8
 
-#  redis集群配置
+#  redis集群配置(redis3.0之前客户端一致性hash分布式方案)
 #   redis:
 #      distributed:
 #          nodes[0]:
