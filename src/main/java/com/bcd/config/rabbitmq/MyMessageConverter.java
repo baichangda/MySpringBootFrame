@@ -1,8 +1,8 @@
-package com.bcd.config.plugins.rabbitmq;
+package com.bcd.config.rabbitmq;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.bcd.config.plugins.define.ErrorDefine;
+import com.bcd.config.define.ErrorDefine;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConversionException;

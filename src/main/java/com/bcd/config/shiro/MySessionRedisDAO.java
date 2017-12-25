@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.shiro;
+package com.bcd.config.shiro;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;

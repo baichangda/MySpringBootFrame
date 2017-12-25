@@ -7,7 +7,7 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,4 +133,5 @@ public class UserService  extends BaseService<UserBean,Long> {
 //        System.out.println("RSA decoded: "
 //                + RSASecurity.decode(privateKey, Base64.decodeBase64(Base64.encodeBase64String(encodedText))));
     }
+
 }

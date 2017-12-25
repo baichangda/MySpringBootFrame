@@ -1,7 +1,7 @@
-package com.bcd.config.plugins.shiro;
+package com.bcd.config.shiro;
 
 import com.bcd.base.util.JsonUtil;
-import com.bcd.config.plugins.define.ErrorDefine;
+import com.bcd.config.define.ErrorDefine;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 
 import javax.servlet.ServletRequest;

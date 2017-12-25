@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.kafka.example.producer;
+package com.bcd.config.kafka.example.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

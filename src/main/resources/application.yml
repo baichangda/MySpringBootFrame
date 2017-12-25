@@ -98,4 +98,4 @@ spring:
 #  activiti配置
 #  processDefinitionLocationPrefix 默认为 src/main/resources/processes
 #   activiti:
-#       processDefinitionLocationPrefix: classpath:/com/bcd/config/activiti/example/
+#       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/

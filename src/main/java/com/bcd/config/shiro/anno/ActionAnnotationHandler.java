@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.shiro.anno;
+package com.bcd.config.shiro.anno;
 
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;

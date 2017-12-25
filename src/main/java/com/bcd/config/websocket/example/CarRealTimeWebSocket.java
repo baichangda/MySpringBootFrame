@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.websocket.example;
+package com.bcd.config.websocket.example;
 
 import org.springframework.stereotype.Component;
 

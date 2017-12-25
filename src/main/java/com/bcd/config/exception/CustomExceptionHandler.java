@@ -1,11 +1,11 @@
-package com.bcd.config.plugins.exception;
+package com.bcd.config.exception;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.message.BaseErrorMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
-import com.bcd.config.plugins.shiro.ShiroConst;
+import com.bcd.config.shiro.ShiroConst;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;

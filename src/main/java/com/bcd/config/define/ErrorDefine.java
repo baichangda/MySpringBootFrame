@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.define;
+package com.bcd.config.define;
 
 import com.bcd.base.i18n.I18NData;
 import com.bcd.base.message.BaseErrorMessage;

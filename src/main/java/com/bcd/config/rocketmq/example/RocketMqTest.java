@@ -1,8 +1,8 @@
-package com.bcd.config.plugins.rocketmq.example;
+package com.bcd.config.rocketmq.example;
 
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.SendResult;
-import com.bcd.config.plugins.rocketmq.MyProducerBean;
+import com.bcd.config.rocketmq.MyProducerBean;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

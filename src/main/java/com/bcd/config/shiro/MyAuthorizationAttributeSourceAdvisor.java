@@ -1,6 +1,6 @@
-package com.bcd.config.plugins.shiro;
+package com.bcd.config.shiro;
 
-import com.bcd.config.plugins.shiro.anno.RequiresAction;
+import com.bcd.config.shiro.anno.RequiresAction;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -39,7 +39,7 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
         return securityManager;
     }
 
-    public void setSecurityManager(org.apache.shiro.mgt.SecurityManager securityManager) {
+    public void setSecurityManager(SecurityManager securityManager) {
         this.securityManager = securityManager;
     }
 
@@ -47,17 +47,17 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
      * Returns <tt>true</tt> if the method or the class has any Shiro annotations, false otherwise.
      * The annotations inspected are:
      * <ul>
-     * <li>{@link org.apache.shiro.authz.annotation.RequiresAuthentication RequiresAuthentication}</li>
-     * <li>{@link org.apache.shiro.authz.annotation.RequiresUser RequiresUser}</li>
-     * <li>{@link org.apache.shiro.authz.annotation.RequiresGuest RequiresGuest}</li>
-     * <li>{@link org.apache.shiro.authz.annotation.RequiresRoles RequiresRoles}</li>
-     * <li>{@link org.apache.shiro.authz.annotation.RequiresPermissions RequiresPermissions}</li>
+     * <li>{@link RequiresAuthentication RequiresAuthentication}</li>
+     * <li>{@link RequiresUser RequiresUser}</li>
+     * <li>{@link RequiresGuest RequiresGuest}</li>
+     * <li>{@link RequiresRoles RequiresRoles}</li>
+     * <li>{@link RequiresPermissions RequiresPermissions}</li>
      * </ul>
      *
      * @param method      the method to check for a Shiro annotation
      * @param targetClass the class potentially declaring Shiro annotations
      * @return <tt>true</tt> if the method has a Shiro annotation, false otherwise.
-     * @see org.springframework.aop.MethodMatcher#matches(java.lang.reflect.Method, Class)
+     * @see org.springframework.aop.MethodMatcher#matches(Method, Class)
      */
     public boolean matches(Method method, Class targetClass) {
         Method m = method;

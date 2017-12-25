@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.convert;
+package com.bcd.config.convert;
 
 
 import org.springframework.core.convert.converter.Converter;

@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.swagger;
+package com.bcd.config.swagger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.async.DeferredResult;

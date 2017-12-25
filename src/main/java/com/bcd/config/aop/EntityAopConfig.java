@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.aop;
+package com.bcd.config.aop;
 
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;

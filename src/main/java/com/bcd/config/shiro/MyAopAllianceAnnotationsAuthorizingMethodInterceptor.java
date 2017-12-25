@@ -1,9 +1,8 @@
-package com.bcd.config.plugins.shiro;
+package com.bcd.config.shiro;
 
-import com.bcd.config.plugins.shiro.anno.ActionAnnotationMethodInterceptor;
+import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.service.UserService;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;

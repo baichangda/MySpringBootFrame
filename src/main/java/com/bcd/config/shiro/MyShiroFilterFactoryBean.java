@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.shiro;
+package com.bcd.config.shiro;
 
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;

@@ -1,4 +1,4 @@
-package com.bcd.config.plugins.redis.cluster;
+package com.bcd.config.redis.cluster;
 
 import redis.clients.jedis.JedisPoolConfig;
 

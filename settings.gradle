@@ -4,5 +4,5 @@ include 'Sys'
 include 'RDB'
 //include 'MongoDB'
 include 'NettyServer'
-include 'RDBInfoCollect'
+include 'Config'
 

@@ -1,6 +1,6 @@
-package com.bcd.config.plugins.shiro.anno;
+package com.bcd.config.shiro.anno;
 
-import com.bcd.config.plugins.define.ErrorDefine;
+import com.bcd.config.define.ErrorDefine;
 import org.apache.shiro.aop.AnnotationResolver;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;

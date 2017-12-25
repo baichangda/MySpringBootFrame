@@ -1,8 +1,7 @@
-package com.bcd.config.plugins.rocketmq;
+package com.bcd.config.rocketmq;
 
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.bean.ProducerBean;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
