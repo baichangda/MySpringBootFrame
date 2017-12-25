@@ -1,8 +1,9 @@
-package com.bcd.sys.shiro;
+package com.bcd.config.plugins.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.config.plugins.shiro.service.ShiroUserService;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -28,13 +29,14 @@ public class MyShiroRealm extends AuthorizingRealm {
 
 
     @Autowired
-    private UserService userService;
+    private ShiroUserService shiroUserService;
 
     /**
      * 登录认证
      */  
     @Override  
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        return shiroUserService.doGetAuthenticationInfo(authenticationToken);
         //UsernamePasswordToken用于存放提交的登录信息
         UsernamePasswordToken token = (UsernamePasswordToken)authenticationToken;
         UserBean user = userService.findOne(

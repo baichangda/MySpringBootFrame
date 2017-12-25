@@ -1,18 +1,18 @@
-package com.bcd.config.activiti.example;
+package com.bcd.config.plugins.activiti;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.activiti.engine.delegate.TaskListener;
 
-public class TaskListener1 implements TaskListener,JavaDelegate {
+public class TaskListener2 implements TaskListener,JavaDelegate {
     @Override
     public void notify(DelegateTask delegateTask) {
-        System.err.println("Execute TaskListener1 notify!");
+        System.err.println("Execute TaskListener2 notify!");
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-        System.err.println("Execute TaskListener1 execute!");
+        System.err.println("Execute TaskListener2 execute!");
     }
 }

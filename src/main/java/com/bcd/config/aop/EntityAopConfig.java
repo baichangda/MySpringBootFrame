@@ -1,4 +1,4 @@
-package com.bcd.config.aop;
+package com.bcd.config.plugins.aop;
 
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
@@ -22,7 +22,7 @@ public class EntityAopConfig {
     /**
      * 切面:所有 Repository 层的save开头的方法
      */
-    @Pointcut("execution(* com.bcd..service.*Service.save(*)) && !execution(* com.bcd..service.LogService.save(*))")
+    @Pointcut("execution(* com.bcd..repository.*Repository.save(*)) && !execution(* com.bcd..repository.LogRepository.save(*))")
     public void savePointCut(){
 
     }

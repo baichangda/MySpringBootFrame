@@ -1,6 +1,6 @@
-package com.bcd.config.shiro;
+package com.bcd.config.plugins.shiro;
 
-import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
+import com.bcd.config.plugins.shiro.anno.ActionAnnotationMethodInterceptor;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;

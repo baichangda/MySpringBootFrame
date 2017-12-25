@@ -1,4 +1,4 @@
-package com.bcd.config.activiti.example;
+package com.bcd.config.plugins.activiti;
 
 import org.springframework.stereotype.Service;
 

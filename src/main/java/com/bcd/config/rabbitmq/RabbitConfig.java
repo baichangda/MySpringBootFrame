@@ -1,4 +1,4 @@
-package com.bcd.config.rabbitmq;
+package com.bcd.config.plugins.rabbitmq;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;

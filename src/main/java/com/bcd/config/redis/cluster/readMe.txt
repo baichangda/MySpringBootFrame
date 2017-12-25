@@ -3,7 +3,7 @@
 3、修改redis.conf，如下配置
      	port 6379                               //端口
 	cluster-enabled yes                     //开启集群模式
-	cluster-config-file nodes-6379.conf     //集群内部的配置文件
+	cluster-com.bcd.config-file nodes-6379.conf     //集群内部的配置文件
 	cluster-node-timeout 15000              //节点超时时间，单位毫秒
 4、使用修改后的配置文件启动redis
 5、安装ruby(yum install ruby 和 yum install rubygems)

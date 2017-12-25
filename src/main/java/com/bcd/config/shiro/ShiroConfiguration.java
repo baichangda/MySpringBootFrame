@@ -1,4 +1,4 @@
-package com.bcd.config.shiro;
+package com.bcd.config.plugins.shiro;
 
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
@@ -12,7 +12,6 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -51,7 +50,7 @@ public class ShiroConfiguration {
     @Bean
     public EhCacheManager ehCacheManager(){
         EhCacheManager ehcacheManager = new EhCacheManager();
-        ehcacheManager.setCacheManagerConfigFile("classpath:config/ehcache-shiro.xml");
+        ehcacheManager.setCacheManagerConfigFile("classpath:com.bcd.config/ehcache-shiro.xml");
         return ehcacheManager;
     }
 

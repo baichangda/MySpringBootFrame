@@ -1,4 +1,4 @@
-package com.bcd.config.redis.cluster;
+package com.bcd.config.plugins.redis.cluster;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

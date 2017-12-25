@@ -1,4 +1,4 @@
-package com.bcd.config.datasource;
+package com.bcd.config.plugins.datasource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

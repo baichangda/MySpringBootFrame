@@ -1,8 +1,8 @@
-package com.bcd.config.shiro;
+package com.bcd.config.plugins.shiro;
 
 
 import com.bcd.base.message.BaseErrorMessage;
-import com.bcd.define.ErrorDefine;
+import com.bcd.config.plugins.define.ErrorDefine;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;

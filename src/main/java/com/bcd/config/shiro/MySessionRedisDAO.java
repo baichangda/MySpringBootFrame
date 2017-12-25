@@ -1,10 +1,9 @@
-package com.bcd.config.shiro;
+package com.bcd.config.plugins.shiro;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
 import java.io.Serializable;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**

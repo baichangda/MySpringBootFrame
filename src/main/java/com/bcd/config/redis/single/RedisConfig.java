@@ -1,4 +1,4 @@
-package com.bcd.config.redis.single;
+package com.bcd.config.plugins.redis.single;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

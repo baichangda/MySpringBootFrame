@@ -1,4 +1,4 @@
-package com.bcd.config.rocketmq;
+package com.bcd.config.plugins.rocketmq;
 
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.bean.ProducerBean;

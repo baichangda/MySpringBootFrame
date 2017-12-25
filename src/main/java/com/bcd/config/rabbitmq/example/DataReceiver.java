@@ -1,4 +1,4 @@
-package com.bcd.config.rabbitmq.example;
+package com.bcd.config.plugins.rabbitmq.example;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

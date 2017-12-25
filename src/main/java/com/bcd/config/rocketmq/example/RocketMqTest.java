@@ -1,16 +1,11 @@
-package com.bcd.config.rocketmq;
+package com.bcd.config.plugins.rocketmq.example;
 
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.SendResult;
-import com.bcd.Application;
+import com.bcd.config.plugins.rocketmq.MyProducerBean;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
 public class RocketMqTest {
     @Autowired
     private MyProducerBean producer;
