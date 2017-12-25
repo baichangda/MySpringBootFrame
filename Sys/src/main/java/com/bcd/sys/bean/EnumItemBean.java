@@ -1,6 +1,5 @@
 package com.bcd.sys.bean;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.rdb.bean.SuperBaseBean;
 
 import javax.persistence.Entity;
@@ -13,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "t_enum_item")
-public class EnumItemBean extends SuperBaseBean {
+public class EnumItemBean extends SuperBaseBean<Long> {
 
     private Long typeId;
     private String name;

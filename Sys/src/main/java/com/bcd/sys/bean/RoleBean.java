@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "t_sys_role")
-public class RoleBean extends BaseBean {
+public class RoleBean extends BaseBean<Long> {
     private String name;  //角色名称
     private String code; //角色编码(必须以Role_开头)
     private String remark;  //备注

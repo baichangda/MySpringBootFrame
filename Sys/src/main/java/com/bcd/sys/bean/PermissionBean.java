@@ -12,7 +12,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "t_sys_permission")
-public class PermissionBean extends BaseBean {
+public class PermissionBean extends BaseBean<Long> {
     private String name;
     private String code;
     private String remark;

@@ -19,7 +19,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "t_sys_menu")
-public class MenuBean extends BaseBean {
+public class MenuBean extends BaseBean<Long> {
     private String name;  //菜单名称
     private String url;  //url地址
     private String icon;  //图标

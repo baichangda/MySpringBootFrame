@@ -18,7 +18,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "t_sys_user")
-public class UserBean extends BaseBean {
+public class UserBean extends BaseBean<Long> {
 	private String username;  //用户名
 	private String email;  //邮箱
 	private String phone;  //手机号

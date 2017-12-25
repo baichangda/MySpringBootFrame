@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "t_log")
-public class LogBean extends SuperBaseBean {
+public class LogBean extends SuperBaseBean<Long> {
 
     private Integer operType; //操作
 

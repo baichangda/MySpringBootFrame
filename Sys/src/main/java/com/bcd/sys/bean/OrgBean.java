@@ -18,7 +18,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "t_sys_org")
-public class OrgBean extends BaseBean {
+public class OrgBean extends BaseBean<Long> {
     private String name;  //组织名称
     private String address;  //地址
     private String phone;  //电话
