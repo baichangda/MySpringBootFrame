@@ -1,12 +1,12 @@
-package com.bcd.config.rocketmq.example;
+package com.bcd.config.aliyun.rocketmq.example;
 
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.SendResult;
-import com.bcd.config.rocketmq.MyProducerBean;
+import com.bcd.config.aliyun.rocketmq.MyProducerBean;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class RocketMqTest {
+public class RocketMqPropertiesTest {
     @Autowired
     private MyProducerBean producer;
     @Test

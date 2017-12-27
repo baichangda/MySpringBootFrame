@@ -13,9 +13,9 @@ allprojects{
     }
 
     repositories {
-        mavenLocal();
+        mavenLocal()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        mavenCentral();
+        mavenCentral()
     }
 
     dependencies{
@@ -42,6 +42,13 @@ allprojects{
         compile("org.apache.shiro:shiro-cas:${shiroVersion}")
         //rocketmq集成
         compile("com.aliyun.openservices:ons-client:1.7.0.Final")
+        //阿里云 tablestore集成
+        compile("com.aliyun.openservices:tablestore:${tablestoreVersion}") {
+            //解决阿里云传递性依赖
+            exclude group: 'org.apache.logging.log4j', module: 'slf4j-api'
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+        }
     }
 
     gradle.projectsEvaluated {
@@ -64,11 +71,12 @@ buildscript {
         shiroVersion='1.+'
         kafkaVersion='1.+'
         activitiVersion='6.0.+'
+        tablestoreVersion='4.+'
     }
     repositories {
-        mavenLocal();
+        mavenLocal()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        mavenCentral();
+        mavenCentral()
     }
     dependencies {
         //使用springboot框架

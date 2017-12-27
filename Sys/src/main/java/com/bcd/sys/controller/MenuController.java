@@ -52,7 +52,7 @@ public class MenuController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除菜单")})
     public JsonMessage delete(@RequestParam Long[] menuIdArr){
-        menuService.deleteWithNoReferred(menuIdArr);
+        menuService.delete(menuIdArr);
         return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 

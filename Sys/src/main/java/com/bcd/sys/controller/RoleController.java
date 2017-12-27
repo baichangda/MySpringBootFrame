@@ -92,7 +92,7 @@ public class RoleController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除角色")})
     public JsonMessage delete(@RequestParam Long[] roleIdArr){
-        roleService.deleteWithNoReferred(roleIdArr);
+        roleService.delete(roleIdArr);
         return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 

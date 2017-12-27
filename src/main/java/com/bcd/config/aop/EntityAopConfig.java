@@ -60,7 +60,7 @@ public class EntityAopConfig {
      */
     private void setValueBeforeSave(BaseBean bean, UserBean user){
         //1、判断主键id是否为null,因此判断其为新增还是修改
-        Long id=bean.getId();
+        Object id=bean.getId();
         //2、属性注入
         if(id==null){
             bean.setCreateTime(new Date());

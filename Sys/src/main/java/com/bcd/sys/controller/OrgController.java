@@ -53,7 +53,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除机构")})
     public JsonMessage delete(@RequestParam Long[] orgIdArr){
-        orgService.deleteWithNoReferred(orgIdArr);
+        orgService.delete(orgIdArr);
         return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
     }
 
