@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.shiro.anno.RequiresAction;
+import com.bcd.config.shiro.anno.RequiresUserInfo;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -23,7 +24,7 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
             new Class[] {
                     RequiresPermissions.class, RequiresRoles.class,
                     RequiresUser.class, RequiresGuest.class, RequiresAuthentication.class,
-                    RequiresAction.class
+                    RequiresAction.class, RequiresUserInfo.class
             };
 
     protected SecurityManager securityManager = null;

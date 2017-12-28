@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
+import com.bcd.config.shiro.anno.UserInfoAnnotationMethodInterceptor;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.util.ShiroUtil;
@@ -17,6 +18,7 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
         super();
         //自定义注解拦截器配置
         this.methodInterceptors.add(new ActionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
+        this.methodInterceptors.add(new UserInfoAnnotationMethodInterceptor(new SpringAnnotationResolver()));
     }
 
     /**
