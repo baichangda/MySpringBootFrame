@@ -11,7 +11,7 @@ spring:
    freemarker.cache: false
    resources.cache-period: 0
    datasource:
-         url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
+         url: jdbc:mysql://127.0.0.1:3306/zdmp?characterEncoding=utf8&useSSL=false
          username: root
          password: root
          hikari:
