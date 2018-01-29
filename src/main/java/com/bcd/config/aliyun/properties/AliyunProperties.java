@@ -3,8 +3,8 @@ package com.bcd.config.aliyun.properties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ConfigurationProperties(prefix = "aliyun")
+//@Configuration
+//@ConfigurationProperties(prefix = "aliyun")
 public class AliyunProperties {
     public String secretKey;
     public String accessKey;

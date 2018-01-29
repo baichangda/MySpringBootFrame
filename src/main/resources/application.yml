@@ -11,7 +11,7 @@ spring:
    freemarker.cache: false
    resources.cache-period: 0
    datasource:
-         url: jdbc:mysql://127.0.0.1:3306/zdmp?characterEncoding=utf8&useSSL=false
+         url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false
          username: root
          password: root
          hikari:
@@ -100,12 +100,12 @@ spring:
 #   activiti:
 #       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
 
-aliyun:
-   secretKey: CgVFaBhk8znSdBsZVlBSFSqr4a76P1
-   accessKey: LTAI2LEtG5xmDgUx
-   rocketMq:
-      producerId: PID_Proudcer_4
-      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
-   tableStore:
-      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
-      instanceName: rooster-dev
+#aliyun:
+#   secretKey: CgVFaBhk8znSdBsZVlBSFSqr4a76P1
+#   accessKey: LTAI2LEtG5xmDgUx
+#   rocketMq:
+#      producerId: PID_Proudcer_4
+#      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
+#   tableStore:
+#      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
+#      instanceName: rooster-dev

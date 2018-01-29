@@ -9,8 +9,10 @@ create table IF NOT EXISTS t_sys_menu
    order_num            int comment '排序',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
    create_user_id       bigint comment '创建人id',
+   create_user_name     varchar(50) comment '创建人姓名',
    update_time          timestamp NULL comment '更新时间',
    update_user_id       bigint comment '更新人id',
+   update_user_name     varchar(50) comment '更新人姓名',
    primary key (id)
 );
 

@@ -6,7 +6,7 @@ import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.rdb.util.RDBUtil;
+import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
@@ -69,7 +69,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
-        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(OrgBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
         return JsonMessage.successed(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
     }
 

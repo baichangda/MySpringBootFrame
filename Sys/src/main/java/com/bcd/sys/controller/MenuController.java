@@ -6,7 +6,7 @@ import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.rdb.util.RDBUtil;
+import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.service.MenuService;
 import io.swagger.annotations.*;
@@ -68,7 +68,7 @@ public class MenuController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
     public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
-        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(MenuBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
         return JsonMessage.successed(JsonUtil.toJSONResult(menuService.findOne(menuId),filters));
     }
 

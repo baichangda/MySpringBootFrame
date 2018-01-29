@@ -14,8 +14,7 @@ allprojects{
 
     repositories {
         mavenLocal()
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        mavenCentral()
+        maven { url "${mavenRepoUrl}" }
     }
 
     dependencies{
@@ -72,11 +71,11 @@ buildscript {
         kafkaVersion='1.+'
         activitiVersion='6.0.+'
         tablestoreVersion='4.+'
+        mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {
         mavenLocal()
-        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        mavenCentral()
+        maven { url "${mavenRepoUrl}" }
     }
     dependencies {
         //使用springboot框架

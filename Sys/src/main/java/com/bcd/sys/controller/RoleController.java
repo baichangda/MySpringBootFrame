@@ -9,7 +9,7 @@ import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.rdb.util.RDBUtil;
+import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.service.RoleService;
 import io.swagger.annotations.*;
@@ -49,7 +49,7 @@ public class RoleController extends BaseController{
                                         @RequestParam(value = "code",required = false) String code,
                                         @RequestParam(value = "pageNum",required = false)Integer pageNum,
                                         @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(RoleBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(RoleBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),

@@ -9,7 +9,7 @@ import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.rdb.util.RDBUtil;
+import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.EnumItemBean;
 import com.bcd.sys.service.EnumItemService;
 import io.swagger.annotations.*;
@@ -60,7 +60,7 @@ public class EnumItemController extends BaseController{
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
         );
-        SimplePropertyPreFilter [] filters= RDBUtil.getOneDeepJsonFilter(EnumItemBean.class);
+        SimplePropertyPreFilter [] filters= FilterUtil.getOneDeepJsonFilter(EnumItemBean.class);
         if(pageNum==null || pageSize==null){
             return JsonMessage.successed(JsonUtil.toJSONResult(enumItemService.findAll(condition), filters));
         }else{

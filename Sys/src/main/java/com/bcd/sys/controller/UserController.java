@@ -10,7 +10,7 @@ import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.rdb.util.RDBUtil;
+import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
@@ -56,7 +56,7 @@ public class UserController extends BaseController {
                              @RequestParam(value="timeZone",required = true)String timeZone){
 
             UserBean user= userService.login(username,password,timeZone);
-            SimplePropertyPreFilter[] filters= RDBUtil.getOneDeepJsonFilter(UserBean.class);
+            SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
             return JsonMessage.successed(JsonUtil.toJSONResult(user,filters));
     }
 
@@ -150,7 +150,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "orgName",required = false) String orgName,
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimplePropertyPreFilter [] filters=RDBUtil.getOneDeepJsonFilter(UserBean.class);
+        SimplePropertyPreFilter [] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
