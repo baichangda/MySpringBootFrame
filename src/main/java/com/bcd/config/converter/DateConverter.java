@@ -1,4 +1,4 @@
-package com.bcd.config.convert;
+package com.bcd.config.converter;
 
 import com.bcd.base.util.DateUtil;
 import com.bcd.define.ErrorDefine;
@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by Administrator on 2017/5/31.
  */
 @Component
-public class DateConvert implements Converter<String,Date> {
+public class DateConverter implements Converter<String,Date> {
     @Override
     public Date convert(String source) {
         try {
