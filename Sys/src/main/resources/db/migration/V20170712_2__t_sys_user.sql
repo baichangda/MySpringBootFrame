@@ -12,8 +12,10 @@ create table IF NOT EXISTS t_sys_user
    status               int comment '是否可用（0：禁用；1：可用）',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
    create_user_id       bigint comment '创建人id',
+   create_user_name     varchar(50) comment '创建人姓名',
    update_time          timestamp NULL comment '更新时间',
    update_user_id       bigint comment '更新人id',
+   update_user_name     varchar(50) comment '更新人姓名',
    org_id              bigint comment '关联机构id',
    primary key (id)
 );

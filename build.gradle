@@ -1,58 +1,59 @@
-allprojects {
+allprojects{
     group 'MySpringBootFrame'
     version '1.0-SNAPSHOT'
-
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'org.flywaydb.flyway'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
     bootRun {
         addResources = true
+        /**
+         * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
+         * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
+         */
+        if (project.hasProperty('jvmArgs') ) {
+            jvmArgs = (project.jvmArgs.split("\\s+") as List)
+        }
     }
-
     repositories {
-        mavenLocal();
-        mavenCentral();
+        mavenLocal()
+        maven { url "${mavenRepoUrl}" }
     }
 
-
-    dependencies {
+    dependencies{
         //springboot web支持
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-        //springboot jpa支持
-        compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+        //springboot test支持
+        compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+        //springboot redis支持
+        compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
         //springboot websocket支持
         compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
         //springboot rabbitmq支持
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-
+        //activiti支持
+        compile("org.activiti:activiti-spring-boot-starter-basic:${activitiVersion}")
         //swagger集成
         compile "io.springfox:springfox-swagger2:${swaggerVersion}"
         compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
-
-        //alibaba fastjson集成
-        compile("com.alibaba:fastjson:${fastjsonVersion}")
-
         //shiro权限框架集成
         compile("org.apache.shiro:shiro-spring:${shiroVersion}")
         compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
         compile("org.apache.shiro:shiro-cas:${shiroVersion}")
-
-        //commons lang通用包集成
-        compile("commons-lang:commons-lang:${commonslangVersion}")
-
-        //poi 集成
-        compile("org.apache.poi:poi:${poiVersion}")
-        compile("org.apache.poi:poi-ooxml:${poiVersion}")
-        
-        //mysql驱动包
-        runtime "mysql:mysql-connector-java:${mysqlVersion}"
+        //rocketmq集成
+        compile("com.aliyun.openservices:ons-client:1.7.0.Final")
+        //阿里云 tablestore集成
+        compile("com.aliyun.openservices:tablestore:${tablestoreVersion}") {
+            //解决阿里云传递性依赖
+            exclude group: 'org.apache.logging.log4j', module: 'slf4j-api'
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+        }
     }
 
     gradle.projectsEvaluated {
@@ -61,24 +62,26 @@ allprojects {
             options.encoding = "UTF-8"
         }
     }
-
 }
+
+
+
+
 
 buildscript {
     ext {
         springBootVersion = '1.+'
         flywayVersion='3.2.1'
         swaggerVersion='2.+'
-        commonslangVersion='2.6'
         shiroVersion='1.+'
-        fastjsonVersion='1.+'
-        poiVersion='3.+'
-        mysqlVersion='5.+'
         kafkaVersion='1.+'
+        activitiVersion='6.0.+'
+        tablestoreVersion='4.+'
+        mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {
-        mavenLocal();
-        mavenCentral();
+        mavenLocal()
+        maven { url "${mavenRepoUrl}" }
     }
     dependencies {
         //使用springboot框架
@@ -90,6 +93,7 @@ buildscript {
 }
 
 dependencies {
-    compile project(':Base')
     compile project(':Sys')
+//    compile project(':MongoDB')
+    compile project(':NettyServer')
 }

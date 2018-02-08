@@ -11,7 +11,7 @@ spring:
    freemarker.cache: false
    resources.cache-period: 0
    datasource:
-         url: jdbc:mysql://127.0.0.1:3306/test?characterEncoding=utf8&useSSL=false
+         url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false
          username: root
          password: root
          hikari:
@@ -22,9 +22,11 @@ spring:
                  prepStmtCacheSize: 250
                  prepStmtCacheSqlLimit: 2048
                  useServerPrepStmts: true
+#  mongodb配置
+#   data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
 #  jpa配置
    jpa:
-      show-sql: true
+      show-sql: false
       hibernate:
           # Hibernate DDL  auto: create, create-drop, update, validate
           ddl-auto: validate
@@ -34,18 +36,58 @@ spring:
 
 #  i18n资源文件配置
    messages:
-      basename: i18n/base/messages,i18n/ubi/messages,i18n/ubi/sys/messages,i18n/ubi/car/messages
+      basename: i18n/base/messages,i18n/main/messages,i18n/sys/messages,i18n/rdb/messages,i18n/mongodb/messages,i18n/nettyserver/messages
       cache-seconds: -1
       encoding: UTF-8
 
-#   rabbitmq配置
+#  redis单例配置
+#   redis:
+#       hostName: 10.10.35.99
+#       port: 6379
+#       timeout: 0
+#       pool:
+#           max-idle: 8
+#           min-idle: 0
+#           max-active: 8
+#           max-wait: -1
+
+#  redis分布式配置(redis3.x提供的redis cluster)
+#   redis:
+#       cluster:
+#           nodes:
+#             - 10.10.35.99:6379
+#             - 10.10.35.100:6379
+#           connectionTimeout: 2000
+#           soTimeout: 2000
+#           maxAttempts: 5
+#           maxIdle: 8
+#           minIdle: 0
+#           maxTotal: 8
+
+#  redis集群配置(redis3.0之前客户端一致性hash分布式方案)
+#   redis:
+#      distributed:
+#          nodes[0]:
+#              host: 10.10.35.99
+#              port: 6379
+#              connectionTimeout:
+#          nodes[1]:
+#              host: 10.10.35.100
+#              port: 6379
+#              connectionTimeout:
+#          maxAttempts: -1
+#          maxIdle: 8
+#          minIdle: 0
+#          maxTotal: 8
+
+#  rabbitmq配置
 #   rabbitmq:
 #      host: 121.40.157.200
 #      port: 5672
 #      username: briair
 #      password: briair
 
-#   kafka配置
+#  kafka配置
 #   kafka:
 #      bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
 #      consumer.group-id: zd
@@ -53,3 +95,17 @@ spring:
 #      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 #      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+#  activiti配置
+#  processDefinitionLocationPrefix 默认为 src/main/resources/processes
+#   activiti:
+#       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
+
+#aliyun:
+#   secretKey: CgVFaBhk8znSdBsZVlBSFSqr4a76P1
+#   accessKey: LTAI2LEtG5xmDgUx
+#   rocketMq:
+#      producerId: PID_Proudcer_4
+#      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
+#   tableStore:
+#      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
+#      instanceName: rooster-dev
