@@ -9,6 +9,6 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);
-        new NettyHttpServer().run();
+        new NettyHttpServer("test",10001).run();
     }
 }
