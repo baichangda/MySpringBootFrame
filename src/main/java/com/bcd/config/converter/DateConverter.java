@@ -26,10 +26,10 @@ public class DateConverter implements Converter<String,Date> {
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
                     return DateUtil.stringToDateWithUserTimeZone(timeZone,source,DateUtil.DATE_FORMAT_SECOND);
                 }else{
-                    throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
+                    throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }
             } catch (Exception e1) {
-                throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
+                throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
             }
         }
     }
