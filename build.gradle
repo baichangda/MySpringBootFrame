@@ -63,11 +63,6 @@ allprojects{
         }
     }
 }
-
-
-
-
-
 buildscript {
     ext {
         springBootVersion = '1.+'
