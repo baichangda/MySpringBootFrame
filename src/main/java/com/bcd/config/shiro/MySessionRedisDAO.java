@@ -3,7 +3,7 @@ package com.bcd.config.shiro;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
-import java.io.Serializable;
+import java.io.*;
 
 
 /**
@@ -41,6 +41,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
     protected void doUpdate(Session session) {
         super.doUpdate(session);
         //每个该session的请求都会调用
+        sessionToByte(session);
     }
 
     /**
@@ -51,4 +52,43 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
         super.doDelete(session);
     }
 
+
+    /**
+     * 把session对象转化为byte保存到redis中
+     * @param session
+     * @return
+     */
+    public byte[] sessionToByte(Session session){
+        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        byte[] bytes = null;
+        try {
+            ObjectOutputStream oo = new ObjectOutputStream(bo);
+            oo.writeObject(session);
+            bytes = bo.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bytes;
+    }
+
+    /**
+     * 把byte还原为session
+     * @param bytes
+     * @return
+     */
+    public Session byteToSession(byte[] bytes){
+        ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
+        ObjectInputStream in;
+        Session session = null;
+        try {
+            in = new ObjectInputStream(bi);
+            session = (Session) in.readObject();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return session;
+    }
 }

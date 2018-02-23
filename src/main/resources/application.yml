@@ -41,15 +41,15 @@ spring:
       encoding: UTF-8
 
 #  redis单例配置
-#   redis:
-#       hostName: 10.10.35.99
-#       port: 6379
-#       timeout: 0
-#       pool:
-#           max-idle: 8
-#           min-idle: 0
-#           max-active: 8
-#           max-wait: -1
+   redis:
+       hostName: 127.0.0.1
+       port: 6379
+       timeout: 0
+       pool:
+           max-idle: 8
+           min-idle: 0
+           max-active: 8
+           max-wait: -1
 
 #  redis分布式配置(redis3.x提供的redis cluster)
 #   redis:
