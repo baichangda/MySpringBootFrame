@@ -100,9 +100,23 @@ spring:
 #   activiti:
 #       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
 
-#aliyun:
-#   secretKey: CgVFaBhk8znSdBsZVlBSFSqr4a76P1
-#   accessKey: LTAI2LEtG5xmDgUx
+aliyun:
+   mns:
+      test1:
+        enable: true
+        queueWaitSeconds: 30
+        topic: bcd-test
+        queue: bcd-test1
+        subscription: bcd-test1
+      test2:
+        enable: true
+        queueWaitSeconds: 30
+        topic: bcd-test
+        queue: bcd-test2
+        subscription: bcd-test2
+      endPoint:
+#   secretKey:
+#   accessKey:
 #   rocketMq:
 #      producerId: PID_Proudcer_4
 #      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet

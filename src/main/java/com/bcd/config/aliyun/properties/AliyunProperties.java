@@ -1,15 +1,17 @@
 package com.bcd.config.aliyun.properties;
 
+import com.bcd.config.aliyun.properties.mns.MnsProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration
-//@ConfigurationProperties(prefix = "aliyun")
+@Configuration
+@ConfigurationProperties(prefix = "aliyun")
 public class AliyunProperties {
     public String secretKey;
     public String accessKey;
     public RocketMqProperties rocketMq;
     public TableStoreProperties tableStore;
+    public MnsProperties mns;
 
     public String getSecretKey() {
         return secretKey;
@@ -41,6 +43,14 @@ public class AliyunProperties {
 
     public void setTableStore(TableStoreProperties tableStore) {
         this.tableStore = tableStore;
+    }
+
+    public MnsProperties getMns() {
+        return mns;
+    }
+
+    public void setMns(MnsProperties mns) {
+        this.mns = mns;
     }
 }
 

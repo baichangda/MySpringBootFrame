@@ -54,6 +54,8 @@ allprojects{
             exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
             exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
         }
+        //阿里云mns集成
+        compile("com.aliyun.mns:aliyun-sdk-mns:${mnsVersion}")
     }
 
     gradle.projectsEvaluated {
@@ -72,6 +74,7 @@ buildscript {
         kafkaVersion='1.+'
         activitiVersion='6.0.+'
         tablestoreVersion='4.+'
+        mnsVersion='1.+'
         mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {
@@ -90,5 +93,5 @@ buildscript {
 dependencies {
     compile project(':Sys')
 //    compile project(':MongoDB')
-    compile project(':NettyServer')
+//    compile project(':NettyServer')
 }
