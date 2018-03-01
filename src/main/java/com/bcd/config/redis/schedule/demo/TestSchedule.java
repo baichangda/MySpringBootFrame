@@ -1,51 +1,89 @@
-package com.bcd.config.redis.schedule;
+package com.bcd.config.redis.schedule.demo;
 
+import com.bcd.config.redis.schedule.RedisScheduleClusterHandler;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+@Component
+@Configurable
+@EnableScheduling
 public class TestSchedule {
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    private String lockId="bcd-test";
+
+    private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Scheduled(cron = "*/3 * * * * ?")
     public void test1(){
-        ScheduleUtil.doBeforeStart("test",3000L);
+        RedisScheduleClusterHandler handler=new RedisScheduleClusterHandler(lockId,2000L,2);
+        boolean res=handler.doBeforeStart();
+        if(!res){
+            return;
+        }
         try {
-            System.out.println("===========test1");
-            ScheduleUtil.doOnSuccess("test",3000L);
+            String a=null;
+            System.out.println("exception===========test1 "+sdf.format(new Date()));
+            a.toString();
+            System.out.println("===========test1 "+sdf.format(new Date()));
+            handler.doOnSuccess();
         }catch (Exception e){
-            ScheduleUtil.doOnFailed("test");
+            handler.doOnFailed();
         }
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "*/3 * * * * ?")
     public void test2(){
-        ScheduleUtil.doBeforeStart("test",3000L);
+        RedisScheduleClusterHandler handler=new RedisScheduleClusterHandler(lockId,2000L,2);
+        boolean res= handler.doBeforeStart();
+        if(!res){
+            return;
+        }
         try {
-            System.out.println("===========test2");
-            ScheduleUtil.doOnSuccess("test",3000L);
+            String a=null;
+            System.out.println("exception===========test2 "+sdf.format(new Date()));
+            a.toString();
+            System.out.println("===========test2 "+sdf.format(new Date()));
+            handler.doOnSuccess();
         }catch (Exception e){
-            ScheduleUtil.doOnFailed("test");
+            handler.doOnFailed();
         }
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "*/3 * * * * ?")
     public void test3(){
-        ScheduleUtil.doBeforeStart("test",3000L);
+        RedisScheduleClusterHandler handler=new RedisScheduleClusterHandler(lockId,2000L,2);
+        boolean res=handler.doBeforeStart();
+        if(!res){
+            return;
+        }
         try {
-            System.out.println("===========test3");
-            ScheduleUtil.doOnSuccess("test",3000L);
+            String a=null;
+            System.out.println("exception===========test3 "+sdf.format(new Date()));
+            a.toString();
+            System.out.println("===========test3 "+sdf.format(new Date()));
+            handler.doOnSuccess();
         }catch (Exception e){
-            ScheduleUtil.doOnFailed("test");
+            handler.doOnFailed();
         }
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "*/3 * * * * ?")
     public void test4(){
-        ScheduleUtil.doBeforeStart("test",3000L);
+        RedisScheduleClusterHandler handler=new RedisScheduleClusterHandler(lockId,2000L,2);
+        boolean res=handler.doBeforeStart();
+        if(!res){
+            return;
+        }
         try {
-            System.out.println("===========test4");
-            ScheduleUtil.doOnSuccess("test",3000L);
+            System.out.println("===========test4 "+sdf.format(new Date()));
+            handler.doOnSuccess();
         }catch (Exception e){
-            ScheduleUtil.doOnFailed("test");
+            handler.doOnFailed();
         }
     }
 }

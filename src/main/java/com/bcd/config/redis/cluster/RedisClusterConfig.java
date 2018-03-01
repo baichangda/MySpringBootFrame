@@ -1,7 +1,9 @@
 package com.bcd.config.redis.cluster;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
@@ -9,8 +11,8 @@ import redis.clients.jedis.JedisCluster;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-//@Configuration
-//@EnableConfigurationProperties(RedisClusterProperties.class)
+@Configuration
+@EnableConfigurationProperties(RedisClusterProperties.class)
 public class RedisClusterConfig {
     private final int DEFAULT_TIMEOUT = 2000;
     private final int DEFAULT_MAX_ATTEMPTS = 5;
