@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
-@Configuration
-@EnableConfigurationProperties(AliyunProperties.class)
+//@Configuration
+//@EnableConfigurationProperties(AliyunProperties.class)
 public class MnsConfig {
 
     @Autowired

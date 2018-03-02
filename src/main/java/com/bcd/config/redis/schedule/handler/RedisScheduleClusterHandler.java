@@ -1,4 +1,4 @@
-package com.bcd.config.redis.schedule;
+package com.bcd.config.redis.schedule.handler;
 
 import com.bcd.base.util.SpringUtil;
 import redis.clients.jedis.JedisCluster;
@@ -29,8 +29,8 @@ public abstract class RedisScheduleClusterHandler {
     protected String lockId;
 
     /**
-     * 任务执行成功后锁存活时间
-     * 在任务执行成功后,为了让其他正在等待获取锁终端销毁自己的定时任务
+     * 任务执行后锁存活时间
+     * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
      */
     protected long aliveTime;
 
