@@ -3,6 +3,8 @@ package com.bcd.config.redis.schedule.handler;
 import com.bcd.base.util.SpringUtil;
 import redis.clients.jedis.JedisCluster;
 
+import java.util.UUID;
+
 /**
  * Redis定时任务集群处理类
  *
@@ -16,6 +18,8 @@ import redis.clients.jedis.JedisCluster;
  *
  */
 public abstract class RedisScheduleClusterHandler {
+
+
     protected JedisCluster redisOp;
     /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
@@ -34,12 +38,18 @@ public abstract class RedisScheduleClusterHandler {
      */
     protected long aliveTime;
 
+
+
+
     public RedisScheduleClusterHandler(String lockId,long timeOut,long aliveTime){
-        this.lockId=lockId;
+        this.lockId= lockId;
         this.timeOut=timeOut;
         this.aliveTime=aliveTime;
         this.redisOp=SpringUtil.applicationContext.getBean(JedisCluster.class);
+
     }
+
+
 
 
     /**
@@ -55,6 +65,8 @@ public abstract class RedisScheduleClusterHandler {
 
     /**
      * 执行成功时调用
+     * 注意:
+     * 如果是ClusterFailedScheduleHandler的实现类,必须处理异常回滚,防止任务被多次执行
      */
     public abstract void doOnSuccess();
 
