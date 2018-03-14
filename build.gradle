@@ -92,6 +92,6 @@ buildscript {
 
 dependencies {
     compile project(':Sys')
-//    compile project(':MongoDB')
+    compile project(':MongoDB')
 //    compile project(':NettyServer')
 }

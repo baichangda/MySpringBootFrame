@@ -2,6 +2,6 @@ rootProject.name = 'MySpringBootFrame'
 include 'Base'
 include 'Sys'
 include 'RDB'
-//include 'MongoDB'
+include 'MongoDB'
 //include 'NettyServer'
 
