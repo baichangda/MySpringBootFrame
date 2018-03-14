@@ -1,6 +1,7 @@
 package com.bcd.config.redis.schedule.handler.impl;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.config.redis.schedule.handler.RedisScheduleClusterHandler;
 
 import java.util.UUID;
@@ -33,6 +34,10 @@ public class ClusterFailedScheduleHandler extends RedisScheduleClusterHandler {
 
     public ClusterFailedScheduleHandler(String lockId,long timeOut) {
         this(lockId,timeOut,timeOut/2,timeOut/10);
+    }
+
+    public ClusterFailedScheduleHandler(ClusterFailedSchedule anno) {
+        this(anno.lockId(),anno.timeOut(),anno.aliveTime()==0L?anno.timeOut()/2:anno.aliveTime(),anno.cycleInterval()==0L?anno.timeOut()/10:anno.cycleInterval());
     }
 
     /**
