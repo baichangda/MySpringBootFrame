@@ -8,16 +8,18 @@ import com.bcd.config.redis.schedule.handler.RedisScheduleClusterHandler;
  */
 public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
 
+    private final static Long DEFAULT_ALIVE_TIME=2000L;
+
     public SingleFailedScheduleHandler(String lockId,long timeOut,long aliveTime) {
         super(lockId,timeOut,aliveTime);
     }
 
     public SingleFailedScheduleHandler(String lockId,long timeOut) {
-        this(lockId,timeOut,timeOut/10);
+        this(lockId,timeOut,DEFAULT_ALIVE_TIME);
     }
 
     public SingleFailedScheduleHandler(SingleFailedSchedule anno){
-        this(anno.lockId(),anno.timeOut(),anno.aliveTime()==0L?anno.timeOut()/10:anno.aliveTime());
+        this(anno.lockId(),anno.timeOut(),anno.aliveTime()==0L?DEFAULT_ALIVE_TIME:anno.aliveTime());
     }
     /**
      * 执行任务之前调用

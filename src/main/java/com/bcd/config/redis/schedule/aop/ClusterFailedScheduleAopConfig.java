@@ -48,7 +48,7 @@ public class ClusterFailedScheduleAopConfig {
             if(handler!=null){
                 handler.doOnFailed();
             }
-            throwable.printStackTrace();
+//            throwable.printStackTrace();
         }
     }
 

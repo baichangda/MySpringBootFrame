@@ -25,10 +25,4 @@ public @interface SingleFailedSchedule {
      * @return
      */
     long aliveTime() default 0L;
-
-    /**
-     * 获取key失败循环周期
-     * @return
-     */
-    long cycleInterval() default 0L;
 }

@@ -10,8 +10,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@EnableConfigurationProperties(AliyunProperties.class)
+//@Configuration
+//@EnableConfigurationProperties(AliyunProperties.class)
 public class SmsConfig {
     @Autowired
     private AliyunProperties aliyunProperties;
