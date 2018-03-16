@@ -56,6 +56,9 @@ allprojects{
         }
         //阿里云mns集成
         compile("com.aliyun.mns:aliyun-sdk-mns:${mnsVersion}")
+        //阿里云sms集成
+        compile ("com.aliyun:aliyun-java-sdk-dysmsapi:${smsVersion}")
+        compile ("com.aliyun:aliyun-java-sdk-core:${aliyunSdkCoreVersion}")
     }
 
     gradle.projectsEvaluated {
@@ -75,6 +78,8 @@ buildscript {
         activitiVersion='6.0.+'
         tablestoreVersion='4.+'
         mnsVersion='1.+'
+        smsVersion='1.+'
+        aliyunSdkCoreVersion='2.+'
         mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {

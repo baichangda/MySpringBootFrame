@@ -1,5 +1,6 @@
 package com.bcd.config.redis.schedule.handler.impl;
 
+import com.bcd.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.config.redis.schedule.handler.RedisScheduleClusterHandler;
 
 /**
@@ -12,9 +13,12 @@ public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
     }
 
     public SingleFailedScheduleHandler(String lockId,long timeOut) {
-        this(lockId,timeOut,2000L);
+        this(lockId,timeOut,timeOut/10);
     }
 
+    public SingleFailedScheduleHandler(SingleFailedSchedule anno){
+        this(anno.lockId(),anno.timeOut(),anno.aliveTime()==0L?anno.timeOut()/10:anno.aliveTime());
+    }
     /**
      * 执行任务之前调用
      * 1、获取锁返回可执行

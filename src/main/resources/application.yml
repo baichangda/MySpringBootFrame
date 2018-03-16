@@ -125,3 +125,8 @@ aliyun:
 #   tableStore:
 #      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
 #      instanceName: rooster-dev
+#   sms:
+#      product: Dysmsapi
+#      domain: dysmsapi.aliyuncs.com
+#      regionId: cn-hangzhou
+#      endpointName: cn-hangzhou
