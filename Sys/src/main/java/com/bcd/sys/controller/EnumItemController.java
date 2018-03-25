@@ -81,7 +81,7 @@ public class EnumItemController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存枚举项")})
     public JsonMessage save(@RequestBody EnumItemBean enumItemDTO){
         enumItemService.save(enumItemDTO);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
 
@@ -96,7 +96,7 @@ public class EnumItemController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除枚举项")})
     public JsonMessage delete(@RequestParam Long[] idArr){
         enumItemService.delete(idArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 

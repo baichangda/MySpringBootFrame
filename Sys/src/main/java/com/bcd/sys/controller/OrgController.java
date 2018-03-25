@@ -38,7 +38,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存机构")})
     public JsonMessage save(@RequestBody OrgBean org){
         orgService.save(org);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
     /**
@@ -54,7 +54,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除机构")})
     public JsonMessage delete(@RequestParam Long[] orgIdArr){
         orgService.delete(orgIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
     /**

@@ -75,7 +75,7 @@ public class RoleController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存角色")})
     public JsonMessage save(@RequestBody RoleBean role){
         roleService.save(role);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
 
     }
 
@@ -93,7 +93,7 @@ public class RoleController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除角色")})
     public JsonMessage delete(@RequestParam Long[] roleIdArr){
         roleService.delete(roleIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 

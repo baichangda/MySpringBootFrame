@@ -19,4 +19,5 @@ public class ErrorDefine {
 
    public static BaseErrorMessage ERROR_RABBITMQ_MESSAGECONVERT_UNSUPPORTEDENCODING=BaseErrorMessage.getMessage(I18NData.getI18NData("MyMessageConverter.fromMessage.UnsupportedEncoding"));
 
+
 }

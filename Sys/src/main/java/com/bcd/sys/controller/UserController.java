@@ -181,7 +181,7 @@ public class UserController extends BaseController {
             user.setPassword(new Md5Hash(initialPassword,user.getUsername()).toBase64());
         }
         userService.saveIgnoreNull(user);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
 
@@ -196,7 +196,7 @@ public class UserController extends BaseController {
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除用户")})
     public JsonMessage delete(@RequestParam Long[] userIdArr){
         userService.delete(userIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
     /**

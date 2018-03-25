@@ -37,7 +37,7 @@ public class MenuController extends BaseController{
     @ApiResponses(value={@ApiResponse(code=200,message = "保存的菜单")})
     public JsonMessage save(@RequestBody MenuBean menu){
         menuService.save(menu);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
     /**
@@ -53,7 +53,7 @@ public class MenuController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除菜单")})
     public JsonMessage delete(@RequestParam Long[] menuIdArr){
         menuService.delete(menuIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 

@@ -2,6 +2,8 @@ package com.bcd.controller;
 
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
+import com.bcd.define.ErrorDefine;
+import com.bcd.define.SuccessDefine;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,11 +42,11 @@ public class I18NController {
                     break;
                 }
                 default:{
-                    return new JsonMessage<>(false, I18nUtil.getMessage("I18NController.changeLocale.FAILED",new Object[]{lang}));
+                    return ErrorDefine.ERROR_CHANGE_LOCALE.toJsonMessage(lang);
                 }
             }
         }
         request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,locale);
-        return new JsonMessage<>(true,I18nUtil.getMessage("I18NController.changeLocale.SUCCESSED"));
+        return SuccessDefine.SUCCESS_CHANGE_LOCALE.toJsonMessage();
     }
 }

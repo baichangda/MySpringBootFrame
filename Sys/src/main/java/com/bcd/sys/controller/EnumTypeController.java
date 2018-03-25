@@ -84,7 +84,7 @@ public class EnumTypeController extends BaseController{
         enumTypeService.save(enumTypeDTO);
         //清空无关系的枚举项
         enumItemService.delete(new NullCondition("typeId"));
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
 
@@ -99,7 +99,7 @@ public class EnumTypeController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除枚举类型")})
     public JsonMessage delete(@RequestParam Long[] idArr){
         enumTypeService.delete(idArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 
