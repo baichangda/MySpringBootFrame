@@ -8,7 +8,11 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
 
@@ -20,26 +24,20 @@ public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
     @Override
     public void assertAuthorized(Annotation a) throws AuthorizationException {
         if (!(a instanceof RequiresUserInfo)) return;
-        long id=((RequiresUserInfo)a).id();
-        String username=((RequiresUserInfo)a).username();
+        long[] ids=((RequiresUserInfo)a).id();
+        String[] usernames=((RequiresUserInfo)a).username();
         Logical logical=((RequiresUserInfo)a).logical();
         UserBean userBean= ShiroUtil.getCurrentUser();
-        List<Boolean> conditionList=new ArrayList<>();
-        if(id!=0){
-            conditionList.add(userBean.getId()==id);
-        }
-        if(!"".equals(username)){
-            conditionList.add(username.equals(userBean.getUsername()));
-        }
-        if(conditionList.size()==0){
-            return;
-        }
+        Stream<Boolean> idStream= Arrays.stream(ids).mapToObj(e->e==userBean.getId());
+        Stream<Boolean> userNameStream= Arrays.stream(usernames).map(e->e.equals(userBean.getUsername()));
         if(logical==Logical.AND){
-            if(conditionList.stream().anyMatch(e->!e)){
+            if((ids.length==0||idStream.allMatch(e->e)) &&
+                    (usernames.length==0||userNameStream.allMatch(e->e))){
                 throw new AuthorizationException("");
             }
         }else if(logical==Logical.OR){
-            if(conditionList.stream().allMatch(e->!e)){
+            if((ids.length==0||idStream.anyMatch(e->e)) &&
+                    (usernames.length==0||userNameStream.anyMatch(e->e))){
                 throw new AuthorizationException("");
             }
         }

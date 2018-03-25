@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by Administrator on 2017/8/16.
+ * 此注解使用方法为
+ * 检查当前用户权限字符串中是否有当前方法的 [完整类名:方法名] 字符串
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
