@@ -1,5 +1,6 @@
 package com.bcd.config.converter;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateUtil;
 import com.bcd.define.ErrorDefine;
 import com.bcd.sys.util.ShiroUtil;
@@ -29,7 +30,7 @@ public class DateConverter implements Converter<String,Date> {
                     throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }
             } catch (Exception e1) {
-                throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
+                throw BaseRuntimeException.getException(e1);
             }
         }
     }
