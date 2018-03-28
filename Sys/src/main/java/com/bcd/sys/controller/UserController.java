@@ -135,7 +135,6 @@ public class UserController extends BaseController {
      * @param pageSize
      * @return
      */
-    @RequiresAuthentication
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询所有用户",notes = "查询所有用户")
     @ApiImplicitParams({

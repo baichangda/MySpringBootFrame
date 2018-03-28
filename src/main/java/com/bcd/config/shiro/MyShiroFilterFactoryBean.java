@@ -49,8 +49,8 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
   
         PathMatchingFilterChainResolver chainResolver = new PathMatchingFilterChainResolver();
         FilterChainManager chainManager = createFilterChainManager();
-        chainResolver.setFilterChainManager(chainManager);  
-        return new MySpringShiroFilter((WebSecurityManager)securityManager, chainResolver);  
+        chainResolver.setFilterChainManager(chainManager);
+        return new MySpringShiroFilter((WebSecurityManager)securityManager, chainResolver);
     }  
   
     /**  
