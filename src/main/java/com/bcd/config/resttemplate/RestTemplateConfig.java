@@ -1,5 +1,6 @@
 package com.bcd.config.resttemplate;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,7 @@ public class RestTemplateConfig {
      * @return
      */
     @Bean
-    public RestTemplate restTemplate(ClientHttpRequestFactory factory,HttpMessageConverter httpMessageConverter) {
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter httpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters=new ArrayList<>();
         //在此添加转换器配置

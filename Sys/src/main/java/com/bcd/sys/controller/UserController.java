@@ -15,6 +15,7 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,6 +135,7 @@ public class UserController extends BaseController {
      * @param pageSize
      * @return
      */
+    @RequiresAuthentication
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询所有用户",notes = "查询所有用户")
     @ApiImplicitParams({

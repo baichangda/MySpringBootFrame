@@ -10,7 +10,11 @@ import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -37,7 +41,7 @@ import java.util.Map;
  2、当设置多个过滤器时，全部验证通过，才视为通过
  3、部分过滤器可指定参数，如perms，roles
  */
-//@Configuration
+@Configuration
 public class ShiroConfiguration {
     private static final Logger logger = Logger.getLogger(ShiroConfiguration.class);
 
@@ -49,7 +53,7 @@ public class ShiroConfiguration {
     @Bean
     public EhCacheManager ehCacheManager(){
         EhCacheManager ehcacheManager = new EhCacheManager();
-        ehcacheManager.setCacheManagerConfigFile("classpath:com.bcd.config/ehcache-shiro.xml");
+        ehcacheManager.setCacheManagerConfigFile("classpath:com/bcd/config/ehcache-shiro.xml");
         return ehcacheManager;
     }
 
@@ -129,10 +133,12 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager){
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,
+                                                         @Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter converter){
         ShiroFilterFactoryBean factoryBean = new MyShiroFilterFactoryBean();
         Map<String,Filter> filterMap=new HashMap<>();
-        filterMap.put("authc",new MyAuthenticationFilter());
+        filterMap.put("authc",new MyAuthenticationFilter(converter));
+        filterMap.put("perms",new MyAuthorizationFilter(converter));
         factoryBean.setFilters(filterMap);
 
         factoryBean.setSecurityManager(securityManager);
@@ -154,10 +160,8 @@ public class ShiroConfiguration {
     private void loadShiroFilterChain(ShiroFilterFactoryBean factoryBean) {
         /**下面这些规则配置最好配置到配置文件中*/
         Map<String, String> filterChainMap = new LinkedHashMap<String, String>();
-        /** authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器
-         * org.apache.shiro.web.filter.authc.FormAuthenticationFilter */
+        //authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
-        //authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问
         filterChainMap.put("/api/security/getPublicKey", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
 //        filterChainMap.put("/api/**","authc");

@@ -16,13 +16,18 @@ import java.util.List;
 @Configuration
 public class MessageConverterConfig {
     @Bean
-    public HttpMessageConverter httpMessageConverter(){
+    public HttpMessageConverter fastJsonHttpMessageConverter(){
         FastJsonConfig fastJsonConfig=new FastJsonConfig();
         FastJsonHttpMessageConverter converter= new FastJsonHttpMessageConverter();
         /**
          * 必须设置支持的数据类型(不能设置为*);否则可能会导致请求报错
          * java.lang.IllegalArgumentException: 'Content-Type' cannot contain wildcard type '*'
          * 因为在 org.springframework.http.converter.AbstractHttpMessageConverter.write 设置有保护机制;不允许设置*
+         *
+         * 注意:spring默认加载了
+         * stringHttpMessageConverter HttpMessageConvertersAutoConfiguration$StringHttpMessageConverterConfiguration
+         * mappingJackson2HttpMessageConverter JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration
+         * 覆盖这两个类的方式就是通过设置 setSupportedMediaTypes 来替换
          */
         List<MediaType> supportedMediaTypes = new ArrayList<>();
         supportedMediaTypes.add(MediaType.APPLICATION_JSON);

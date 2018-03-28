@@ -7,8 +7,8 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
-@ConfigurationProperties(prefix = "spring.redis.cluster")
+//@Configuration
+//@ConfigurationProperties(prefix = "spring.redis.cluster")
 public class RedisClusterProperties extends JedisPoolConfig {
 
     //集群节点

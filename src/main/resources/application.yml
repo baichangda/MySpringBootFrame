@@ -41,15 +41,15 @@ spring:
       encoding: UTF-8
 
 #  redis单例配置
-   redis:
-       hostName: 127.0.0.1
-       port: 6379
-       timeout: 0
-       pool:
-           max-idle: 8
-           min-idle: 0
-           max-active: 8
-           max-wait: -1
+#   redis:
+#       hostName: 127.0.0.1
+#       port: 6379
+#       timeout: 0
+#       pool:
+#           max-idle: 8
+#           min-idle: 0
+#           max-active: 8
+#           max-wait: -1
 
 #  redis分布式配置(redis3.x提供的redis cluster)
 #   redis:
@@ -100,23 +100,23 @@ spring:
 #   activiti:
 #       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
 
-aliyun:
-   mns:
-      test1:
-        enable: true
-        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
-        queueWaitSeconds: 30
-        topic: bcd-test
-        queue: bcd-test1
-        subscription: bcd-test1
-      test2:
-        enable: true
-        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
-        queueWaitSeconds: 30
-        topic: bcd-test
-        queue: bcd-test2
-        subscription: bcd-test2
-      endPoint:
+#aliyun:
+#   mns:
+#      test1:
+#        enable: true
+#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
+#        queueWaitSeconds: 30
+#        topic: bcd-test
+#        queue: bcd-test1
+#        subscription: bcd-test1
+#      test2:
+#        enable: true
+#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
+#        queueWaitSeconds: 30
+#        topic: bcd-test
+#        queue: bcd-test2
+#        subscription: bcd-test2
+#      endPoint:
 #   secretKey:
 #   accessKey:
 #   rocketMq:
@@ -130,3 +130,9 @@ aliyun:
 #      domain: dysmsapi.aliyuncs.com
 #      regionId: cn-hangzhou
 #      endpointName: cn-hangzhou
+
+#nettyServer:
+#   http:
+#      servers[0]:
+#         id: test
+#         port: 6379

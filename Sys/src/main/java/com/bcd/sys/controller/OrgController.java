@@ -10,6 +10,7 @@ import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +63,7 @@ public class OrgController extends BaseController{
      * @param orgId
      * @return
      */
+    @RequiresPermissions("abc:a")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询机构",notes="查询机构")
     @ApiImplicitParams({
