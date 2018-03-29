@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Configuration
 public class MessageConverterConfig {
-    @Bean
+    @Bean("fastJsonHttpMessageConverter")
     public HttpMessageConverter fastJsonHttpMessageConverter(){
         FastJsonConfig fastJsonConfig=new FastJsonConfig();
         FastJsonHttpMessageConverter converter= new FastJsonHttpMessageConverter();

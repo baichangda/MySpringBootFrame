@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.log4j.Logger;
@@ -10,11 +11,9 @@ import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.converter.HttpMessageConverter;
 
 import javax.servlet.Filter;
 import java.util.HashMap;
@@ -134,11 +133,11 @@ public class ShiroConfiguration {
      */
     @Bean(name = "shiroFilter")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,
-                                                         @Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter converter){
+                                                         ExceptionResponseHandler handler){
         ShiroFilterFactoryBean factoryBean = new MyShiroFilterFactoryBean();
         Map<String,Filter> filterMap=new HashMap<>();
-        filterMap.put("authc",new MyAuthenticationFilter(converter));
-        filterMap.put("perms",new MyAuthorizationFilter(converter));
+        filterMap.put("authc",new MyAuthenticationFilter(handler));
+        filterMap.put("perms",new MyAuthorizationFilter(handler));
         factoryBean.setFilters(filterMap);
 
         factoryBean.setSecurityManager(securityManager);

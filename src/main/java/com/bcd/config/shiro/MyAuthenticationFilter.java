@@ -1,21 +1,15 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.json.JsonMessage;
-import com.bcd.base.message.BaseErrorMessage;
-import com.bcd.base.util.ExceptionUtil;
+import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpResponse;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -42,12 +36,22 @@ import java.io.IOException;
 @SuppressWarnings("unchecked")
 public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
     private static final Logger log = LoggerFactory.getLogger(MyAuthenticationFilter.class);
-    private HttpMessageConverter converter;
+    private ExceptionResponseHandler handler;
 
-    public MyAuthenticationFilter(HttpMessageConverter converter) {
-        this.converter=converter;
+    public MyAuthenticationFilter(ExceptionResponseHandler handler) {
+        this.handler=handler;
     }
 
+    /**
+     * 重写此方法
+     * 此方法主要是用在url认证authc功能
+     * 1、在验证账户失败时候,改变返回结果
+     * 2、去掉在验证失败时候自动登陆的逻辑(shiro会在第一次登陆成功后,在response cookies中加上账户密码(加密后的))
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
 //        boolean loggedIn = false; //false by default or we wouldn't be in this method
@@ -55,15 +59,19 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
 //            loggedIn = executeLogin(request, response);
 //        }
 //        if (!loggedIn) {
-            response(response,new UnauthenticatedException());
+                handler.handle(WebUtils.toHttp(response),new UnauthenticatedException());
 //        }
 //        return loggedIn;
         return false;
     }
 
     /**
-     * 重写这个方法的原因是为了拦截所有的认证异常
-     * 重写onAccessDenied不满足需求的原因是因为,父类cleanup只会处理UnauthenticatedException
+     * 重写这个方法
+     * 此方法主要是用在请求中发生异常但是又没有被spring拦截的异常
+     *
+     * 1、拦截所有在请求执行过程中发生的异常(已经被spring拦截下来的会转换成JsonMessage,这里拦截不到)
+     *
+     * remarks:单单重写onAccessDenied不满足需求的原因是因为,父类cleanup只会处理UnauthenticatedException
      * @param request
      * @param response
      * @param existing
@@ -85,7 +93,7 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
 //                    loggedIn = executeLogin(request, response);
 //                }
 //                if (!loggedIn) {
-                    response(response,existing);
+                    handler.handle(WebUtils.toHttp(response),existing);
 //                }
                 /**
                  * 此处是 onAccessDenied方法实现 end
@@ -134,26 +142,5 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
         /**
          * 以下是 AdviceFilter cleanup逻辑,直接复制过来 end
          */
-    }
-
-    /**
-     * 采用 spring 自带的转换器转换结果,输出结果
-     * @param response
-     * @param exception
-     * @throws IOException
-     */
-    private void response(ServletResponse response,Exception exception) throws IOException {
-        HttpServletResponse httpResponse = WebUtils.toHttp(response);
-        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(httpResponse);
-        BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(exception.getClass().getName());
-        JsonMessage result;
-        if(errorMessage==null){
-            result= ExceptionUtil.toJsonMessage(exception);
-        }else{
-            result=errorMessage.toJsonMessage();
-        }
-        converter.write(result,
-                MediaType.APPLICATION_JSON_UTF8,
-                servletServerHttpResponse);
     }
 }

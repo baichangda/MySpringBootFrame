@@ -1,17 +1,14 @@
 package com.bcd.config.shiro;
 
-import com.bcd.config.define.ErrorDefine;
+import com.bcd.config.exception.handler.ExceptionResponseHandler;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.StringUtils;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpResponse;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -39,10 +36,10 @@ import java.io.IOException;
  */
 @SuppressWarnings("unchecked")
 public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
-    private HttpMessageConverter converter;
+    private ExceptionResponseHandler handler;
 
-    public MyAuthorizationFilter(HttpMessageConverter converter) {
-        this.converter=converter;
+    public MyAuthorizationFilter(ExceptionResponseHandler handler) {
+        this.handler=handler;
     }
 
     @Override
@@ -60,23 +57,9 @@ public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
                 WebUtils.issueRedirect(request, response, unauthorizedUrl);
             } else {
                 //这里返回自定义异常
-                response(response);
+                handler.handle(WebUtils.toHttp(response),new AuthorizationException());
             }
         }
         return false;
-    }
-
-    /**
-     * 采用 spring 自带的转换器转换结果,输出结果
-     * @param response
-     * @throws IOException
-     */
-    private void response(ServletResponse response) throws IOException {
-        HttpServletResponse httpResponse = WebUtils.toHttp(response);
-        httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(httpResponse);
-        converter.write(ErrorDefine.ERROR_SHIRO_AUTHORIZATION.toJsonMessage(),
-                MediaType.APPLICATION_JSON_UTF8,
-                servletServerHttpResponse);
     }
 }
