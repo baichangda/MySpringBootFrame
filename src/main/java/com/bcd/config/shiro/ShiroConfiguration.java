@@ -13,6 +13,7 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.converter.HttpMessageConverter;
 
 import javax.servlet.Filter;
@@ -108,9 +109,9 @@ public class ShiroConfiguration {
     }
 
     @Bean
-    public SessionManager sessionManager(){
+    public SessionManager sessionManager(RedisTemplate redisTemplate){
         DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
-//        sessionManager.setSessionDAO(new MySessionRedisDAO());
+        sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));
         return sessionManager;
     }
 
@@ -163,7 +164,7 @@ public class ShiroConfiguration {
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         filterChainMap.put("/api/security/getPublicKey", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
-//        filterChainMap.put("/api/**","authc");
+        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 

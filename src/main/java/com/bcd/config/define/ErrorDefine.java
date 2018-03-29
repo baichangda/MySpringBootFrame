@@ -16,6 +16,7 @@ public class ErrorDefine {
    public static BaseErrorMessage ERROR_SHIRO_UNAUTHENTICATED = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.UnauthenticatedException"),String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
    public static BaseErrorMessage ERROR_SHIRO_EXPIRED_CREDENTIALS = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.ExpiredCredentialsException"));
    public static BaseErrorMessage ERROR_SHIRO_AUTHORIZATION = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.AuthorizationException"));
+   public static BaseErrorMessage ERROR_SHIRO_UNKNOWNSESSIONEXCEPTION = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.UnknownSessionException"));
 
    public static BaseErrorMessage ERROR_RABBITMQ_MESSAGECONVERT_UNSUPPORTEDENCODING=BaseErrorMessage.getMessage(I18NData.getI18NData("MyMessageConverter.fromMessage.UnsupportedEncoding"));
 

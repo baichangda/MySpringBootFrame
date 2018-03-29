@@ -6,6 +6,8 @@ import com.bcd.config.define.ErrorDefine;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.UnauthorizedException;
+import org.apache.shiro.session.UnknownSessionException;
 
 import java.util.HashMap;
 
@@ -24,5 +26,7 @@ public class ShiroConst {
         EXCEPTION_ERRORMESSAGE_MAP.put(UnauthenticatedException.class.getName(), ErrorDefine.ERROR_SHIRO_UNAUTHENTICATED);
         EXCEPTION_ERRORMESSAGE_MAP.put(ExpiredCredentialsException.class.getName(), ErrorDefine.ERROR_SHIRO_EXPIRED_CREDENTIALS);
         EXCEPTION_ERRORMESSAGE_MAP.put(AuthorizationException.class.getName(), ErrorDefine.ERROR_SHIRO_AUTHORIZATION);
+        EXCEPTION_ERRORMESSAGE_MAP.put(UnauthorizedException.class.getName(), ErrorDefine.ERROR_SHIRO_AUTHORIZATION);
+        EXCEPTION_ERRORMESSAGE_MAP.put(UnknownSessionException.class.getName(), ErrorDefine.ERROR_SHIRO_UNKNOWNSESSIONEXCEPTION);
     }
 }

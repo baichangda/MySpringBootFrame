@@ -10,6 +10,8 @@ import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.service.MenuService;
 import io.swagger.annotations.*;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,6 +63,7 @@ public class MenuController extends BaseController{
      * 查询菜单
      * @return
      */
+    @RequiresRoles("abc")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询菜单",notes="查询菜单")
     @ApiImplicitParams({

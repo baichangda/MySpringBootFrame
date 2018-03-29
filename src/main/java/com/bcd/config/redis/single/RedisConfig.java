@@ -9,8 +9,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-//@Configuration
-//@EnableAutoConfiguration
+@Configuration
+@EnableAutoConfiguration
+@SuppressWarnings("unchecked")
 public class RedisConfig {
     /**
      * 注入 RedisConnectionFactory
@@ -24,8 +25,8 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisTemplate<String, Object> functionDomainRedisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate functionDomainRedisTemplate() {
+        RedisTemplate redisTemplate = new RedisTemplate<>();
         initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
         return redisTemplate;
     }

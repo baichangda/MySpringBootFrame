@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Configuration
+@SuppressWarnings("unchecked")
 public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
     @Autowired
     @Qualifier("fastJsonHttpMessageConverter")

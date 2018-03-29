@@ -63,6 +63,7 @@ public class OrgController extends BaseController{
      * @param orgId
      * @return
      */
+    @RequiresPermissions("abc")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询机构",notes="查询机构")
     @ApiImplicitParams({
