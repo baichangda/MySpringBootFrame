@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * 配置spring的restTemplate , 此对象可以用来发送 restful 请求
  */
 @Configuration
 public class RestTemplateConfig {
@@ -24,6 +24,7 @@ public class RestTemplateConfig {
      * @return
      */
     @Bean
+    @ConditionalOnMissingBean(RestTemplate.class)
     public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter httpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters=new ArrayList<>();
@@ -34,11 +35,10 @@ public class RestTemplateConfig {
     }
 
     @Bean
-    @ConditionalOnMissingBean({ClientHttpRequestFactory.class})
     public ClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000);// ms
-        factory.setReadTimeout(5000);// ms
+        factory.setConnectTimeout(10000);// ms
+        factory.setReadTimeout(10000);// ms
         return factory;
     }
 }

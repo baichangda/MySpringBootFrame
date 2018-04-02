@@ -18,7 +18,4 @@ public class ErrorDefine {
    public static BaseErrorMessage ERROR_SHIRO_AUTHORIZATION = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.AuthorizationException"));
    public static BaseErrorMessage ERROR_SHIRO_UNKNOWNSESSIONEXCEPTION = BaseErrorMessage.getMessage(I18NData.getI18NData("CustomExceptionHandler.UnknownSessionException"));
 
-   public static BaseErrorMessage ERROR_RABBITMQ_MESSAGECONVERT_UNSUPPORTEDENCODING=BaseErrorMessage.getMessage(I18NData.getI18NData("MyMessageConverter.fromMessage.UnsupportedEncoding"));
-
-
 }
