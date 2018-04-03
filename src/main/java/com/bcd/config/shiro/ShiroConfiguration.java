@@ -163,7 +163,7 @@ public class ShiroConfiguration {
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         filterChainMap.put("/api/security/getPublicKey", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
-        filterChainMap.put("/api/**","authc");
+//        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 
