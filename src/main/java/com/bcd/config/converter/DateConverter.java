@@ -16,6 +16,9 @@ import java.util.Date;
 public class DateConverter implements Converter<String,Date> {
     @Override
     public Date convert(String source) {
+        if(source==null){
+            return null;
+        }
         try {
             long t = Long.parseLong(source);
             return new Date(t);
