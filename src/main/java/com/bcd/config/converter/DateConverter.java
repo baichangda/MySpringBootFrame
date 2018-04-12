@@ -1,5 +1,6 @@
 package com.bcd.config.converter;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateUtil;
 import com.bcd.define.ErrorDefine;
 import com.bcd.sys.util.ShiroUtil;
@@ -15,6 +16,9 @@ import java.util.Date;
 public class DateConverter implements Converter<String,Date> {
     @Override
     public Date convert(String source) {
+        if(source==null){
+            return null;
+        }
         try {
             long t = Long.parseLong(source);
             return new Date(t);
@@ -26,10 +30,10 @@ public class DateConverter implements Converter<String,Date> {
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
                     return DateUtil.stringToDateWithUserTimeZone(timeZone,source,DateUtil.DATE_FORMAT_SECOND);
                 }else{
-                    throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
+                    throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }
             } catch (Exception e1) {
-                throw ErrorDefine.ERROR_DATECONVERT_FAILED.toRuntimeException();
+                throw BaseRuntimeException.getException(e1);
             }
         }
     }

@@ -19,6 +19,6 @@ public class SecurityController {
     @ApiOperation(value = "获取公钥",notes = "获取公钥")
     @ApiResponses(value = {@ApiResponse(code = 200,message = "公钥信息")})
     public JsonMessage<Object> getPublicKey(){
-        return JsonMessage.successed(RSASecurity.keyMap.get(RSASecurity.PUBLIC_KEY));
+        return JsonMessage.success(RSASecurity.keyMap.get(RSASecurity.PUBLIC_KEY));
     }
 }

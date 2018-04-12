@@ -56,9 +56,9 @@ public class RoleController extends BaseController{
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.successed(JsonUtil.toJSONResult(roleService.findAll(condition),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition),filters));
         }else{
-            return JsonMessage.successed(JsonUtil.toJSONResult(roleService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
         }
     }
 
@@ -75,7 +75,7 @@ public class RoleController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存角色")})
     public JsonMessage save(@RequestBody RoleBean role){
         roleService.save(role);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
 
     }
 
@@ -93,32 +93,9 @@ public class RoleController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除角色")})
     public JsonMessage delete(@RequestParam Long[] roleIdArr){
         roleService.delete(roleIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 
-    /**
-     * 字段唯一性验证
-     * @param fieldName
-     * @param val
-     * @return
-     */
-    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
-    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage isUniqueCheck(
-            @RequestParam(value = "fieldName",required = true) String fieldName,
-            @RequestParam(value = "fieldValue",required = true) String val){
-        boolean flag = roleService.isUnique(fieldName, val);
-        if (flag==false){
-            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
-        }else {
-            return JsonMessage.successed();
-        }
-    }
 
 }

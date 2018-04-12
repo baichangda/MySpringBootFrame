@@ -9,5 +9,7 @@ import javax.servlet.http.HttpServletResponse;
  * Created by Administrator on 2017/9/28.
  */
 public class ErrorDefine {
-   public static BaseErrorMessage ERROR_DATECONVERT_FAILED=BaseErrorMessage.getMessage(I18NData.getI18NData("DateConvert.convert.FAILED"));
+   public static BaseErrorMessage ERROR_DATE_CONVERT_FAILED =BaseErrorMessage.getMessage(I18NData.getI18NData("DateConvert.convert.FAILED"));
+
+   public static BaseErrorMessage ERROR_CHANGE_LOCALE=BaseErrorMessage.getMessage(I18NData.getI18NData("I18NController.changeLocale.FAILED"));
 }

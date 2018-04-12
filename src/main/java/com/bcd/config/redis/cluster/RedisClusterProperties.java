@@ -1,5 +1,7 @@
 package com.bcd.config.redis.cluster;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.ArrayList;

@@ -10,6 +10,7 @@ import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.service.MenuService;
 import io.swagger.annotations.*;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class MenuController extends BaseController{
     @ApiResponses(value={@ApiResponse(code=200,message = "保存的菜单")})
     public JsonMessage save(@RequestBody MenuBean menu){
         menuService.save(menu);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
     /**
@@ -53,7 +54,7 @@ public class MenuController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除菜单")})
     public JsonMessage delete(@RequestParam Long[] menuIdArr){
         menuService.delete(menuIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 
@@ -61,6 +62,7 @@ public class MenuController extends BaseController{
      * 查询菜单
      * @return
      */
+    @RequiresRoles("abc")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询菜单",notes="查询菜单")
     @ApiImplicitParams({
@@ -69,32 +71,8 @@ public class MenuController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
     public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
         SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
-        return JsonMessage.successed(JsonUtil.toJSONResult(menuService.findOne(menuId),filters));
+        return JsonMessage.success(JsonUtil.toJSONResult(menuService.findOne(menuId),filters));
     }
 
-
-    /**
-     * 字段唯一性验证
-     * @param fieldName
-     * @param val
-     * @return
-     */
-    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
-    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage isUniqueCheck(
-            @RequestParam(value = "fieldName",required = true) String fieldName,
-            @RequestParam(value = "fieldValue",required = true) String val){
-        boolean flag = menuService.isUnique(fieldName, val);
-        if (flag==false){
-            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
-        }else {
-            return JsonMessage.successed();
-        }
-    }
 
 }

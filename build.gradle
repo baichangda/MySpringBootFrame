@@ -54,6 +54,11 @@ allprojects{
             exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
             exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
         }
+        //阿里云mns集成
+        compile("com.aliyun.mns:aliyun-sdk-mns:${mnsVersion}")
+        //阿里云sms集成
+        compile ("com.aliyun:aliyun-java-sdk-dysmsapi:${smsVersion}")
+        compile ("com.aliyun:aliyun-java-sdk-core:${aliyunSdkCoreVersion}")
     }
 
     gradle.projectsEvaluated {
@@ -63,11 +68,6 @@ allprojects{
         }
     }
 }
-
-
-
-
-
 buildscript {
     ext {
         springBootVersion = '1.+'
@@ -77,6 +77,9 @@ buildscript {
         kafkaVersion='1.+'
         activitiVersion='6.0.+'
         tablestoreVersion='4.+'
+        mnsVersion='1.+'
+        smsVersion='1.+'
+        aliyunSdkCoreVersion='2.+'
         mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {
@@ -94,6 +97,5 @@ buildscript {
 
 dependencies {
     compile project(':Sys')
-//    compile project(':MongoDB')
-    compile project(':NettyServer')
+    compile project(':MongoDB')
 }

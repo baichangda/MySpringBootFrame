@@ -57,7 +57,7 @@ public class UserController extends BaseController {
 
             UserBean user= userService.login(username,password,timeZone);
             SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
-            return JsonMessage.successed(JsonUtil.toJSONResult(user,filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(user,filters));
     }
 
     /**
@@ -157,9 +157,9 @@ public class UserController extends BaseController {
                 new StringCondition("org.name",orgName, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.successed(JsonUtil.toJSONResult(userService.findAll(condition),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition),filters));
         }else{
-            return JsonMessage.successed(JsonUtil.toJSONResult(userService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
         }
 
     }
@@ -181,7 +181,7 @@ public class UserController extends BaseController {
             user.setPassword(new Md5Hash(initialPassword,user.getUsername()).toBase64());
         }
         userService.saveIgnoreNull(user);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
 
@@ -196,31 +196,7 @@ public class UserController extends BaseController {
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除用户")})
     public JsonMessage delete(@RequestParam Long[] userIdArr){
         userService.delete(userIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
-    }
-
-    /**
-     * 字段唯一性验证
-     * @param fieldName
-     * @param val
-     * @return
-     */
-    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
-    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage isUniqueCheck(
-            @RequestParam(value = "fieldName",required = true) String fieldName,
-            @RequestParam(value = "fieldValue",required = true) String val){
-        boolean flag = userService.isUnique(fieldName, val);
-        if (flag==false){
-            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
-        }else {
-            return JsonMessage.successed();
-        }
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
 }

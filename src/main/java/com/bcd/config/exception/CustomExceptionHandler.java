@@ -1,12 +1,13 @@
 package com.bcd.config.exception;
 
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.json.JsonMessage;
-import com.bcd.base.message.BaseErrorMessage;
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.util.JsonUtil;
-import com.bcd.config.shiro.ShiroConst;
+import com.bcd.config.exception.handler.ExceptionResponseHandler;
+import com.bcd.config.exception.handler.impl.DefaultExceptionResponseHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
@@ -15,40 +16,33 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Configuration
+@SuppressWarnings("unchecked")
 public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
+    private ExceptionResponseHandler handler;
     @Override
     public ModelAndView resolveException(HttpServletRequest request,
                                          HttpServletResponse response, Object object, Exception exception) {
-        //1、先打印出异常信息
-        exception.printStackTrace();
-        //2、判断response
-        if(!response.isCommitted()){
-            try {
-                JsonMessage result;
-                //2.1、先验证是否属于自定义运行异常
-                if(BaseRuntimeException.class.isAssignableFrom(exception.getClass())){
-                    result=((BaseRuntimeException)exception).toJsonMessage();
-                }else{
-                    //2.2、非自定义异常处理
-                    //2.2.1、先验证是否属于shiro的异常类型
-                    BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(exception.getClass().getName());
-                    if(errorMessage!=null){
-                        result=errorMessage.toJsonMessage();
-                    }else{
-                        //2.2.2、否则当作普通异常处理,直接返回
-                        result=JsonMessage.failed(exception.getMessage(),null,exception.toString());
-                    }
-                }
-                //2.3、获取异常堆栈信息
-                result.setError(ExceptionUtil.getStackTraceMessage(exception));
+        //1、判断response
+        if(response.isCommitted()){
+            return new ModelAndView();
+        }
+        //2、打印异常
+        ExceptionUtil.printException(exception);
 
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(JsonUtil.toJSONResult(result));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        //3、使用异常handler处理异常
+        try {
+            handler.handle(response,exception);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return new ModelAndView();
     }
 
+    @Bean
+    @ConditionalOnMissingBean()
+    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter converter) {
+        ExceptionResponseHandler handler=new DefaultExceptionResponseHandler(converter);
+        this.handler=handler;
+        return handler;
+    }
 }

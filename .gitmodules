@@ -7,6 +7,3 @@
 [submodule "MongoDB"]
 	path = MongoDB
 	url = ../MongoDB.git
-[submodule "NettyServer"]
-	path = NettyServer
-	url = ../NettyServer.git

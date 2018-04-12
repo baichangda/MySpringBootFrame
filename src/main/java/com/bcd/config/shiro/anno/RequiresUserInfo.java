@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresUserInfo {
-    long id() default 0;
-    String username() default "";
+    long[] id() default {};
+    String[] username() default {};
     Logical logical() default Logical.AND;
 }

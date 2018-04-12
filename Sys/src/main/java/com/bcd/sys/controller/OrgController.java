@@ -10,6 +10,7 @@ import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +39,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存机构")})
     public JsonMessage save(@RequestBody OrgBean org){
         orgService.save(org);
-        return SuccessDefine.SUCCESS_SAVE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
     /**
@@ -54,7 +55,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除机构")})
     public JsonMessage delete(@RequestParam Long[] orgIdArr){
         orgService.delete(orgIdArr);
-        return SuccessDefine.SUCCESS_DELETE_SUCCESSED.toJsonMessage();
+        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
     /**
@@ -62,6 +63,7 @@ public class OrgController extends BaseController{
      * @param orgId
      * @return
      */
+    @RequiresPermissions("abc")
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询机构",notes="查询机构")
     @ApiImplicitParams({
@@ -70,31 +72,8 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
         SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
-        return JsonMessage.successed(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
+        return JsonMessage.success(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
     }
 
-    /**
-     * 字段唯一性验证
-     * @param fieldName
-     * @param val
-     * @return
-     */
-    @RequestMapping(value = "/isUniqueCheck",method = RequestMethod.GET)
-    @ApiOperation(value = "字段唯一性验证",notes = "字段唯一性验证")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "fieldName",value = "字段名称",dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "fieldValue",value = "字段的值",dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "true(可用) false(不可用)")})
-    public JsonMessage isUniqueCheck(
-            @RequestParam(value = "fieldName",required = true) String fieldName,
-            @RequestParam(value = "fieldValue",required = true) String val){
-        boolean flag = orgService.isUnique(fieldName, val);
-        if (flag==false){
-            return ErrorDefine.ERROR_FIELD_VALUE_EXISTED.toJsonMessage();
-        }else {
-            return JsonMessage.successed();
-        }
-    }
 
 }

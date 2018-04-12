@@ -42,7 +42,7 @@ spring:
 
 #  redis单例配置
 #   redis:
-#       hostName: 10.10.35.99
+#       hostName: 127.0.0.1
 #       port: 6379
 #       timeout: 0
 #       pool:
@@ -101,11 +101,32 @@ spring:
 #       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
 
 #aliyun:
-#   secretKey: CgVFaBhk8znSdBsZVlBSFSqr4a76P1
-#   accessKey: LTAI2LEtG5xmDgUx
+#   mns:
+#      test1:
+#        enable: true
+#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
+#        queueWaitSeconds: 30
+#        topic: bcd-test
+#        queue: bcd-test1
+#        subscription: bcd-test1
+#      test2:
+#        enable: true
+#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
+#        queueWaitSeconds: 30
+#        topic: bcd-test
+#        queue: bcd-test2
+#        subscription: bcd-test2
+#      endPoint:
+#   secretKey:
+#   accessKey:
 #   rocketMq:
 #      producerId: PID_Proudcer_4
 #      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
 #   tableStore:
 #      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
 #      instanceName: rooster-dev
+#   sms:
+#      product: Dysmsapi
+#      domain: dysmsapi.aliyuncs.com
+#      regionId: cn-hangzhou
+#      endpointName: cn-hangzhou

@@ -1,7 +1,9 @@
 package com.bcd.config.redis.cluster;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
