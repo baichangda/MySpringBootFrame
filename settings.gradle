@@ -3,5 +3,4 @@ include 'Base'
 include 'Sys'
 include 'RDB'
 include 'MongoDB'
-include 'NettyServer'
 

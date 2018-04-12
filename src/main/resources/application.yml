@@ -130,9 +130,3 @@ spring:
 #      domain: dysmsapi.aliyuncs.com
 #      regionId: cn-hangzhou
 #      endpointName: cn-hangzhou
-
-#nettyServer:
-#   http:
-#      servers[0]:
-#         id: test
-#         port: 6379
