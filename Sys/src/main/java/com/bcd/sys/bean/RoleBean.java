@@ -1,8 +1,8 @@
 package com.bcd.sys.bean;
 
 
-import com.bcd.rdb.annotation.CheckRepeatReferOnSave;
-import com.bcd.rdb.annotation.CheckReferredOnDelete;
+import com.bcd.rdb.anno.CheckRepeatReferOnSave;
+import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;

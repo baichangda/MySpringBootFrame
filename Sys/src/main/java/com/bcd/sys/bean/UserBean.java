@@ -2,7 +2,7 @@ package com.bcd.sys.bean;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.bcd.rdb.annotation.CheckRepeatReferOnSave;
+import com.bcd.rdb.anno.CheckRepeatReferOnSave;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;

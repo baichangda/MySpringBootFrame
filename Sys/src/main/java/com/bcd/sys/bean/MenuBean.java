@@ -2,7 +2,7 @@ package com.bcd.sys.bean;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.bcd.rdb.annotation.CheckReferredOnDelete;
+import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
 
 import javax.persistence.*;
