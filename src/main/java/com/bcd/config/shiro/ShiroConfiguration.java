@@ -8,6 +8,7 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
@@ -163,7 +164,7 @@ public class ShiroConfiguration {
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         filterChainMap.put("/api/security/getPublicKey", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
-//        filterChainMap.put("/api/**","authc");
+        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 

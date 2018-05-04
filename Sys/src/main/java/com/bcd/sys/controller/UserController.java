@@ -1,6 +1,8 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.bcd.base.annotation.RequiresAction;
+import com.bcd.base.annotation.RequiresUrlPermission;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
@@ -15,6 +17,8 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +46,6 @@ public class UserController extends BaseController {
      * @param timeZone
      * @return
      */
-
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value="用户登录",notes = "根据帐号密码登录")
     @ApiImplicitParams({
@@ -134,6 +137,7 @@ public class UserController extends BaseController {
      * @param pageSize
      * @return
      */
+    @RequiresUrlPermission
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询所有用户",notes = "查询所有用户")
     @ApiImplicitParams({
@@ -169,6 +173,7 @@ public class UserController extends BaseController {
      * @param user
      * @return
      */
+
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiImplicitParams({

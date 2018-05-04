@@ -13,6 +13,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@SuppressWarnings("unchecked")
 public class DefaultExceptionResponseHandler implements ExceptionResponseHandler{
     private HttpMessageConverter converter;
 

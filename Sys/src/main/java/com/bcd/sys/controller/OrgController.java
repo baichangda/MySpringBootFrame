@@ -1,6 +1,7 @@
 package com.bcd.sys.controller;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.bcd.base.annotation.RequiresAction;
 import com.bcd.base.define.ErrorDefine;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.JsonMessage;
@@ -63,7 +64,7 @@ public class OrgController extends BaseController{
      * @param orgId
      * @return
      */
-    @RequiresPermissions("abc")
+    @RequiresAction
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询机构",notes="查询机构")
     @ApiImplicitParams({

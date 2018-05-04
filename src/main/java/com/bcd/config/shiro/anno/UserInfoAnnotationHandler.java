@@ -1,5 +1,6 @@
 package com.bcd.config.shiro.anno;
 
+import com.bcd.base.annotation.RequiresUserInfo;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.shiro.authz.AuthorizationException;
@@ -7,11 +8,7 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
