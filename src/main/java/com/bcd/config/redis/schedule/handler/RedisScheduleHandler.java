@@ -18,7 +18,7 @@ import java.util.UUID;
  * 2、此处理类不适用于频率非常高的定时任务,建议使用在定时任务周期>30s(具体的任务时间周期受redis网络环境的影响)
  *
  */
-public abstract class RedisScheduleClusterHandler {
+public abstract class RedisScheduleHandler {
 
 
     protected RedisTemplate redisTemplate;
@@ -42,7 +42,7 @@ public abstract class RedisScheduleClusterHandler {
 
 
 
-    public RedisScheduleClusterHandler(String lockId,long timeOut,long aliveTime){
+    public RedisScheduleHandler(String lockId, long timeOut, long aliveTime){
         this.lockId= lockId;
         this.timeOut=timeOut;
         this.aliveTime=aliveTime;

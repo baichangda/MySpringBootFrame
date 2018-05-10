@@ -1,4 +1,4 @@
-package com.bcd.config.redis.single;
+package com.bcd.config.redis;
 
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.springframework.beans.factory.annotation.Autowired;

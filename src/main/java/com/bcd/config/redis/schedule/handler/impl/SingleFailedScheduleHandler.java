@@ -1,12 +1,14 @@
 package com.bcd.config.redis.schedule.handler.impl;
 
 import com.bcd.config.redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.config.redis.schedule.handler.RedisScheduleClusterHandler;
+import com.bcd.config.redis.schedule.handler.RedisScheduleHandler;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果
  */
-public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
+public class SingleFailedScheduleHandler extends RedisScheduleHandler {
 
     private final static Long DEFAULT_ALIVE_TIME=2000L;
 
@@ -30,13 +32,13 @@ public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
     public boolean doBeforeStart() {
         try {
             //1、获取锁
-            Long lock = redisOp.setnx(lockId, "0");
-            if (lock == 1L) {
+            boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockId, "0");
+            if (isLock) {
                 //2、获取锁成功则设置过期时间
-                Long pexpireRes=redisOp.pexpire(lockId, timeOut);
+                boolean pexpireRes=redisTemplate.expire(lockId, timeOut, TimeUnit.MILLISECONDS);
                 //2.1、如果设置失败,则不执行;同时释放锁
-                if(pexpireRes==0){
-                    redisOp.del(lockId);
+                if(!pexpireRes){
+                    redisTemplate.delete(lockId);
                     return false;
                 }else{
                     return true;
@@ -58,7 +60,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
     @Override
     public void doOnFailed() {
         //1、即使设置失败,也没有任何影响,只是会有冗余数据在redis
-        redisOp.psetex(lockId,aliveTime,"2");
+        redisTemplate.opsForValue().set(lockId,"2",aliveTime,TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -70,6 +72,6 @@ public class SingleFailedScheduleHandler extends RedisScheduleClusterHandler {
     @Override
     public void doOnSuccess() {
         //1、即使设置失败,也没有任何影响,只是会有冗余数据在redis
-        redisOp.psetex(lockId,aliveTime,"1");
+        redisTemplate.opsForValue().set(lockId,"1",aliveTime,TimeUnit.MILLISECONDS);
     }
 }

@@ -1,4 +1,4 @@
-server:
+吖pplicaserver:
     port: 8888
     compression:
         enabled: true
@@ -40,45 +40,38 @@ spring:
       cache-seconds: -1
       encoding: UTF-8
 
-#  redis单例配置
-#   redis:
-#       hostName: 127.0.0.1
-#       port: 6379
-#       timeout: 0
-#       pool:
-#           max-idle: 8
-#           min-idle: 0
-#           max-active: 8
-#           max-wait: -1
-
-#  redis分布式配置(redis3.x提供的redis cluster)
-#   redis:
-#       cluster:
-#           nodes:
-#             - 10.10.35.99:6379
-#             - 10.10.35.100:6379
-#           connectionTimeout: 2000
-#           soTimeout: 2000
-#           maxAttempts: 5
-#           maxIdle: 8
-#           minIdle: 0
-#           maxTotal: 8
-
-#  redis集群配置(redis3.0之前客户端一致性hash分布式方案)
-#   redis:
-#      distributed:
-#          nodes[0]:
-#              host: 10.10.35.99
-#              port: 6379
-#              connectionTimeout:
-#          nodes[1]:
-#              host: 10.10.35.100
-#              port: 6379
-#              connectionTimeout:
-#          maxAttempts: -1
-#          maxIdle: 8
-#          minIdle: 0
-#          maxTotal: 8
+#  redis配置
+#  如果都进行了配置,加载的先后顺序为:
+#  sentinel>cluster>single
+   redis:
+      #公用配置
+      ssl: false
+      database: 0
+      timeout: 0
+      password:
+      #连接池
+      pool:
+          max-idle: 8
+          min-idle: 0
+          max-active: 8
+          max-wait: -1
+      #主从配置
+#      sentinel:
+#          master: myMaster
+#          nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
+      #集群配置
+#      cluster:
+#          maxRedirects: 3
+#          nodes:
+#             - 119.23.34.40:7001
+#             - 119.23.34.40:7002
+#             - 119.23.34.40:7003
+#             - 39.108.14.114:7004
+#             - 39.108.14.114:7005
+#             - 39.108.14.114:7006
+      #单机配置
+      host: 127.0.0.1
+      port: 6379
 
 #  rabbitmq配置
 #   rabbitmq:

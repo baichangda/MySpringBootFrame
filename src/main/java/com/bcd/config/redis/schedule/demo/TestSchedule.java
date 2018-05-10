@@ -1,10 +1,6 @@
 package com.bcd.config.redis.schedule.demo;
 
 import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.config.redis.schedule.handler.RedisScheduleClusterHandler;
-import com.bcd.config.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
-import com.bcd.sys.service.LogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
