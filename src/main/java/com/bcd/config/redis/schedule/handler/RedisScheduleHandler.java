@@ -1,6 +1,7 @@
 package com.bcd.config.redis.schedule.handler;
 
 import com.bcd.base.util.SpringUtil;
+import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCluster;
 
 import java.util.UUID;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public abstract class RedisScheduleClusterHandler {
 
 
-    protected JedisCluster redisOp;
+    protected RedisTemplate redisTemplate;
     /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
      * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
@@ -45,7 +46,7 @@ public abstract class RedisScheduleClusterHandler {
         this.lockId= lockId;
         this.timeOut=timeOut;
         this.aliveTime=aliveTime;
-        this.redisOp=SpringUtil.applicationContext.getBean(JedisCluster.class);
+        this.redisTemplate=SpringUtil.applicationContext.getBean(RedisTemplate.class);
 
     }
 
