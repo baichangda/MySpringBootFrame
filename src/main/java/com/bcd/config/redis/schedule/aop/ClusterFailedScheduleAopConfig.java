@@ -28,7 +28,7 @@ public class ClusterFailedScheduleAopConfig {
     }
 
     /**
-     * 定时任务 环绕通知 记录日志
+     * 定时任务 环绕通知
      */
     @Around("methodSchedule()")
     public void doAroundSchedule(ProceedingJoinPoint joinPoint){
