@@ -1,9 +1,9 @@
 package com.bcd.sys.bean;
 
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.bcd.rdb.anno.CheckRepeatReferOnSave;
 import com.bcd.rdb.bean.BaseBean;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -29,7 +29,7 @@ public class UserBean extends BaseBean<Long> {
 	private Integer status;    //状态 0：禁用；1：启用
 	private Long orgId;
 
-	@JSONField(serialize = false ,deserialize = false)
+	@JsonIgnore
 	private String password;  //密码凭证
 
 	//用户关联角色
@@ -49,7 +49,7 @@ public class UserBean extends BaseBean<Long> {
 
 	//临时字段、供登陆时使用
 	@Transient
-	@JSONField(serialize = false ,deserialize = false)
+	@JsonIgnore
 	private String timeZone;
 
 	public String getUsername() {

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果
  */
+@SuppressWarnings("unchecked")
 public class SingleFailedScheduleHandler extends RedisScheduleHandler {
 
     private final static Long DEFAULT_ALIVE_TIME=2000L;

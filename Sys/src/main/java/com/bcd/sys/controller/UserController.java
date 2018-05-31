@@ -1,13 +1,10 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.bcd.base.annotation.RequiresAction;
-import com.bcd.base.annotation.RequiresUrlPermission;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.define.ErrorDefine;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.jackson.impl.SimpleFilterBean;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
@@ -17,8 +14,6 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +54,7 @@ public class UserController extends BaseController {
                              @RequestParam(value="timeZone",required = true)String timeZone){
 
             UserBean user= userService.login(username,password,timeZone);
-            SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
             return JsonMessage.success(JsonUtil.toJSONResult(user,filters));
     }
 
@@ -137,7 +132,6 @@ public class UserController extends BaseController {
      * @param pageSize
      * @return
      */
-    @RequiresUrlPermission
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询所有用户",notes = "查询所有用户")
     @ApiImplicitParams({
@@ -154,7 +148,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "orgName",required = false) String orgName,
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimplePropertyPreFilter [] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+        SimpleFilterBean [] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),

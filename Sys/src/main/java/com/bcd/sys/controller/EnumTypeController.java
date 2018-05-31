@@ -1,12 +1,11 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NullCondition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.define.ErrorDefine;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.jackson.impl.SimpleFilterBean;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
@@ -61,7 +60,7 @@ public class EnumTypeController extends BaseController{
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
         );
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(EnumTypeBean.class);
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(EnumTypeBean.class);
         if(pageNum==null || pageSize==null){
             return JsonMessage.success(JsonUtil.toJSONResult(enumTypeService.findAll(condition), filters));
         }else{

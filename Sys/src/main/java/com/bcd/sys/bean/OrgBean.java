@@ -1,9 +1,10 @@
 package com.bcd.sys.bean;
 
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public class OrgBean extends BaseBean<Long> {
     @OneToMany(mappedBy = "orgId")
     private Set<UserBean> userBeanSet = new HashSet<>();
 
-    @JSONField(serialize = false ,deserialize = false)
+    @JsonIgnore
     @CheckReferredOnDelete
     @OneToMany(mappedBy = "parentId")
     private Set<OrgBean> orgBeanSet = new HashSet<>();

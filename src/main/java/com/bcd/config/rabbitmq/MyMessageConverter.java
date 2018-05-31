@@ -1,17 +1,14 @@
 package com.bcd.config.rabbitmq;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.config.define.ErrorDefine;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017/6/22.
@@ -50,14 +47,14 @@ public class MyMessageConverter implements MessageConverter{
             throw BaseRuntimeException.getException(e);
         }
         Class clazz= (Class)properties.getInferredArgumentType();
-        if(clazz.isAssignableFrom(String.class)){
-            return content;
-        }else if(clazz.isAssignableFrom(Map.class)){
-            return JSONObject.parse(content);
-        }else if(clazz.isAssignableFrom(List.class)){
-            return JSONArray.parse(content);
-        }else{
-            return JSONObject.parseObject(content,clazz);
+        try {
+            if(clazz.isAssignableFrom(String.class)){
+                return content;
+            }else{
+                return new ObjectMapper().readValue(content,clazz);
+            }
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
         }
     }
 }

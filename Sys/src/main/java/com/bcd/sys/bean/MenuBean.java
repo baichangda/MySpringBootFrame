@@ -1,9 +1,9 @@
 package com.bcd.sys.bean;
 
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class MenuBean extends BaseBean<Long> {
     private EnumItemBean enumItemDTO;
 
     @CheckReferredOnDelete
-    @JSONField(serialize=false,deserialize = false)
+    @JsonIgnore
     @OneToMany(mappedBy = "parentId")
     @OrderBy("orderNum ASC")
     private List<MenuBean> childrenList = new ArrayList<>();

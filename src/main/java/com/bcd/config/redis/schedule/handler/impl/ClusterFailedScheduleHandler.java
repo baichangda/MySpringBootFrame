@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 集群失败执行模式,如果一个终端执行定时任务失败,会有其他终端执行;直到所有的终端执行失败,定时任务才算失败
  */
+@SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     /**
      * 锁失败循环间隔时间(此参数在 单机失败模式下无效 )

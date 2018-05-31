@@ -5,7 +5,6 @@ import com.bcd.base.message.BaseErrorMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.config.shiro.ShiroConst;
-import org.apache.shiro.web.util.WebUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;

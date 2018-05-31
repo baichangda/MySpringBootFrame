@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Component
-@Configurable
-@EnableScheduling
+//@Component
+//@Configurable
+//@EnableScheduling
 public class TestSchedule {
 
     private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

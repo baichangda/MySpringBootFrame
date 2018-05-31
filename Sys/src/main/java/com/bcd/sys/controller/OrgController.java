@@ -1,9 +1,8 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.annotation.RequiresAction;
-import com.bcd.base.define.ErrorDefine;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.jackson.impl.SimpleFilterBean;
 import com.bcd.base.json.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
@@ -11,7 +10,6 @@ import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,7 +70,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
         return JsonMessage.success(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
     }
 

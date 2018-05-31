@@ -25,7 +25,7 @@ public class RestTemplateConfig {
      */
     @Bean
     @ConditionalOnMissingBean(RestTemplate.class)
-    public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter httpMessageConverter) {
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("stringHttpMessageConverter") HttpMessageConverter httpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters=new ArrayList<>();
         //在此添加转换器配置
