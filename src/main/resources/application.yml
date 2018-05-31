@@ -2,7 +2,7 @@
     port: 8888
     compression:
         enabled: true
-        mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
+        mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/result
         min-response-size: 1024
     session:
         timeout: 1800

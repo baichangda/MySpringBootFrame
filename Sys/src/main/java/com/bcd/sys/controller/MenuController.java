@@ -1,8 +1,8 @@
 package com.bcd.sys.controller;
 
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.jackson.impl.SimpleFilterBean;
-import com.bcd.base.json.JsonMessage;
+import com.bcd.base.json.jackson.impl.SimpleFilterBean;
+import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;

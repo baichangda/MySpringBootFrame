@@ -1,7 +1,6 @@
 package com.bcd.controller;
 
-import com.bcd.base.json.JsonMessage;
-import com.bcd.base.util.I18nUtil;
+import com.bcd.base.message.JsonMessage;
 import com.bcd.define.ErrorDefine;
 import com.bcd.define.SuccessDefine;
 import io.swagger.annotations.*;
