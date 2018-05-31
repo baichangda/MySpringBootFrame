@@ -22,8 +22,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
     }
 
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
-        HttpServletResponse httpResponse = WebUtils.toHttp(response);
-        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(httpResponse);
+        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(response);
         BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(throwable.getClass().getName());
         JsonMessage result;
         if(errorMessage==null){
