@@ -1,6 +1,5 @@
 package com.bcd.config.shiro.anno;
 
-import com.bcd.base.annotation.RequiresUserInfo;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.shiro.authz.AuthorizationException;

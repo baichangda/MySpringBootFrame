@@ -78,7 +78,7 @@ public class UserService  extends BaseService<UserBean,Long> {
      */
     public boolean updatePassword(Long userId,String encryptOldPassword,String encryptNewPassword){
         //1、查找当前用户
-        UserBean sysUserDTO= findOne(userId);
+        UserBean sysUserDTO= findById(userId);
         //2、根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
             //2.1、获取私钥

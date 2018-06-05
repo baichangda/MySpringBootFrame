@@ -52,7 +52,7 @@ public class MenuController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除菜单")})
     public JsonMessage delete(@RequestParam Long[] menuIdArr){
-        menuService.delete(menuIdArr);
+        menuService.deleteById(menuIdArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
@@ -70,7 +70,7 @@ public class MenuController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
     public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
         SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
-        return JsonMessage.success(JsonUtil.toJSONResult(menuService.findOne(menuId),filters));
+        return JsonMessage.success(JsonUtil.toJSONResult(menuService.findById(menuId),filters));
     }
 
 

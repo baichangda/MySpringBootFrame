@@ -1,8 +1,8 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.annotation.RequiresUrlPermission;
-import com.bcd.base.annotation.RequiresAction;
-import com.bcd.base.annotation.RequiresUserInfo;
+import com.bcd.config.shiro.anno.RequiresUrlPermission;
+import com.bcd.config.shiro.anno.RequiresAction;
+import com.bcd.config.shiro.anno.RequiresUserInfo;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;

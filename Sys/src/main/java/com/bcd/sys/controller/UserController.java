@@ -89,7 +89,7 @@ public class UserController extends BaseController {
     @ApiResponses(value={@ApiResponse(code=200,message = "是否重置成功")})
     public JsonMessage resetPassword(@RequestParam(value = "userId") Long userId){
         //1、重置密码
-        UserBean sysUserDTO= userService.findOne(userId);
+        UserBean sysUserDTO= userService.findById(userId);
         //2、设置默认密码
         sysUserDTO.setPassword(new Md5Hash(initialPassword,sysUserDTO.getUsername()).toBase64());
         userService.save(sysUserDTO);
@@ -157,7 +157,7 @@ public class UserController extends BaseController {
         if(pageNum==null||pageSize==null){
             return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition),filters));
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)),filters));
         }
 
     }
@@ -194,7 +194,7 @@ public class UserController extends BaseController {
     @ApiImplicitParam(name = "userIdArr",value = "用户id数组",paramType = "query")
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除用户")})
     public JsonMessage delete(@RequestParam Long[] userIdArr){
-        userService.delete(userIdArr);
+        userService.deleteById(userIdArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 

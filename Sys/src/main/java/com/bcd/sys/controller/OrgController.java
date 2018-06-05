@@ -1,6 +1,5 @@
 package com.bcd.sys.controller;
 
-import com.bcd.base.annotation.RequiresAction;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.json.jackson.impl.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
@@ -53,7 +52,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除机构")})
     public JsonMessage delete(@RequestParam Long[] orgIdArr){
-        orgService.delete(orgIdArr);
+        orgService.deleteById(orgIdArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 
@@ -62,7 +61,6 @@ public class OrgController extends BaseController{
      * @param orgId
      * @return
      */
-    @RequiresAction
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "查询机构",notes="查询机构")
     @ApiImplicitParams({
@@ -71,7 +69,7 @@ public class OrgController extends BaseController{
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
         SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
-        return JsonMessage.success(JsonUtil.toJSONResult(orgService.findOne(orgId),filters));
+        return JsonMessage.success(JsonUtil.toJSONResult(orgService.findById(orgId),filters));
     }
 
 

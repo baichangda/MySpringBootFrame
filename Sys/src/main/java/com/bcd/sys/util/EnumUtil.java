@@ -53,6 +53,6 @@ public class EnumUtil {
      * @return
      */
     public static EnumItemBean getEnumItem(Long id){
-        return enumItemService.findOne(id);
+        return enumItemService.findById(id);
     }
 }

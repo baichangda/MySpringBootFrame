@@ -2,9 +2,7 @@ package com.bcd.config.redis.schedule.handler;
 
 import com.bcd.base.util.SpringUtil;
 import org.springframework.data.redis.core.RedisTemplate;
-import redis.clients.jedis.JedisCluster;
 
-import java.util.UUID;
 
 /**
  * Redis定时任务集群处理类

@@ -11,6 +11,8 @@ allprojects{
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
+        jcenter()
+        mavenCentral()
     }
 
     dependencies{
@@ -18,16 +20,20 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
         //springboot test支持
         compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+
         //springboot redis支持
+        //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
         compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
+        compile("org.apache.commons:commons-pool2:${commonsPool2}")
+        //jedis同步客户端,可以不进行引用(此jar默认引入了apache commons-pool2)
+        compile("redis.clients:jedis:${jedisVersion}")
+
         //springboot websocket支持
         compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
         //springboot rabbitmq支持
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-        //activiti支持
-        compile("org.activiti:activiti-spring-boot-starter-basic:${activitiVersion}")
         //swagger集成
         compile "io.springfox:springfox-swagger2:${swaggerVersion}"
         compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
@@ -58,10 +64,13 @@ allprojects{
             options.encoding = "UTF-8"
         }
     }
+
+    jar {
+        enabled = true
+    }
 }
 
 bootRun {
-    addResources = true
     /**
      * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
      * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
@@ -73,21 +82,24 @@ bootRun {
 
 buildscript {
     ext {
-        springBootVersion = '1.+'
+        springBootVersion = '+'
         flywayVersion='3.2.1'
-        swaggerVersion='2.+'
-        shiroVersion='1.+'
-        kafkaVersion='1.+'
-        activitiVersion='6.0.+'
-        tablestoreVersion='4.+'
-        mnsVersion='1.+'
-        smsVersion='1.+'
-        aliyunSdkCoreVersion='2.+'
+        swaggerVersion='+'
+        shiroVersion='+'
+        kafkaVersion='+'
+        tablestoreVersion='+'
+        mnsVersion='+'
+        smsVersion='+'
+        aliyunSdkCoreVersion='+'
+        commonsPool2='+'
+        jedisVersion='+'
         mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
+        jcenter()
+        mavenCentral()
     }
     dependencies {
         //使用springboot框架

@@ -57,7 +57,7 @@ public class RoleController extends BaseController{
         if(pageNum==null||pageSize==null){
             return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition),filters));
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition,new PageRequest(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)),filters));
         }
     }
 
@@ -91,7 +91,7 @@ public class RoleController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除角色")})
     public JsonMessage delete(@RequestParam Long[] roleIdArr){
-        roleService.delete(roleIdArr);
+        roleService.deleteById(roleIdArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 

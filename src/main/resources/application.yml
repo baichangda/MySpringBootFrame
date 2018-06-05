@@ -1,27 +1,30 @@
-吖pplicaserver:
-    port: 8888
-    compression:
-        enabled: true
-        mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/result
-        min-response-size: 1024
+server:
+  port: 8888
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/result
+    min-response-size: 1024
+  servlet:
     session:
-        timeout: 1800
+      timeout: 1800
 spring:
+   resources:
+     cache:
+       period: -1
    profiles.active: dev
    freemarker.cache: false
-   resources.cache-period: 0
    datasource:
-         url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false
-         username: root
-         password: root
-         hikari:
-             minimumIdle: 5
-             maximumPoolSize: 15
-             data-source-properties:
-                 cachePrepStmts: true
-                 prepStmtCacheSize: 250
-                 prepStmtCacheSqlLimit: 2048
-                 useServerPrepStmts: true
+     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false
+     username: root
+     password: root
+     hikari:
+       minimumIdle: 5
+       maximumPoolSize: 15
+       data-source-properties:
+         cachePrepStmts: true
+         prepStmtCacheSize: 250
+         prepStmtCacheSqlLimit: 2048
+         useServerPrepStmts: true
 #  mongodb配置
 #   data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
 #  jpa配置
@@ -29,16 +32,16 @@ spring:
       show-sql: false
       hibernate:
           # Hibernate DDL  auto: create, create-drop, update, validate
-          ddl-auto: validate
+        ddl-auto: validate
       properties:
-          hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
-          hibernate.current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
+        hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+        hibernate.current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
 
 #  i18n资源文件配置
    messages:
       basename: i18n/base/messages,i18n/main/messages,i18n/sys/messages,i18n/rdb/messages,i18n/mongodb/messages,i18n/nettyserver/messages
-      cache-seconds: -1
       encoding: UTF-8
+      cache-duration: -1
 
 #  redis配置
 #  如果都进行了配置,加载的先后顺序为:
@@ -47,31 +50,42 @@ spring:
       #公用配置
       ssl: false
       database: 0
-      timeout: 0
-      password:
-      #连接池
-      pool:
-          max-idle: 8
-          min-idle: 0
-          max-active: 8
-          max-wait: -1
+      timeout: 10000
+      password: zd@2018
+      #同步jedis连接池
+#      jedis:
+#        pool:
+#          maxIdle: 8
+#          minIdle: 0
+#          maxActive: 8
+#          maxWait: -1
+      #异步lettuce连接池(默认)
+      lettuce:
+        pool:
+          maxIdle: 8
+          minIdle: 0
+          maxActive: 8
+          maxWait: -1
       #主从配置
 #      sentinel:
-#          master: myMaster
-#          nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
+#        master: myMaster
+#        nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
       #集群配置
-#      cluster:
-#          maxRedirects: 3
-#          nodes:
-#             - 119.23.34.40:7001
-#             - 119.23.34.40:7002
-#             - 119.23.34.40:7003
-#             - 39.108.14.114:7004
-#             - 39.108.14.114:7005
-#             - 39.108.14.114:7006
+      cluster:
+        maxRedirects: 3
+        nodes:
+          - 119.23.34.40:7001
+          - 119.23.34.40:7002
+          - 119.23.34.40:7003
+          - 39.108.14.114:7004
+          - 39.108.14.114:7005
+          - 39.108.14.114:7006
+
       #单机配置
-      host: 127.0.0.1
-      port: 6379
+#      host: 127.0.0.1
+#      port: 6379
+
+
 
 #  rabbitmq配置
 #   rabbitmq:
@@ -88,10 +102,6 @@ spring:
 #      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
 #      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 #      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-#  activiti配置
-#  processDefinitionLocationPrefix 默认为 src/main/resources/processes
-#   activiti:
-#       processDefinitionLocationPrefix: classpath:/com/bcd/com.bcd.config/activiti/example/
 
 #aliyun:
 #   mns:

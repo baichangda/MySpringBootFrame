@@ -64,7 +64,7 @@ public class EnumTypeController extends BaseController{
         if(pageNum==null || pageSize==null){
             return JsonMessage.success(JsonUtil.toJSONResult(enumTypeService.findAll(condition), filters));
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(enumTypeService.findAll(condition,new PageRequest(pageNum-1,pageSize)), filters));
+            return JsonMessage.success(JsonUtil.toJSONResult(enumTypeService.findAll(condition,PageRequest.of(pageNum-1,pageSize)), filters));
         }
     }
 
@@ -97,7 +97,7 @@ public class EnumTypeController extends BaseController{
     @ApiImplicitParam(name = "idArr",value = "枚举类型id数组",paramType = "query",required = true)
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除枚举类型")})
     public JsonMessage delete(@RequestParam Long[] idArr){
-        enumTypeService.delete(idArr);
+        enumTypeService.deleteById(idArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 }
