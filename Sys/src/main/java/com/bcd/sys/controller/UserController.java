@@ -1,10 +1,10 @@
 package com.bcd.sys.controller;
 
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.base.util.JsonUtil;
@@ -54,7 +54,7 @@ public class UserController extends BaseController {
                              @RequestParam(value="timeZone",required = true)String timeZone){
 
             UserBean user= userService.login(username,password,timeZone);
-        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
             return JsonMessage.success(JsonUtil.toJSONResult(user,filters));
     }
 
@@ -148,7 +148,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "orgName",required = false) String orgName,
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimpleFilterBean [] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),

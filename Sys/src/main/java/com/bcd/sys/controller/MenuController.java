@@ -1,7 +1,7 @@
 package com.bcd.sys.controller;
 
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
@@ -69,7 +69,7 @@ public class MenuController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
     public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
-        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
         return JsonMessage.success(JsonUtil.toJSONResult(menuService.findById(menuId),filters));
     }
 

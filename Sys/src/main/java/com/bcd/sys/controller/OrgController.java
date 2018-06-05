@@ -1,7 +1,7 @@
 package com.bcd.sys.controller;
 
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
@@ -68,7 +68,7 @@ public class OrgController extends BaseController{
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
     public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
-        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
         return JsonMessage.success(JsonUtil.toJSONResult(orgService.findById(orgId),filters));
     }
 

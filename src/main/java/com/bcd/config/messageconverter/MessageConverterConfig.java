@@ -1,5 +1,6 @@
 package com.bcd.config.messageconverter;
 
+import com.aliyun.openservices.shade.com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -14,7 +15,7 @@ import java.util.List;
 @Configuration
 public class MessageConverterConfig {
     @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(){
+    public FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter4(){
         /**
          * 必须设置支持的数据类型(不能设置为*);否则可能会导致请求报错
          * java.lang.IllegalArgumentException: 'Content-Type' cannot contain wildcard type '*'
@@ -25,7 +26,7 @@ public class MessageConverterConfig {
          * mappingJackson2HttpMessageConverter JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration
          * 覆盖这两个类的方式就是通过设置 setSupportedMediaTypes 来替换
          */
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter=new MappingJackson2HttpMessageConverter();
+        FastJsonHttpMessageConverter4 fastJsonHttpMessageConverter4=new FastJsonHttpMessageConverter4();
         List<MediaType> supportedMediaTypes = new ArrayList<>();
         supportedMediaTypes.add(MediaType.APPLICATION_JSON);
         supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
@@ -44,7 +45,7 @@ public class MessageConverterConfig {
         supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
         supportedMediaTypes.add(MediaType.TEXT_PLAIN);
         supportedMediaTypes.add(MediaType.TEXT_XML);
-        mappingJackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-        return mappingJackson2HttpMessageConverter;
+        fastJsonHttpMessageConverter4.setSupportedMediaTypes(supportedMediaTypes);
+        return fastJsonHttpMessageConverter4;
     }
 }

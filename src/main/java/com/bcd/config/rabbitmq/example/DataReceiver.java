@@ -1,8 +1,6 @@
 package com.bcd.config.rabbitmq.example;
 
-import com.bcd.base.exception.BaseRuntimeException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import java.io.File;
@@ -15,12 +13,9 @@ import java.util.Map;
 public class DataReceiver {
     @RabbitListener(queues = "dataQueue")
     public void process(Map<String,Object> data) {
-        System.out.println("Receiver  : " + data);
-        try {
-            saveDataToFile(new ObjectMapper().writeValueAsString(data));
-        } catch (JsonProcessingException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        String dataStr=JSONObject.toJSONString(data);
+        System.out.println("Receiver  : " + dataStr);
+        saveDataToFile(dataStr);
     }
 
     private void saveDataToFile(String data) {

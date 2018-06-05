@@ -1,10 +1,10 @@
 package com.bcd.sys.controller;
 
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
@@ -48,7 +48,7 @@ public class RoleController extends BaseController{
                                         @RequestParam(value = "code",required = false) String code,
                                         @RequestParam(value = "pageNum",required = false)Integer pageNum,
                                         @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(RoleBean.class);
+        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(RoleBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
