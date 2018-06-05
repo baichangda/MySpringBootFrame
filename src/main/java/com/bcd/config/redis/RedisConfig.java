@@ -27,6 +27,7 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Primary
     @Bean(name = "fastJsonRedisSerializer")
     public FastJsonRedisSerializer fastJsonRedisSerializer(){
         return new FastJsonRedisSerializer<>(Object.class);
