@@ -39,7 +39,7 @@ spring:
 
 #  i18n资源文件配置
    messages:
-      basename: i18n/base/messages,i18n/main/messages,i18n/sys/messages,i18n/rdb/messages,i18n/mongodb/messages,i18n/nettyserver/messages
+      basename: i18n/base/messages,i18n/main/messages,i18n/sys/messages,i18n/rdb/messages,i18n/mongodb/messages
       encoding: UTF-8
       cache-duration: -1
 
