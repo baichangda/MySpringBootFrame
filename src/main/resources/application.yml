@@ -36,6 +36,13 @@ spring:
       properties:
         hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
         hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+#  jdbcTemplate配置
+   jdbc:
+      template:
+        fetch-size: -1
+        max-rows: -1
+        query-timeout:
+
 
 #  i18n资源文件配置
    messages:
