@@ -1,9 +1,8 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.MenuBean;
@@ -11,6 +10,7 @@ import com.bcd.sys.service.MenuService;
 import io.swagger.annotations.*;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -68,9 +68,9 @@ public class MenuController extends BaseController{
             @ApiImplicitParam(name = "menuId",value = "菜单id",dataType = "Long",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "菜单列表")})
-    public JsonMessage list(@RequestParam(value = "menuId",required = false) Long menuId){
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
-        return JsonMessage.success(JsonUtil.toJSONResult(menuService.findById(menuId),filters));
+    public MappingJacksonValue list(@RequestParam(value = "menuId",required = false) Long menuId){
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(MenuBean.class);
+        return JsonMessage.success(menuService.findById(menuId)).toMappingJacksonValue(filters);
     }
 
 

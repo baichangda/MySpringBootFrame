@@ -1,12 +1,11 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.RoleBean;
@@ -14,6 +13,7 @@ import com.bcd.sys.service.RoleService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -43,21 +43,21 @@ public class RoleController extends BaseController{
             @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "所有角色列表")})
-    public JsonMessage list(@RequestParam(value = "id",required = false) Long id,
-            @RequestParam(value = "name",required = false) String name,
-                                        @RequestParam(value = "code",required = false) String code,
-                                        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-                                        @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(RoleBean.class);
+    public MappingJacksonValue list(@RequestParam(value = "id",required = false) Long id,
+                                    @RequestParam(value = "name",required = false) String name,
+                                    @RequestParam(value = "code",required = false) String code,
+                                    @RequestParam(value = "pageNum",required = false)Integer pageNum,
+                                    @RequestParam(value = "pageSize",required = false) Integer pageSize){
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(RoleBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition),filters));
+            return JsonMessage.success(roleService.findAll(condition)).toMappingJacksonValue(filters);
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize))).toMappingJacksonValue(filters);
         }
     }
 

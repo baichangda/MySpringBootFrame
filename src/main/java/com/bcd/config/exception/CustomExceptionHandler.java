@@ -40,7 +40,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
 
     @Bean
     @ConditionalOnMissingBean()
-    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("fastJsonHttpMessageConverter") HttpMessageConverter converter) {
+    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("httpMessageConverter") HttpMessageConverter converter) {
         ExceptionResponseHandler handler=new DefaultExceptionResponseHandler(converter);
         this.handler=handler;
         return handler;

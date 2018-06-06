@@ -1,12 +1,13 @@
 package com.bcd.config.redis;
 
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
@@ -21,16 +22,16 @@ public class RedisConfig {
      */
     @Primary
     @Bean(name = "redisTemplate")
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory,FastJsonRedisSerializer redisSerializer) {
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier("redisSerializer") RedisSerializer redisSerializer) {
         RedisTemplate redisTemplate = new RedisTemplate<>();
         initDomainRedisTemplate(redisTemplate, redisConnectionFactory,redisSerializer);
         return redisTemplate;
     }
 
     @Primary
-    @Bean(name = "fastJsonRedisSerializer")
-    public FastJsonRedisSerializer fastJsonRedisSerializer(){
-        return new FastJsonRedisSerializer<>(Object.class);
+    @Bean(name = "redisSerializer")
+    public RedisSerializer redisSerializer(){
+        return new Jackson2JsonRedisSerializer<>(Object.class);
     }
 
     /**

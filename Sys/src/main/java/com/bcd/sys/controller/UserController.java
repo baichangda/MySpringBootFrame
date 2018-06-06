@@ -1,13 +1,12 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
-import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.UserBean;
@@ -18,6 +17,7 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -49,13 +49,13 @@ public class UserController extends BaseController {
             @ApiImplicitParam( name = "timeZone", value = "时区", dataType = "String",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "是否登录成功")})
-    public JsonMessage login(@RequestParam(value = "username",required = true) String username,
-                             @RequestParam(value = "password",required = true) String password,
-                             @RequestParam(value="timeZone",required = true)String timeZone){
+    public MappingJacksonValue login(@RequestParam(value = "username",required = true) String username,
+                                     @RequestParam(value = "password",required = true) String password,
+                                     @RequestParam(value="timeZone",required = true)String timeZone){
 
             UserBean user= userService.login(username,password,timeZone);
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
-            return JsonMessage.success(JsonUtil.toJSONResult(user,filters));
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+            return JsonMessage.success(user).toMappingJacksonValue(filters);
     }
 
     /**
@@ -142,22 +142,22 @@ public class UserController extends BaseController {
             @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "所有用户列表")})
-    public JsonMessage list(
+    public MappingJacksonValue list(
             @RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "username",required = false) String username,
             @RequestParam(value = "orgName",required = false) String orgName,
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("org.name",orgName, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
-            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition),filters));
+            return JsonMessage.success(userService.findAll(condition)).toMappingJacksonValue(filters);
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)),filters));
+            return JsonMessage.success(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize))).toMappingJacksonValue(filters);
         }
 
     }

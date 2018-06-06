@@ -1,10 +1,11 @@
 package com.bcd.config.messageconverter;
 
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import java.util.ArrayList;
@@ -15,8 +16,9 @@ import java.util.List;
  */
 @Configuration
 public class MessageConverterConfig {
+    @Primary
     @Bean
-    public FastJsonHttpMessageConverter fastJsonHttpMessageConverter(){
+    public HttpMessageConverter httpMessageConverter(){
         /**
          * 必须设置支持的数据类型(不能设置为*);否则可能会导致请求报错
          * java.lang.IllegalArgumentException: 'Content-Type' cannot contain wildcard type '*'
@@ -27,7 +29,7 @@ public class MessageConverterConfig {
          * mappingJackson2HttpMessageConverter JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration
          * 覆盖这两个类的方式就是通过设置 setSupportedMediaTypes 来替换
          */
-        FastJsonHttpMessageConverter fastJsonHttpMessageConverter=new FastJsonHttpMessageConverter();
+        MappingJackson2HttpMessageConverter httpMessageConverter=new MappingJackson2HttpMessageConverter();
         List<MediaType> supportedMediaTypes = new ArrayList<>();
         supportedMediaTypes.add(MediaType.APPLICATION_JSON);
         supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
@@ -46,7 +48,8 @@ public class MessageConverterConfig {
         supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
         supportedMediaTypes.add(MediaType.TEXT_PLAIN);
         supportedMediaTypes.add(MediaType.TEXT_XML);
-        fastJsonHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-        return fastJsonHttpMessageConverter;
+        httpMessageConverter.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        httpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+        return httpMessageConverter;
     }
 }

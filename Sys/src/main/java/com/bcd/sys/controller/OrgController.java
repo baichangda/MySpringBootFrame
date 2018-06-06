@@ -1,15 +1,15 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.service.OrgService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -67,9 +67,9 @@ public class OrgController extends BaseController{
             @ApiImplicitParam(name = "orgId",value = "机构id",dataType = "Long",paramType = "query")
     })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "机构列表")})
-    public JsonMessage list(@RequestParam(value = "orgId",required = false) Long orgId){
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
-        return JsonMessage.success(JsonUtil.toJSONResult(orgService.findById(orgId),filters));
+    public MappingJacksonValue list(@RequestParam(value = "orgId",required = false) Long orgId){
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(OrgBean.class);
+        return JsonMessage.success(orgService.findById(orgId)).toMappingJacksonValue(filters);
     }
 
 

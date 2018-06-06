@@ -1,12 +1,11 @@
 package com.bcd.sys.controller;
 
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.json.jackson.filter.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.JsonUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.EnumItemBean;
@@ -14,6 +13,7 @@ import com.bcd.sys.service.EnumItemService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -46,7 +46,7 @@ public class EnumItemController extends BaseController{
     })
     @ApiResponses(value={@ApiResponse(code=200,message = "所有枚举项(根据是否传入分页参数来决定返回值的数据类型)")})
     @SuppressWarnings("unchecked")
-    public JsonMessage list(
+    public MappingJacksonValue list(
             @RequestParam(value = "id",required = false) Long id,
             @RequestParam(value = "name",required = false) String name,
             @RequestParam(value = "code",required = false) String code,
@@ -59,11 +59,11 @@ public class EnumItemController extends BaseController{
                 new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL)
         );
-        SimplePropertyPreFilter[] filters= FilterUtil.getOneDeepJsonFilter(EnumItemBean.class);
+        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(EnumItemBean.class);
         if(pageNum==null || pageSize==null){
-            return JsonMessage.success(JsonUtil.toJSONResult(enumItemService.findAll(condition), filters));
+            return JsonMessage.success(enumItemService.findAll(condition)).toMappingJacksonValue(filters);
         }else{
-            return JsonMessage.success(JsonUtil.toJSONResult(enumItemService.findAll(condition,PageRequest.of(pageNum-1,pageSize)), filters));
+            return JsonMessage.success(enumItemService.findAll(condition,PageRequest.of(pageNum-1,pageSize))).toMappingJacksonValue(filters);
         }
     }
 
