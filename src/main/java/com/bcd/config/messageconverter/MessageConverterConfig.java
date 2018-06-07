@@ -1,5 +1,6 @@
 package com.bcd.config.messageconverter;
 
+import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +49,7 @@ public class MessageConverterConfig {
         supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
         supportedMediaTypes.add(MediaType.TEXT_PLAIN);
         supportedMediaTypes.add(MediaType.TEXT_XML);
+        JsonUtil.withMapFilter(httpMessageConverter.getObjectMapper());
         httpMessageConverter.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
         httpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
         return httpMessageConverter;
