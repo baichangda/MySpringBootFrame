@@ -11,8 +11,8 @@ allprojects{
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-        jcenter()
-        mavenCentral()
+//        jcenter()
+//        mavenCentral()
     }
 
     dependencies{
@@ -98,8 +98,8 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-        jcenter()
-        mavenCentral()
+//        jcenter()
+//        mavenCentral()
     }
     dependencies {
         //使用springboot框架

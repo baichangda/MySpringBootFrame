@@ -42,13 +42,13 @@ public class ClusterFailedScheduleAopConfig {
             if(flag){
                 Object[] args = joinPoint.getArgs();
                 joinPoint.proceed(args);
+                handler.doOnSuccess();
             }
-            handler.doOnSuccess();
         } catch (Throwable throwable) {
             if(handler!=null){
                 handler.doOnFailed();
             }
-//            throwable.printStackTrace();
+            throwable.printStackTrace();
         }
     }
 

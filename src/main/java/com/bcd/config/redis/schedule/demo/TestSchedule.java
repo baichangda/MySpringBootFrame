@@ -21,30 +21,30 @@ public class TestSchedule {
     @Transactional(rollbackFor = Exception.class)
     @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test1(){
-        String a=null;
-        System.out.println(Thread.currentThread().getId()+" exception===========test1 "+sdf.format(new Date()));
-        a.toString();
-        System.out.println("===========test1 "+sdf.format(new Date()));
+//        String a=null;
+//        System.out.println(Thread.currentThread().getId()+" exception===========test1 "+sdf.format(new Date()));
+//        a.toString();
+        System.out.println(Thread.currentThread().getId()+"===========test1 "+sdf.format(new Date()));
     }
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test2(){
-        String a=null;
-        System.out.println(Thread.currentThread().getId()+" exception===========test2 "+sdf.format(new Date()));
-        a.toString();
-        System.out.println("===========test2 "+sdf.format(new Date()));
+//        String a=null;
+//        System.out.println(Thread.currentThread().getId()+" exception===========test2 "+sdf.format(new Date()));
+//        a.toString();
+        System.out.println(Thread.currentThread().getId()+"===========test2 "+sdf.format(new Date()));
     }
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
     @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test3(){
-        String a=null;
-        System.out.println(Thread.currentThread().getId()+" exception===========test3 "+sdf.format(new Date()));
-        a.toString();
-        System.out.println("===========test3 "+sdf.format(new Date()));
+//        String a=null;
+//        System.out.println(Thread.currentThread().getId()+" exception===========test3 "+sdf.format(new Date()));
+//        a.toString();
+        System.out.println(Thread.currentThread().getId()+"===========test3 "+sdf.format(new Date()));
     }
 
     @Scheduled(cron = "*/3 * * * * ?")
