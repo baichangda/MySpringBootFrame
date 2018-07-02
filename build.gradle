@@ -68,6 +68,11 @@ allprojects{
     jar {
         enabled = true
     }
+    bootJar {
+        manifest {
+            attributes 'Start-Class': 'com.bcd.Application'
+        }
+    }
 }
 
 bootRun {
