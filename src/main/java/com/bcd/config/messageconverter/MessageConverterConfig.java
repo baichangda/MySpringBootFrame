@@ -49,7 +49,7 @@ public class MessageConverterConfig {
         supportedMediaTypes.add(MediaType.TEXT_MARKDOWN);
         supportedMediaTypes.add(MediaType.TEXT_PLAIN);
         supportedMediaTypes.add(MediaType.TEXT_XML);
-        JsonUtil.withMapFilterAndIgnoreNull(httpMessageConverter.getObjectMapper());
+        httpMessageConverter.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
         httpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
         return httpMessageConverter;
     }

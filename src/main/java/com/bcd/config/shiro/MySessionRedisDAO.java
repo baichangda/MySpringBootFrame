@@ -54,7 +54,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
         Session session= super.doReadSession(sessionId);
         if(session==null){
             //在这里从redis中获取session(当内存中找不到sessionId的session时候)
-            byte[] sessionBytes=SerializerUtil.deserialize(redisOp.get(sessionId.toString().getBytes()));
+            byte[] sessionBytes= redisOp.get(sessionId.toString().getBytes());
             if(sessionBytes==null){
                 return null;
             }else{
