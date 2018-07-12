@@ -31,9 +31,6 @@ public class UserService  extends BaseService<UserBean,Long> {
     @Autowired
     private OrgService orgService;
 
-
-
-
     /**
      * 登录
      * @param username
