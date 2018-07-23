@@ -15,7 +15,7 @@ public class SwaggerConfig {
     @SuppressWarnings("unchecked")
     @Bean
     public Docket testApi(){
-        Docket docket = new Docket(DocumentationType.SPRING_WEB)
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .genericModelSubstitutes(DeferredResult.class)
                 .useDefaultResponseMessages(false)
                 .forCodeGeneration(true)

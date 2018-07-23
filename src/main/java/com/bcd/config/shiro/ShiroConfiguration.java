@@ -3,15 +3,15 @@ package com.bcd.config.shiro;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.shiro.MyShiroRealm;
-import org.apache.log4j.Logger;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -43,7 +43,7 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfiguration {
-    private static final Logger logger = Logger.getLogger(ShiroConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShiroConfiguration.class);
 
 
     /**

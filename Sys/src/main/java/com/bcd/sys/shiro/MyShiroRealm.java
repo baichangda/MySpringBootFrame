@@ -1,13 +1,11 @@
 package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
-import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -15,6 +13,8 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class MyShiroRealm extends AuthorizingRealm {
   
-    private static final Logger logger = Logger.getLogger(MyShiroRealm.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
 
 
     @Autowired
