@@ -10,6 +10,7 @@ import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
@@ -28,8 +29,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/sys/user")
 public class UserController extends BaseController {
-
-    private final String initialPassword="123qwe";
 
     @Autowired
     private UserService userService;
@@ -91,7 +90,7 @@ public class UserController extends BaseController {
         //1、重置密码
         UserBean sysUserDTO= userService.findById(userId);
         //2、设置默认密码
-        sysUserDTO.setPassword(new Md5Hash(initialPassword,sysUserDTO.getUsername()).toBase64());
+        sysUserDTO.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,sysUserDTO.getUsername()).toBase64());
         userService.save(sysUserDTO);
 
         return new JsonMessage(true,I18nUtil.getMessage("UserController.resetPassword.SUCCESSED"));
@@ -177,7 +176,7 @@ public class UserController extends BaseController {
     public JsonMessage save(@RequestBody UserBean user){
         //如果为新增操作、则赋予初始密码
         if(user.getId()==null){
-            user.setPassword(new Md5Hash(initialPassword,user.getUsername()).toBase64());
+            user.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,user.getUsername()).toBase64());
         }
         userService.saveIgnoreNull(user);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
