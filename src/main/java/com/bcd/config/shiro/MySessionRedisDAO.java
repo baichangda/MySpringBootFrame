@@ -1,19 +1,15 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.util.SerializerUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
-import redis.clients.jedis.Jedis;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
@@ -25,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unchecked")
 public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
 
-    private final static long TIME_OUT_SECONDS=15L;
+    private final static long TIME_OUT_SECONDS=30*60L;
 
-    private ValueOperations<byte[],byte[]> redisOp;
+    private ValueOperations redisOp;
 
     public MySessionRedisDAO(RedisTemplate redisTemplate) {
         redisOp=redisTemplate.opsForValue();
@@ -41,7 +37,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
     protected Serializable doCreate(Session session) {
         Serializable sessionId= super.doCreate(session);
         //在这里创建session到redis中
-        redisOp.set(sessionId.toString().getBytes(),SerializerUtil.serialize(session),TIME_OUT_SECONDS,TimeUnit.SECONDS);
+        redisOp.set(sessionId,session,TIME_OUT_SECONDS,TimeUnit.SECONDS);
         return sessionId;
     }
 
@@ -54,12 +50,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
         Session session= super.doReadSession(sessionId);
         if(session==null){
             //在这里从redis中获取session(当内存中找不到sessionId的session时候)
-            byte[] sessionBytes= redisOp.get(sessionId.toString().getBytes());
-            if(sessionBytes==null){
-                return null;
-            }else{
-                session= SerializerUtil.deserialize(sessionBytes);
-            }
+            session= (Session)redisOp.get(sessionId);
         }
         return session;
     }
@@ -76,7 +67,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
             @Nullable
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                return connection.set(session.getId().toString().getBytes(),SerializerUtil.serialize(session),Expiration.seconds(TIME_OUT_SECONDS), RedisStringCommands.SetOption.SET_IF_PRESENT);
+                return connection.set(redisOp.getOperations().getKeySerializer().serialize(session.getId()),redisOp.getOperations().getValueSerializer().serialize(session),Expiration.seconds(TIME_OUT_SECONDS), RedisStringCommands.SetOption.SET_IF_PRESENT);
             }
         });
         if(!res){
