@@ -1,14 +1,9 @@
 package com.bcd.sys.bean;
 
 
-import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -31,23 +26,6 @@ public class OrgBean extends BaseBean<Long> {
     @JoinColumn(insertable = false,updatable = false,name = "orgItemId")
     private EnumItemBean enumItemDTO;
 
-    @CheckReferredOnDelete
-    @ManyToMany
-    @JoinTable(
-            name = "t_sys_org_role",
-            joinColumns = @JoinColumn(name = "org_id",referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
-    )
-    private Set<RoleBean> roleBeanSet = new HashSet<RoleBean>();
-
-    @CheckReferredOnDelete
-    @OneToMany(mappedBy = "orgId")
-    private Set<UserBean> userBeanSet = new HashSet<>();
-
-    @JsonIgnore
-    @CheckReferredOnDelete
-    @OneToMany(mappedBy = "parentId")
-    private Set<OrgBean> orgBeanSet = new HashSet<>();
 
     public String getName() {
         return name;
@@ -90,22 +68,6 @@ public class OrgBean extends BaseBean<Long> {
     }
 
 
-    public Set<RoleBean> getRoleBeanSet() {
-        return roleBeanSet;
-    }
-
-    public void setRoleBeanSet(Set<RoleBean> roleBeanSet) {
-        this.roleBeanSet = roleBeanSet;
-    }
-
-    public Set<UserBean> getUserBeanSet() {
-        return userBeanSet;
-    }
-
-    public void setUserBeanSet(Set<UserBean> userBeanSet) {
-        this.userBeanSet = userBeanSet;
-    }
-
     public Long getOrgItemId() {
         return orgItemId;
     }
@@ -122,11 +84,4 @@ public class OrgBean extends BaseBean<Long> {
         this.enumItemDTO = enumItemDTO;
     }
 
-    public Set<OrgBean> getOrgBeanSet() {
-        return orgBeanSet;
-    }
-
-    public void setOrgBeanSet(Set<OrgBean> orgBeanSet) {
-        this.orgBeanSet = orgBeanSet;
-    }
 }

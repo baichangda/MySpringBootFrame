@@ -1,14 +1,12 @@
 package com.bcd.sys.bean;
 
 
-import com.bcd.rdb.anno.CheckRepeatReferOnSave;
 import com.bcd.rdb.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 用户基础信息
@@ -31,16 +29,6 @@ public class UserBean extends BaseBean<Long> {
 
 	@JsonIgnore
 	private String password;  //密码凭证
-
-	//用户关联角色
-	@CheckRepeatReferOnSave
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "t_sys_user_role",
-			joinColumns=@JoinColumn(name = "user_id",referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
-	)
-	private Set<RoleBean> roleBeanSet = new HashSet<>();
 
 	@ManyToOne
 	@JoinColumn(name = "orgId",insertable = false,updatable = false)
@@ -122,14 +110,6 @@ public class UserBean extends BaseBean<Long> {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public Set<RoleBean> getRoleBeanSet() {
-		return roleBeanSet;
-	}
-
-	public void setRoleBeanSet(Set<RoleBean> roleBeanSet) {
-		this.roleBeanSet = roleBeanSet;
 	}
 
 	public OrgBean getOrg() {

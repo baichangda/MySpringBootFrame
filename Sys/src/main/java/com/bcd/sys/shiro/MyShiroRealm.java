@@ -76,11 +76,6 @@ public class MyShiroRealm extends AuthorizingRealm {
             UserBean user=userService.findOne(new StringCondition("username",userName));
             Set<String> roleSet=new HashSet<>();
             Set<String> permissionSet=new HashSet<>();
-            user.getRoleBeanSet().forEach(role->{
-                roleSet.add(role.getCode());
-                role.getMenuBeanSet().forEach(menu->permissionSet.add(MenuBean.class.getSimpleName()+":"+menu.getId()));
-                role.getPermissionBeanSet().forEach(permission->permissionSet.add(permission.getCode()));
-            });
             info.setRoles(roleSet);
             info.setStringPermissions(permissionSet);
         }

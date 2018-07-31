@@ -1,15 +1,11 @@
 package com.bcd.sys.bean;
 
 
-import com.bcd.rdb.anno.CheckReferredOnDelete;
 import com.bcd.rdb.bean.BaseBean;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 菜单
@@ -27,25 +23,9 @@ public class MenuBean extends BaseBean<Long> {
     private Long parentId;
     private Long menuItemId;
 
-    //角色关联菜单
-    @CheckReferredOnDelete
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "t_sys_role_menu",
-            joinColumns = @JoinColumn(name = "menu_id",referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id")
-    )
-    private Set<RoleBean> roleBeanSet = new HashSet<RoleBean>();
-
     @ManyToOne
     @JoinColumn(insertable = false,updatable = false,name = "menuItemId")
     private EnumItemBean enumItemDTO;
-
-    @CheckReferredOnDelete
-    @JsonIgnore
-    @OneToMany(mappedBy = "parentId")
-    @OrderBy("orderNum ASC")
-    private List<MenuBean> childrenList = new ArrayList<>();
 
     @Transient
     private List<MenuBean> userChildrenList=new ArrayList<>();
@@ -90,13 +70,6 @@ public class MenuBean extends BaseBean<Long> {
         this.parentId = parentId;
     }
 
-    public List<MenuBean> getChildrenList() {
-        return childrenList;
-    }
-
-    public void setChildrenList(List<MenuBean> childrenList) {
-        this.childrenList = childrenList;
-    }
 
     public Long getMenuItemId() {
         return menuItemId;
@@ -112,14 +85,6 @@ public class MenuBean extends BaseBean<Long> {
 
     public void setEnumItemDTO(EnumItemBean enumItemDTO) {
         this.enumItemDTO = enumItemDTO;
-    }
-
-    public Set<RoleBean> getRoleBeanSet() {
-        return roleBeanSet;
-    }
-
-    public void setRoleBeanSet(Set<RoleBean> roleBeanSet) {
-        this.roleBeanSet = roleBeanSet;
     }
 
     public List<MenuBean> getUserChildrenList() {
