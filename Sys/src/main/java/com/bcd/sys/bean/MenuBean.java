@@ -1,97 +1,85 @@
 package com.bcd.sys.bean;
 
-
 import com.bcd.rdb.bean.BaseBean;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.*;
+import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+
+
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 菜单
- *
- * @author Aaric
- * @since 2017-04-28
+ *  菜单表
  */
 @Entity
 @Table(name = "t_sys_menu")
 public class MenuBean extends BaseBean<Long> {
-    private String name;  //菜单名称
-    private String url;  //url地址
-    private String icon;  //图标
-    private Integer orderNum;  //排序
+    //field
+    @ApiModelProperty(position = 1, value = "父菜单id")
     private Long parentId;
-    private Long menuItemId;
 
-    @ManyToOne
-    @JoinColumn(insertable = false,updatable = false,name = "menuItemId")
-    private EnumItemBean enumItemDTO;
+    @NotBlank(message = "菜单名称不能为空")
+    @Length(max = 50,message = "[菜单名称]长度不能超过50")
+    @ApiModelProperty(position = 2, value = "菜单名称")
+    private String name;
 
-    @Transient
-    private List<MenuBean> userChildrenList=new ArrayList<>();
+    @Length(max = 256,message = "[url地址]长度不能超过256")
+    @ApiModelProperty(position = 3, value = "url地址")
+    private String url;
 
-    public String getName() {
-        return name;
+    @Length(max = 256,message = "[图标]长度不能超过256")
+    @ApiModelProperty(position = 4, value = "图标")
+    private String icon;
+
+    @NotNull(message = "排序不能为空")
+    @ApiModelProperty(position = 5, value = "排序")
+    private Integer orderNum;
+
+
+    //method
+    public void setParentId(Long parentId){
+        this.parentId=parentId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Long getParentId(){
+        return this.parentId;
     }
 
-    public String getUrl() {
-        return url;
+    public void setName(String name){
+        this.name=name;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public String getName(){
+        return this.name;
     }
 
-    public String getIcon() {
-        return icon;
+    public void setUrl(String url){
+        this.url=url;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public String getUrl(){
+        return this.url;
     }
 
-    public Integer getOrderNum() {
-        return orderNum;
+    public void setIcon(String icon){
+        this.icon=icon;
     }
 
-    public void setOrderNum(Integer orderNum) {
-        this.orderNum = orderNum;
+    public String getIcon(){
+        return this.icon;
     }
 
-    public Long getParentId() {
-        return parentId;
+    public void setOrderNum(Integer orderNum){
+        this.orderNum=orderNum;
     }
 
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public Integer getOrderNum(){
+        return this.orderNum;
     }
 
 
-    public Long getMenuItemId() {
-        return menuItemId;
-    }
-
-    public void setMenuItemId(Long menuItemId) {
-        this.menuItemId = menuItemId;
-    }
-
-    public EnumItemBean getEnumItemDTO() {
-        return enumItemDTO;
-    }
-
-    public void setEnumItemDTO(EnumItemBean enumItemDTO) {
-        this.enumItemDTO = enumItemDTO;
-    }
-
-    public List<MenuBean> getUserChildrenList() {
-        return userChildrenList;
-    }
-
-    public void setUserChildrenList(List<MenuBean> userChildrenList) {
-        this.userChildrenList = userChildrenList;
-    }
 }

@@ -1,12 +1,11 @@
 create table IF NOT EXISTS t_sys_menu
 (
-   id                   bigint unsigned not null auto_increment comment 'id',
+   id                   bigint unsigned not null auto_increment comment '主键',
    parent_id            bigint comment '父菜单id',
-   name                 varchar(50) comment '菜单名称',
-   menu_item_id         bigint comment '菜单类型枚举项id',
+   name                 varchar(50) not null comment '菜单名称',
    url                  varchar(256) comment 'url地址',
    icon                 varchar(256) comment '图标',
-   order_num            int comment '排序',
+   order_num            int not null comment '排序',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
    create_user_id       bigint comment '创建人id',
    create_user_name     varchar(50) comment '创建人姓名',

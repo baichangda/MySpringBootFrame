@@ -1,44 +1,63 @@
 package com.bcd.sys.bean;
 
-
 import com.bcd.rdb.bean.BaseBean;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.*;
+import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+
+
 
 import javax.persistence.*;
 
 /**
- * 角色
- *
- * @author Aaric
- * @since 2017-04-28
+ *  角色表
  */
 @Entity
 @Table(name = "t_sys_role")
 public class RoleBean extends BaseBean<Long> {
-    private String name;  //角色名称
-    private String code; //角色编码(必须以Role_开头)
-    private String remark;  //备注
+    //field
+    @NotBlank(message = "角色名称不能为空")
+    @Length(max = 20,message = "[角色名称]长度不能超过20")
+    @ApiModelProperty(position = 1, value = "角色名称")
+    private String name;
 
-    public String getName() {
-        return name;
+    @NotBlank(message = "编码不能为空")
+    @Length(max = 100,message = "[编码]长度不能超过100")
+    @ApiModelProperty(position = 2, value = "编码")
+    private String code;
+
+    @Length(max = 256,message = "[备注]长度不能超过256")
+    @ApiModelProperty(position = 3, value = "备注")
+    private String remark;
+
+
+    //method
+    public void setName(String name){
+        this.name=name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName(){
+        return this.name;
     }
 
-    public String getRemark() {
-        return remark;
+    public void setCode(String code){
+        this.code=code;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public String getCode(){
+        return this.code;
     }
 
-    public String getCode() {
-        return code;
+    public void setRemark(String remark){
+        this.remark=remark;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public String getRemark(){
+        return this.remark;
     }
+
+
 }

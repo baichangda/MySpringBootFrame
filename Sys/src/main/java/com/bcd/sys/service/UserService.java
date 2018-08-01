@@ -1,5 +1,6 @@
 package com.bcd.sys.service;
 
+import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,14 +25,6 @@ import java.util.Map;
  */
 @Service
 public class UserService  extends BaseService<UserBean,Long> {
-
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private OrgService orgService;
-
     /**
      * 登录
      * @param username
@@ -61,7 +55,6 @@ public class UserService  extends BaseService<UserBean,Long> {
         UserBean user= findOne(
                 new StringCondition("username",username, StringCondition.Handler.EQUAL)
         );
-        //6.1、设置当前登录用户的时区
         user.setTimeZone(timeZone);
         currentUser.getSession().setAttribute("user",user);
         return user;
@@ -110,8 +103,12 @@ public class UserService  extends BaseService<UserBean,Long> {
      * @param password
      * @return
      */
-    public String encryptPassword(String username,String password){
-        return new Md5Hash(password,username).toBase64();
+    private String encryptPassword(String username,String password){
+        if(CommonConst.IS_PASSWORD_ENCODED){
+            return new Md5Hash(password,username).toBase64();
+        }else{
+            return password;
+        }
     }
 
 
@@ -131,4 +128,12 @@ public class UserService  extends BaseService<UserBean,Long> {
 //                + RSASecurity.decode(privateKey, Base64.decodeBase64(Base64.encodeBase64String(encodedText))));
     }
 
+    public void resetPassword(Long userId) {
+        //1、重置密码
+        UserBean sysUserDTO= findById(userId);
+        //2、设置默认密码
+        update(new NumberCondition("id",userId),new HashMap<String,Object>(){{
+            put("password",encryptPassword(sysUserDTO.getUsername(),CommonConst.INITIAL_PASSWORD));
+        }});
+    }
 }

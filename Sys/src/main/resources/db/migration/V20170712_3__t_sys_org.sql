@@ -1,9 +1,8 @@
 create table IF NOT EXISTS t_sys_org
 (
-   id                   bigint unsigned not null auto_increment comment 'id',
+   id                   bigint unsigned not null auto_increment comment '主键',
    parent_id            bigint comment '父组织id',
-   org_item_id          bigint comment '组织类型枚举项id',
-   name                 varchar(50) comment '组织名称',
+   name                 varchar(50) not null comment '组织名称',
    address              varchar(256) comment '地址',
    phone                varchar(11) comment '电话',
    remark               varchar(256) comment '备注',

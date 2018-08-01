@@ -42,19 +42,14 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value="用户登录",notes = "根据帐号密码登录")
-    @ApiImplicitParams({
-            @ApiImplicitParam( name = "username", value = "帐号", dataType = "String",paramType = "query"),
-            @ApiImplicitParam( name = "password", value = "密码", dataType = "String",paramType = "query"),
-            @ApiImplicitParam( name = "timeZone", value = "时区", dataType = "String",paramType = "query")
-    })
     @ApiResponses(value={@ApiResponse(code=200,message = "是否登录成功")})
-    public MappingJacksonValue login(@RequestParam(value = "username",required = true) String username,
-                                     @RequestParam(value = "password",required = true) String password,
-                                     @RequestParam(value="timeZone",required = true)String timeZone){
+    public MappingJacksonValue login(@ApiParam(value = "用户名") @RequestParam(value = "username",required = true) String username,
+                                     @ApiParam(value = "密码") @RequestParam(value = "password",required = true) String password,
+                                     @ApiParam(value = "时区") @RequestParam(value="timeZone",required = true)String timeZone){
 
-            UserBean user= userService.login(username,password,timeZone);
+        UserBean user= userService.login(username,password,timeZone);
         SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
-            return JsonMessage.success(user).toMappingJacksonValue(filters);
+        return JsonMessage.success(user).toMappingJacksonValue(filters);
     }
 
     /**
@@ -82,17 +77,9 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @ApiOperation(value="重置密码",notes = "重置密码")
-    @ApiImplicitParams({
-            @ApiImplicitParam( name = "userId", value = "用户主键", dataType = "Long",paramType = "query"),
-    })
     @ApiResponses(value={@ApiResponse(code=200,message = "是否重置成功")})
-    public JsonMessage resetPassword(@RequestParam(value = "userId") Long userId){
-        //1、重置密码
-        UserBean sysUserDTO= userService.findById(userId);
-        //2、设置默认密码
-        sysUserDTO.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,sysUserDTO.getUsername()).toBase64());
-        userService.save(sysUserDTO);
-
+    public JsonMessage resetPassword(@ApiParam(value = "用户主键",example = "1") @RequestParam(value = "userId") Long userId){
+        userService.resetPassword(userId);
         return new JsonMessage(true,I18nUtil.getMessage("UserController.resetPassword.SUCCESSED"));
     }
 
@@ -105,15 +92,10 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @ApiOperation(value="修改密码",notes = "修改密码")
-    @ApiImplicitParams({
-            @ApiImplicitParam( name = "userId", value = "用户主键", dataType = "Long",paramType = "query",required = true),
-            @ApiImplicitParam( name = "oldPassword", value = "旧密码(已经加密)", dataType = "String",paramType = "query",required = true),
-            @ApiImplicitParam( name = "newPassword", value = "新密码(已经加密)", dataType = "String",paramType = "query",required = true)
-    })
     @ApiResponses(value={@ApiResponse(code=200,message = "是否修改成功")})
-    public JsonMessage updatePassword(@RequestParam(value = "userId") Long userId,
-                                      @RequestParam(value = "oldPassword") String oldPassword,
-                                      @RequestParam(value = "newPassword") String newPassword){
+    public JsonMessage updatePassword(@ApiParam(value = "用户主键",example = "1") @RequestParam(value = "userId") Long userId,
+                                      @ApiParam(value = "旧密码") @RequestParam(value = "oldPassword") String oldPassword,
+                                      @ApiParam(value = "新密码") @RequestParam(value = "newPassword") String newPassword){
         boolean flag= userService.updatePassword(userId,oldPassword,newPassword);
         if(flag){
             return new JsonMessage(true,I18nUtil.getMessage("COMMON.UPDATE_SUCCESSED"));
@@ -133,25 +115,18 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询所有用户",notes = "查询所有用户")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id",value = "主键", dataType = "Long",paramType = "query"),
-            @ApiImplicitParam(name = "username",value = "用户名", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "orgName",value = "机构名称", dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "pageNum",value = "当前页数(分页参数)",dataType = "int",paramType = "query"),
-            @ApiImplicitParam(name = "pageSize",value = "每页显示记录数(分页参数)",dataType = "int",paramType = "query")
-    })
-    @ApiResponses(value={@ApiResponse(code=200,message = "所有用户列表")})
+    @ApiResponses(value={@ApiResponse(code=200,response = JsonMessage.class,message = "所有用户列表")})
     public MappingJacksonValue list(
-            @RequestParam(value = "id",required = false) Long id,
-            @RequestParam(value = "username",required = false) String username,
-            @RequestParam(value = "orgName",required = false) String orgName,
-            @RequestParam(value = "pageNum",required = false)Integer pageNum,
-            @RequestParam(value = "pageSize",required = false) Integer pageSize){
-        SimpleFilterBean[] filters= FilterUtil.getOneDeepJsonFilter(UserBean.class);
+            @ApiParam(value = "用户主键",example = "1") @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(value = "用户名") @RequestParam(value = "username",required = false) String username,
+            @ApiParam(value = "组织机构名称") @RequestParam(value = "orgName",required = false) String orgName,
+            @ApiParam(value = "分页参数(页数)",example="1") @RequestParam(value = "pageNum",required = false)Integer pageNum,
+            @ApiParam(value = "分页参数(页大小)",example="20") @RequestParam(value = "pageSize",required = false) Integer pageSize){
+        SimpleFilterBean[] filters= FilterUtil.getZeroDeepJsonFilter(UserBean.class);
         Condition condition= Condition.and(
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("org.name",orgName, StringCondition.Handler.ALL_LIKE)
+                new StringCondition("orgBean.name",orgName, StringCondition.Handler.ALL_LIKE)
         );
         if(pageNum==null||pageSize==null){
             return JsonMessage.success(userService.findAll(condition)).toMappingJacksonValue(filters);
@@ -169,11 +144,8 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "user",value = "用户实体",dataType = "SysUserDTO",paramType = "body"),
-    })
     @ApiResponses(value = {@ApiResponse(code = 200,message = "保存用户")})
-    public JsonMessage save(@RequestBody UserBean user){
+    public JsonMessage save(@ApiParam(value = "用户实体")@RequestBody UserBean user){
         //如果为新增操作、则赋予初始密码
         if(user.getId()==null){
             user.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,user.getUsername()).toBase64());
@@ -190,9 +162,8 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "删除用户")
-    @ApiImplicitParam(name = "userIdArr",value = "用户id数组",paramType = "query")
     @ApiResponses(value = {@ApiResponse(code = 200,message = "删除用户")})
-    public JsonMessage delete(@RequestParam Long[] userIdArr){
+    public JsonMessage delete(@ApiParam(value = "用户主键数组")@RequestParam Long[] userIdArr){
         userService.deleteById(userIdArr);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }

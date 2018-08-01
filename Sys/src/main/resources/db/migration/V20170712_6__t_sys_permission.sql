@@ -1,8 +1,8 @@
 create table IF NOT EXISTS t_sys_permission
 (
    id                   bigint unsigned not null auto_increment comment 'id',
-   name                 varchar(20) comment '角色名称',
-   code                 varchar(100) comment '编码',
+   name                 varchar(20) not null comment '角色名称',
+   code                 varchar(100) not null comment '编码',
    remark               varchar(256) comment '备注',
    role_id              bigint comment '关联角色id',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',

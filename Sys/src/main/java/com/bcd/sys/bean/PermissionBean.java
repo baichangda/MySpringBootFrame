@@ -1,63 +1,74 @@
 package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.*;
+import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+
+
+import javax.persistence.*;
 
 /**
- * Created by Administrator on 2017/7/12.
+ *  角色与权限关系表
  */
 @Entity
 @Table(name = "t_sys_permission")
 public class PermissionBean extends BaseBean<Long> {
+    //field
+    @NotBlank(message = "角色名称不能为空")
+    @Length(max = 20,message = "[角色名称]长度不能超过20")
+    @ApiModelProperty(position = 1, value = "角色名称")
     private String name;
+
+    @NotBlank(message = "编码不能为空")
+    @Length(max = 100,message = "[编码]长度不能超过100")
+    @ApiModelProperty(position = 2, value = "编码")
     private String code;
+
+    @Length(max = 256,message = "[备注]长度不能超过256")
+    @ApiModelProperty(position = 3, value = "备注")
     private String remark;
+
+    @ApiModelProperty(position = 4, value = "关联角色id")
     private Long roleId;
-    @ManyToOne
-    @JoinColumn(name = "roleId",insertable = false,updatable = false)
-    private RoleBean role;
 
-    public String getName() {
-        return name;
+
+    //method
+    public void setName(String name){
+        this.name=name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName(){
+        return this.name;
     }
 
-    public String getCode() {
-        return code;
+    public void setCode(String code){
+        this.code=code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public String getCode(){
+        return this.code;
     }
 
-    public String getRemark() {
-        return remark;
+    public void setRemark(String remark){
+        this.remark=remark;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public String getRemark(){
+        return this.remark;
     }
 
-    public Long getRoleId() {
-        return roleId;
+    public void setRoleId(Long roleId){
+        this.roleId=roleId;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public Long getRoleId(){
+        return this.roleId;
     }
 
-    public RoleBean getRole() {
-        return role;
-    }
 
-    public void setRole(RoleBean role) {
-        this.role = role;
-    }
 }
