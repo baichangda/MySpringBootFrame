@@ -4,7 +4,7 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.define.SuccessDefine;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
+import com.bcd.base.json.SimpleFilterBean;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.controller.BaseController;

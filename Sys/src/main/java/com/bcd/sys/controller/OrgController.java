@@ -1,7 +1,7 @@
 package com.bcd.sys.controller;
 
 import org.springframework.http.converter.json.MappingJacksonValue;
-import com.bcd.base.json.jackson.filter.SimpleFilterBean;
+import com.bcd.base.json.SimpleFilterBean;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
