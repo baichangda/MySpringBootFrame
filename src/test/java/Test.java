@@ -2,6 +2,7 @@ import com.bcd.Application;
 import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.FileUtil;
 import com.bcd.mongodb.test.service.TestService;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
