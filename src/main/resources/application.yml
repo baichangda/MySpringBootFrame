@@ -127,8 +127,8 @@ spring:
 #        queue: bcd-test2
 #        subscription: bcd-test2
 #      endPoint:
-#   secretKey:
-#   accessKey:
+#   accessKeySecret:
+#   accessKeyId:
 #   rocketMq:
 #      producerId: PID_Proudcer_4
 #      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet

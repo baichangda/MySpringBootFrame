@@ -4,8 +4,6 @@ import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.bean.ProducerBean;
 import com.bcd.config.aliyun.properties.AliyunProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -19,8 +17,8 @@ public class MyProducerBean extends ProducerBean{
     public MyProducerBean(){
         Properties properties=new Properties();
         properties.setProperty(PropertyKeyConst.ProducerId,aliyunProperties.rocketMq.producerId);
-        properties.setProperty(PropertyKeyConst.AccessKey,aliyunProperties.accessKey);
-        properties.setProperty(PropertyKeyConst.SecretKey,aliyunProperties.secretKey);
+        properties.setProperty(PropertyKeyConst.AccessKey,aliyunProperties.accessKeyId);
+        properties.setProperty(PropertyKeyConst.SecretKey,aliyunProperties.accessKeySecret);
         properties.setProperty(PropertyKeyConst.ONSAddr,aliyunProperties.rocketMq.onsAddr);
         setProperties(properties);
     }

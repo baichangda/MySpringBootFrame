@@ -4,9 +4,7 @@ import com.aliyun.mns.client.CloudAccount;
 import com.aliyun.mns.client.MNSClient;
 import com.bcd.config.aliyun.properties.AliyunProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 
 //@Configuration
@@ -18,8 +16,8 @@ public class MnsConfig {
 
     @Bean
     public MNSClient mnsClient(){
-        CloudAccount account = new CloudAccount(aliyunProperties.accessKey,
-                aliyunProperties.secretKey, aliyunProperties.mns.endPoint);
+        CloudAccount account = new CloudAccount(aliyunProperties.accessKeyId,
+                aliyunProperties.accessKeySecret, aliyunProperties.mns.endPoint);
         MNSClient client = account.getMNSClient();
         return client;
     }

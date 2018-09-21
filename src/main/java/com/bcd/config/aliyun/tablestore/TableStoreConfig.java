@@ -5,9 +5,7 @@ import com.alicloud.openservices.tablestore.SyncClient;
 import com.alicloud.openservices.tablestore.model.AlwaysRetryStrategy;
 import com.bcd.config.aliyun.properties.AliyunProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration
 //@EnableConfigurationProperties(AliyunProperties.class)
@@ -28,8 +26,8 @@ public class TableStoreConfig {
         clientConfiguration.setRetryStrategy(new AlwaysRetryStrategy());
         SyncClient client = new SyncClient(
                 aliyunProperties.tableStore.endPoint,
-                aliyunProperties.accessKey,
-                aliyunProperties.secretKey,
+                aliyunProperties.accessKeyId,
+                aliyunProperties.accessKeySecret,
                 aliyunProperties.tableStore.instanceName,
                 clientConfiguration);
         return client;

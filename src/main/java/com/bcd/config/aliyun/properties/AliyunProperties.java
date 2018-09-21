@@ -1,33 +1,31 @@
 package com.bcd.config.aliyun.properties;
 
 import com.bcd.config.aliyun.properties.mns.MnsProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 //@Configuration
 //@ConfigurationProperties(prefix = "aliyun")
 public class AliyunProperties {
-    public String secretKey;
-    public String accessKey;
+    public String accessKeyId;
+    public String accessKeySecret;
     public RocketMqProperties rocketMq;
     public TableStoreProperties tableStore;
     public MnsProperties mns;
     public SmsProperties sms;
 
-    public String getSecretKey() {
-        return secretKey;
+    public String getAccessKeySecret() {
+        return accessKeySecret;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public void setAccessKeySecret(String accessKeySecret) {
+        this.accessKeySecret = accessKeySecret;
     }
 
-    public String getAccessKey() {
-        return accessKey;
+    public String getAccessKeyId() {
+        return accessKeyId;
     }
 
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
+    public void setAccessKeyId(String accessKeyId) {
+        this.accessKeyId = accessKeyId;
     }
 
     public RocketMqProperties getRocketMq() {
