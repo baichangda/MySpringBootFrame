@@ -11,7 +11,6 @@ public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler
 
     public UrlPermissionAnnotationHandler() {
         super(RequiresUrlPermission.class);
-        // TODO Auto-generated constructor stub
     }
 
     private ThreadLocal<Set<String>>  actionPermission = new ThreadLocal<>();
@@ -24,8 +23,6 @@ public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler
 
     @Override
     public void assertAuthorized(Annotation a) throws AuthorizationException {
-        // TODO Auto-generated method stub
-
         Subject subject = getSubject();
         Set<String> permissionSet=getActionPermission();
         if(permissionSet==null||permissionSet.size()==0){

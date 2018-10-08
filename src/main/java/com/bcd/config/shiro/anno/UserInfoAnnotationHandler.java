@@ -14,7 +14,6 @@ public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
 
     public UserInfoAnnotationHandler() {
         super(RequiresUserInfo.class);
-        // TODO Auto-generated constructor stub
     }
 
     @Override

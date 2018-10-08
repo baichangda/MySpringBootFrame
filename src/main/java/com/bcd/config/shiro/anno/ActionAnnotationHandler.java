@@ -11,7 +11,6 @@ public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
 
     public ActionAnnotationHandler() {
         super(RequiresAction.class);
-        // TODO Auto-generated constructor stub
     }
 
     private ThreadLocal<String>  actionPermission = new ThreadLocal<>();
@@ -24,8 +23,6 @@ public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
 
     @Override
     public void assertAuthorized(Annotation a) throws AuthorizationException {
-        // TODO Auto-generated method stub
-
         Subject subject = getSubject();
         /**
          * 此处使用拼装出的字符串『ClassName : MethodName』
