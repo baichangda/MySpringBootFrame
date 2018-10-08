@@ -140,3 +140,9 @@ spring:
 #      domain: dysmsapi.aliyuncs.com
 #      regionId: cn-hangzhou
 #      endpointName: cn-hangzhou
+#   live:
+#      domainName: live.incarcloud.com
+#      regionId: cn-shanghai
+#   oss:
+#      endPoint: oss-cn-beijing.aliyuncs.com
+#      bucketName: iceasmp

@@ -11,6 +11,8 @@ public class AliyunProperties {
     public TableStoreProperties tableStore;
     public MnsProperties mns;
     public SmsProperties sms;
+    public OSSProperties oss;
+    public LiveProperties live;
 
     public String getAccessKeySecret() {
         return accessKeySecret;
@@ -58,6 +60,22 @@ public class AliyunProperties {
 
     public void setSms(SmsProperties sms) {
         this.sms = sms;
+    }
+
+    public OSSProperties getOss() {
+        return oss;
+    }
+
+    public void setOss(OSSProperties oss) {
+        this.oss = oss;
+    }
+
+    public LiveProperties getLive() {
+        return live;
+    }
+
+    public void setLive(LiveProperties live) {
+        this.live = live;
     }
 }
 
