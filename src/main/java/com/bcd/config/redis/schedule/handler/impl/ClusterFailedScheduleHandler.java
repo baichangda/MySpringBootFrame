@@ -3,6 +3,12 @@ package com.bcd.config.redis.schedule.handler.impl;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.config.redis.schedule.handler.RedisScheduleHandler;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.lang.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -12,9 +18,25 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
+
+    /**
+     * 任务执行超时时间(请确保任务执行时间不会超过此时间)
+     * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
+     * 单位(毫秒)
+     */
+    private long timeOut;
+
+    /**
+     * 任务执行后锁存活时间
+     * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
+     * 单位(毫秒)
+     */
+    private long aliveTime;
+
     /**
      * 锁失败循环间隔时间(此参数在 单机失败模式下无效 )
      * 获取锁失败时候,循环检测执行结果并重新处理的循环时间间隔
+     * 单位(毫秒)
      */
     private long cycleInterval;
 
@@ -26,7 +48,9 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
 
 
     public ClusterFailedScheduleHandler(String lockId, long timeOut, long aliveTime, long cycleInterval) {
-        super(lockId,timeOut, aliveTime);
+        super(lockId);
+        this.timeOut=timeOut;
+        this.aliveTime=aliveTime;
         this.cycleInterval = cycleInterval;
         String randomVal= UUID.randomUUID().toString();
         this.executingVal="0-"+randomVal;
@@ -51,10 +75,10 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     public boolean doBeforeStart() {
         try {
             //1、获取锁
-            boolean isLock = redisTemplate.opsForValue().setIfAbsent(lockId, executingVal);
+            boolean isLock = getLock();
             if (isLock) {
                 //2、获取成功则执行过期时间设置
-                return doAfterGetLock();
+                return true;
             } else {
                 //3、获取锁失败
                 /**
@@ -75,10 +99,10 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                     String[] res = parseValue(redisTemplate.opsForValue().get(lockId));
                     if (res[0] == null) {
                         //3.2、如果执行超时或执行失败,此时重新获取锁
-                        isLock = redisTemplate.opsForValue().setIfAbsent(lockId, executingVal);
+                        isLock = getLock();
                         if (isLock) {
                             //3.2.1、获取成功则执行过期时间设置
-                            return doAfterGetLock();
+                            return true;
                         } else {
                             //3.2.2、获取失败则进入下一轮循环等待执行结果
                             continue;
@@ -114,20 +138,17 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     }
 
     /**
-     * 在setnx成功后执行
-     * 设置过期时间,如果设置失败,释放锁并且返回false
+     * 获取锁
      * @return
      */
-    private boolean doAfterGetLock(){
-        //1、设置过期时间
-        boolean pexpireRes=redisTemplate.expire(lockId, timeOut,TimeUnit.MILLISECONDS);
-        //2、如果设置超时时间失败,则不执行;同时释放锁
-        if(!pexpireRes){
-            redisTemplate.delete(lockId);
-            return false;
-        }else{
-            return true;
-        }
+    private boolean getLock(){
+        return (boolean)redisTemplate.execute(new RedisCallback<Object>() {
+            @Nullable
+            @Override
+            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                return connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT);
+            }
+        });
     }
 
     /**

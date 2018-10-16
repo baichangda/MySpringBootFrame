@@ -15,13 +15,8 @@ public @interface SingleFailedSchedule {
     String lockId();
 
     /**
-     * 超时时间
-     * @return
-     */
-    long timeOut();
-
-    /**
      * 任务执行完毕key存活时间
+     * 单位(毫秒)
      * @return
      */
     long aliveTime() default 0L;

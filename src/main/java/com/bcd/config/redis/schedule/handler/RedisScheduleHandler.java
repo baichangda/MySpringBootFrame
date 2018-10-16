@@ -21,31 +21,13 @@ public abstract class RedisScheduleHandler {
 
     protected RedisTemplate redisTemplate;
     /**
-     * 任务执行超时时间(请确保任务执行时间不会超过此时间)
-     * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
-     */
-    protected long timeOut;
-
-    /**
      * 定时任务的锁表示字符串,确保每一个定时任务设置不同的锁id
      */
     protected String lockId;
 
-    /**
-     * 任务执行后锁存活时间
-     * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
-     */
-    protected long aliveTime;
-
-
-
-
-    public RedisScheduleHandler(String lockId, long timeOut, long aliveTime){
+    public RedisScheduleHandler(String lockId){
         this.lockId= lockId;
-        this.timeOut=timeOut;
-        this.aliveTime=aliveTime;
         this.redisTemplate=SpringUtil.applicationContext.getBean(RedisTemplate.class);
-
     }
 
 
