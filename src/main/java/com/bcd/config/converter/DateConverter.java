@@ -26,9 +26,9 @@ public class DateConverter implements Converter<String,Date> {
             try {
                 String timeZone= ShiroUtil.getCurrentUser().getTimeZone();
                 if(source.length()==DateUtil.DATE_FORMAT_DAY.length()){
-                    return DateUtil.stringToDateWithUserTimeZone(timeZone,source,DateUtil.DATE_FORMAT_DAY);
+                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,timeZone);
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
-                    return DateUtil.stringToDateWithUserTimeZone(timeZone,source,DateUtil.DATE_FORMAT_SECOND);
+                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,timeZone);
                 }else{
                     throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }

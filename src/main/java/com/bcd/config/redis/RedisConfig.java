@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -47,6 +48,13 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
         redisTemplate.setConnectionFactory(factory);
         redisTemplate.afterPropertiesSet();
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory){
+        RedisMessageListenerContainer redisMessageListenerContainer= new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(factory);
+        return redisMessageListenerContainer;
     }
 
 }

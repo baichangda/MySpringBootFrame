@@ -21,7 +21,7 @@ public class SmsConfig {
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");
         IClientProfile profile = DefaultProfile.getProfile(aliyunProperties.sms.regionId, aliyunProperties.accessKeyId,
                 aliyunProperties.accessKeySecret);
-        DefaultProfile.addEndpoint(aliyunProperties.sms.endpointName, aliyunProperties.sms.regionId, aliyunProperties.sms.product, aliyunProperties.sms.domain);
+        DefaultProfile.addEndpoint(aliyunProperties.sms.endpointName,aliyunProperties.sms.product,aliyunProperties.sms.regionId);
         IAcsClient acsClient = new DefaultAcsClient(profile);
         return acsClient;
     }
