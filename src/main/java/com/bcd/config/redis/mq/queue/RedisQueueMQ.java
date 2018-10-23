@@ -8,6 +8,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -40,6 +41,10 @@ public abstract class RedisQueueMQ implements RedisMQ{
     public RedisQueueMQ(@NotNull String name, @NotNull RedisConnectionFactory redisConnectionFactory){
         this.name=name;
         this.stop=false;
+        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory);
+    }
+
+    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         RedisTemplate redisTemplate=new RedisTemplate();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(DEFAULT_KEY_SERIALIZER);
@@ -47,7 +52,7 @@ public abstract class RedisQueueMQ implements RedisMQ{
         redisTemplate.setValueSerializer(DEFAULT_VALUE_SERIALIZER);
         redisTemplate.setHashValueSerializer(DEFAULT_VALUE_SERIALIZER);
         redisTemplate.afterPropertiesSet();
-        this.redisTemplate=redisTemplate;
+        return redisTemplate;
     }
 
     @Override

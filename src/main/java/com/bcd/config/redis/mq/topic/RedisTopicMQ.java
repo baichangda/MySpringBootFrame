@@ -1,6 +1,5 @@
 package com.bcd.config.redis.mq.topic;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.config.redis.mq.RedisMQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +9,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public abstract class RedisTopicMQ implements RedisMQ<Message>{
+
+    protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();
+    protected final static RedisSerializer DEFAULT_VALUE_SERIALIZER=new Jackson2JsonRedisSerializer(Object.class);
 
     protected Logger logger= LoggerFactory.getLogger(RedisTopicMQ.class);
 
@@ -44,8 +47,10 @@ public abstract class RedisTopicMQ implements RedisMQ<Message>{
     private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer){
         RedisTemplate redisTemplate=new RedisTemplate();
         redisTemplate.setConnectionFactory(redisMessageListenerContainer.getConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        redisTemplate.setKeySerializer(DEFAULT_KEY_SERIALIZER);
+        redisTemplate.setHashKeySerializer(DEFAULT_KEY_SERIALIZER);
+        redisTemplate.setValueSerializer(DEFAULT_VALUE_SERIALIZER);
+        redisTemplate.setHashValueSerializer(DEFAULT_VALUE_SERIALIZER);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
