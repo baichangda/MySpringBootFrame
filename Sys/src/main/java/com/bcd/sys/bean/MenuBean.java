@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 
 
@@ -19,24 +20,24 @@ import javax.persistence.*;
 @Table(name = "t_sys_menu")
 public class MenuBean extends BaseBean<Long> {
     //field
-    @ApiModelProperty(position = 1, value = "父菜单id")
+    @ApiModelProperty(value = "父菜单id")
     private Long parentId;
 
     @NotBlank(message = "菜单名称不能为空")
     @Length(max = 50,message = "[菜单名称]长度不能超过50")
-    @ApiModelProperty(position = 2, value = "菜单名称")
+    @ApiModelProperty(value = "菜单名称")
     private String name;
 
     @Length(max = 256,message = "[url地址]长度不能超过256")
-    @ApiModelProperty(position = 3, value = "url地址")
+    @ApiModelProperty(value = "url地址")
     private String url;
 
     @Length(max = 256,message = "[图标]长度不能超过256")
-    @ApiModelProperty(position = 4, value = "图标")
+    @ApiModelProperty(value = "图标")
     private String icon;
 
     @NotNull(message = "排序不能为空")
-    @ApiModelProperty(position = 5, value = "排序")
+    @ApiModelProperty(value = "排序")
     private Integer orderNum;
 
 

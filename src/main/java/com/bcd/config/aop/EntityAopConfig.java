@@ -2,6 +2,7 @@ package com.bcd.config.aop;
 
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.util.IPUtil;
 import com.bcd.sys.util.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -64,13 +65,18 @@ public class EntityAopConfig {
         //2、属性注入
         if(id==null){
             bean.setCreateTime(new Date());
+            bean.setCreateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setCreateUserId(user.getId());
+                bean.setCreateUserName(user.getUsername());
+
             }
         }else{
             bean.setUpdateTime(new Date());
+            bean.setUpdateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setUpdateUserId(user.getId());
+                bean.setUpdateUserName(user.getUsername());
             }
         }
     }

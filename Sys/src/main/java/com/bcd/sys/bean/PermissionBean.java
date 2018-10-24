@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 
 
@@ -21,19 +22,19 @@ public class PermissionBean extends BaseBean<Long> {
     //field
     @NotBlank(message = "角色名称不能为空")
     @Length(max = 20,message = "[角色名称]长度不能超过20")
-    @ApiModelProperty(position = 1, value = "角色名称")
+    @ApiModelProperty(value = "角色名称")
     private String name;
 
     @NotBlank(message = "编码不能为空")
     @Length(max = 100,message = "[编码]长度不能超过100")
-    @ApiModelProperty(position = 2, value = "编码")
+    @ApiModelProperty(value = "编码")
     private String code;
 
     @Length(max = 256,message = "[备注]长度不能超过256")
-    @ApiModelProperty(position = 3, value = "备注")
+    @ApiModelProperty(value = "备注")
     private String remark;
 
-    @ApiModelProperty(position = 4, value = "关联角色id")
+    @ApiModelProperty(value = "关联角色id")
     private Long roleId;
 
 

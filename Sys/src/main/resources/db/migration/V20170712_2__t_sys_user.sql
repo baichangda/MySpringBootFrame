@@ -17,6 +17,8 @@ create table IF NOT EXISTS t_sys_user
    update_time          timestamp NULL comment '更新时间',
    update_user_id       bigint comment '更新人id',
    update_user_name     varchar(50) comment '更新人姓名',
+   create_ip            varchar(50) comment '创建ip地址',
+   update_ip            varchar(50) comment '更新ip地址',
    primary key (id)
 );
 

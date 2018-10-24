@@ -9,5 +9,8 @@ public class CommonConst {
     public final static String INITIAL_PASSWORD ="123qwe";
 
 
-    public final static ExecutorService SYS_TASK_POOL= Executors.newWorkStealingPool();
+    /**
+     * 用来执行系统任务的线程池
+     */
+    public final static ExecutorService SYS_TASK_POOL= Executors.newFixedThreadPool(3);
 }

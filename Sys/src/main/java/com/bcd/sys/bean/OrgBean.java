@@ -7,6 +7,7 @@ import javax.persistence.*;
 import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 
 
@@ -19,24 +20,24 @@ import javax.persistence.*;
 @Table(name = "t_sys_org")
 public class OrgBean extends BaseBean<Long> {
     //field
-    @ApiModelProperty(position = 1, value = "父组织id")
+    @ApiModelProperty(value = "父组织id")
     private Long parentId;
 
     @NotBlank(message = "组织名称不能为空")
     @Length(max = 50,message = "[组织名称]长度不能超过50")
-    @ApiModelProperty(position = 2, value = "组织名称")
+    @ApiModelProperty(value = "组织名称")
     private String name;
 
     @Length(max = 256,message = "[地址]长度不能超过256")
-    @ApiModelProperty(position = 3, value = "地址")
+    @ApiModelProperty(value = "地址")
     private String address;
 
     @Length(max = 11,message = "[电话]长度不能超过11")
-    @ApiModelProperty(position = 4, value = "电话")
+    @ApiModelProperty(value = "电话")
     private String phone;
 
     @Length(max = 256,message = "[备注]长度不能超过256")
-    @ApiModelProperty(position = 5, value = "备注")
+    @ApiModelProperty(value = "备注")
     private String remark;
 
 
