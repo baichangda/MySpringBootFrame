@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("unchecked")
 public abstract class RedisQueueMQ implements RedisMQ{
 
     protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();

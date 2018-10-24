@@ -8,8 +8,10 @@ import com.bcd.base.message.JsonMessage;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
+import java.util.List;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 
@@ -29,15 +31,14 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务列表")
-    @ApiResponses(value={@ApiResponse(code=200,response = TaskBean.class,message = "查询系统任务列表")})
-    public JsonMessage list(
+    public JsonMessage<List<TaskBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
             @ApiParam(value = "任务状态(1:等待中;2:执行中;2:任务被终止;2:已完成;3:执行失败;)",example="1")
             @RequestParam(value = "status",required = false) Integer status,
-            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)")
+            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
             @ApiParam(value = "备注(失败时记录失败原因)")
             @RequestParam(value = "remark",required = false) String remark,
@@ -67,15 +68,14 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务分页")
-    @ApiResponses(value={@ApiResponse(code=200,response = TaskBean.class,message = "查询系统任务分页")})
-    public JsonMessage list(
+    public JsonMessage<Page<TaskBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
             @ApiParam(value = "任务状态(1:等待中;2:执行中;2:任务被终止;2:已完成;3:执行失败;)",example="1")
             @RequestParam(value = "status",required = false) Integer status,
-            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)")
+            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
             @ApiParam(value = "备注(失败时记录失败原因)")
             @RequestParam(value = "remark",required = false) String remark,
@@ -110,7 +110,6 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存系统任务",notes = "保存系统任务")
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "保存系统任务")})
     public JsonMessage save(@ApiParam(value = "系统任务实体") @RequestBody TaskBean task){
         taskService.save(task);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
@@ -124,7 +123,6 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除系统任务",notes = "删除系统任务")
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "删除系统任务")})
     public JsonMessage delete(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
         taskService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();

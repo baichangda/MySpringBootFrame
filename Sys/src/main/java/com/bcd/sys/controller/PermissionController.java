@@ -12,52 +12,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.bean.RoleBean;
-import com.bcd.sys.service.RoleService;
+import com.bcd.sys.bean.PermissionBean;
+import com.bcd.sys.service.PermissionService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/role")
-public class RoleController extends BaseController {
+@RequestMapping("/api/permission")
+public class PermissionController extends BaseController {
 
     @Autowired
-    private RoleService roleService;
+    private PermissionService permissionService;
 
 
 
     /**
-     * 查询角色列表
+     * 查询权限列表
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value="查询角色列表",notes = "查询角色列表")
-    public JsonMessage<List<RoleBean>> list(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "角色名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "编码")
-            @RequestParam(value = "code",required = false) String code,
-            @ApiParam(value = "备注")
-            @RequestParam(value = "remark",required = false) String remark
-        ){
-        Condition condition= Condition.and(
-            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
-        );
-        return JsonMessage.success(roleService.findAll(condition));
-    }
-
-    /**
-     * 查询角色分页
-     * @return
-     */
-    @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询角色列表",notes = "查询角色分页")
-    public JsonMessage<Page<RoleBean>> page(
-            @ApiParam(value = "主键",example="1")
+    @ApiOperation(value="查询权限列表",notes = "查询权限列表")
+    public JsonMessage<List<PermissionBean>> list(
+            @ApiParam(value = "id",example="1")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "角色名称")
             @RequestParam(value = "name",required = false) String name,
@@ -65,6 +40,36 @@ public class RoleController extends BaseController {
             @RequestParam(value = "code",required = false) String code,
             @ApiParam(value = "备注")
             @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "关联角色id",example="1")
+            @RequestParam(value = "roleId",required = false) Long roleId
+        ){
+        Condition condition= Condition.and(
+            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+            new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new NumberCondition("roleId",roleId, NumberCondition.Handler.EQUAL)
+        );
+        return JsonMessage.success(permissionService.findAll(condition));
+    }
+
+    /**
+     * 查询权限分页
+     * @return
+     */
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @ApiOperation(value="查询权限列表",notes = "查询权限分页")
+    public JsonMessage<Page<PermissionBean>> page(
+            @ApiParam(value = "id",example="1")
+            @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(value = "角色名称")
+            @RequestParam(value = "name",required = false) String name,
+            @ApiParam(value = "编码")
+            @RequestParam(value = "code",required = false) String code,
+            @ApiParam(value = "备注")
+            @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "关联角色id",example="1")
+            @RequestParam(value = "roleId",required = false) Long roleId,
             @ApiParam(value = "分页参数(页数)",example="1")
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
             @ApiParam(value = "分页参数(页大小)",example="20")
@@ -74,33 +79,34 @@ public class RoleController extends BaseController {
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
+            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new NumberCondition("roleId",roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success(permissionService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
-     * 保存角色
-     * @param role
+     * 保存权限
+     * @param permission
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ApiOperation(value = "保存角色",notes = "保存角色")
-    public JsonMessage save(@ApiParam(value = "角色实体") @RequestBody RoleBean role){
-        roleService.save(role);
+    @ApiOperation(value = "保存权限",notes = "保存权限")
+    public JsonMessage save(@ApiParam(value = "权限实体") @RequestBody PermissionBean permission){
+        permissionService.save(permission);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }
 
 
     /**
-     * 删除角色
+     * 删除权限
      * @param ids
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除角色",notes = "删除角色")
-    public JsonMessage delete(@ApiParam(value = "角色id数组") @RequestParam Long[] ids){
-        roleService.deleteById(ids);
+    @ApiOperation(value = "删除权限",notes = "删除权限")
+    public JsonMessage delete(@ApiParam(value = "权限id数组") @RequestParam Long[] ids){
+        permissionService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 

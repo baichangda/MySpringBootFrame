@@ -15,6 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public abstract class RedisTopicMQ implements RedisMQ<Message>{
 
     protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();

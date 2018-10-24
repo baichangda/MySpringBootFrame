@@ -59,6 +59,8 @@ public class UserBean extends BaseBean<Long> {
     @ApiModelProperty(value = "是否可用（0：禁用；1：可用）")
     private Integer status;
 
+    @Transient
+    private String timeZone;
 
     //method
     public void setOrgId(Long orgId){
@@ -141,5 +143,11 @@ public class UserBean extends BaseBean<Long> {
         return this.status;
     }
 
+    public String getTimeZone() {
+        return timeZone;
+    }
 
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
 }
