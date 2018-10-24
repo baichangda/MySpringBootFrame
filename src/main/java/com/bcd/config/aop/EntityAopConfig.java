@@ -1,15 +1,18 @@
 package com.bcd.config.aop;
 
+import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.util.IPUtil;
 import com.bcd.sys.util.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -65,7 +68,10 @@ public class EntityAopConfig {
         //2、属性注入
         if(id==null){
             bean.setCreateTime(new Date());
-            bean.setCreateIp(IPUtil.getIpAddress());
+            HttpServletRequest request=getRequest();
+            if(request!=null){
+                bean.setCreateIp(IPUtil.getIpAdrress(request));
+            }
             if(user!=null){
                 bean.setCreateUserId(user.getId());
                 bean.setCreateUserName(user.getUsername());
@@ -73,11 +79,19 @@ public class EntityAopConfig {
             }
         }else{
             bean.setUpdateTime(new Date());
-            bean.setUpdateIp(IPUtil.getIpAddress());
+            HttpServletRequest request=getRequest();
+            if(request!=null){
+                bean.setUpdateIp(IPUtil.getIpAdrress(request));
+            }
             if(user!=null){
                 bean.setUpdateUserId(user.getId());
                 bean.setUpdateUserName(user.getUsername());
             }
         }
+    }
+
+    private HttpServletRequest getRequest(){
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return servletRequestAttributes==null?null:servletRequestAttributes.getRequest();
     }
 }
