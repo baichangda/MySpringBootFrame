@@ -1,6 +1,6 @@
-package com.bcd.config.redis.mq.queue;
+package com.bcd.base.redis.mq.queue;
 
-import com.bcd.config.redis.mq.RedisMQ;
+import com.bcd.base.redis.mq.RedisMQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

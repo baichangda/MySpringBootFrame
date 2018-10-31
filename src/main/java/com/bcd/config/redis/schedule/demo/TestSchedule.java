@@ -1,10 +1,7 @@
-package com.bcd.config.redis.schedule.demo;
+package com.bcd.base.redis.schedule.demo;
 
-import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import com.bcd.base.redis.schedule.anno.ClusterFailedSchedule;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;

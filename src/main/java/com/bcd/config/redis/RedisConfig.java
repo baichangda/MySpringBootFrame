@@ -1,4 +1,4 @@
-package com.bcd.config.redis;
+package com.bcd.base.redis;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

@@ -1,15 +1,13 @@
-package com.bcd.config.redis.schedule.handler.impl;
+package com.bcd.base.redis.schedule.handler.impl;
 
-import com.bcd.config.redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.config.redis.schedule.handler.RedisScheduleHandler;
+import com.bcd.base.redis.schedule.anno.SingleFailedSchedule;
+import com.bcd.base.redis.schedule.handler.RedisScheduleHandler;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.Nullable;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果

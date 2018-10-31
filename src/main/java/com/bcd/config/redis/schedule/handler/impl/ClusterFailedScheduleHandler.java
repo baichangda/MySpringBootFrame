@@ -1,8 +1,8 @@
-package com.bcd.config.redis.schedule.handler.impl;
+package com.bcd.base.redis.schedule.handler.impl;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.config.redis.schedule.handler.RedisScheduleHandler;
+import com.bcd.base.redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.redis.schedule.handler.RedisScheduleHandler;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;

@@ -1,7 +1,7 @@
-package com.bcd.config.redis.mq.example;
+package com.bcd.base.redis.mq.example;
 
 import com.bcd.base.util.JsonUtil;
-import com.bcd.config.redis.mq.queue.RedisQueueMQ;
+import com.bcd.base.redis.mq.queue.RedisQueueMQ;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,11 +12,6 @@ public class TestRedisQueueMQ extends RedisQueueMQ{
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
         super("test",redisConnectionFactory);
         watch();
-    }
-
-    @Bean(name = "testRedisQueueMQTemplate")
-    private RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory){
-        return redisTemplate;
     }
 
     @Override

@@ -1,7 +1,7 @@
-package com.bcd.config.redis.schedule.aop;
+package com.bcd.base.redis.schedule.aop;
 
-import com.bcd.config.redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.config.redis.schedule.handler.impl.SingleFailedScheduleHandler;
+import com.bcd.base.redis.schedule.anno.SingleFailedSchedule;
+import com.bcd.base.redis.schedule.handler.impl.SingleFailedScheduleHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -21,7 +21,7 @@ public class SingleFailedScheduleAopConfig {
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.config.redis.schedule.anno.SingleFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.redis.schedule.anno.SingleFailedSchedule)")
     public void methodSchedule(){
     }
 

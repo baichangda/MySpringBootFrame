@@ -1,6 +1,6 @@
-package com.bcd.config.redis.mq.example;
+package com.bcd.base.redis.mq.example;
 
-import com.bcd.config.redis.mq.topic.RedisTopicMQ;
+import com.bcd.base.redis.mq.topic.RedisTopicMQ;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
