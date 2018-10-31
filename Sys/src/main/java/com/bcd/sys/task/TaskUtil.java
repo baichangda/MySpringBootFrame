@@ -1,13 +1,11 @@
-package com.bcd.sys.util;
+package com.bcd.sys.task;
 
-import com.bcd.sys.task.SuperTaskBean;
+import com.bcd.base.util.SpringUtil;
+import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.task.SysTaskRunnable;
-import com.bcd.sys.task.TaskConsumer;
-import com.bcd.sys.task.TaskRedisList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.bcd.sys.service.TaskService;
+import com.bcd.sys.util.ShiroUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -15,90 +13,96 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
+@SuppressWarnings("unchecked")
 @Component
 public class TaskUtil {
 
-    private final static Logger logger= LoggerFactory.getLogger(TaskUtil.class);
-
     @Autowired
-    public void setRedisTemplate(@Qualifier(value = "taskRedisTemplate") RedisTemplate redisTemplate){
+    public void init(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
         //初始化系统任务线程池
         CommonConst.SYS_TASK_POOL=new ThreadPoolExecutor(2,2,30, TimeUnit.SECONDS,
                 new TaskRedisList(CommonConst.SYS_TASK_LIST_NAME,redisTemplate));
     }
 
-    @Bean(name = "taskRedisTemplate")
-    public RedisTemplate taskRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate redisTemplate = new RedisTemplate<>();
-        StringRedisSerializer keySerializer=new StringRedisSerializer();
-        JdkSerializationRedisSerializer valueSerializer=new JdkSerializationRedisSerializer();
-        redisTemplate.setKeySerializer(keySerializer);
-        redisTemplate.setHashKeySerializer(keySerializer);
-        redisTemplate.setHashValueSerializer(valueSerializer);
-        redisTemplate.setValueSerializer(valueSerializer);
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+    public static TaskService getTaskService(){
+        return Init.taskService;
     }
 
     /**
      * 注册任务
-     * @param supplier 提供任务实体
-     * @param consumer
-     * @param <T>
+     * @param name 任务名称
+     * @param type 任务类型
+     * @param consumer 任务执行方法
+     * @param onStart 开始执行任务时回调
+     * @param onSuccess 成功时回调
+     * @param onFailed 失败时回调
      * @return
      */
-    public static <T extends SuperTaskBean>T registerTask(Supplier<T> supplier, TaskConsumer consumer){
-        UserBean userBean=ShiroUtil.getCurrentUser();
-        T taskBean=supplier.get();
+    public static TaskBean registerTask(String name,int type,TaskConsumer consumer,TaskConsumer onStart,TaskConsumer onSuccess,TaskConsumer onFailed){
+        UserBean userBean= ShiroUtil.getCurrentUser();
+        TaskBean taskBean=new TaskBean(name,type);
         if(userBean!=null){
             taskBean.setCreateUserName(userBean.getUsername());
             taskBean.setCreateUserId(userBean.getId());
         }
+        taskBean.setOnStart(onStart);
+        taskBean.setOnSuccess(onSuccess);
+        taskBean.setOnFailed(onFailed);
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(1);
         taskBean.setConsumer(consumer);
-        taskBean.save();
+        getTaskService().save(taskBean);
         CommonConst.SYS_TASK_POOL.execute(new SysTaskRunnable(taskBean));
         return taskBean;
     }
 
+    public static TaskBean registerTask(String name,int type,TaskConsumer consumer){
+        return registerTask(name, type, consumer,null,null,null);
+    }
+
     /**
      * 终止任务
-     * @param taskBean
-     * @param <T>
+     * @param ids
      * @return true代表终止成功;false代表终止失败(可能正在执行中或已经完成)
      */
-    public static <T extends SuperTaskBean>boolean stopTask(T taskBean){
-        boolean res=false;
-        List<SysTaskRunnable> list= ((TaskRedisList)CommonConst.SYS_TASK_POOL.getQueue()).range(0,-1);
-        for (SysTaskRunnable sysTaskRunnable : list) {
-            if(sysTaskRunnable.getTaskBean().getId().equals(taskBean.getId())){
-                res=CommonConst.SYS_TASK_POOL.getQueue().remove(sysTaskRunnable);
-                break;
-            }
+    public static boolean[] stopTask(Long ...ids){
+        if(ids==null||ids.length==0){
+            return new boolean[0];
         }
-        if(res){
-            taskBean.setStatus(3);
-            taskBean.setFinishTime(new Date());
-            taskBean.save();
-            if(taskBean.getOnStop()!=null){
-                try{
-                    taskBean.onStop.accept(taskBean);
-                }catch (Exception e){
-                    logger.error("执行任务["+taskBean.getName()+"]的[onStop]出现异常",e);
+        List<SysTaskRunnable> list= ((TaskRedisList)CommonConst.SYS_TASK_POOL.getQueue()).range(0,-1);
+        boolean[]res=new boolean[ids.length];
+        List<Long> stopIdList=new ArrayList<>();
+        for (int i=0;i<=ids.length-1;i++) {
+            Long id=ids[i];
+            for (SysTaskRunnable sysTaskRunnable : list) {
+                if(sysTaskRunnable.getTaskBean().getId().equals(id)){
+                    res[i]=CommonConst.SYS_TASK_POOL.getQueue().remove(sysTaskRunnable);
+                    break;
                 }
             }
+            if(res[i]){
+                stopIdList.add(id);
+            }
         }
+        Map<String,Object> paramMap=new HashMap<>();
+        paramMap.put("status",3);
+        paramMap.put("ids",stopIdList);
+        int count=new NamedParameterJdbcTemplate(Init.jdbcTemplate).update(
+                "update t_sys_task set status=:status where id in (:ids)",paramMap);
         return res;
+    }
+
+    static class Init{
+        private final static TaskService taskService=SpringUtil.applicationContext.getBean(TaskService.class);
+        private final static JdbcTemplate jdbcTemplate=SpringUtil.applicationContext.getBean(JdbcTemplate.class);
     }
 
 }

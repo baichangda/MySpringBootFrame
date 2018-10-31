@@ -1,4 +1,4 @@
-package com.bcd.base.redis.mq;
+package com.bcd.config.redis.mq;
 
 import java.util.List;
 

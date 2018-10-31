@@ -5,6 +5,8 @@ import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.task.TaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 
 @SuppressWarnings(value = "unchecked")
@@ -36,12 +37,16 @@ public class TaskController extends BaseController {
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "任务状态(1:等待中;2:执行中;2:任务被终止;2:已完成;3:执行失败;)",example="1")
+            @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)",example="1")
             @RequestParam(value = "status",required = false) Integer status,
             @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
             @ApiParam(value = "备注(失败时记录失败原因)")
             @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "任务开始时间开始")
+            @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
+            @ApiParam(value = "任务开始时间截止")
+            @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
             @ApiParam(value = "任务完成时间开始")
             @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
             @ApiParam(value = "任务完成时间截止")
@@ -55,6 +60,8 @@ public class TaskController extends BaseController {
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
             new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new DateCondition("startTime",startTimeBegin, DateCondition.Handler.GE),
+            new DateCondition("startTime",startTimeEnd, DateCondition.Handler.LE),
             new DateCondition("finishTime",finishTimeBegin, DateCondition.Handler.GE),
             new DateCondition("finishTime",finishTimeEnd, DateCondition.Handler.LE),
             new StringCondition("filePaths",filePaths, StringCondition.Handler.ALL_LIKE)
@@ -73,12 +80,16 @@ public class TaskController extends BaseController {
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "任务状态(1:等待中;2:执行中;2:任务被终止;2:已完成;3:执行失败;)",example="1")
+            @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)",example="1")
             @RequestParam(value = "status",required = false) Integer status,
             @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
             @ApiParam(value = "备注(失败时记录失败原因)")
             @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "任务开始时间开始")
+            @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
+            @ApiParam(value = "任务开始时间截止")
+            @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
             @ApiParam(value = "任务完成时间开始")
             @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
             @ApiParam(value = "任务完成时间截止")
@@ -96,6 +107,8 @@ public class TaskController extends BaseController {
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
             new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new DateCondition("startTime",startTimeBegin, DateCondition.Handler.GE),
+            new DateCondition("startTime",startTimeEnd, DateCondition.Handler.LE),
             new DateCondition("finishTime",finishTimeBegin, DateCondition.Handler.GE),
             new DateCondition("finishTime",finishTimeEnd, DateCondition.Handler.LE),
             new StringCondition("filePaths",filePaths, StringCondition.Handler.ALL_LIKE)
@@ -117,14 +130,14 @@ public class TaskController extends BaseController {
 
 
     /**
-     * 删除系统任务
+     * 停止系统任务
      * @param ids
      * @return
      */
-    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除系统任务",notes = "删除系统任务")
-    public JsonMessage delete(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
-        taskService.deleteById(ids);
+    @RequestMapping(value = "/stop",method = RequestMethod.POST)
+    @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
+    public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
+        TaskUtil.stopTask(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 

@@ -76,11 +76,11 @@ allprojects{
     /**
      * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
      */
-//    bootJar {
-//        manifest {
-//            attributes 'Start-Class': 'com.bcd.Application'
-//        }
-//    }
+    bootJar {
+        manifest {
+            attributes 'Start-Class': 'com.bcd.Application'
+        }
+    }
 }
 
 bootRun {
@@ -99,7 +99,7 @@ buildscript {
         flywayVersion='3.2.1'
         swaggerVersion='+'
         shiroVersion='+'
-        kafkaVersion='+'
+        kafkaVersion='2.1.10.RELEASE'
         tablestoreVersion='+'
         mnsVersion='+'
         smsVersion='+'

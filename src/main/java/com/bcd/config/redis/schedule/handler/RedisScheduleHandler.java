@@ -1,4 +1,4 @@
-package com.bcd.base.redis.schedule.handler;
+package com.bcd.config.redis.schedule.handler;
 
 import com.bcd.base.util.SpringUtil;
 import org.springframework.data.redis.core.RedisTemplate;
