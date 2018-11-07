@@ -20,12 +20,12 @@ import javax.persistence.*;
 @Table(name = "t_sys_role")
 public class RoleBean extends BaseBean<Long> {
     //field
-    @NotBlank(message = "角色名称不能为空")
+    @NotBlank(message = "[角色名称]不能为空")
     @Length(max = 20,message = "[角色名称]长度不能超过20")
     @ApiModelProperty(value = "角色名称(不能为空,长度不能超过20)")
     private String name;
 
-    @NotBlank(message = "编码不能为空")
+    @NotBlank(message = "[编码]不能为空")
     @Length(max = 100,message = "[编码]长度不能超过100")
     @ApiModelProperty(value = "编码(不能为空,长度不能超过100)")
     private String code;

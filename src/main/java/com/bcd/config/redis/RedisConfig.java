@@ -15,25 +15,21 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableAutoConfiguration
 @SuppressWarnings("unchecked")
 public class RedisConfig {
 
     /**
-     * 实例化
      * key 用 StringRedisSerializer
      * value 用 JdkSerializationRedisSerializer
      * 的 RedisTemplate
      * @return
      */
-    @Primary
     @Bean(name = "string_jdk_redisTemplate")
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate string_jdk_redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate redisTemplate = new RedisTemplate<>();
-        StringRedisSerializer keySerializer=new StringRedisSerializer();
         JdkSerializationRedisSerializer valueSerializer= new JdkSerializationRedisSerializer();
-        redisTemplate.setKeySerializer(keySerializer);
-        redisTemplate.setHashKeySerializer(keySerializer);
+        redisTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+        redisTemplate.setHashKeySerializer(StringRedisSerializer.UTF_8);
         redisTemplate.setHashValueSerializer(valueSerializer);
         redisTemplate.setValueSerializer(valueSerializer);
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -42,18 +38,16 @@ public class RedisConfig {
     }
 
     /**
-     * 实例化
      * key 用 StringRedisSerializer
      * value 用 Jackson2JsonRedisSerializer
      * 的 RedisTemplate
      * @return
      */
     @Bean(name = "string_jackson_redisTemplate")
-    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier(value = "jacksonRedisSerializer") RedisSerializer valueSerializer) {
+    public RedisTemplate string_jackson_redisTemplate(RedisConnectionFactory redisConnectionFactory,@Qualifier(value = "jacksonRedisSerializer") RedisSerializer valueSerializer) {
         RedisTemplate redisTemplate = new RedisTemplate<>();
-        StringRedisSerializer keySerializer=new StringRedisSerializer();
-        redisTemplate.setKeySerializer(keySerializer);
-        redisTemplate.setHashKeySerializer(keySerializer);
+        redisTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+        redisTemplate.setHashKeySerializer(StringRedisSerializer.UTF_8);
         redisTemplate.setHashValueSerializer(valueSerializer);
         redisTemplate.setValueSerializer(valueSerializer);
         redisTemplate.setConnectionFactory(redisConnectionFactory);
@@ -61,7 +55,6 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Primary
     @Bean(name = "jacksonRedisSerializer")
     public RedisSerializer redisSerializer(){
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer=new Jackson2JsonRedisSerializer<>(Object.class);

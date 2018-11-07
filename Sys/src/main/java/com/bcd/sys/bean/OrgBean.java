@@ -23,7 +23,7 @@ public class OrgBean extends BaseBean<Long> {
     @ApiModelProperty(value = "父组织id")
     private Long parentId;
 
-    @NotBlank(message = "组织名称不能为空")
+    @NotBlank(message = "[组织名称]不能为空")
     @Length(max = 50,message = "[组织名称]长度不能超过50")
     @ApiModelProperty(value = "组织名称(不能为空,长度不能超过50)")
     private String name;

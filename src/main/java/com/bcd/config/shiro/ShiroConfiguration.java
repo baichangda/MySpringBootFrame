@@ -12,6 +12,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -110,6 +111,7 @@ public class ShiroConfiguration {
     }
 
     @Bean
+    @Autowired
     public SessionManager sessionManager(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
         DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
         sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));

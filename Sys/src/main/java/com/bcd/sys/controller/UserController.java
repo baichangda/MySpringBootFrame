@@ -62,7 +62,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
             @ApiParam(value = "身份证号")
             @RequestParam(value = "cardNumber",required = false) String cardNumber,
-            @ApiParam(value = "是否可用（0：禁用；1：可用）",example="1")
+            @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
             @RequestParam(value = "status",required = false) Integer status
         ){
         Condition condition= Condition.and(
@@ -111,7 +111,7 @@ public class UserController extends BaseController {
             @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
             @ApiParam(value = "身份证号")
             @RequestParam(value = "cardNumber",required = false) String cardNumber,
-            @ApiParam(value = "是否可用（0：禁用；1：可用）",example="1")
+            @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
             @RequestParam(value = "status",required = false) Integer status,
             @ApiParam(value = "分页参数(页数)",example="1")
             @RequestParam(value = "pageNum",required = false)Integer pageNum,

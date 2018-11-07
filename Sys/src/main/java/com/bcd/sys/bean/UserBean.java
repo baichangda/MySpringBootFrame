@@ -23,14 +23,14 @@ public class UserBean extends BaseBean<Long> {
     @ApiModelProperty(value = "关联机构id")
     private Long orgId;
 
-    @NotBlank(message = "用户名不能为空")
+    @NotBlank(message = "[用户名]不能为空")
     @Length(max = 50,message = "[用户名]长度不能超过50")
     @ApiModelProperty(value = "用户名(不能为空,长度不能超过50)")
     private String username;
 
-    @NotBlank(message = "用户名不能为空")
-    @Length(max = 100,message = "[用户名]长度不能超过100")
-    @ApiModelProperty(value = "用户名(不能为空,长度不能超过100)")
+    @NotBlank(message = "[密码]不能为空")
+    @Length(max = 100,message = "[密码]长度不能超过100")
+    @ApiModelProperty(value = "密码(不能为空,长度不能超过100)")
     private String password;
 
     @Length(max = 100,message = "[邮箱]长度不能超过100")
@@ -56,7 +56,8 @@ public class UserBean extends BaseBean<Long> {
     @ApiModelProperty(value = "身份证号(长度不能超过20)")
     private String cardNumber;
 
-    @ApiModelProperty(value = "是否可用（0：禁用；1：可用）")
+    @NotNull(message = "[是否可用]不能为空")
+    @ApiModelProperty(value = "是否可用(0:禁用,1:可用)(不能为空)")
     private Integer status;
 
     @ApiModelProperty(hidden = true)

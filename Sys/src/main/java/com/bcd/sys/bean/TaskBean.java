@@ -21,16 +21,16 @@ import javax.persistence.*;
 @Table(name = "t_sys_task")
 public class TaskBean extends SuperBaseBean<Long> {
     //field
-    @NotBlank(message = "任务名称不能为空")
+    @NotBlank(message = "[任务名称]不能为空")
     @Length(max = 50,message = "[任务名称]长度不能超过50")
     @ApiModelProperty(value = "任务名称(不能为空,长度不能超过50)")
     private String name;
 
-    @NotNull(message = "任务状态不能为空")
+    @NotNull(message = "[任务状态]不能为空")
     @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)(不能为空)")
     private Integer status;
 
-    @NotNull(message = "任务类型不能为空")
+    @NotNull(message = "[任务类型]不能为空")
     @ApiModelProperty(value = "任务类型(1:普通任务;2:文件类型任务)(不能为空)")
     private Integer type;
 
@@ -79,8 +79,8 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(hidden = true)
     public TaskConsumer onFailed;
 
-    public TaskBean(@NotBlank(message = "任务名称不能为空") @Length(max = 50, message = "[任务名称]长度不能超过50") String name,
-                    @NotNull(message = "任务状态不能为空") Integer type) {
+    public TaskBean(@NotBlank(message = "[任务名称]不能为空") @Length(max = 50, message = "[任务名称]长度不能超过50") String name,
+                    @NotNull(message = "[任务状态]不能为空") Integer type) {
         this.name=name;
         this.type = type;
     }
