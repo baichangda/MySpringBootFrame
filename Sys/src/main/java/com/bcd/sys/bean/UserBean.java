@@ -25,40 +25,41 @@ public class UserBean extends BaseBean<Long> {
 
     @NotBlank(message = "用户名不能为空")
     @Length(max = 50,message = "[用户名]长度不能超过50")
-    @ApiModelProperty(value = "用户名")
+    @ApiModelProperty(value = "用户名(不能为空,长度不能超过50)")
     private String username;
 
     @NotBlank(message = "用户名不能为空")
     @Length(max = 100,message = "[用户名]长度不能超过100")
-    @ApiModelProperty(value = "用户名")
+    @ApiModelProperty(value = "用户名(不能为空,长度不能超过100)")
     private String password;
 
     @Length(max = 100,message = "[邮箱]长度不能超过100")
-    @ApiModelProperty(value = "邮箱")
+    @ApiModelProperty(value = "邮箱(长度不能超过100)")
     private String email;
 
     @Length(max = 11,message = "[手机号]长度不能超过11")
-    @ApiModelProperty(value = "手机号")
+    @ApiModelProperty(value = "手机号(长度不能超过11)")
     private String phone;
 
     @Length(max = 50,message = "[真实姓名]长度不能超过50")
-    @ApiModelProperty(value = "真实姓名")
+    @ApiModelProperty(value = "真实姓名(长度不能超过50)")
     private String realName;
 
     @Length(max = 5,message = "[性别]长度不能超过5")
-    @ApiModelProperty(value = "性别")
+    @ApiModelProperty(value = "性别(长度不能超过5)")
     private String sex;
 
     @ApiModelProperty(value = "生日")
     private Date birthday;
 
     @Length(max = 20,message = "[身份证号]长度不能超过20")
-    @ApiModelProperty(value = "身份证号")
+    @ApiModelProperty(value = "身份证号(长度不能超过20)")
     private String cardNumber;
 
     @ApiModelProperty(value = "是否可用（0：禁用；1：可用）")
     private Integer status;
 
+    @ApiModelProperty(hidden = true)
     @Transient
     private String timeZone;
 

@@ -116,18 +116,6 @@ public class TaskController extends BaseController {
         return JsonMessage.success(taskService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
-    /**
-     * 保存系统任务
-     * @param task
-     * @return
-     */
-    @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ApiOperation(value = "保存系统任务",notes = "保存系统任务")
-    public JsonMessage save(@ApiParam(value = "系统任务实体") @RequestBody TaskBean task){
-        taskService.save(task);
-        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
-    }
-
 
     /**
      * 停止系统任务

@@ -20,6 +20,7 @@ import java.util.Iterator;
 /**
  * Created by Administrator on 2017/4/13.
  */
+@SuppressWarnings("unchecked")
 @Aspect
 @Component
 public class EntityAopConfig {
