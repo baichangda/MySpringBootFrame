@@ -1,10 +1,11 @@
+apply plugin: 'org.flywaydb.flyway'
+
 allprojects{
     group 'MySpringBootFrame'
     version '1.0-SNAPSHOT'
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'org.springframework.boot'
-    apply plugin: 'org.flywaydb.flyway'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -20,7 +21,8 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
         //springboot test支持
         compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
-
+        //springboot batch支持
+        compile("org.springframework.boot:spring-boot-starter-batch:${springBootVersion}")
         //springboot redis支持
         //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
         compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
@@ -96,10 +98,9 @@ bootRun {
 buildscript {
     ext {
         springBootVersion = '+'
-        flywayVersion='3.2.1'
         swaggerVersion='+'
         shiroVersion='+'
-        kafkaVersion='2.1.10.RELEASE'
+        kafkaVersion='+'
         tablestoreVersion='+'
         mnsVersion='+'
         smsVersion='+'
@@ -108,21 +109,23 @@ buildscript {
         aliyunSdkCoreVersion='+'
         commonsPool2='+'
         jedisVersion='+'
+        flywayVersion = '+'
         mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
     }
+
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
 //        jcenter()
 //        mavenCentral()
     }
+
     dependencies {
         //使用springboot框架
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         //使用flyway插件
         classpath "org.flywaydb:flyway-gradle-plugin:${flywayVersion}"
     }
-
 }
 
 dependencies {
