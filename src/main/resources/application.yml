@@ -25,7 +25,7 @@ spring:
        maximumPoolSize: 15
      url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC
      username: root
-     password: root
+     password: 123456
 #  mongodb配置
 #   data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
 #  jpa配置
