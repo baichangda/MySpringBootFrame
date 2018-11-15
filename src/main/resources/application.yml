@@ -35,8 +35,9 @@ spring:
           # Hibernate DDL  auto: create, create-drop, update, validate
         ddl-auto: validate
       properties:
-        hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+        hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
         hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+
 #  jdbcTemplate配置
    jdbc:
       template:
@@ -57,7 +58,7 @@ spring:
       #公用配置
       ssl: false
       database: 0
-      timeout: 10000
+      timeout: 10
       password:
       #同步jedis连接池
 #      jedis:
@@ -91,9 +92,6 @@ spring:
       #单机配置
       host: 127.0.0.1
       port: 6379
-
-
-
 
 #  rabbitmq配置
 #   rabbitmq:

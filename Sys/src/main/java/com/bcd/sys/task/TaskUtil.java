@@ -39,7 +39,7 @@ public class TaskUtil {
     /**
      * 注册任务
      * @param name 任务名称
-     * @param type 任务类型
+     * @param type 任务类型 (对应TaskBean里面的type,根据不同的项目翻译成不同的意思,默认 1:普通任务;2:文件类型任务 )
      * @param consumer 任务执行方法
      * @param onStart 开始执行任务时回调
      * @param onSuccess 成功时回调
@@ -64,6 +64,13 @@ public class TaskUtil {
         return taskBean;
     }
 
+    /**
+     * @see #registerTask(String, int, TaskConsumer, TaskConsumer, TaskConsumer, TaskConsumer)
+     * @param name
+     * @param type
+     * @param consumer
+     * @return
+     */
     public static TaskBean registerTask(String name,int type,TaskConsumer consumer){
         return registerTask(name, type, consumer,null,null,null);
     }
