@@ -2,14 +2,17 @@ package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.SuperBaseBean;
 import com.bcd.sys.task.TaskConsumer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import javax.persistence.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.context.annotation.Lazy;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-
+import java.util.concurrent.Future;
 
 
 import javax.persistence.*;
@@ -20,6 +23,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "t_sys_task")
 public class TaskBean extends SuperBaseBean<Long> {
+
+
     //field
     @NotBlank(message = "[任务名称]不能为空")
     @Length(max = 50,message = "[任务名称]长度不能超过50")
@@ -27,7 +32,7 @@ public class TaskBean extends SuperBaseBean<Long> {
     private String name;
 
     @NotNull(message = "[任务状态]不能为空")
-    @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)(不能为空)")
+    @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;6:终止中)(不能为空)")
     private Integer status;
 
     @NotNull(message = "[任务类型]不能为空")
@@ -37,6 +42,13 @@ public class TaskBean extends SuperBaseBean<Long> {
     @Length(max = 255,message = "[备注]长度不能超过255")
     @ApiModelProperty(value = "备注(失败时记录失败原因)(长度不能超过255)")
     private String remark;
+
+    @Length(max = 65535,message = "[失败堆栈信息]长度不能超过65535")
+    @ApiModelProperty(value = "失败堆栈信息(失败时后台异常堆栈信息)(长度不能超过65535)")
+    @Column(columnDefinition="TEXT")
+    @Lazy
+    @JsonIgnore
+    private String stackMessage;
 
     @ApiModelProperty(value = "任务开始时间")
     private Date startTime;
@@ -78,6 +90,13 @@ public class TaskBean extends SuperBaseBean<Long> {
     @Transient
     @ApiModelProperty(hidden = true)
     public TaskConsumer onFailed;
+
+    /**
+     * 任务执行过程中的future结果集,通过这个来终止执行中的任务
+     */
+    @Transient
+    @ApiModelProperty(hidden = true)
+    public Future future;
 
     public TaskBean(@NotBlank(message = "[任务名称]不能为空") @Length(max = 50, message = "[任务名称]长度不能超过50") String name,
                     @NotNull(message = "[任务状态]不能为空") Integer type) {
@@ -208,5 +227,21 @@ public class TaskBean extends SuperBaseBean<Long> {
 
     public void setOnFailed(TaskConsumer onFailed) {
         this.onFailed = onFailed;
+    }
+
+    public String getStackMessage() {
+        return stackMessage;
+    }
+
+    public void setStackMessage(String stackMessage) {
+        this.stackMessage = stackMessage;
+    }
+
+    public Future getFuture() {
+        return future;
+    }
+
+    public void setFuture(Future future) {
+        this.future = future;
     }
 }

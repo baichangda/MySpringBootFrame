@@ -1,6 +1,7 @@
 package com.bcd.sys.task;
 
 
+import com.bcd.base.util.ExceptionUtil;
 import com.bcd.sys.bean.TaskBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +15,14 @@ public class SysTaskRunnable implements Runnable,Serializable{
 
     private TaskBean taskBean;
 
-    public SysTaskRunnable(@NotNull TaskBean taskBean) {
+    public SysTaskRunnable(TaskBean taskBean) {
         this.taskBean = taskBean;
     }
 
     @Override
     public void run() {
         //1、先更新任务状态为执行中
-        taskBean.setStatus(2);
+        taskBean.setStatus(TaskStatus.EXECUTING.getStatus());
         taskBean.setStartTime(new Date());
         TaskUtil.getTaskService().save(taskBean);
         if(taskBean.getOnStart()!=null){
@@ -34,7 +35,7 @@ public class SysTaskRunnable implements Runnable,Serializable{
         //2、开始执行任务;并记录执行结果
         try {
             taskBean.getConsumer().accept(taskBean);
-            taskBean.setStatus(4);
+            taskBean.setStatus(TaskStatus.FINISHED.getStatus());
             taskBean.setFinishTime(new Date());
             TaskUtil.getTaskService().save(taskBean);
             if(taskBean.getOnSuccess()!=null){
@@ -46,9 +47,10 @@ public class SysTaskRunnable implements Runnable,Serializable{
             }
         }catch (Exception e){
             logger.error("执行任务["+taskBean.getName()+"]出现异常",e);
-            taskBean.setStatus(5);
+            taskBean.setStatus(TaskStatus.FAILED.getStatus());
             taskBean.setRemark(e.getMessage());
             taskBean.setFinishTime(new Date());
+            taskBean.setStackMessage(ExceptionUtil.getStackTraceMessage(e));
             TaskUtil.getTaskService().save(taskBean);
             if(taskBean.getOnFailed()!=null){
                 try {

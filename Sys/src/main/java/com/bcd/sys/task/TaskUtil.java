@@ -1,5 +1,6 @@
 package com.bcd.sys.task;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.SpringUtil;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
@@ -18,6 +19,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -57,10 +60,10 @@ public class TaskUtil {
         taskBean.setOnSuccess(onSuccess);
         taskBean.setOnFailed(onFailed);
         taskBean.setCreateTime(new Date());
-        taskBean.setStatus(1);
+        taskBean.setStatus(TaskStatus.WAITING.getStatus());
         taskBean.setConsumer(consumer);
         getTaskService().save(taskBean);
-        CommonConst.SYS_TASK_POOL.execute(new SysTaskRunnable(taskBean));
+        CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
         return taskBean;
     }
 
@@ -100,11 +103,25 @@ public class TaskUtil {
             }
         }
         Map<String,Object> paramMap=new HashMap<>();
-        paramMap.put("status",3);
+        paramMap.put("status",TaskStatus.STOPPED.getStatus());
         paramMap.put("ids",stopIdList);
         int count=new NamedParameterJdbcTemplate(Init.jdbcTemplate).update(
                 "update t_sys_task set status=:status where id in (:ids)",paramMap);
         return res;
+    }
+
+    /**
+     * 终止全部的系统任务
+     */
+    public static int stopAllTask(){
+        List<Runnable> list= new ArrayList<>();
+        CommonConst.SYS_TASK_POOL.getQueue().drainTo(list);
+        Map<String,Object> paramMap=new HashMap<>();
+        paramMap.put("status",TaskStatus.STOPPED.getStatus());
+        paramMap.put("ids",list.stream().map(e->((SysTaskRunnable)e).getTaskBean().getId()));
+        int count=new NamedParameterJdbcTemplate(Init.jdbcTemplate).update(
+                "update t_sys_task set status=:status where id in (:ids)",paramMap);
+        return count;
     }
 
     static class Init{

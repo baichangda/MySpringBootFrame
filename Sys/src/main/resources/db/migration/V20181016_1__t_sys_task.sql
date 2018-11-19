@@ -5,6 +5,7 @@ create table IF NOT EXISTS t_sys_task
    status               int not null comment '任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)',
    type                 int not null comment '任务类型(1:普通任务;2:文件类型任务)',
    remark               varchar(255) null comment '备注(失败时记录失败原因)',
+   stack_message        text null comment '失败堆栈信息(失败时后台异常堆栈信息)',
    start_time           timestamp NULL comment '任务开始时间',
    finish_time          timestamp NULL comment '任务完成时间',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
