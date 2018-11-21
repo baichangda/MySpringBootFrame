@@ -44,7 +44,7 @@ public class TaskBean extends SuperBaseBean<Long> {
     private String remark;
 
     @Length(max = 65535,message = "[失败堆栈信息]长度不能超过65535")
-    @ApiModelProperty(value = "失败堆栈信息(失败时后台异常堆栈信息)(长度不能超过65535)")
+    @ApiModelProperty(hidden = true,readOnly = true,value = "失败堆栈信息(失败时后台异常堆栈信息)(长度不能超过65535)")
     @Column(columnDefinition="TEXT")
     @Lazy
     @JsonIgnore
