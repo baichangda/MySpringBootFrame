@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -86,7 +87,7 @@ public class RoleController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存角色",notes = "保存角色")
-    public JsonMessage save(@ApiParam(value = "角色实体") @RequestBody RoleBean role){
+    public JsonMessage save(@ApiParam(value = "角色实体") @RequestBody @Validated RoleBean role){
         roleService.save(role);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }

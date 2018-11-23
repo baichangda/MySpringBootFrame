@@ -6,5 +6,5 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 public interface TaskConsumer extends Serializable{
-    void accept(TaskBean taskBean);
+    void accept(TaskBean taskBean) throws InterruptedException ;
 }

@@ -12,7 +12,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -31,14 +30,14 @@ public abstract class RedisTopicMQ implements RedisMQ<Message>{
 
     protected MessageListener messageListener;
 
-    public RedisTopicMQ(@NotNull String name, @NotNull RedisMessageListenerContainer redisMessageListenerContainer,  @NotNull RedisTemplate redisTemplate) {
+    public RedisTopicMQ( String name, RedisMessageListenerContainer redisMessageListenerContainer, RedisTemplate redisTemplate) {
         this.name = name;
         this.redisMessageListenerContainer=redisMessageListenerContainer;
         this.redisTemplate=redisTemplate;
         this.messageListener=getMessageListener();
     }
 
-    public RedisTopicMQ(@NotNull String name,@NotNull RedisMessageListenerContainer redisMessageListenerContainer) {
+    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer) {
         this.name = name;
         this.redisMessageListenerContainer=redisMessageListenerContainer;
         this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer);

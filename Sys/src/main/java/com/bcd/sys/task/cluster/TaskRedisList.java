@@ -1,4 +1,4 @@
-package com.bcd.sys.task;
+package com.bcd.sys.task.cluster;
 
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;

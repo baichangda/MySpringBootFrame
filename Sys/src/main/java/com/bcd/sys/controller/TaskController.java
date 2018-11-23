@@ -6,7 +6,7 @@ import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.TaskUtil;
+import com.bcd.sys.task.cluster.TaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -125,7 +125,7 @@ public class TaskController extends BaseController {
     @RequestMapping(value = "/stop",method = RequestMethod.POST)
     @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
-        TaskUtil.stopTask(ids);
+        TaskUtil.stopTaskInWaiting(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
     }
 

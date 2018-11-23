@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -98,7 +99,7 @@ public class OrgController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存组织机构",notes = "保存组织机构")
-    public JsonMessage save(@ApiParam(value = "组织机构实体") @RequestBody OrgBean org){
+    public JsonMessage save(@ApiParam(value = "组织机构实体") @RequestBody @Validated OrgBean org){
         orgService.save(org);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }

@@ -20,8 +20,8 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
         this.converter = converter;
     }
 
+    @Override
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
-        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(response);
         BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(throwable.getClass().getName());
         JsonMessage result;
         if(errorMessage==null){
@@ -29,6 +29,12 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
         }else{
             result=errorMessage.toJsonMessage();
         }
+        handle(response, result);
+    }
+
+    @Override
+    public void handle(HttpServletResponse response, Object result) throws IOException {
+        ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(response);
         converter.write(result,
                 MediaType.APPLICATION_JSON_UTF8,
                 servletServerHttpResponse);

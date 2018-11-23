@@ -11,7 +11,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,13 +30,13 @@ public abstract class RedisQueueMQ implements RedisMQ{
 
     private volatile boolean stop;
 
-    public RedisQueueMQ(@NotNull String name,@NotNull RedisTemplate redisTemplate) {
+    public RedisQueueMQ(String name,RedisTemplate redisTemplate) {
         this.name=name;
         this.stop=false;
         this.redisTemplate=redisTemplate;
     }
 
-    public RedisQueueMQ(@NotNull String name, @NotNull RedisConnectionFactory redisConnectionFactory){
+    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory){
         this.name=name;
         this.stop=false;
         this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory);

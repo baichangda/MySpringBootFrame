@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -92,7 +93,7 @@ public class PermissionController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存权限",notes = "保存权限")
-    public JsonMessage save(@ApiParam(value = "权限实体") @RequestBody PermissionBean permission){
+    public JsonMessage save(@ApiParam(value = "权限实体") @RequestBody @Validated PermissionBean permission){
         permissionService.save(permission);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }

@@ -2,12 +2,10 @@ package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.base.json.SimpleFilterBean;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.rdb.util.FilterUtil;
 import com.bcd.sys.define.CommonConst;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
@@ -16,12 +14,14 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
+
+import javax.validation.constraints.NotNull;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -142,9 +142,10 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
-    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody UserBean user){
+    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody @Validated UserBean user){
         if(user.getId()==null){
             user.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,user.getUsername()).toBase64());
+            throw new NullPointerException();
         }
         userService.save(user);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();

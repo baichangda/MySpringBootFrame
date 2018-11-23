@@ -1,17 +1,17 @@
-package com.bcd.sys.task;
+package com.bcd.sys.task.cluster;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.SpringUtil;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.service.TaskService;
+import com.bcd.sys.task.CommonConst;
+import com.bcd.sys.task.SysTaskRunnable;
+import com.bcd.sys.task.TaskConsumer;
+import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -29,12 +29,8 @@ public class TaskUtil {
     @Autowired
     public void init(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
         //初始化系统任务线程池
-        CommonConst.SYS_TASK_POOL=new ThreadPoolExecutor(2,2,30, TimeUnit.SECONDS,
-                new TaskRedisList(CommonConst.SYS_TASK_LIST_NAME,redisTemplate));
-    }
-
-    public static TaskService getTaskService(){
-        return Init.taskService;
+        TaskConst.SYS_TASK_POOL=new ThreadPoolExecutor(2,2,30, TimeUnit.SECONDS,
+                new TaskRedisList(TaskConst.SYS_TASK_LIST_NAME,redisTemplate));
     }
 
     /**
@@ -54,8 +50,8 @@ public class TaskUtil {
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
         taskBean.setConsumer(consumer);
-        getTaskService().save(taskBean);
-        Future future= CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
+        CommonConst.Init.taskService.save(taskBean);
+        Future future= TaskConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
         CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(taskBean.getId(),future);
         return taskBean;
     }
@@ -71,14 +67,14 @@ public class TaskUtil {
         if(ids==null||ids.length==0){
             return new Boolean[0];
         }
-        List<SysTaskRunnable> list= ((TaskRedisList)CommonConst.SYS_TASK_POOL.getQueue()).range(0,-1);
+        List<SysTaskRunnable> list= ((TaskRedisList) TaskConst.SYS_TASK_POOL.getQueue()).range(0,-1);
         Boolean[]res=new Boolean[ids.length];
         List<Long> stopIdList=new ArrayList<>();
         for (int i=0;i<=ids.length-1;i++) {
             Long id=ids[i];
             for (SysTaskRunnable sysTaskRunnable : list) {
                 if(sysTaskRunnable.getTaskBean().getId().equals(id)){
-                    res[i]=CommonConst.SYS_TASK_POOL.getQueue().remove(sysTaskRunnable);
+                    res[i]= TaskConst.SYS_TASK_POOL.getQueue().remove(sysTaskRunnable);
                     break;
                 }
             }
@@ -89,7 +85,7 @@ public class TaskUtil {
         Map<String,Object> paramMap=new HashMap<>();
         paramMap.put("status",TaskStatus.STOPPED.getStatus());
         paramMap.put("ids",stopIdList);
-        int count=new NamedParameterJdbcTemplate(Init.jdbcTemplate).update(
+        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
                 "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
         return res;
     }
@@ -102,12 +98,12 @@ public class TaskUtil {
      */
     public static Long[] stopAllTaskInWaiting(){
         List<Runnable> list= new ArrayList<>();
-        CommonConst.SYS_TASK_POOL.getQueue().drainTo(list);
+        TaskConst.SYS_TASK_POOL.getQueue().drainTo(list);
         List<Long> idList= list.stream().map(e->((SysTaskRunnable)e).getTaskBean().getId()).collect(Collectors.toList());
         Map<String,Object> paramMap=new HashMap<>();
         paramMap.put("status",TaskStatus.STOPPED.getStatus());
         paramMap.put("ids",idList);
-        int count=new NamedParameterJdbcTemplate(Init.jdbcTemplate).update(
+        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
                 "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
         return list.stream().toArray(len->new Long[len]);
     }
@@ -126,16 +122,19 @@ public class TaskUtil {
      * @return 结果数组;true代表终止成功;false代表终止失败(可能已经取消或已经完成)
      */
     public static Boolean[] stopTask(Long ...ids){
+        if(ids==null||ids.length==0){
+            return new Boolean[0];
+        }
         //1、生成当前停止任务请求随机编码
         String code= RandomStringUtils.randomAlphanumeric(32);
         //2、构造当前请求的空结果集并加入到全局map
         ConcurrentHashMap<Long,Boolean> resultMap=new ConcurrentHashMap<>();
-        CommonConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
+        TaskConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
         //3、构造请求数据,推送给其他服务器停止任务
         Map<String,Object> dataMap=new HashMap<>();
         dataMap.put("code",code);
         dataMap.put("ids",ids);
-        Init.redisTemplate.convertAndSend(CommonConst.STOP_SYS_TASK_CHANNEL,dataMap);
+        CommonConst.Init.redisTemplate.convertAndSend(TaskConst.STOP_SYS_TASK_CHANNEL,dataMap);
         //4、锁住此次请求的结果map,等待,便于本服务器其他线程收到结果时唤醒
         //4.1、定义退出循环标记
         boolean isFinish=false;
@@ -155,11 +154,4 @@ public class TaskUtil {
             }
         }
     }
-
-    static class Init{
-        private final static TaskService taskService=SpringUtil.applicationContext.getBean(TaskService.class);
-        private final static JdbcTemplate jdbcTemplate=SpringUtil.applicationContext.getBean(JdbcTemplate.class);
-        private final static RedisTemplate redisTemplate=(RedisTemplate)SpringUtil.applicationContext.getBean("string_jackson_redisTemplate");
-    }
-
 }

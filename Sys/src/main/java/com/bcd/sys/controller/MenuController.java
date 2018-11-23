@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -98,7 +99,7 @@ public class MenuController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存菜单",notes = "保存菜单")
-    public JsonMessage save(@ApiParam(value = "菜单实体") @RequestBody MenuBean menu){
+    public JsonMessage save(@ApiParam(value = "菜单实体") @RequestBody @Validated MenuBean menu){
         menuService.save(menu);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
     }

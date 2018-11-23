@@ -11,11 +11,7 @@ import org.springframework.context.annotation.Lazy;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
 import java.util.concurrent.Future;
-
-
-import javax.persistence.*;
 
 /**
  *  系统任务处理表
@@ -79,18 +75,6 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(hidden = true)
     public TaskConsumer consumer;
 
-    @Transient
-    @ApiModelProperty(hidden = true)
-    public TaskConsumer onStart;
-
-    @Transient
-    @ApiModelProperty(hidden = true)
-    public TaskConsumer onSuccess;
-
-    @Transient
-    @ApiModelProperty(hidden = true)
-    public TaskConsumer onFailed;
-
     /**
      * 任务执行过程中的future结果集,通过这个来终止执行中的任务
      */
@@ -98,8 +82,7 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(hidden = true)
     public Future future;
 
-    public TaskBean(@NotBlank(message = "[任务名称]不能为空") @Length(max = 50, message = "[任务名称]长度不能超过50") String name,
-                    @NotNull(message = "[任务状态]不能为空") Integer type) {
+    public TaskBean(String name,Integer type) {
         this.name=name;
         this.type = type;
     }
@@ -203,30 +186,6 @@ public class TaskBean extends SuperBaseBean<Long> {
 
     public void setConsumer(TaskConsumer consumer) {
         this.consumer = consumer;
-    }
-
-    public TaskConsumer getOnStart() {
-        return onStart;
-    }
-
-    public void setOnStart(TaskConsumer onStart) {
-        this.onStart = onStart;
-    }
-
-    public TaskConsumer getOnSuccess() {
-        return onSuccess;
-    }
-
-    public void setOnSuccess(TaskConsumer onSuccess) {
-        this.onSuccess = onSuccess;
-    }
-
-    public TaskConsumer getOnFailed() {
-        return onFailed;
-    }
-
-    public void setOnFailed(TaskConsumer onFailed) {
-        this.onFailed = onFailed;
     }
 
     public String getStackMessage() {
