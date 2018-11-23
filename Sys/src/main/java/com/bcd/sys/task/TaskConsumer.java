@@ -5,6 +5,6 @@ import com.bcd.sys.bean.TaskBean;
 import java.io.Serializable;
 import java.util.function.Consumer;
 
-public interface TaskConsumer extends Consumer<TaskBean>,Serializable{
-
+public interface TaskConsumer extends Serializable{
+    void accept(TaskBean taskBean);
 }
