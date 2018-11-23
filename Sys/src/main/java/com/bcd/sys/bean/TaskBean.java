@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Lazy;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import java.util.concurrent.Future;
 
 /**
  *  系统任务处理表
@@ -74,13 +73,6 @@ public class TaskBean extends SuperBaseBean<Long> {
     @Transient
     @ApiModelProperty(hidden = true)
     public TaskConsumer consumer;
-
-    /**
-     * 任务执行过程中的future结果集,通过这个来终止执行中的任务
-     */
-    @Transient
-    @ApiModelProperty(hidden = true)
-    public Future future;
 
     public TaskBean(String name,Integer type) {
         this.name=name;
@@ -194,13 +186,5 @@ public class TaskBean extends SuperBaseBean<Long> {
 
     public void setStackMessage(String stackMessage) {
         this.stackMessage = stackMessage;
-    }
-
-    public Future getFuture() {
-        return future;
-    }
-
-    public void setFuture(Future future) {
-        this.future = future;
     }
 }
