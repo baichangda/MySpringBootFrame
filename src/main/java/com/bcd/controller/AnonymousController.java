@@ -17,8 +17,8 @@ import java.util.Optional;
  * Created by Administrator on 2017/6/15.
  */
 @RestController
-@RequestMapping("/api/security")
-public class SecurityController {
+@RequestMapping("/api/anonymous")
+public class AnonymousController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey",method = RequestMethod.GET)
     @ApiOperation(value = "获取公钥",notes = "获取公钥")

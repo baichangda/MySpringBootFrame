@@ -18,7 +18,7 @@ import com.bcd.sys.service.RoleService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/role")
+@RequestMapping("/api/sys/role")
 public class RoleController extends BaseController {
 
     @Autowired
@@ -33,19 +33,19 @@ public class RoleController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询角色列表",notes = "查询角色列表")
     public JsonMessage<List<RoleBean>> list(
-            @ApiParam(value = "编码")
-            @RequestParam(value = "code",required = false) String code,
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "角色名称")
             @RequestParam(value = "name",required = false) String name,
+            @ApiParam(value = "编码")
+            @RequestParam(value = "code",required = false) String code,
             @ApiParam(value = "备注")
             @RequestParam(value = "remark",required = false) String remark
         ){
         Condition condition= Condition.and(
-            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
             new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(roleService.findAll(condition));
@@ -58,12 +58,12 @@ public class RoleController extends BaseController {
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询角色列表",notes = "查询角色分页")
     public JsonMessage<Page<RoleBean>> page(
-            @ApiParam(value = "编码")
-            @RequestParam(value = "code",required = false) String code,
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
             @ApiParam(value = "角色名称")
             @RequestParam(value = "name",required = false) String name,
+            @ApiParam(value = "编码")
+            @RequestParam(value = "code",required = false) String code,
             @ApiParam(value = "备注")
             @RequestParam(value = "remark",required = false) String remark,
             @ApiParam(value = "分页参数(页数)",example="1")
@@ -72,9 +72,9 @@ public class RoleController extends BaseController {
             @RequestParam(value = "pageSize",required = false) Integer pageSize
         ){
         Condition condition= Condition.and(
-            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
             new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));

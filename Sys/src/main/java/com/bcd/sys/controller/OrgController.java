@@ -18,7 +18,7 @@ import com.bcd.sys.service.OrgService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/org")
+@RequestMapping("/api/sys/org")
 public class OrgController extends BaseController {
 
     @Autowired

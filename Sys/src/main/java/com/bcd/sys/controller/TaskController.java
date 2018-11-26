@@ -18,7 +18,7 @@ import com.bcd.sys.service.TaskService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/task")
+@RequestMapping("/api/sys/task")
 public class TaskController extends BaseController {
 
     @Autowired

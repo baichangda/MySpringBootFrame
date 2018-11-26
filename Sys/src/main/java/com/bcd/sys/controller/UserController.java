@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/sys/user")
 public class UserController extends BaseController {
 
     @Autowired

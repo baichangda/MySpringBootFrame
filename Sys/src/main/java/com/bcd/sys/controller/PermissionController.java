@@ -18,7 +18,7 @@ import com.bcd.sys.service.PermissionService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/permission")
+@RequestMapping("/api/sys/permission")
 public class PermissionController extends BaseController {
 
     @Autowired
