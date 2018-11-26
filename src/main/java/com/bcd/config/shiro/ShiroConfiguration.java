@@ -113,9 +113,9 @@ public class ShiroConfiguration {
     }
 
     @Bean
-    @Autowired
     public SessionManager sessionManager(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
-        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
+        MyWebSessionManager sessionManager=new MyWebSessionManager("test");
+//        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager()
         sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));
         return sessionManager;
     }
@@ -132,26 +132,13 @@ public class ShiroConfiguration {
         return advisor;
     }
 
-    @Bean
-    public FilterRegistrationBean<Filter> filterRegistrationBean(ShiroFilterFactoryBean shiroFilterFactoryBean) throws Exception{
-        FilterRegistrationBean<Filter> filterRegistration = new FilterRegistrationBean<>();
-        filterRegistration.setFilter((Filter)(shiroFilterFactoryBean.getObject()));
-        filterRegistration.addInitParameter("targetFilterLifecycle", "true");
-        filterRegistration.setAsyncSupported(true);
-        filterRegistration.setEnabled(true);
-        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST,DispatcherType.ASYNC);
-
-        return filterRegistration;
-    }
-
     /**
      * 拦截器工厂
      * @param securityManager
      * @return
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,
-                                                         ExceptionResponseHandler handler){
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager, ExceptionResponseHandler handler){
         ShiroFilterFactoryBean factoryBean = new MyShiroFilterFactoryBean();
         Map<String,Filter> filterMap=new HashMap<>();
         filterMap.put("authc",new MyAuthenticationFilter(handler));
@@ -165,7 +152,6 @@ public class ShiroConfiguration {
 //        factoryBean.setSuccessUrl("/welcome");
 //        factoryBean.setUnauthorizedUrl("/403");
         loadShiroFilterChain(factoryBean);
-        logger.info("shiro拦截器工厂类注入成功");
         return factoryBean;
     }
 
@@ -185,6 +171,16 @@ public class ShiroConfiguration {
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 
+    @Bean
+    public FilterRegistrationBean<Filter> filterRegistrationBean(@Qualifier(value = "shiroFilter") ShiroFilterFactoryBean shiroFilterFactoryBean) throws Exception{
+        FilterRegistrationBean<Filter> filterRegistration = new FilterRegistrationBean<>();
+        filterRegistration.setFilter((Filter)(shiroFilterFactoryBean.getObject()));
+        filterRegistration.addInitParameter("targetFilterLifecycle", "true");
+        filterRegistration.setAsyncSupported(true);
+        filterRegistration.setEnabled(true);
+        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST,DispatcherType.ASYNC);
+        return filterRegistration;
+    }
 
 
 }
