@@ -48,7 +48,15 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
     }
 
 
-
+    /**
+     * 自定义参数验证错误信息
+     * @param ex
+     * @param request
+     * @param response
+     * @param handler
+     * @return
+     * @throws IOException
+     */
     @Override
     protected ModelAndView handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request, HttpServletResponse response, @Nullable Object handler) throws IOException {
         String message=ex.getBindingResult().getAllErrors().stream().map(e->e.getDefaultMessage()).filter(e->e!=null).reduce((e1,e2)->e1+","+e2).orElse("");
@@ -60,4 +68,6 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
         }
         return new ModelAndView();
     }
+
+
 }

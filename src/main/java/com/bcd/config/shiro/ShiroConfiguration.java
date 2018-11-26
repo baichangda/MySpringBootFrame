@@ -14,10 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -130,6 +132,18 @@ public class ShiroConfiguration {
         return advisor;
     }
 
+    @Bean
+    public FilterRegistrationBean<Filter> filterRegistrationBean(ShiroFilterFactoryBean shiroFilterFactoryBean) throws Exception{
+        FilterRegistrationBean<Filter> filterRegistration = new FilterRegistrationBean<>();
+        filterRegistration.setFilter((Filter)(shiroFilterFactoryBean.getObject()));
+        filterRegistration.addInitParameter("targetFilterLifecycle", "true");
+        filterRegistration.setAsyncSupported(true);
+        filterRegistration.setEnabled(true);
+        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST,DispatcherType.ASYNC);
+
+        return filterRegistration;
+    }
+
     /**
      * 拦截器工厂
      * @param securityManager
@@ -165,7 +179,7 @@ public class ShiroConfiguration {
         Map<String, String> filterChainMap = new LinkedHashMap<String, String>();
         //authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
-        filterChainMap.put("/api/security/getPublicKey", "anon");
+        filterChainMap.put("/api/security/**", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
 //        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
