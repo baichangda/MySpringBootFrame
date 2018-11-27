@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
+@SuppressWarnings("unchecked")
 @Component
 public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>{
     @Override
