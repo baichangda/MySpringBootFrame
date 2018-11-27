@@ -6,12 +6,12 @@ import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.keys.KeysConst;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
@@ -37,7 +37,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         //根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
             //2.1、使用私钥解密密码
-            PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
+            PrivateKey privateKey = KeysConst.PRIVATE_KEY;
             String password= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
             //2.2、构造登录对象
             token = new UsernamePasswordToken(username, password);
@@ -71,7 +71,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         //2、根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
             //2.1、获取私钥
-            PrivateKey privateKey = RSASecurity.restorePrivateKey(RSASecurity.keyMap.get(RSASecurity.PRIVATE_KEY));
+            PrivateKey privateKey = KeysConst.PRIVATE_KEY;
             //2.2、解密密码
             String oldPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
             String newPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
@@ -112,7 +112,6 @@ public class UserService  extends BaseService<UserBean,Long> {
 
 
     public static void main(String [] args){
-        Map<String, byte[]> keyMap = RSASecurity.generateKeyBytes();
         String pwd="123qwe";
         String publicKeyStr="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAighwVytpiItt2nqesNkS12uxr575syUJXk+bwZqQteRCgCRfOjV+bCrLNTEAP4JozyAzbTYF8lEbOn86V5nq9SDqxBCN/+m6kysGrGOTFcHbBA8oCdykhgMUdok7rUBu2b4TLy29dYg9560xsku1g4i4+P8cv0Z2+T7TgeqaganlGQF5wJZ3NmIvVztSTn8HLLZOyy6QHQh1xTeYOq+3O9GbOUwwJK3i62115V2jHWhykhlt+wxkq5YSQGsZzT0VDevjfDZa37QWySitBg9K1YwC5Rqfe3tA+ezPR8yfj/cm2eOeeZw1gPohDy1CNuCDUUMlu8qr5PGBUq99Hdd2wQIDAQAB";
         String privateKeyStr="";

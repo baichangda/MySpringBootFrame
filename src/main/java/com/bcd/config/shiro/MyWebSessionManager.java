@@ -12,7 +12,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import java.io.Serializable;
 
-
+/**
+ * 自定义Session Manager
+ * 1、取出request header中的 对应sessionId 来识别身份
+ * 2、生成新session时候,在response header中加入 sessionId
+ *
+ */
 public class MyWebSessionManager extends DefaultSessionManager {
     private static final Logger log = LoggerFactory.getLogger(MyWebSessionManager.class);
 
@@ -41,6 +46,12 @@ public class MyWebSessionManager extends DefaultSessionManager {
             ServletRequest request = WebUtils.getRequest(key);
             id = this.getSessionId(request);
         }
+
+        if(id!=null&&WebUtils.isWeb(key)){
+            ServletResponse response = WebUtils.getResponse(key);
+            WebUtils.toHttp(response).setHeader(sessionHeaderKeyName, id.toString());
+        }
+
         return id;
     }
 
