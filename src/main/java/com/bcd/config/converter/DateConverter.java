@@ -7,6 +7,7 @@ import com.bcd.sys.util.ShiroUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneOffset;
 import java.util.Date;
 
 /**
@@ -25,10 +26,11 @@ public class DateConverter implements Converter<String,Date> {
         }catch (NumberFormatException e){
             try {
                 String timeZone= ShiroUtil.getCurrentUser().getTimeZone();
+                ZoneOffset zoneOffset= ZoneOffset.of(timeZone);
                 if(source.length()==DateUtil.DATE_FORMAT_DAY.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,timeZone);
+                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,zoneOffset);
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,timeZone);
+                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,zoneOffset);
                 }else{
                     throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }
