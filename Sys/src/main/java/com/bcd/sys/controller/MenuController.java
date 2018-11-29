@@ -32,6 +32,7 @@ public class MenuController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询菜单列表",notes = "查询菜单列表")
+    @ApiResponse(code = 200,message = "菜单列表")
     public JsonMessage<List<MenuBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -63,6 +64,7 @@ public class MenuController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询菜单列表",notes = "查询菜单分页")
+    @ApiResponse(code = 200,message = "菜单分页结果集")
     public JsonMessage<Page<MenuBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -99,6 +101,7 @@ public class MenuController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存菜单",notes = "保存菜单")
+    @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "菜单实体") @RequestBody @Validated MenuBean menu){
         menuService.save(menu);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
@@ -112,6 +115,7 @@ public class MenuController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除菜单",notes = "删除菜单")
+    @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "菜单id数组") @RequestParam Long[] ids){
         menuService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();

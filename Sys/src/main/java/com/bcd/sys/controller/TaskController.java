@@ -32,6 +32,7 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务列表")
+    @ApiResponse(code = 200,message = "任务列表")
     public JsonMessage<List<TaskBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -75,6 +76,7 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务分页")
+    @ApiResponse(code = 200,message = "任务分页结果集")
     public JsonMessage<Page<TaskBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -124,6 +126,7 @@ public class TaskController extends BaseController {
      */
     @RequestMapping(value = "/stop",method = RequestMethod.POST)
     @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
+    @ApiResponse(code = 200,message = "停止系统任务结果")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
         TaskUtil.stopTaskInWaiting(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();

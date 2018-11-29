@@ -32,6 +32,7 @@ public class PermissionController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限列表")
+    @ApiResponse(code = 200,message = "权限列表")
     public JsonMessage<List<PermissionBean>> list(
             @ApiParam(value = "id",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -60,6 +61,7 @@ public class PermissionController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限分页")
+    @ApiResponse(code = 200,message = "权限分页结果集")
     public JsonMessage<Page<PermissionBean>> page(
             @ApiParam(value = "id",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -93,6 +95,7 @@ public class PermissionController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存权限",notes = "保存权限")
+    @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "权限实体") @RequestBody @Validated PermissionBean permission){
         permissionService.save(permission);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
@@ -106,6 +109,7 @@ public class PermissionController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除权限",notes = "删除权限")
+    @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "权限id数组") @RequestParam Long[] ids){
         permissionService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();

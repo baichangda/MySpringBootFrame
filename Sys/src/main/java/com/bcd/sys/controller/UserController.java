@@ -39,6 +39,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")
+    @ApiResponse(code = 200,message = "用户列表")
     public JsonMessage<List<UserBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -88,6 +89,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户分页")
+    @ApiResponse(code = 200,message = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -142,6 +144,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
+    @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody @Validated UserBean user){
         if(user.getId()==null){
             user.setPassword(new Md5Hash(CommonConst.INITIAL_PASSWORD,user.getUsername()).toBase64());
@@ -159,6 +162,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "删除用户")
+    @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "用户id数组") @RequestParam Long[] ids){
         userService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
@@ -173,6 +177,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation(value="用户登录",notes = "根据帐号密码登录")
+    @ApiResponse(code = 200,message = "登录的用户信息")
     public JsonMessage login(
             @ApiParam(value = "用户名")
             @RequestParam(value = "username",required = true) String username,
@@ -190,6 +195,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @ApiOperation(value="用户注销",notes = "用户注销")
+    @ApiResponse(code = 200,message = "注销结果")
     public JsonMessage logout() {
         Subject currentUser = SecurityUtils.getSubject();
         String successMsg= I18nUtil.getMessage("UserController.logout.SUCCESSED");
@@ -205,6 +211,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @ApiOperation(value="重置密码",notes = "重置密码")
+    @ApiResponse(code = 200,message = "重制密码结果")
     public JsonMessage resetPassword(@ApiParam(value = "用户主键",example = "1") @RequestParam(value = "userId") Long userId){
         userService.resetPassword(userId);
         return new JsonMessage(true,I18nUtil.getMessage("UserController.resetPassword.SUCCESSED"));
@@ -218,6 +225,7 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @ApiOperation(value="修改密码",notes = "修改密码")
+    @ApiResponse(code = 200,message = "修改密码结果")
     public JsonMessage updatePassword(
             @ApiParam(value = "用户主键",example = "1")
             @RequestParam(value = "userId") Long userId,

@@ -16,6 +16,17 @@ allprojects{
 //        mavenCentral()
     }
 
+
+    //下载源码和文档
+    //gradle cleanIdea idea
+    idea {
+        module {
+            downloadSources=true
+            downloadJavadoc=true
+        }
+    }
+
+
     dependencies{
         //springboot web支持
         compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
@@ -70,6 +81,8 @@ allprojects{
         }
     }
 
+
+
     jar {
         enabled = true
     }
@@ -109,7 +122,7 @@ buildscript {
         commonsPool2='+'
         jedisVersion='+'
         flywayVersion = '+'
-        mavenRepoUrl='http://maven.aliyun.com/nexus/content/groups/public/'
+        mavenRepoUrl='https://maven.aliyun.com/repository/central'
     }
 
     repositories {

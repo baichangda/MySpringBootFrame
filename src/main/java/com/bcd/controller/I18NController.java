@@ -23,11 +23,10 @@ public class I18NController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/changeLocal",method = RequestMethod.POST)
     @ApiOperation(value = "切换语言",notes = "切换语言")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "lang",value = "语言标识",dataType = "String",paramType = "query")
-    })
-    @ApiResponses(value = {@ApiResponse(code = 200,message = "是否切换成功")})
-    public JsonMessage<Object> changeLocal(HttpServletRequest request,
+    @ApiResponse(code = 200,message = "切换结果")
+    public JsonMessage<Object> changeLocal(
+            HttpServletRequest request,
+            @ApiParam(value = "语言标识(zh:中文;en:英文)")
             @RequestParam(value="lang",required = false) String lang){
         Locale locale=Locale.getDefault();
         if(lang!=null){

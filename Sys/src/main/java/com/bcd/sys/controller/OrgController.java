@@ -32,6 +32,7 @@ public class OrgController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询组织机构列表",notes = "查询组织机构列表")
+    @ApiResponse(code = 200,message = "组织机构列表")
     public JsonMessage<List<OrgBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -63,6 +64,7 @@ public class OrgController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询组织机构列表",notes = "查询组织机构分页")
+    @ApiResponse(code = 200,message = "组织结构分页结果集")
     public JsonMessage<Page<OrgBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
@@ -99,6 +101,7 @@ public class OrgController extends BaseController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存组织机构",notes = "保存组织机构")
+    @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "组织机构实体") @RequestBody @Validated OrgBean org){
         orgService.save(org);
         return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
@@ -112,6 +115,7 @@ public class OrgController extends BaseController {
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除组织机构",notes = "删除组织机构")
+    @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "组织机构id数组") @RequestParam Long[] ids){
         orgService.deleteById(ids);
         return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
