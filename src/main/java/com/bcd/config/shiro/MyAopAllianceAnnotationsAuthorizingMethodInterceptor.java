@@ -3,9 +3,7 @@ package com.bcd.config.shiro;
 import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
 import com.bcd.config.shiro.anno.UrlPermissionAnnotationMethodInterceptor;
 import com.bcd.config.shiro.anno.UserInfoAnnotationMethodInterceptor;
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.util.ShiroUtil;
+import com.bcd.sys.shiro.CurrentUserValidateHandler;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.spring.aop.SpringAnnotationResolver;
@@ -15,8 +13,10 @@ import org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthor
  * Created by Administrator on 2017/8/16.
  */
 public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAllianceAnnotationsAuthorizingMethodInterceptor {
-    public MyAopAllianceAnnotationsAuthorizingMethodInterceptor(){
+    private CurrentUserValidateHandler currentUserValidateHandler;
+    public MyAopAllianceAnnotationsAuthorizingMethodInterceptor(CurrentUserValidateHandler currentUserValidateHandler){
         super();
+        this.currentUserValidateHandler=currentUserValidateHandler;
         //自定义注解拦截器配置
         this.methodInterceptors.add(new ActionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
         this.methodInterceptors.add(new UserInfoAnnotationMethodInterceptor(new SpringAnnotationResolver()));
@@ -30,8 +30,7 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
      */
     @Override
     protected void assertAuthorized(MethodInvocation methodInvocation) throws AuthorizationException {
-        UserBean userBean= ShiroUtil.getCurrentUser();
-        if(userBean!=null && CommonConst.ADMIN_ID.equals(userBean.getId())){
+        if(!currentUserValidateHandler.isValidate(methodInvocation)){
             return;
         }
         super.assertAuthorized(methodInvocation);

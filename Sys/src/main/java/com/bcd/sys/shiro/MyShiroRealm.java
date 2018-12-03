@@ -2,7 +2,6 @@ package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
@@ -13,8 +12,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -24,9 +21,6 @@ import java.util.Set;
 
 public class MyShiroRealm extends AuthorizingRealm {
   
-    private static final Logger logger = LoggerFactory.getLogger(MyShiroRealm.class);
-
-
     @Autowired
     private UserService userService;
 
@@ -78,6 +72,9 @@ public class MyShiroRealm extends AuthorizingRealm {
             Set<String> permissionSet=new HashSet<>();
             info.setRoles(roleSet);
             info.setStringPermissions(permissionSet);
+            if(user.getId().equals(1L)){
+                permissionSet.add("a");
+            }
         }
          //返回null将会导致用户访问任何被拦截的请求时都会自动跳转到unauthorizedUrl指定的地址
         return info;

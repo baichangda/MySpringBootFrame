@@ -2,28 +2,40 @@ package com.bcd.sys.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.define.ErrorDefine;
 import com.bcd.sys.keys.KeysConst;
+import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/4/18.
  */
 @Service
 public class UserService  extends BaseService<UserBean,Long> {
+
+    @Autowired
+    private MyShiroRealm myShiroRealm;
+
     /**
      * 登录
      * @param username
@@ -104,7 +116,7 @@ public class UserService  extends BaseService<UserBean,Long> {
      * @param password
      * @return
      */
-    private String encryptPassword(String username,String password){
+    public String encryptPassword(String username,String password){
         if(CommonConst.IS_PASSWORD_ENCODED){
             return new Md5Hash(password,username).toBase64();
         }else{
@@ -130,10 +142,29 @@ public class UserService  extends BaseService<UserBean,Long> {
 
     public void resetPassword(Long userId) {
         //1、重置密码
-        UserBean sysUserDTO= findById(userId);
+        UserBean userBean= findById(userId);
         //2、设置默认密码
         update(new NumberCondition("id",userId),new HashMap<String,Object>(){{
-            put("password",encryptPassword(sysUserDTO.getUsername(),CommonConst.INITIAL_PASSWORD));
+            put("password",encryptPassword(userBean.getUsername(),CommonConst.INITIAL_PASSWORD));
         }});
+    }
+
+    public void runAs(Long ... ids) {
+        Subject subject= SecurityUtils.getSubject();
+        if(subject.isRunAs()){
+            throw ErrorDefine.ERROR_HAS_RUN_AS.toRuntimeException();
+        }
+        List<UserBean> userBeanList= findAllById(ids);
+        SimplePrincipalCollection simplePrincipalCollection=new SimplePrincipalCollection();
+        simplePrincipalCollection.add(userBeanList.stream().map(e->e.getUsername()).collect(Collectors.toList()),myShiroRealm.getName());
+        subject.runAs(simplePrincipalCollection);
+    }
+
+    public void releaseRunAs() {
+        Subject subject= SecurityUtils.getSubject();
+        if(!subject.isRunAs()){
+            throw ErrorDefine.ERROR_NOT_RUN_AS.toRuntimeException();
+        }
+        subject.releaseRunAs();
     }
 }
