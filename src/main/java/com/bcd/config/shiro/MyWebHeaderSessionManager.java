@@ -19,13 +19,19 @@ import java.io.Serializable;
  * 2、生成新session时候,在response header中加入 sessionId
  *
  */
-public class MyWebSessionManager extends DefaultSessionManager {
-    private static final Logger log = LoggerFactory.getLogger(MyWebSessionManager.class);
+public class MyWebHeaderSessionManager extends DefaultSessionManager {
+    private static final Logger log = LoggerFactory.getLogger(MyWebHeaderSessionManager.class);
+
+    private static final String DEFAULT_SESSION_HEADER_KEY_NAME="JSESSIONID";
 
     private String sessionHeaderKeyName;
 
-    public MyWebSessionManager(String sessionHeaderKeyName) {
+    public MyWebHeaderSessionManager(String sessionHeaderKeyName) {
         this.sessionHeaderKeyName = sessionHeaderKeyName;
+    }
+
+    public MyWebHeaderSessionManager() {
+        this(DEFAULT_SESSION_HEADER_KEY_NAME);
     }
 
     @Override

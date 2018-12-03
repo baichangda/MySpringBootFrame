@@ -34,7 +34,7 @@ public class UserService  extends BaseService<UserBean,Long> {
     public UserBean login(String username,String encryptPassword,String timeZone){
         //1、构造shiro登录对象
         UsernamePasswordToken token;
-        //根据是否加密处理选择不同处理方式
+        //2、根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
             //2.1、使用私钥解密密码
             PrivateKey privateKey = KeysConst.PRIVATE_KEY;
@@ -44,6 +44,8 @@ public class UserService  extends BaseService<UserBean,Long> {
         }else{
             token = new UsernamePasswordToken(username, encryptPassword);
         }
+        //2.3、设置记住我
+        token.setRememberMe(true);
         //3、获取当前subject
         Subject currentUser = SecurityUtils.getSubject();
         //4、进行登录操作

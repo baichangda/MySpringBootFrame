@@ -3,16 +3,15 @@ package com.bcd.config.shiro;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.shiro.MyShiroRealm;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -104,7 +103,8 @@ public class ShiroConfiguration {
         //设置realm
         securityManager.setRealm(realm);
         //设置为空、否则将使用默认的;会产生异常
-//        securityManager.setRememberMeManager(null);
+        MyWebHeaderRememberMeManager myWebHeaderRememberMeManager=new MyWebHeaderRememberMeManager();
+        securityManager.setRememberMeManager(myWebHeaderRememberMeManager);
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
         //设置缓存管理器
@@ -114,8 +114,8 @@ public class ShiroConfiguration {
 
     @Bean
     public SessionManager sessionManager(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
-        MyWebSessionManager sessionManager=new MyWebSessionManager("test");
-//        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager()
+        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
+//        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
         sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));
         return sessionManager;
     }
@@ -143,6 +143,7 @@ public class ShiroConfiguration {
         Map<String,Filter> filterMap=new HashMap<>();
         filterMap.put("authc",new MyAuthenticationFilter(handler));
         filterMap.put("perms",new MyAuthorizationFilter(handler));
+        filterMap.put("user",new MyUserFilter(handler));
         factoryBean.setFilters(filterMap);
 
         factoryBean.setSecurityManager(securityManager);
@@ -167,6 +168,7 @@ public class ShiroConfiguration {
         // anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         filterChainMap.put("/api/anonymous/**", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
+        filterChainMap.put("/api/sys/user/list", "user");
         filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
