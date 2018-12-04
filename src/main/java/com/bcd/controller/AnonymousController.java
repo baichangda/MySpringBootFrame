@@ -1,14 +1,11 @@
 package com.bcd.controller;
 
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.security.RSASecurity;
-import com.bcd.base.util.DateUtil;
-import com.bcd.base.util.ZoneDateUtil;
+import com.bcd.base.util.DateZoneUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.service.ApiService;
 import com.bcd.sys.keys.KeysConst;
 import io.swagger.annotations.*;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -18,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
@@ -59,7 +54,7 @@ public class AnonymousController extends BaseController{
     @ApiResponse(code = 200,message = "导入的Excel")
     public JsonMessage<String> exportApi(HttpServletResponse response){
         XSSFWorkbook workbook=apiService.exportApi();
-        response(workbook,"Api-"+ ZoneDateUtil.getDateNum(new Date(), ChronoUnit.MILLIS)+".xlsx",response);
+        response(workbook,toDateFileName("Api.xlsx"),response);
         return JsonMessage.success();
     }
 }
