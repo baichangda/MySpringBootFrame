@@ -3,14 +3,14 @@ package com.bcd.sys.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import java.util.Date;
+
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import com.bcd.sys.bean.RoleBean;
@@ -92,7 +92,7 @@ public class RoleController extends BaseController {
     @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "角色实体") @Validated @RequestBody RoleBean role){
         roleService.save(role);
-        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
+        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 
 
@@ -106,7 +106,7 @@ public class RoleController extends BaseController {
     @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "角色id数组") @RequestParam Long[] ids){
         roleService.deleteById(ids);
-        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
+        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 
 }

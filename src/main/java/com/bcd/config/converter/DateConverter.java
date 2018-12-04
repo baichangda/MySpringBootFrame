@@ -2,7 +2,7 @@ package com.bcd.config.converter;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateUtil;
-import com.bcd.define.ErrorDefine;
+import com.bcd.define.MessageDefine;
 import com.bcd.sys.util.ShiroUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class DateConverter implements Converter<String,Date> {
                 }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
                     return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,zoneOffset);
                 }else{
-                    throw ErrorDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
+                    throw MessageDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
                 }
             } catch (Exception e1) {
                 throw BaseRuntimeException.getException(e1);

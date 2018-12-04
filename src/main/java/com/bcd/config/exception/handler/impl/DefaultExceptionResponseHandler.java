@@ -1,7 +1,7 @@
 package com.bcd.config.exception.handler.impl;
 
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.message.BaseErrorMessage;
+import com.bcd.base.message.ErrorMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.config.shiro.ShiroConst;
@@ -22,7 +22,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
 
     @Override
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
-        BaseErrorMessage errorMessage= ShiroConst.EXCEPTION_ERRORMESSAGE_MAP.get(throwable.getClass().getName());
+        ErrorMessage errorMessage= ShiroConst.EXCEPTION_ERROR_MESSAGE_MAP.get(throwable.getClass().getName());
         JsonMessage result;
         if(errorMessage==null){
             result= ExceptionUtil.toJsonMessage(throwable);

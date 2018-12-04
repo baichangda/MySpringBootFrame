@@ -2,17 +2,12 @@ package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.base.define.SuccessDefine;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.define.ErrorDefine;
+import com.bcd.sys.define.MessageDefine;
 import io.swagger.annotations.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -23,8 +18,6 @@ import java.util.Date;
 import java.util.List;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
-
-import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -154,7 +147,7 @@ public class UserController extends BaseController {
             user.setPassword(userService.encryptPassword(user.getUsername(),user.getPassword()));
         }
         userService.save(user);
-        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
+        return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 
 
@@ -168,7 +161,7 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "用户id数组") @RequestParam Long[] ids){
         userService.deleteById(ids);
-        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
+        return com.bcd.base.define.MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 
     /**
@@ -201,7 +194,7 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "注销结果")
     public JsonMessage logout() {
         Subject currentUser = SecurityUtils.getSubject();
-        JsonMessage jsonMessage= com.bcd.sys.define.SuccessDefine.SUCCESS_LOGOUT.toJsonMessage();
+        JsonMessage jsonMessage= MessageDefine.SUCCESS_LOGOUT.toJsonMessage(true);
         //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
         currentUser.logout();
         return jsonMessage;
@@ -217,7 +210,7 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "重制密码结果")
     public JsonMessage resetPassword(@ApiParam(value = "用户主键",example = "1") @RequestParam(value = "userId") Long userId){
         userService.resetPassword(userId);
-        return com.bcd.sys.define.SuccessDefine.SUCCESS_RESET_PASSWORD.toJsonMessage();
+        return MessageDefine.SUCCESS_RESET_PASSWORD.toJsonMessage(true);
     }
 
 
@@ -238,9 +231,9 @@ public class UserController extends BaseController {
             @RequestParam(value = "newPassword") String newPassword){
         boolean flag= userService.updatePassword(userId,oldPassword,newPassword);
         if(flag){
-            return SuccessDefine.SUCCESS_UPDATE.toJsonMessage();
+            return com.bcd.base.define.MessageDefine.SUCCESS_UPDATE.toJsonMessage(true);
         }else{
-            return ErrorDefine.ERROR_PASSWORD_WRONG.toJsonMessage();
+            return MessageDefine.ERROR_PASSWORD_WRONG.toJsonMessage();
         }
     }
 
@@ -254,7 +247,7 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "授权结果")
     public JsonMessage runAs(Long ... ids){
         userService.runAs(ids);
-        return com.bcd.sys.define.SuccessDefine.SUCCESS_AUTHORITY.toJsonMessage();
+        return MessageDefine.SUCCESS_AUTHORITY.toJsonMessage(true);
     }
 
     /**
@@ -266,7 +259,7 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "解除授权结果")
     public JsonMessage releaseRunAs(){
         userService.releaseRunAs();
-        return com.bcd.sys.define.SuccessDefine.SUCCESS_RELEASE.toJsonMessage();
+        return MessageDefine.SUCCESS_RELEASE.toJsonMessage(true);
     }
 
 }

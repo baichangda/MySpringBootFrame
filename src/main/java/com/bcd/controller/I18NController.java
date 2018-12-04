@@ -1,7 +1,7 @@
 package com.bcd.controller;
 
 import com.bcd.base.message.JsonMessage;
-import com.bcd.define.ErrorDefine;
+import com.bcd.define.MessageDefine;
 import com.bcd.define.SuccessDefine;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,11 +40,11 @@ public class I18NController {
                     break;
                 }
                 default:{
-                    return ErrorDefine.ERROR_CHANGE_LOCALE.toJsonMessage(lang);
+                    return MessageDefine.ERROR_CHANGE_LOCALE.toJsonMessage(lang);
                 }
             }
         }
         request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,locale);
-        return SuccessDefine.SUCCESS_CHANGE_LOCALE.toJsonMessage();
+        return MessageDefine.SUCCESS_CHANGE_LOCALE.toJsonMessage(true);
     }
 }

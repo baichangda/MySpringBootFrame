@@ -3,7 +3,7 @@ package com.bcd.sys.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
-import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.cluster.TaskUtil;
@@ -129,7 +129,7 @@ public class TaskController extends BaseController {
     @ApiResponse(code = 200,message = "停止系统任务结果")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
         TaskUtil.stopTaskInWaiting(ids);
-        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
+        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 
 }

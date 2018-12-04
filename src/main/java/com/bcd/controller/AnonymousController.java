@@ -2,6 +2,8 @@ package com.bcd.controller;
 
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.DateZoneUtil;
+import com.bcd.base.util.I18nUtil;
+import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.service.ApiService;
 import com.bcd.sys.keys.KeysConst;
@@ -54,7 +56,8 @@ public class AnonymousController extends BaseController{
     @ApiResponse(code = 200,message = "导入的Excel")
     public JsonMessage<String> exportApi(HttpServletResponse response){
         XSSFWorkbook workbook=apiService.exportApi();
-        response(workbook,toDateFileName("接口文档.xlsx"),response);
+        String fileName=I18nUtil.getMessage("AnonymousController.exportApi.fileName")+".xlsx";
+        response(workbook,toDateFileName(fileName),response);
         return JsonMessage.success();
     }
 }

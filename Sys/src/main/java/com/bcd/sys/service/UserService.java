@@ -2,19 +2,17 @@ package com.bcd.sys.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.define.ErrorDefine;
+import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
 import com.bcd.sys.shiro.MyShiroRealm;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -152,7 +149,7 @@ public class UserService  extends BaseService<UserBean,Long> {
     public void runAs(Long ... ids) {
         Subject subject= SecurityUtils.getSubject();
         if(subject.isRunAs()){
-            throw ErrorDefine.ERROR_HAS_RUN_AS.toRuntimeException();
+            throw MessageDefine.ERROR_HAS_RUN_AS.toRuntimeException();
         }
         List<UserBean> userBeanList= findAllById(ids);
         SimplePrincipalCollection simplePrincipalCollection=new SimplePrincipalCollection();
@@ -163,7 +160,7 @@ public class UserService  extends BaseService<UserBean,Long> {
     public void releaseRunAs() {
         Subject subject= SecurityUtils.getSubject();
         if(!subject.isRunAs()){
-            throw ErrorDefine.ERROR_NOT_RUN_AS.toRuntimeException();
+            throw MessageDefine.ERROR_NOT_RUN_AS.toRuntimeException();
         }
         subject.releaseRunAs();
     }
