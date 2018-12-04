@@ -54,7 +54,7 @@ public class AnonymousController extends BaseController{
     @ApiResponse(code = 200,message = "导入的Excel")
     public JsonMessage<String> exportApi(HttpServletResponse response){
         XSSFWorkbook workbook=apiService.exportApi();
-        response(workbook,toDateFileName("Api.xlsx"),response);
+        response(workbook,toDateFileName("接口文档.xlsx"),response);
         return JsonMessage.success();
     }
 }
