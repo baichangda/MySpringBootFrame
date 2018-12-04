@@ -46,7 +46,8 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
      * 重写此方法
      * 此方法主要是用在url认证authc功能
      * 1、在验证账户失败时候,改变返回结果
-     * 2、去掉在验证失败时候自动登陆的逻辑(shiro会在第一次登陆成功后,在response cookies中加上账户密码(加密后的))
+     * 2、executeLogin会从当前request中取出header为 Authorization 的信息,其中包含的是Base64加密的账号密码,格式如下
+     *   (schema Base64(username:password)),以此来进行登录
      * @param request
      * @param response
      * @return
@@ -54,15 +55,14 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-//        boolean loggedIn = false; //false by default or we wouldn't be in this method
-//        if (isLoginAttempt(request, response)) {
-//            loggedIn = executeLogin(request, response);
-//        }
-//        if (!loggedIn) {
+        boolean loggedIn = false; //false by default or we wouldn't be in this method
+        if (isLoginAttempt(request, response)) {
+            loggedIn = executeLogin(request, response);
+        }
+        if (!loggedIn) {
                 handler.handle(WebUtils.toHttp(response),new UnauthenticatedException());
-//        }
-//        return loggedIn;
-        return false;
+        }
+        return loggedIn;
     }
 
     /**
