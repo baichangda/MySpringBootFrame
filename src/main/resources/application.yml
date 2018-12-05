@@ -27,7 +27,7 @@ spring:
      username: root
      password: 123456
 #  mongodb配置
-#   data.mongodb.uri: mongodb://root:root@localhost:27017/devtestV11
+   data.mongodb.uri: mongodb://test:test@localhost:27017/test
 #  jpa配置
    jpa:
       show-sql: false
