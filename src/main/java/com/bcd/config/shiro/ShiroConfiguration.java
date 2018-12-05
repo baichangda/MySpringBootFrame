@@ -3,8 +3,8 @@ package com.bcd.config.shiro;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.shiro.MyShiroRealm;
-import com.bcd.sys.shiro.CurrentUserValidateHandler;
-import com.bcd.sys.shiro.impl.DefaultCurrentUserValidateHandler;
+import com.bcd.sys.shiro.AuthorizationHandler;
+import com.bcd.sys.shiro.impl.DefaultAuthorizationHandler;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -127,19 +127,19 @@ public class ShiroConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CurrentUserValidateHandler currentUserValidateHandler(){
-        return new DefaultCurrentUserValidateHandler();
+    public AuthorizationHandler currentUserValidateHandler(){
+        return new DefaultAuthorizationHandler();
     }
 
     /**
      * 自定义权限注解解析器
      * @param securityManager
-     * @param currentUserValidateHandler 当前用户是否验证权限的处理器
+     * @param authorizationHandler 当前用户是否验证权限的处理器
      * @return
      */
     @Bean
-    public MyAuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager, CurrentUserValidateHandler currentUserValidateHandler){
-        MyAuthorizationAttributeSourceAdvisor advisor = new MyAuthorizationAttributeSourceAdvisor(currentUserValidateHandler);
+    public MyAuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(DefaultWebSecurityManager securityManager, AuthorizationHandler authorizationHandler){
+        MyAuthorizationAttributeSourceAdvisor advisor = new MyAuthorizationAttributeSourceAdvisor(authorizationHandler);
         advisor.setSecurityManager(securityManager);
         return advisor;
     }

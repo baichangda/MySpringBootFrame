@@ -1,9 +1,9 @@
 package com.bcd.sys.shiro.impl;
 
-import com.bcd.sys.shiro.CurrentUserAuthzHandler;
+import com.bcd.sys.shiro.AuthorizationHandler;
 import org.apache.shiro.aop.MethodInvocation;
 
-public class DefaultCurrentUserAuthzHandler implements CurrentUserAuthzHandler {
+public class DefaultAuthorizationHandler implements AuthorizationHandler {
     @Override
     public boolean isValidate(MethodInvocation methodInvocation) {
 //        UserBean userBean= ShiroUtil.getCurrentUser();

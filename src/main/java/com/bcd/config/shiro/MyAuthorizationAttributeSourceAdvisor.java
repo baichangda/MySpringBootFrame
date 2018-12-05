@@ -3,7 +3,7 @@ package com.bcd.config.shiro;
 import com.bcd.config.shiro.anno.RequiresUrlPermission;
 import com.bcd.config.shiro.anno.RequiresAction;
 import com.bcd.config.shiro.anno.RequiresUserInfo;
-import com.bcd.sys.shiro.CurrentUserValidateHandler;
+import com.bcd.sys.shiro.AuthorizationHandler;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
@@ -34,8 +34,8 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
     /**
      * Create a new AuthorizationAttributeSourceAdvisor.
      */
-    public MyAuthorizationAttributeSourceAdvisor(CurrentUserValidateHandler currentUserValidateHandler) {
-        setAdvice(new MyAopAllianceAnnotationsAuthorizingMethodInterceptor(currentUserValidateHandler));
+    public MyAuthorizationAttributeSourceAdvisor(AuthorizationHandler authorizationHandler) {
+        setAdvice(new MyAopAllianceAnnotationsAuthorizingMethodInterceptor(authorizationHandler));
     }
 
     public SecurityManager getSecurityManager() {
