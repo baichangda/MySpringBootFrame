@@ -7,7 +7,7 @@ import org.apache.shiro.aop.MethodInvocation;
  * 一般用于全局性的验证配置,例如:
  * admin跳过所有权限验证
  */
-public interface CurrentUserValidateHandler {
+public interface CurrentUserAuthzHandler {
     /**
      * 当前用户运行当前方法是否需要检验权限
      * @param methodInvocation 当前需要验证权限的方法
