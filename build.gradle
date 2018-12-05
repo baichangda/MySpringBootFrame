@@ -74,6 +74,7 @@ allprojects{
 
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
+
             options.compilerArgs << "-Xlint:unchecked"
             options.compilerArgs << "-parameters"
             options.encoding = "UTF-8"
@@ -105,6 +106,8 @@ bootRun {
     if (project.hasProperty('jvmArgs') ) {
         jvmArgs = (project.jvmArgs.split("\\s+") as List)
     }
+    //开启缓存行补齐
+    jvmArgs('-XX:-RestrictContended')
 }
 
 buildscript {

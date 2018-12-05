@@ -27,7 +27,7 @@ public class TaskBean extends SuperBaseBean<Long> {
     private String name;
 
     @NotNull(message = "[任务状态]不能为空")
-    @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;6:终止中)(不能为空)")
+    @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)(不能为空)")
     private Integer status;
 
     @NotNull(message = "[任务类型]不能为空")
