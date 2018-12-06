@@ -69,10 +69,7 @@ public class EntityAopConfig {
         //2、属性注入
         if(id==null){
             bean.setCreateTime(new Date());
-            HttpServletRequest request=getRequest();
-            if(request!=null){
-                bean.setCreateIp(IPUtil.getIpAdrress(request));
-            }
+            bean.setCreateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setCreateUserId(user.getId());
                 bean.setCreateUserName(user.getUsername());
@@ -80,19 +77,11 @@ public class EntityAopConfig {
             }
         }else{
             bean.setUpdateTime(new Date());
-            HttpServletRequest request=getRequest();
-            if(request!=null){
-                bean.setUpdateIp(IPUtil.getIpAdrress(request));
-            }
+            bean.setUpdateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setUpdateUserId(user.getId());
                 bean.setUpdateUserName(user.getUsername());
             }
         }
-    }
-
-    private HttpServletRequest getRequest(){
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        return servletRequestAttributes==null?null:servletRequestAttributes.getRequest();
     }
 }

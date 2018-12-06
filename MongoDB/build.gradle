@@ -1,0 +1,8 @@
+group 'MongoDB'
+version '1.0-SNAPSHOT'
+
+dependencies {
+    //springboot mongodb支持
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+    compile project(':Base')
+}

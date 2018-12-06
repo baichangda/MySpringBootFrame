@@ -1,5 +1,3 @@
-apply plugin: 'org.flywaydb.flyway'
-
 dependencies {
     compile project(':RDB')
 }

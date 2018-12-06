@@ -1,0 +1,46 @@
+dependencies {
+    //spring支持
+    compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+
+    //poi 集成
+    compile("org.apache.poi:poi:${poiVersion}")
+    compile("org.apache.poi:poi-ooxml:${poiVersion}")
+
+    //json
+    compile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    compile("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+    compile("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+
+    //apache commons beanUtils
+    compile("commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}")
+
+    //apache commons lang3
+    compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
+
+    //swagger集成
+    compile "io.springfox:springfox-swagger2:${swaggerVersion}"
+    compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+
+    //springboot web支持
+    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    //springboot test支持
+    compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    //springboot redis支持
+    //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
+    compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
+    compile("org.apache.commons:commons-pool2:${commonsPool2}")
+    //jedis同步客户端,可以不进行引用(此jar默认引入了apache commons-pool2)
+//    compile("redis.clients:jedis:${jedisVersion}")
+
+}
+buildscript {
+    ext {
+        jacksonVersion = '+'
+        poiVersion = '+'
+        commonsBeanutilsVersion ='+'
+        commonsLangVersion='+'
+        swaggerVersion='+'
+        commonsPool2='+'
+        jedisVersion='+'
+    }
+}

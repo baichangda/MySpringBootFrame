@@ -1,0 +1,13 @@
+dependencies {
+    //springboot jpa支持
+    compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+    //mysql驱动包
+    runtime "mysql:mysql-connector-java:${mysqlVersion}"
+    compile project(':Base')
+}
+buildscript {
+    ext {
+        mysqlVersion = '8.+'
+    }
+}
+

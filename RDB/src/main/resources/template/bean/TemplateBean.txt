@@ -1,0 +1,26 @@
+package @{package}.bean;
+
+import com.bcd.rdb.bean.@{superBean};
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.*;
+import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+
+
+
+import javax.persistence.*;
+
+/**
+ *  @{moduleDesc}
+ */
+@Entity
+@Table(name = "@{tableName}")
+public class @{upperModuleName}Bean extends @{superBean}<@{pkType}> {
+    //field
+@{beanFields}
+    //method
+@{beanMethods}
+}
