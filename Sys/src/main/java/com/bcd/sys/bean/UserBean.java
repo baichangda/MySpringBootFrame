@@ -1,6 +1,9 @@
 package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import javax.persistence.*;
@@ -28,6 +31,7 @@ public class UserBean extends BaseBean<Long> {
     @ApiModelProperty(value = "用户名(不能为空,长度不能超过50)")
     private String username;
 
+    @JsonIgnore
     @NotBlank(message = "[密码]不能为空")
     @Length(max = 100,message = "[密码]长度不能超过100")
     @ApiModelProperty(value = "密码(不能为空,长度不能超过100)")
@@ -60,6 +64,7 @@ public class UserBean extends BaseBean<Long> {
     @ApiModelProperty(value = "是否可用(0:禁用,1:可用)(不能为空)")
     private Integer status;
 
+    //"Asia/Shanghai"
     @ApiModelProperty(hidden = true)
     @Transient
     private String timeZone;

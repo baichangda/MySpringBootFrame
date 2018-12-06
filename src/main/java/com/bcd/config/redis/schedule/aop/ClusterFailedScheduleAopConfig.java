@@ -1,7 +1,7 @@
 package com.bcd.config.redis.schedule.aop;
 
-import com.bcd.config.redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.config.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
+import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.config.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -21,7 +21,7 @@ public class ClusterFailedScheduleAopConfig {
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.config.redis.schedule.anno.ClusterFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule)")
     public void methodSchedule(){
     }
 

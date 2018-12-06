@@ -1,4 +1,4 @@
-package com.bcd.config.shiro.anno;
+package com.bcd.base.config.shiro;
 
 import org.apache.shiro.authz.annotation.Logical;
 

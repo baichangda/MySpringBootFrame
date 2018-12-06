@@ -1,4 +1,4 @@
-package com.bcd.config.shiro.anno;
+package com.bcd.base.config.shiro;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
