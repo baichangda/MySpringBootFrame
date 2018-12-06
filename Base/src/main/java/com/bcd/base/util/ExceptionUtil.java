@@ -2,6 +2,7 @@ package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
@@ -53,11 +54,12 @@ public class ExceptionUtil {
         if(realException instanceof BaseRuntimeException){
             return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode(),getStackTraceMessage(realException));
         }else if(realException instanceof ConstraintViolationException) {
-            return JsonMessage.fail(
-                    ((ConstraintViolationException)realException).getConstraintViolations().stream().map(e->e.getMessage()).reduce((e1,e2)->e1+","+e2).get()
-            );
+            String message=((ConstraintViolationException)realException).getConstraintViolations().stream().map(e->e.getMessage()).reduce((e1,e2)->e1+","+e2).orElse("");
+            return JsonMessage.fail(message);
+        }else if(realException instanceof MethodArgumentNotValidException) {
+            String message=((MethodArgumentNotValidException)realException).getBindingResult().getAllErrors().stream().map(e->e.getDefaultMessage()).filter(e->e!=null).reduce((e1,e2)->e1+","+e2).orElse("");
+            return JsonMessage.fail(message);
         }else {
-//            return JsonMessage.fail(realException.getMessage(),null,getStackTraceMessage(realException));
             return JsonMessage.fail(realException.getMessage());
         }
     }

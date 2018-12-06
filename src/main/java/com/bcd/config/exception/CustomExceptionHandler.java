@@ -59,8 +59,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
      */
     @Override
     protected ModelAndView handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request, HttpServletResponse response, @Nullable Object handler) throws IOException {
-        String message=ex.getBindingResult().getAllErrors().stream().map(e->e.getDefaultMessage()).filter(e->e!=null).reduce((e1,e2)->e1+","+e2).orElse("");
-        JsonMessage result=JsonMessage.fail(message);
+        JsonMessage result=ExceptionUtil.toJsonMessage(ex);
         try {
             this.handler.handle(response,result);
         } catch (IOException e) {
