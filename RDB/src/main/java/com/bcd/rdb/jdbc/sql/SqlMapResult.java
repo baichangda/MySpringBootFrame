@@ -1,4 +1,4 @@
-package com.bcd.rdb.jdbc;
+package com.bcd.rdb.jdbc.sql;
 
 import java.util.Map;
 

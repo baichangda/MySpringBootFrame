@@ -1,4 +1,4 @@
-package com.bcd.rdb.jdbc;
+package com.bcd.rdb.jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import net.sf.jsqlparser.JSQLParserException;
