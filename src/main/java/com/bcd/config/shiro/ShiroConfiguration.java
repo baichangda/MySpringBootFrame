@@ -65,22 +65,6 @@ public class ShiroConfiguration {
     }
 
     /**
-     * 验证域对象
-     * @return
-     */
-    @Bean(name = "myShiroRealm")
-    public MyShiroRealm myShiroRealm(){
-        MyShiroRealm realm = new MyShiroRealm();
-        //采用hash加密算法
-        if(CommonConst.IS_PASSWORD_ENCODED){
-            HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
-            hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
-            realm.setCredentialsMatcher(hashedCredentialsMatcher);
-        }
-        return realm;
-    }
-
-    /**
      * 验证生命周期
      * @return
      */
@@ -150,11 +134,11 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager, ExceptionResponseHandler handler){
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager, ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler){
         ShiroFilterFactoryBean factoryBean = new MyShiroFilterFactoryBean();
         Map<String,Filter> filterMap=new HashMap<>();
         filterMap.put("authc",new MyAuthenticationFilter(handler));
-        filterMap.put("perms",new MyAuthorizationFilter(handler));
+        filterMap.put("perms",new MyAuthorizationFilter(handler,authorizationHandler));
         filterMap.put("user",new MyUserFilter(handler));
         factoryBean.setFilters(filterMap);
 

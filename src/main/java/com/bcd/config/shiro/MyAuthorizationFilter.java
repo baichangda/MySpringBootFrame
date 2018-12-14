@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
+import com.bcd.sys.shiro.AuthorizationHandler;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.StringUtils;
@@ -37,9 +38,18 @@ import java.io.IOException;
 @SuppressWarnings("unchecked")
 public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
     private ExceptionResponseHandler handler;
+    private AuthorizationHandler authorizationHandler;
 
-    public MyAuthorizationFilter(ExceptionResponseHandler handler) {
+    public MyAuthorizationFilter(ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler) {
         this.handler=handler;
+    }
+
+    @Override
+    public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
+        if(authorizationHandler.skip(request, response, mappedValue)){
+            return true;
+        }
+        return super.isAccessAllowed(request, response, mappedValue);
     }
 
     @Override

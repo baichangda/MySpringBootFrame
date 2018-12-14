@@ -7,22 +7,34 @@ import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-
+@Component
 public class MyShiroRealm extends AuthorizingRealm {
   
     @Autowired
     private UserService userService;
+
+    public MyShiroRealm() {
+        if(CommonConst.IS_PASSWORD_ENCODED){
+            HashedCredentialsMatcher hashedCredentialsMatcher= new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
+            hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
+            setCredentialsMatcher(hashedCredentialsMatcher);
+        }
+    }
 
     /**
      * 登录认证

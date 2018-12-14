@@ -33,7 +33,7 @@ public class SysTaskRunnable implements Runnable,Serializable{
             CommonConst.Init.taskService.save(taskBean);
         }catch (Exception e){
             if(e instanceof InterruptedException){
-                //2.1、如果任务是被打断的,则只更新任务完成时间
+                //2.1、如果任务是被打断的,则只更新任务完成时间和状态
                 taskBean.setFinishTime(new Date());
                 taskBean.setStatus(TaskStatus.STOPPED.getStatus());
                 CommonConst.Init.taskService.save(taskBean);
