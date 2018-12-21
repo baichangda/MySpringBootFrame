@@ -64,14 +64,6 @@ public class ShiroConfiguration {
         return ehcacheManager;
     }
 
-    /**
-     * 验证生命周期
-     * @return
-     */
-//    @Bean(name = "lifecycleBeanPostProcessor")
-//    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor(){
-//        return new LifecycleBeanPostProcessor();
-//    }
 
 //    @Bean
 //    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator(){

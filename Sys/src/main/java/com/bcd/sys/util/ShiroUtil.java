@@ -13,12 +13,12 @@ import java.util.Collection;
  */
 public class ShiroUtil {
     /**
-     * 清除当前权限信息
+     * 清除当前登录用户缓存权限信息
      */
-    public static void clearAuthz(){
+    public static void clearCurrentUserCachedAuthorizationInfo(){
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
         MyShiroRealm realm=  (MyShiroRealm)rsm.getRealms().iterator().next();
-        realm.clearAuthz();
+        realm.clearCurrentUserCachedAuthorizationInfo();
     }
 
     /**

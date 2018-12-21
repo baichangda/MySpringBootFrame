@@ -1,6 +1,6 @@
 package com.bcd.config.shiro.anno;
 
-import com.bcd.base.config.shiro.RequiresAction;
+import com.bcd.base.config.shiro.anno.RequiresAction;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 import org.apache.shiro.subject.Subject;

@@ -36,6 +36,7 @@ import java.util.*;
  * 非线程安全
  *
  */
+@SuppressWarnings("unchecked")
 public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
     private String sql;

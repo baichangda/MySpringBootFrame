@@ -1,5 +1,6 @@
 package com.bcd.config.shiro.anno;
 
+import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.define.MessageDefine;
 import org.apache.shiro.aop.AnnotationResolver;
 import org.apache.shiro.aop.MethodInvocation;
@@ -50,7 +51,7 @@ public class UrlPermissionAnnotationMethodInterceptor extends AuthorizingAnnotat
             // Annotation handler doesn't know why it was called, so add the information here if possible.
             // Don't wrap the exception here since we don't want to mask the specific exception, such as
             // UnauthenticatedException etc.
-            if (ae.getCause() == null) ae.initCause(MessageDefine.ERROR_SHIRO_AUTHORIZATION.toRuntimeException());
+            if (ae.getCause() == null) ae.initCause(ShiroMessageDefine.ERROR_SHIRO_AUTHORIZATION.toRuntimeException());
             throw ae;
         }
     }

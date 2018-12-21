@@ -39,18 +39,29 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
     @Override  
     protected AbstractShiroFilter createInstance() throws Exception {
         SecurityManager securityManager = getSecurityManager();
-        if (securityManager == null){  
-            throw new BeanInitializationException("SecurityManager property must be set.");
-        }  
-  
-        if (!(securityManager instanceof WebSecurityManager)){
-            throw new BeanInitializationException("The security manager does not implement the WebSecurityManager interface.");  
-        }  
-  
+        if (securityManager == null) {
+            String msg = "SecurityManager property must be set.";
+            throw new BeanInitializationException(msg);
+        }
+
+        if (!(securityManager instanceof WebSecurityManager)) {
+            String msg = "The security manager does not implement the WebSecurityManager interface.";
+            throw new BeanInitializationException(msg);
+        }
+
+        FilterChainManager manager = createFilterChainManager();
+
+        //Expose the constructed FilterChainManager by first wrapping it in a
+        // FilterChainResolver implementation. The AbstractShiroFilter implementations
+        // do not know about FilterChainManagers - only resolvers:
         PathMatchingFilterChainResolver chainResolver = new PathMatchingFilterChainResolver();
-        FilterChainManager chainManager = createFilterChainManager();
-        chainResolver.setFilterChainManager(chainManager);
-        return new MySpringShiroFilter((WebSecurityManager)securityManager, chainResolver);
+        chainResolver.setFilterChainManager(manager);
+
+        //Now create a concrete ShiroFilter instance and apply the acquired SecurityManager and built
+        //FilterChainResolver.  It doesn't matter that the instance is an anonymous inner class
+        //here - we're just using it because it is a concrete AbstractShiroFilter instance that accepts
+        //injection of the SecurityManager and FilterChainResolver:
+        return new MySpringShiroFilter((WebSecurityManager) securityManager, chainResolver);
     }  
   
     /**  

@@ -4,7 +4,7 @@ import com.bcd.base.message.JsonMessage;
 import com.bcd.base.message.ErrorMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.config.shiro.ShiroConst;
+import com.bcd.base.config.shiro.ShiroConst;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;
