@@ -15,6 +15,7 @@ public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler
     }
 
     private ThreadLocal<Set<String>>  actionPermission = new ThreadLocal<>();
+
     public void setActionPermission(Set<String> permission){
         actionPermission.set(permission);
     }
@@ -29,19 +30,18 @@ public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler
         if(permissionSet==null||permissionSet.size()==0){
             return;
         }
-        boolean[] flag=new boolean[]{false};
-        permissionSet.forEach(e->{
+        boolean flag=false;
+        for (String e : permissionSet) {
             try {
                 subject.checkPermission(e);
-                flag[0]=true;
-                return;
+                flag=true;
+                break;
             }catch (AuthorizationException ex){
-
+                break;
             }
-        });
-        if(!flag[0]){
+        }
+        if(!flag){
             throw new AuthorizationException("No Url Permission!");
         }
     }
-
 }

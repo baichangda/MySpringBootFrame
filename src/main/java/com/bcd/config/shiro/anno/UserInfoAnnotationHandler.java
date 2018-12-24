@@ -19,7 +19,6 @@ public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
 
     @Override
     public void assertAuthorized(Annotation a) throws AuthorizationException {
-        if (!(a instanceof RequiresUserInfo)) return;
         long[] ids=((RequiresUserInfo)a).id();
         String[] usernames=((RequiresUserInfo)a).username();
         Logical logical=((RequiresUserInfo)a).logical();

@@ -31,7 +31,6 @@ public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
         String permissionString=getActionPermission();
         if(!StringUtils.isEmpty(permissionString)){
             subject.checkPermission(permissionString);
-            return;
         }
     }
 
