@@ -42,6 +42,7 @@ public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
 
     public MyAuthorizationFilter(ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler) {
         this.handler=handler;
+        this.authorizationHandler=authorizationHandler;
     }
 
     @Override

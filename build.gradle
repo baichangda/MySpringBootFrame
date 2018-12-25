@@ -44,7 +44,6 @@ allprojects{
         //shiro权限框架集成
         compile("org.apache.shiro:shiro-spring:${shiroVersion}")
         compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
-        compile("org.apache.shiro:shiro-cas:${shiroVersion}")
         //rocketmq集成
         compile("com.aliyun.openservices:ons-client:1.7.0.Final")
         //阿里云 tablestore集成
@@ -64,7 +63,7 @@ allprojects{
         //阿里云oss对象存储集成
         compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
         //ics
-        compile ("com.incar:ics-map-tracking:1.5-SNAPSHOT")
+        compile ("com.incarcloud.ics:ics-map-tracking:2.3-SNAPSHOT")
     }
 
     gradle.projectsEvaluated {
