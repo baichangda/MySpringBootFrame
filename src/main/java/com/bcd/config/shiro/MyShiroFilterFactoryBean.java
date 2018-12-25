@@ -32,9 +32,11 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
         ignoreExt.add(".bmp");  
         ignoreExt.add(".js");  
         ignoreExt.add(".css");  
-    }  
+        ignoreExt.add(".html");
+    }
     /**  
-     * 启动时加载  
+     * 启动时加载
+     * 重写此方法,构造自己的过滤器
      */  
     @Override  
     protected AbstractShiroFilter createInstance() throws Exception {

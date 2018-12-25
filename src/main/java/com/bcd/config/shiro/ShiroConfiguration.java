@@ -1,14 +1,11 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.shiro.MyShiroRealm;
 import com.bcd.sys.shiro.AuthorizationHandler;
 import com.bcd.sys.shiro.impl.DefaultAuthorizationHandler;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.shiro.mgt.RememberMeManager;
+import org.apache.shiro.mgt.*;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -49,12 +46,10 @@ import java.util.Map;
  3、部分过滤器可指定参数，如perms，roles
  */
 @Configuration
-public class ShiroConfiguration {
+public class ShiroConfiguration{
     private static final Logger logger = LoggerFactory.getLogger(ShiroConfiguration.class);
-
-
     /**
-     * 缓存对象
+     * 缓存管理器
      * @return
      */
     @Bean
@@ -70,7 +65,7 @@ public class ShiroConfiguration {
      * @param realm
      * @return
      */
-    @Bean(name = "securityManager")
+    @Bean
     public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm,SessionManager sessionManager,EhCacheManager ehCacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
@@ -86,6 +81,11 @@ public class ShiroConfiguration {
         return securityManager;
     }
 
+    /**
+     * 会话管理器
+     * @param redisTemplate
+     * @return
+     */
     @Bean
     public SessionManager sessionManager(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
@@ -94,6 +94,10 @@ public class ShiroConfiguration {
         return sessionManager;
     }
 
+    /**
+     * 当前用户验证处理器,用于跳过不需要验证的用户
+     * @return
+     */
     @Bean
     @ConditionalOnMissingBean
     public AuthorizationHandler currentUserValidateHandler(){
@@ -150,12 +154,19 @@ public class ShiroConfiguration {
         //user: authc后或者rememberMe的都可以访问
         filterChainMap.put("/api/anonymous/**", "anon");
         filterChainMap.put("/api/sys/user/login", "anon");
-        filterChainMap.put("/api/**/list", "user");
-        filterChainMap.put("/api/**/page", "user");
+//        filterChainMap.put("/api/**/list", "user");
+//        filterChainMap.put("/api/**/page", "user");
         filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 
+    /**
+     * 配置shiroFilter,此配置导致ShiroFilterFactoryBean无效
+     * 主要是用于处理 filter 支持异步请求
+     * @param shiroFilterFactoryBean
+     * @return
+     * @throws Exception
+     */
     @Bean
     public FilterRegistrationBean<Filter> filterRegistrationBean(@Qualifier(value = "shiroFilter") ShiroFilterFactoryBean shiroFilterFactoryBean) throws Exception{
         FilterRegistrationBean<Filter> filterRegistration = new FilterRegistrationBean<>();
@@ -166,6 +177,4 @@ public class ShiroConfiguration {
         filterRegistration.setDispatcherTypes(DispatcherType.REQUEST,DispatcherType.ASYNC);
         return filterRegistration;
     }
-
-
 }
