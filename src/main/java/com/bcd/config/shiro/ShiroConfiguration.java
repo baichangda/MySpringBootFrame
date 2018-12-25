@@ -65,13 +65,6 @@ public class ShiroConfiguration {
     }
 
 
-//    @Bean
-//    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator(){
-//        DefaultAdvisorAutoProxyCreator creator = new DefaultAdvisorAutoProxyCreator();
-//        creator.setProxyTargetClass(true);
-//        return creator;
-//    }
-
     /**
      * 安全管理器
      * @param realm

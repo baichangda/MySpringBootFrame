@@ -4,15 +4,14 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -27,13 +26,10 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
-
-
     /**
      * 查询用户列表
      * @return
      */
-    @RequiresPermissions("a")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")
     @ApiResponse(code = 200,message = "用户列表")
@@ -63,6 +59,7 @@ public class UserController extends BaseController {
             @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
             @RequestParam(value = "status",required = false) Integer status
         ){
+        SecurityUtils.getSubject().isPermitted("abc");
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new NumberCondition("orgId",orgId, NumberCondition.Handler.EQUAL),
@@ -142,9 +139,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody @Validated UserBean user){
+    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody UserBean user){
         if(user.getId()==null){
-            user.setPassword(userService.encryptPassword(user.getUsername(),user.getPassword()));
+            user.setPassword(userService.encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
         }
         userService.save(user);
         return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
