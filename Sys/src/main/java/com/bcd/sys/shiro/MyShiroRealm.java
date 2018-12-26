@@ -86,9 +86,6 @@ public class MyShiroRealm extends AuthorizingRealm {
             Set<String> permissionSet=new HashSet<>();
             info.setRoles(roleSet);
             info.setStringPermissions(permissionSet);
-            if(user.getId().equals(1L)){
-                permissionSet.add("a");
-            }
         }
          //返回null将会导致用户访问任何被拦截的请求时都会自动跳转到unauthorizedUrl指定的地址
         return info;
