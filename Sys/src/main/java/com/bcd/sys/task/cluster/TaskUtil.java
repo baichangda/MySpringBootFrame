@@ -130,25 +130,31 @@ public class TaskUtil {
         //2、构造当前请求的空结果集并加入到全局map
         ConcurrentHashMap<Long,Boolean> resultMap=new ConcurrentHashMap<>();
         TaskConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
-        //3、构造请求数据,推送给其他服务器停止任务
-        Map<String,Object> dataMap=new HashMap<>();
-        dataMap.put("code",code);
-        dataMap.put("ids",ids);
-        CommonConst.Init.redisTemplate.convertAndSend(TaskConst.STOP_SYS_TASK_CHANNEL,dataMap);
-        //4、锁住此次请求的结果map,等待,便于本服务器其他线程收到结果时唤醒
-        //4.1、定义退出循环标记
+        //3、锁住此次请求的结果map,等待,便于本服务器其他线程收到结果时唤醒
+        //3.1、定义退出循环标记
         boolean isFinish=false;
         synchronized (resultMap){
+            //3.2、构造请求数据,推送给其他服务器停止任务
+            Map<String,Object> dataMap=new HashMap<>();
+            dataMap.put("code",code);
+            dataMap.put("ids",ids);
+            CommonConst.Init.redisTemplate.convertAndSend(TaskConst.STOP_SYS_TASK_CHANNEL,dataMap);
             try {
-                while(!isFinish){
-                    //4.2、等待其他线程唤醒
-                    resultMap.wait();
-                    //4.3、唤醒后,如果检测到接收到的结果集与请求停止任务数量相等,则表示结果已经完整,结束循环
+                //3.3、设置任务等待超时时间,默认为30s,如果在规定时间内还没有收到所有服务器通知,就不进行等待了,主要是为了解决死循环问题
+                long t=30*1000L;
+                while(!isFinish&&t>0){
+                    long startTs=System.currentTimeMillis();
+                    //3.4、等待其他线程唤醒
+                    resultMap.wait(t);
+                    //3.5、唤醒后,如果检测到接收到的结果集与请求停止任务数量相等,则表示结果已经完整,结束循环
                     if(resultMap.size()==ids.length){
                         isFinish=true;
+                    }else{
+                        t-=(System.currentTimeMillis()-startTs);
                     }
                 }
-               return Arrays.stream(ids).map(id->resultMap.getOrDefault(id,false)).toArray(len->new Boolean[len]);
+                //3.6、根据返回的数据构造结果集(结果集不一定准确,因为有可能在规定时间之内没有收到结果,会判定为终止失败)
+                return Arrays.stream(ids).map(id->resultMap.getOrDefault(id,false)).toArray(len->new Boolean[len]);
             } catch (InterruptedException e) {
                 throw BaseRuntimeException.getException(e);
             }

@@ -59,7 +59,6 @@ public class UserController extends BaseController {
             @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
             @RequestParam(value = "status",required = false) Integer status
         ){
-        SecurityUtils.getSubject().isPermitted("abc");
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new NumberCondition("orgId",orgId, NumberCondition.Handler.EQUAL),
