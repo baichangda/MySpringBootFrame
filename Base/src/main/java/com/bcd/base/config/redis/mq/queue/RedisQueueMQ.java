@@ -22,7 +22,7 @@ public abstract class RedisQueueMQ implements RedisMQ{
     protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();
     protected final static RedisSerializer DEFAULT_VALUE_SERIALIZER=new Jackson2JsonRedisSerializer(Object.class);
 
-    protected Logger logger=LoggerFactory.getLogger(RedisQueueMQ.class);
+    private final static Logger logger=LoggerFactory.getLogger(RedisQueueMQ.class);
 
     protected String name;
 
@@ -96,12 +96,13 @@ public abstract class RedisQueueMQ implements RedisMQ{
                                 try {
                                     redisQueueMQ.onMessage(data);
                                 } catch (Exception e) {
-                                    redisQueueMQ.logger.error(e.getMessage(), e);
+                                    logger.error(e.getMessage(), e);
                                 }
                             });
                         }
                     } catch (Exception e) {
-                        redisQueueMQ.logger.error(e.getMessage(), e);
+                        logger.error("Redis Queue["+redisQueueMQ.name+"] Stop", e);
+                        break;
                     }
                 }
             });

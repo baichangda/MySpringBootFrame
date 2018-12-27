@@ -11,6 +11,6 @@ public class ScheduleConfig implements SchedulingConfigurer{
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         //开启多线程执行定时任务,默认只有单线程执行
-        taskRegistrar.setScheduler(Executors.newScheduledThreadPool(10));
+        taskRegistrar.setScheduler(Executors.newScheduledThreadPool(5));
     }
 }
