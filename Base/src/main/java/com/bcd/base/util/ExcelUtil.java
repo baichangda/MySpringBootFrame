@@ -1,17 +1,17 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -58,7 +58,7 @@ public class ExcelUtil {
         if(cell==null){
             return null;
         }
-        CellType cellType=cell.getCachedFormulaResultType();
+        CellType cellType=cell.getCellType();
         switch (cellType) {
             case BLANK: {
                 return null;
@@ -114,39 +114,6 @@ public class ExcelUtil {
     }
 
     /**
-     * 重写覆盖excel,会用新生成的excel覆盖掉之前的
-     * 原理:
-     * 1、获取path指定的文件,读取成java对象
-     * 2、生成临时的excel文件
-     * 3、将整合的数据写入临时excel
-     * 4、删除path文件同时将临时excel文件改名成path
-     * @param path 覆盖重写的文件path
-     * @param sheetIndex path的sheet编号,从1开始
-     * @param beginRowIndex sheet开始的行号,从1开始
-     * @param beginColIndex sheet开始的列号,从1开始
-     * @param cellBiConsumer 读取cell值的方法
-     * @param dataList 数据集合
-     */
-    public static void overWriteExcel(final Path path,final int sheetIndex, final int beginRowIndex, final int beginColIndex,BiConsumer<Cell,Object> cellBiConsumer, List<List> dataList){
-        if(dataList==null||dataList.size()==0){
-            return;
-        }
-        try {
-            String tempName=path.subpath(0,path.getNameCount()-2)+ File.pathSeparator+UUID.randomUUID().toString();
-            Path tempPath=Paths.get(tempName);
-            writeExcel(path,tempPath,sheetIndex,beginRowIndex,beginColIndex,cellBiConsumer,dataList);
-            Files.deleteIfExists(path);
-            boolean res=tempPath.toFile().renameTo(path.toFile());
-            if(!res){
-                throw BaseRuntimeException.getException("[ExcelUtil.overWriteExcel],Rename Failed!");
-            }
-        }catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-
-    /**
      * 将源excel的数据经过加工写入到目标excel中
      * @param sourcePath 源excel
      * @param targetPath 目标excel
@@ -167,6 +134,38 @@ public class ExcelUtil {
             writeSheet(sheet,beginRowIndex,beginColIndex,cellBiConsumer,dataList);
             workbook.write(os);
         }catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    /**
+     * 生成(.xlsx)
+     * @param path 文件路径
+     * @param dataList 数据集合
+     * @param cellBiConsumer 单元格插入方法
+     */
+    public static void writeExcel_2007(Path path,List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
+        XSSFWorkbook workbook= exportExcel_2007(dataList, cellBiConsumer);
+        FileUtil.createFileIfNotExists(path);
+        try(OutputStream os=Files.newOutputStream(path)){
+            workbook.write(os);
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    /**
+     * 生成(.xls)
+     * @param path 文件路径
+     * @param dataList 数据集合
+     * @param cellBiConsumer 单元格插入方法
+     */
+    public static void writeExcel_2003(Path path,List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
+        HSSFWorkbook workbook= exportExcel_2003(dataList, cellBiConsumer);
+        FileUtil.createFileIfNotExists(path);
+        try(OutputStream os=Files.newOutputStream(path)){
+            workbook.write(os);
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -207,6 +206,8 @@ public class ExcelUtil {
             }
         }
     }
+
+
 
     /**
      * 根绝开始行，开始列，结束列。获取excel中的数据
@@ -285,13 +286,70 @@ public class ExcelUtil {
 
 
 
-    public static void main(String [] args){
-        List<List> dataList= Arrays.asList(
-                Arrays.asList("a","b","c","d","a","b","c","d"),
-                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
-                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
-                Arrays.asList("a","b","c","d","a","b","c","d","1","3")
-        );
-        overWriteExcel(Paths.get("/Users/baichangda/test.xlsx"),1,1,1,null,dataList);
+    public static void main(String [] args) throws IOException {
+//        List<List> dataList= Arrays.asList(
+//                Arrays.asList("a","b","c","d","a","b","c","d"),
+//                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
+//                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
+//                Arrays.asList("a","b","c","d","a","b","c","d","1","3")
+//        );
+//        overWriteExcel(Paths.get("/Users/baichangda/test.xlsx"),1,1,1,null,dataList);
+        doBoyu();
+    }
+
+    private static void doBoyu() throws IOException {
+        Path p1=Paths.get("/Users/baichangda/Downloads/1.txt");
+        Path p2=Paths.get("/Users/baichangda/Downloads/2.xlsx");
+        List<List> dataList=new ArrayList<>();
+        try(BufferedReader br=Files.newBufferedReader(p1, Charset.forName("UTF-8"))){
+            int index=1;
+            String line;
+            while((line=br.readLine())!=null){
+                if(index>1){
+                    String [] arr=line.split("\t");
+                    dataList.add(Arrays.asList(arr));
+                }
+                index++;
+            }
+        }
+
+        Map<String,List> map= dataList.stream().collect(Collectors.toMap(e->e.get(0).toString(),e->{
+            String no=e.get(0).toString();
+            String date=e.get(1).toString();
+            String type=e.get(2).toString();
+            String driverName="";
+            String vehicleNo="";
+            if("2".equals(type)){
+                type="预结算";
+            }else if("3".equals(type)){
+                type="已结算";
+            }else if("4".equals(type)){
+                type="已关账";
+            }
+
+            String json=e.get(3).toString();
+            double val1=0d;
+            double val2=0d;
+            try {
+                try {
+                    JsonNode jsonNode=JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(json);
+                    driverName = jsonNode.get("drivername").asText();
+                    vehicleNo = jsonNode.get("carnum").asText();
+                    val1 = jsonNode.get("dispatchSubsidy").asDouble();
+                    val2 = jsonNode.get("lifeSubsidy").asDouble();
+                }catch (NullPointerException e2){
+                    e2.printStackTrace();
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            return Arrays.asList(no,date,driverName,vehicleNo,type,val1,val2);
+        },(e1,e2)->{
+            return Arrays.asList(e1.get(0),e1.get(1),e1.get(2),e1.get(3),e1.get(4),(double)e1.get(5)+(double)e2.get(5),(double)e1.get(6)+(double)e2.get(6));
+        }));
+
+
+        writeExcel_2007(p2,map.values().stream().collect(Collectors.toList()),(cell,val)->inputValue(cell,val));
+
     }
 }

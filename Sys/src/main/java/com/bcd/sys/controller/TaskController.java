@@ -128,7 +128,7 @@ public class TaskController extends BaseController {
     @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
     @ApiResponse(code = 200,message = "停止系统任务结果")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
-        TaskUtil.stopTaskInWaiting(ids);
+        TaskUtil.stopTask(true,ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 

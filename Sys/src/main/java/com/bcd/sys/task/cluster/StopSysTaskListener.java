@@ -40,6 +40,7 @@ public class StopSysTaskListener implements MessageListener{
             //1、接收到停止任务的请求后,先解析
             JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(message.getBody());
             String code=jsonNode.get("code").asText();
+            Boolean mayInterruptIfRunning=jsonNode.get("mayInterruptIfRunning").asBoolean();
             //2、依次停止每个任务,将结束的任务记录到结果map中
             Map<Long,Boolean> resultMap=new HashMap<>();
             jsonNode.get("ids").forEach(e->{
@@ -48,7 +49,7 @@ public class StopSysTaskListener implements MessageListener{
                 if(future==null){
                     return;
                 }
-                boolean cancelRes=future.cancel(true);
+                boolean cancelRes=future.cancel(mayInterruptIfRunning);
                 resultMap.put(id,cancelRes);
             });
             //3、推送结果map和code到redis中,给请求的源服务器接收

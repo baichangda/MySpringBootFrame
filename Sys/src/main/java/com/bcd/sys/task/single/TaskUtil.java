@@ -7,8 +7,9 @@ import com.bcd.sys.task.SysTaskRunnable;
 import com.bcd.sys.task.TaskConsumer;
 import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.util.ShiroUtil;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.Future;
 
 public class TaskUtil {
@@ -20,6 +21,7 @@ public class TaskUtil {
      * @return
      */
     public static TaskBean registerTask(String name, int type, TaskConsumer consumer){
+        //1、构造任务实体
         UserBean userBean= ShiroUtil.getCurrentUser();
         TaskBean taskBean=new TaskBean(name,type);
         if(userBean!=null){
@@ -29,8 +31,10 @@ public class TaskUtil {
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
         taskBean.setConsumer(consumer);
+        //2、保存任务实体
         CommonConst.Init.taskService.save(taskBean);
-        Future future= TaskConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
+        //3、执行任务
+        Future future= CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
         CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(taskBean.getId(),future);
         return taskBean;
     }
@@ -46,11 +50,21 @@ public class TaskUtil {
             return new Boolean[0];
         }
         Boolean[] res=new Boolean[ids.length];
+        List<Long> stopIdList=new ArrayList<>();
         for (int i=0;i<=ids.length-1;i++) {
             Long id=ids[i];
             Future future= CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.get(id);
             res[i]=future.cancel(mayInterruptIfRunning);
+            if(res[i]){
+                stopIdList.add(id);
+            }
         }
+        Map<String,Object> paramMap=new HashMap<>();
+        paramMap.put("status",TaskStatus.STOPPED.getStatus());
+        paramMap.put("ids",stopIdList);
+        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
+                "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
+
         return res;
     }
 

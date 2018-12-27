@@ -16,22 +16,21 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component
 public class TaskUtil {
 
+
+    static SysTaskRedisQueueMQ redisQueueMQ;
+
     @Autowired
-    public void init(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
-        //初始化系统任务线程池
-        TaskConst.SYS_TASK_POOL=new ThreadPoolExecutor(2,2,30, TimeUnit.SECONDS,
-                new TaskRedisList(TaskConst.SYS_TASK_LIST_NAME,redisTemplate));
+    public void init(SysTaskRedisQueueMQ redisQueueMQ){
+        TaskUtil.redisQueueMQ=redisQueueMQ;
     }
+
 
     /**
      * 注册任务
@@ -41,6 +40,7 @@ public class TaskUtil {
      * @return
      */
     public static TaskBean registerTask(String name,int type,TaskConsumer consumer){
+        //1、构造任务实体
         UserBean userBean= ShiroUtil.getCurrentUser();
         TaskBean taskBean=new TaskBean(name,type);
         if(userBean!=null){
@@ -50,62 +50,11 @@ public class TaskUtil {
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
         taskBean.setConsumer(consumer);
+        //2、保存任务实体
         CommonConst.Init.taskService.save(taskBean);
-        Future future= TaskConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean));
-        CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(taskBean.getId(),future);
+        //3、推送任务实体到redis队列中
+        redisQueueMQ.send(taskBean);
         return taskBean;
-    }
-
-    /**
-     * 终止正在等待执行的任务
-     * 原理:
-     * 通过移除调redis任务队列中的任务来实现
-     * @param ids
-     * @return 结果数组;true代表终止成功;false代表终止失败(可能正在执行中或已经完成)
-     */
-    public static Boolean[] stopTaskInWaiting(Long ...ids){
-        if(ids==null||ids.length==0){
-            return new Boolean[0];
-        }
-        List<SysTaskRunnable> list= ((TaskRedisList) TaskConst.SYS_TASK_POOL.getQueue()).range(0,-1);
-        Boolean[]res=new Boolean[ids.length];
-        List<Long> stopIdList=new ArrayList<>();
-        for (int i=0;i<=ids.length-1;i++) {
-            Long id=ids[i];
-            for (SysTaskRunnable sysTaskRunnable : list) {
-                if(sysTaskRunnable.getTaskBean().getId().equals(id)){
-                    res[i]= TaskConst.SYS_TASK_POOL.getQueue().remove(sysTaskRunnable);
-                    break;
-                }
-            }
-            if(res[i]){
-                stopIdList.add(id);
-            }
-        }
-        Map<String,Object> paramMap=new HashMap<>();
-        paramMap.put("status",TaskStatus.STOPPED.getStatus());
-        paramMap.put("ids",stopIdList);
-        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
-                "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
-        return res;
-    }
-
-    /**
-     * 终止正在等待执行的所有任务
-     * 原理:
-     * 通过移除调redis任务队列中的任务来实现
-     * @return 停止的所有任务的id数组
-     */
-    public static Long[] stopAllTaskInWaiting(){
-        List<Runnable> list= new ArrayList<>();
-        TaskConst.SYS_TASK_POOL.getQueue().drainTo(list);
-        List<Long> idList= list.stream().map(e->((SysTaskRunnable)e).getTaskBean().getId()).collect(Collectors.toList());
-        Map<String,Object> paramMap=new HashMap<>();
-        paramMap.put("status",TaskStatus.STOPPED.getStatus());
-        paramMap.put("ids",idList);
-        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
-                "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
-        return list.stream().toArray(len->new Long[len]);
     }
 
     /**
@@ -119,9 +68,12 @@ public class TaskUtil {
      * 注意:
      * 如果是执行中的任务被结束,虽然已经调用Future cancel()但是并不会马上结束,具体原理参考Thread interrupt()
      *
+     * @param mayInterruptIfRunning 是否打断正在运行的任务(true表示打断wait或者sleep的任务;false表示只打断在等待中的任务)
+     * @param ids
+     *
      * @return 结果数组;true代表终止成功;false代表终止失败(可能已经取消或已经完成)
      */
-    public static Boolean[] stopTask(Long ...ids){
+    public static Boolean[] stopTask(boolean mayInterruptIfRunning,Long ...ids){
         if(ids==null||ids.length==0){
             return new Boolean[0];
         }
@@ -138,6 +90,7 @@ public class TaskUtil {
             Map<String,Object> dataMap=new HashMap<>();
             dataMap.put("code",code);
             dataMap.put("ids",ids);
+            dataMap.put("mayInterruptIfRunning",mayInterruptIfRunning);
             CommonConst.Init.redisTemplate.convertAndSend(TaskConst.STOP_SYS_TASK_CHANNEL,dataMap);
             try {
                 //3.3、设置任务等待超时时间,默认为30s,如果在规定时间内还没有收到所有服务器通知,就不进行等待了,主要是为了解决死循环问题
@@ -153,7 +106,21 @@ public class TaskUtil {
                         t-=(System.currentTimeMillis()-startTs);
                     }
                 }
-                //3.6、根据返回的数据构造结果集(结果集不一定准确,因为有可能在规定时间之内没有收到结果,会判定为终止失败)
+
+                //3.6、停止成功的任务更新其任务状态
+                List<Long> stopIdList=new ArrayList<>();
+                resultMap.forEach((k,v)->{
+                    if(v){
+                        stopIdList.add(k);
+                    }
+                });
+                Map<String,Object> paramMap=new HashMap<>();
+                paramMap.put("status",TaskStatus.STOPPED.getStatus());
+                paramMap.put("ids", stopIdList);
+                int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
+                        "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
+
+                //3.7、根据返回的数据构造结果集(结果集不一定准确,因为有可能在规定时间之内没有收到结果,会判定为终止失败)
                 return Arrays.stream(ids).map(id->resultMap.getOrDefault(id,false)).toArray(len->new Boolean[len]);
             } catch (InterruptedException e) {
                 throw BaseRuntimeException.getException(e);

@@ -1,8 +1,6 @@
 package com.bcd.sys.task.cluster;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 public class TaskConst {
     public final static String SYS_TASK_LIST_NAME="sysTaskQueue";
@@ -21,8 +19,5 @@ public class TaskConst {
      * value: 当前请求的结果集map
      */
     public final static ConcurrentHashMap<String,ConcurrentHashMap<Long,Boolean>> SYS_TASK_CODE_TO_RESULT_MAP =new ConcurrentHashMap<>();
-    /**
-     * 用来执行系统任务的线程池
-     */
-    public static ThreadPoolExecutor SYS_TASK_POOL;
+
 }
