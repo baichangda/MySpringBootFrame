@@ -69,14 +69,15 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(value = "创建ip(长度不能超过50)")
     private String createIp;
 
+    //通过继承TaskConsumer,其中的name
+    @Length(max = 50,message = "[执行任务实体名称]长度不能超过100")
+    @ApiModelProperty(value = "执行任务实体名称(长度不能超过100)")
+    private String consumerName;
 
-    @Transient
-    @ApiModelProperty(hidden = true)
-    public TaskConsumer consumer;
-
-    public TaskBean(String name,Integer type) {
+    public TaskBean(String name,Integer type,String consumerName) {
         this.name=name;
         this.type = type;
+        this.consumerName=consumerName;
     }
 
     private TaskBean() {
@@ -172,12 +173,12 @@ public class TaskBean extends SuperBaseBean<Long> {
         return this.createIp;
     }
 
-    public TaskConsumer getConsumer() {
-        return consumer;
+    public String getConsumerName() {
+        return consumerName;
     }
 
-    public void setConsumer(TaskConsumer consumer) {
-        this.consumer = consumer;
+    public void setConsumerName(String consumerName) {
+        this.consumerName = consumerName;
     }
 
     public String getStackMessage() {

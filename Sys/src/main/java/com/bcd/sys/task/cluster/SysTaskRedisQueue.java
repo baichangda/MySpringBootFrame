@@ -1,12 +1,10 @@
 package com.bcd.sys.task.cluster;
 
-import com.bcd.base.config.redis.mq.queue.RedisQueueMQ;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.CommonConst;
 import com.bcd.sys.task.SysTaskRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
@@ -16,18 +14,22 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.*;
 
 @Component
-public class SysTaskRedisQueueMQ{
-    private final static Logger logger= LoggerFactory.getLogger(SysTaskRedisQueueMQ.class);
+public class SysTaskRedisQueue {
+    private final static Logger logger= LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
 
-    @Autowired
-    @Qualifier(value = "string_jdk_redisTemplate")
     private RedisTemplate redisTemplate;
-    public SysTaskRedisQueueMQ() {
+
+    public SysTaskRedisQueue(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate) {
         this.name=TaskConst.SYS_TASK_LIST_NAME;
+        this.redisTemplate=redisTemplate;
         Worker.init(this);
     }
 
+    /**
+     * 接收到任务数据时候处理
+     * @param data
+     */
     public void onMessage(Object data) {
         //1、接收任务
         TaskBean taskBean=(TaskBean)data;
@@ -44,28 +46,28 @@ public class SysTaskRedisQueueMQ{
         /**
          * 从redis中遍历数据的线程池
          */
-        private final static ExecutorService POOL= Executors.newCachedThreadPool();
+        private final static ExecutorService POOL= Executors.newSingleThreadExecutor();
 
         /**
          * 执行工作任务的线程池
          */
         private final static ExecutorService WORK_POOL=Executors.newCachedThreadPool();
 
-        public static void init(SysTaskRedisQueueMQ redisQueueMQ){
+        public static void init(SysTaskRedisQueue sysTaskRedisQueue){
+            Semaphore lock=new Semaphore(CommonConst.SYS_TASK_POOL.getMaximumPoolSize());
             POOL.execute(()->{
-                Semaphore lock=new Semaphore(CommonConst.SYS_TASK_POOL.getPoolSize());
-                ListOperations listOperations= redisQueueMQ.redisTemplate.opsForList();
-                long timeout=((LettuceConnectionFactory)redisQueueMQ.redisTemplate.getConnectionFactory()).getClientConfiguration().getCommandTimeout().getSeconds();
+                ListOperations listOperations= sysTaskRedisQueue.redisTemplate.opsForList();
+                long timeout=((LettuceConnectionFactory)sysTaskRedisQueue.redisTemplate.getConnectionFactory()).getClientConfiguration().getCommandTimeout().getSeconds();
                 while(true){
                     try {
                         lock.acquire();
-                        Object data = listOperations.rightPop(redisQueueMQ.name, timeout / 2, TimeUnit.MILLISECONDS);
+                        Object data = listOperations.rightPop(sysTaskRedisQueue.name, timeout / 2, TimeUnit.MILLISECONDS);
                         if (data == null) {
                             lock.release();
                         }else{
                             WORK_POOL.execute(() -> {
                                 try {
-                                    redisQueueMQ.onMessage(data);
+                                    sysTaskRedisQueue.onMessage(data);
                                 } catch (Exception e) {
                                     logger.error(e.getMessage(), e);
                                 } finally {
@@ -74,7 +76,7 @@ public class SysTaskRedisQueueMQ{
                             });
                         }
                     } catch (Exception e) {
-                        logger.error("SysTaskRedisQueueMQ["+redisQueueMQ.name+"] Stop", e);
+                        logger.error("SysTaskRedisQueue["+sysTaskRedisQueue.name+"] Stop", e);
                         break;
                     }
                 }

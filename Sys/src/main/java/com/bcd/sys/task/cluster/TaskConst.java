@@ -1,5 +1,8 @@
 package com.bcd.sys.task.cluster;
 
+import com.bcd.sys.task.TaskConsumer;
+
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class TaskConst {

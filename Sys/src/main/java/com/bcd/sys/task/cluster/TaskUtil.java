@@ -4,31 +4,27 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.SysTaskRunnable;
 import com.bcd.sys.task.TaskConsumer;
 import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component
 public class TaskUtil {
 
 
-    static SysTaskRedisQueueMQ redisQueueMQ;
+    private static SysTaskRedisQueue sysTaskRedisQueue;
 
     @Autowired
-    public void init(SysTaskRedisQueueMQ redisQueueMQ){
-        TaskUtil.redisQueueMQ=redisQueueMQ;
+    public void init(SysTaskRedisQueue sysTaskRedisQueue){
+        TaskUtil.sysTaskRedisQueue =sysTaskRedisQueue;
     }
 
 
@@ -42,18 +38,17 @@ public class TaskUtil {
     public static TaskBean registerTask(String name,int type,TaskConsumer consumer){
         //1、构造任务实体
         UserBean userBean= ShiroUtil.getCurrentUser();
-        TaskBean taskBean=new TaskBean(name,type);
+        TaskBean taskBean=new TaskBean(name,type,consumer.getName());
         if(userBean!=null){
             taskBean.setCreateUserName(userBean.getUsername());
             taskBean.setCreateUserId(userBean.getId());
         }
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
-        taskBean.setConsumer(consumer);
         //2、保存任务实体
         CommonConst.Init.taskService.save(taskBean);
         //3、推送任务实体到redis队列中
-        redisQueueMQ.send(taskBean);
+        sysTaskRedisQueue.send(taskBean);
         return taskBean;
     }
 
@@ -114,12 +109,13 @@ public class TaskUtil {
                         stopIdList.add(k);
                     }
                 });
-                Map<String,Object> paramMap=new HashMap<>();
-                paramMap.put("status",TaskStatus.STOPPED.getStatus());
-                paramMap.put("ids", stopIdList);
-                int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
-                        "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
-
+                if(!stopIdList.isEmpty()) {
+                    Map<String, Object> paramMap = new HashMap<>();
+                    paramMap.put("status", TaskStatus.STOPPED.getStatus());
+                    paramMap.put("ids", stopIdList);
+                    int count = new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
+                            "update t_sys_task set status=:status,finish_time=now() where id in (:ids)", paramMap);
+                }
                 //3.7、根据返回的数据构造结果集(结果集不一定准确,因为有可能在规定时间之内没有收到结果,会判定为终止失败)
                 return Arrays.stream(ids).map(id->resultMap.getOrDefault(id,false)).toArray(len->new Boolean[len]);
             } catch (InterruptedException e) {

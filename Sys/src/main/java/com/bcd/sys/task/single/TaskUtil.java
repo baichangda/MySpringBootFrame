@@ -23,14 +23,13 @@ public class TaskUtil {
     public static TaskBean registerTask(String name, int type, TaskConsumer consumer){
         //1、构造任务实体
         UserBean userBean= ShiroUtil.getCurrentUser();
-        TaskBean taskBean=new TaskBean(name,type);
+        TaskBean taskBean=new TaskBean(name,type,consumer.getName());
         if(userBean!=null){
             taskBean.setCreateUserName(userBean.getUsername());
             taskBean.setCreateUserId(userBean.getId());
         }
         taskBean.setCreateTime(new Date());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
-        taskBean.setConsumer(consumer);
         //2、保存任务实体
         CommonConst.Init.taskService.save(taskBean);
         //3、执行任务
@@ -59,12 +58,14 @@ public class TaskUtil {
                 stopIdList.add(id);
             }
         }
-        Map<String,Object> paramMap=new HashMap<>();
-        paramMap.put("status",TaskStatus.STOPPED.getStatus());
-        paramMap.put("ids",stopIdList);
-        int count=new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
-                "update t_sys_task set status=:status,finish_time=now() where id in (:ids)",paramMap);
+        if(!stopIdList.isEmpty()) {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("status", TaskStatus.STOPPED.getStatus());
+            paramMap.put("ids", stopIdList);
+            int count = new NamedParameterJdbcTemplate(CommonConst.Init.jdbcTemplate).update(
+                    "update t_sys_task set status=:status,finish_time=now() where id in (:ids)", paramMap);
 
+        }
         return res;
     }
 

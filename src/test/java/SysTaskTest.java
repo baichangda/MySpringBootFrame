@@ -3,6 +3,7 @@ import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.OrgService;
 import com.bcd.sys.task.CommonConst;
+import com.bcd.sys.task.TaskConsumer;
 import com.bcd.sys.task.cluster.TaskUtil;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,25 @@ public class SysTaskTest {
 
     @org.junit.Test
     public void test() throws InterruptedException{
-        TaskBean t1=TaskUtil.registerTask("test1",1, taskBean -> {
-            Thread.sleep(30*1000);
+        TaskBean t1=TaskUtil.registerTask("test1", 1, new TaskConsumer("test1") {
+            @Override
+            public void accept(TaskBean taskBean) throws InterruptedException {
+                Thread.sleep(20*1000L);
+            }
         });
-        TaskBean t2=TaskUtil.registerTask("test2",1, taskBean -> {
-            Thread.sleep(20*1000);
+        TaskBean t2=TaskUtil.registerTask("test2",1, new TaskConsumer("test2") {
+            @Override
+            public void accept(TaskBean taskBean) throws InterruptedException {
+                Thread.sleep(20*1000L);
+            }
         });
-        TaskBean t3=TaskUtil.registerTask("test3",1, taskBean -> {
-            OrgBean orgBean=new OrgBean();
-            orgBean.setName("absdfs");
-//            orgService.save(orgBean);
+        TaskBean t3=TaskUtil.registerTask("test3",1, new TaskConsumer("test3") {
+            @Override
+            public void accept(TaskBean taskBean) throws InterruptedException {
+                OrgBean orgBean=new OrgBean();
+                orgBean.setName("asdfasd");
+                orgService.save(orgBean);
+            }
         });
         Thread.sleep(2000L);
         Boolean[] res= TaskUtil.stopTask(true,t1.getId());

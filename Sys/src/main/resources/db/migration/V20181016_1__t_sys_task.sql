@@ -10,6 +10,7 @@ create table IF NOT EXISTS t_sys_task
    finish_time          timestamp NULL comment '任务完成时间',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
    file_paths           varchar(100) null comment '文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)',
+   consumer_name        varchar(50) not null comment '执行任务实体名称(长度不能超过100)',
    create_user_id       bigint comment '创建人id',
    create_user_name     varchar(50) comment '创建人姓名',
    create_ip            varchar(50) comment '创建ip',

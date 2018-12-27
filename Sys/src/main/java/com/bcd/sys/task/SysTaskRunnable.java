@@ -43,7 +43,7 @@ public class SysTaskRunnable implements Runnable,Serializable{
         CommonConst.Init.taskService.save(taskBean);
         //4、开始执行任务;并记录执行结果
         try {
-            taskBean.getConsumer().accept(taskBean);
+            CommonConst.NAME_TO_CONSUMER_MAP.get(taskBean.getConsumerName()).accept(taskBean);
             taskBean.setStatus(TaskStatus.FINISHED.getStatus());
             taskBean.setFinishTime(new Date());
             CommonConst.Init.taskService.save(taskBean);

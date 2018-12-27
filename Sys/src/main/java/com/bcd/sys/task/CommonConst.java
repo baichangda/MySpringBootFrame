@@ -5,10 +5,9 @@ import com.bcd.sys.service.TaskService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class CommonConst {
     /**
@@ -19,11 +18,17 @@ public class CommonConst {
     /**
      * 用来执行系统任务的线程池
      */
-    public static ExecutorService SYS_TASK_POOL= Executors.newFixedThreadPool(2) ;
+    public static ThreadPoolExecutor SYS_TASK_POOL= (ThreadPoolExecutor)Executors.newFixedThreadPool(2) ;
 
     public static class Init{
         public final static TaskService taskService= SpringUtil.applicationContext.getBean(TaskService.class);
         public final static JdbcTemplate jdbcTemplate=SpringUtil.applicationContext.getBean(JdbcTemplate.class);
         public final static RedisTemplate redisTemplate=(RedisTemplate)SpringUtil.applicationContext.getBean("string_jackson_redisTemplate");
     }
+
+
+    /**
+     * 定义任务处理器 名称和实体对应关系,name可以供存储,执行时候通过此map找到实体然后执行
+     */
+    public final static Map<String,TaskConsumer> NAME_TO_CONSUMER_MAP=new ConcurrentHashMap<>();
 }
