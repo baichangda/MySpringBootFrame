@@ -21,11 +21,8 @@ public class MyMessageConverter implements MessageConverter{
     }
 
     /**
-     * 目前只支持
      * 1、String
-     * 2、Map 返回类型为 JSONObject
-     * 3、List 返回类型为 JSONArray
-     * 4、JavaBean
+     * 2、Json
      * @param message
      * @return
      * @throws MessageConversionException
