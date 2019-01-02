@@ -20,7 +20,7 @@ public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>
         if(KeysConst.IS_CLUSTER){
             //2、为空则初始化,取出redis中的公钥私钥
             ApplicationContext applicationContext= contextRefreshedEvent.getApplicationContext();
-            RedisTemplate redisTemplate=(RedisTemplate) applicationContext.getBean("string_jdk_redisTemplate");
+            RedisTemplate redisTemplate=(RedisTemplate) applicationContext.getBean("string_serializable_redisTemplate");
             Object[] keys=(Object[])redisTemplate.opsForValue().get(KeysConst.REDIS_KEY_NAME);
             //3、如果redis中公钥私钥为空,则生成一份,插入进去
             if(keys==null){

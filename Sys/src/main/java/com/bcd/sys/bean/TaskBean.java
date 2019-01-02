@@ -1,7 +1,6 @@
 package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.SuperBaseBean;
-import com.bcd.sys.task.TaskConsumer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -30,7 +29,6 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)(不能为空)")
     private Integer status;
 
-    @NotNull(message = "[任务类型]不能为空")
     @ApiModelProperty(value = "任务类型(1:普通任务;2:文件类型任务)(不能为空)")
     private Integer type;
 
@@ -69,19 +67,11 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(value = "创建ip(长度不能超过50)")
     private String createIp;
 
-    //通过继承TaskConsumer,其中的name
-    @Length(max = 50,message = "[执行任务实体名称]长度不能超过100")
-    @ApiModelProperty(value = "执行任务实体名称(长度不能超过100)")
-    private String consumerName;
-
-    public TaskBean(String name,Integer type,String consumerName) {
+    public TaskBean(String name) {
         this.name=name;
-        this.type = type;
-        this.consumerName=consumerName;
     }
 
     private TaskBean() {
-
     }
 
     //method
@@ -171,14 +161,6 @@ public class TaskBean extends SuperBaseBean<Long> {
 
     public String getCreateIp(){
         return this.createIp;
-    }
-
-    public String getConsumerName() {
-        return consumerName;
-    }
-
-    public void setConsumerName(String consumerName) {
-        this.consumerName = consumerName;
     }
 
     public String getStackMessage() {

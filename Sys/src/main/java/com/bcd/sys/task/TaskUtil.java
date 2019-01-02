@@ -1,4 +1,4 @@
-package com.bcd.sys.task.cluster;
+package com.bcd.sys.task;
 
 import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.exception.BaseRuntimeException;
@@ -6,10 +6,6 @@ import com.bcd.base.util.IPUtil;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.TaskService;
-import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.SysTaskRunnable;
-import com.bcd.sys.task.TaskConsumer;
-import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.util.ShiroUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
-@Component("clusterTaskUtil")
+@Component
 public class TaskUtil {
 
     private static RedisTemplate<String,Map> redisTemplate;
@@ -42,22 +39,13 @@ public class TaskUtil {
     /**
      * 注册任务
      * @param name 任务名称
-     * @param type 任务类型 (对应TaskBean里面的type,根据不同的项目翻译成不同的意思,默认 1:普通任务;2:文件类型任务 )
      * @param consumer 任务执行方法
      * @return
      */
-    public static TaskBean registerTask(String name, int type, TaskConsumer consumer){
-        //1、注册任务之前等待所有组件初始化完毕
-        while(!CommonConst.IS_CONSUMER_MAP_INIT){
-            try {
-                Thread.sleep(500L);
-            } catch (InterruptedException e) {
-                throw BaseRuntimeException.getException(e);
-            }
-        }
-        //2、构造任务实体
+    public static TaskBean registerTask(String name,Consumer<TaskBean> consumer){
+        //1、构造任务实体
         UserBean userBean= ShiroUtil.getCurrentUser();
-        TaskBean taskBean=new TaskBean(name,type,consumer.getName());
+        TaskBean taskBean=new TaskBean(name);
         if(userBean!=null){
             taskBean.setCreateUserName(userBean.getUsername());
             taskBean.setCreateUserId(userBean.getId());
@@ -65,10 +53,10 @@ public class TaskUtil {
         taskBean.setCreateTime(new Date());
         taskBean.setCreateIp(IPUtil.getIpAddress());
         taskBean.setStatus(TaskStatus.WAITING.getStatus());
-        //3、保存任务实体
+        //2、保存任务实体
         TaskUtil.taskService.save(taskBean);
-        //4、执行任务
-        Future future= CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean,taskService));
+        //3、执行任务
+        Future future= CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(taskBean,consumer,taskService));
         CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(taskBean.getId(),future);
         return taskBean;
     }
@@ -97,7 +85,7 @@ public class TaskUtil {
         String code= RandomStringUtils.randomAlphanumeric(32);
         //2、构造当前请求的空结果集并加入到全局map
         ConcurrentHashMap<Long,Boolean> resultMap=new ConcurrentHashMap<>();
-        TaskConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
+        CommonConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
         //3、锁住此次请求的结果map,等待,便于本服务器其他线程收到结果时唤醒
         //3.1、定义退出循环标记
         boolean isFinish=false;
@@ -107,7 +95,7 @@ public class TaskUtil {
             dataMap.put("code",code);
             dataMap.put("ids",ids);
             dataMap.put("mayInterruptIfRunning",mayInterruptIfRunning);
-            TaskUtil.redisTemplate.convertAndSend(TaskConst.STOP_SYS_TASK_CHANNEL,dataMap);
+            TaskUtil.redisTemplate.convertAndSend(CommonConst.STOP_SYS_TASK_CHANNEL,dataMap);
             try {
                 //3.3、设置任务等待超时时间,默认为30s,如果在规定时间内还没有收到所有服务器通知,就不进行等待了,主要是为了解决死循环问题
                 long t=30*1000L;

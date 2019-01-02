@@ -6,14 +6,14 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestRedisTopicMQ extends RedisTopicMQ{
+public class TestRedisTopicMQ extends RedisTopicMQ<String>{
     public TestRedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super("test", redisMessageListenerContainer);
+        super("test", redisMessageListenerContainer,String.class);
         watch();
     }
 
     @Override
-    public void onMessage(Message data) {
-        System.out.println(new String(data.getBody()));
+    public void onMessage(String data) {
+        System.out.println(new String(data));
     }
 }

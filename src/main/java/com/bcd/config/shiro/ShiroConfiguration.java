@@ -87,7 +87,7 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean
-    public SessionManager sessionManager(@Qualifier(value = "string_jdk_redisTemplate") RedisTemplate redisTemplate){
+    public SessionManager sessionManager(@Qualifier(value = "string_serializable_redisTemplate") RedisTemplate redisTemplate){
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
         DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
         sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));

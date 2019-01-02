@@ -17,6 +17,8 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public class BeanInfo implements Serializable{
+    public volatile boolean isInit=false;
+
     /**
      * service的实体类
      */

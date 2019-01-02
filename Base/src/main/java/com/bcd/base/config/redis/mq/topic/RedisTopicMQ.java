@@ -1,5 +1,6 @@
 package com.bcd.base.config.redis.mq.topic;
 
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.redis.mq.RedisMQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,57 +9,56 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.io.Serializable;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public abstract class RedisTopicMQ implements RedisMQ<Message> {
-
-    protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();
-    protected final static RedisSerializer DEFAULT_VALUE_SERIALIZER=new Jackson2JsonRedisSerializer(Object.class);
+public abstract class RedisTopicMQ<V> implements RedisMQ<V> {
 
     protected Logger logger= LoggerFactory.getLogger(RedisTopicMQ.class);
 
     protected String name;
 
-    protected RedisTemplate redisTemplate;
+    protected RedisTemplate<String,V> redisTemplate;
 
     protected RedisMessageListenerContainer redisMessageListenerContainer;
 
     protected MessageListener messageListener;
 
-    public RedisTopicMQ( String name, RedisMessageListenerContainer redisMessageListenerContainer, RedisTemplate redisTemplate) {
+    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer, RedisTemplate<String,V> redisTemplate) {
         this.name = name;
         this.redisMessageListenerContainer=redisMessageListenerContainer;
         this.redisTemplate=redisTemplate;
         this.messageListener=getMessageListener();
     }
 
-    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer) {
+    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz) {
         this.name = name;
         this.redisMessageListenerContainer=redisMessageListenerContainer;
-        this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer);
+        this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer,clazz);
         this.messageListener=getMessageListener();
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer){
-        RedisTemplate redisTemplate=new RedisTemplate();
-        redisTemplate.setConnectionFactory(redisMessageListenerContainer.getConnectionFactory());
-        redisTemplate.setKeySerializer(DEFAULT_KEY_SERIALIZER);
-        redisTemplate.setHashKeySerializer(DEFAULT_KEY_SERIALIZER);
-        redisTemplate.setValueSerializer(DEFAULT_VALUE_SERIALIZER);
-        redisTemplate.setHashValueSerializer(DEFAULT_VALUE_SERIALIZER);
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz){
+        if(String.class.isAssignableFrom(clazz)){
+            return RedisUtil.newString_StringRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+        }else if(Serializable.class.isAssignableFrom(clazz)){
+            return RedisUtil.newString_SerializableRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+        } else{
+            return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(),clazz);
+        }
+    }
+
+    protected void onMessage(Message message, byte[] pattern){
+        V v=(V)redisTemplate.getValueSerializer().deserialize(message.getBody());
+        onMessage(v);
     }
 
     private MessageListener getMessageListener(){
         return (message,pattern)->{
             try {
-                onMessage(message);
+                onMessage(message,pattern);
             }catch (Exception e){
                 logger.error(e.getMessage(),e);
             }
@@ -66,12 +66,12 @@ public abstract class RedisTopicMQ implements RedisMQ<Message> {
     }
 
     @Override
-    public void send(Object data) {
+    public void send(V data) {
         redisTemplate.convertAndSend(name,data);
     }
 
     @Override
-    public void sendBatch(List dataList) {
+    public void sendBatch(List<V> dataList) {
         dataList.forEach(data->send(data));
     }
 

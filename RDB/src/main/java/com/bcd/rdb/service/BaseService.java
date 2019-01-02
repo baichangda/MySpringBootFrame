@@ -47,18 +47,23 @@ public class BaseService<T,K extends Serializable> {
     @Autowired
     public JdbcTemplate jdbcTemplate;
 
-    public BeanInfo beanInfo;
+    private volatile BeanInfo beanInfo;
 
 
     /**
-     * 避免命名重复
-     * 初始化
-     * 1、初始化service的泛型实体类的信息
+     * 获取当前service对应实体类的信息
+     * @return
      */
-    public void _init_(){
-        //1、先获取当前service的bean class,在全局缓存map中获取信息
-        Class beanClass=(Class <T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        beanInfo=BeanInfo.getBeanInfo(beanClass);
+    public BeanInfo getBeanInfo(){
+        if(beanInfo==null){
+            synchronized (this){
+                if(beanInfo==null){
+                    Class beanClass=(Class <T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+                    beanInfo=BeanInfo.getBeanInfo(beanClass);
+                }
+            }
+        }
+        return beanInfo;
     }
 
     public boolean existsById(K id){
@@ -237,9 +242,9 @@ public class BaseService<T,K extends Serializable> {
     public int delete(Condition condition){
         Specification specification= ConditionUtil.toSpecification(condition);
         CriteriaBuilder criteriaBuilder= em.getCriteriaBuilder();
-        CriteriaQuery criteriaQuery= criteriaBuilder.createQuery(beanInfo.clazz);
-        CriteriaDelete criteriaDelete= criteriaBuilder.createCriteriaDelete(beanInfo.clazz);
-        Predicate predicate= specification.toPredicate(criteriaDelete.from(beanInfo.clazz),criteriaQuery,criteriaBuilder);
+        CriteriaQuery criteriaQuery= criteriaBuilder.createQuery(getBeanInfo().clazz);
+        CriteriaDelete criteriaDelete= criteriaBuilder.createCriteriaDelete(getBeanInfo().clazz);
+        Predicate predicate= specification.toPredicate(criteriaDelete.from(getBeanInfo().clazz),criteriaQuery,criteriaBuilder);
         criteriaDelete.where(predicate);
         return em.createQuery(criteriaDelete).executeUpdate();
     }
@@ -258,9 +263,9 @@ public class BaseService<T,K extends Serializable> {
         }
         Specification specification= ConditionUtil.toSpecification(condition);
         CriteriaBuilder criteriaBuilder= em.getCriteriaBuilder();
-        CriteriaQuery criteriaQuery= criteriaBuilder.createQuery(beanInfo.clazz);
-        CriteriaUpdate criteriaUpdate= criteriaBuilder.createCriteriaUpdate(beanInfo.clazz);
-        Predicate predicate= specification.toPredicate(criteriaUpdate.from(beanInfo.clazz),criteriaQuery,criteriaBuilder);
+        CriteriaQuery criteriaQuery= criteriaBuilder.createQuery(getBeanInfo().clazz);
+        CriteriaUpdate criteriaUpdate= criteriaBuilder.createCriteriaUpdate(getBeanInfo().clazz);
+        Predicate predicate= specification.toPredicate(criteriaUpdate.from(getBeanInfo().clazz),criteriaQuery,criteriaBuilder);
         criteriaUpdate.where(predicate);
         Iterator<Map.Entry<String,Object>> it= attrMap.entrySet().iterator();
         while(it.hasNext()){
@@ -399,11 +404,11 @@ public class BaseService<T,K extends Serializable> {
      * @param t
      */
     public void validateUniqueBeforeSave(T t){
-        if(!beanInfo.isCheckUnique){
+        if(!getBeanInfo().isCheckUnique){
             return;
         }
         //1、循环集合,验证每个唯一字段是否在数据库中有重复值
-        for (Field f : beanInfo.uniqueFieldList) {
+        for (Field f : getBeanInfo().uniqueFieldList) {
             Object val;
             try {
                 val = PropertyUtils.getProperty(t,f.getName());
@@ -421,14 +426,14 @@ public class BaseService<T,K extends Serializable> {
      * @param iterable
      */
     public void validateUniqueBeforeSave(Iterable<T> iterable){
-        if(!beanInfo.isCheckUnique){
+        if(!getBeanInfo().isCheckUnique){
             return;
         }
         try {
             //1、循环集合,看传入的参数集合中唯一字段是否有重复的值
             Map<String,Set<Object>> fieldValueSetMap=new HashMap<>();
             for (T t : iterable) {
-                for (Field f : beanInfo.uniqueFieldList) {
+                for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName=f.getName();
                     Object val=  PropertyUtils.getProperty(t,fieldName);
                     Set<Object> valueSet= fieldValueSetMap.get(fieldName);
@@ -445,7 +450,7 @@ public class BaseService<T,K extends Serializable> {
             }
             //2、循环集合,验证每个唯一字段是否在数据库中有重复值
             for (T t : iterable) {
-                for (Field f : beanInfo.uniqueFieldList) {
+                for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName=f.getName();
                     Object val=PropertyUtils.getProperty(t,fieldName);
                     if(!isUnique(f.getName(),val,(K)RDBUtil.getPKVal(t))){

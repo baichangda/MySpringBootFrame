@@ -1,5 +1,6 @@
 package com.bcd.base.config.redis.mq.queue;
 
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.redis.mq.RedisMQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,59 +8,52 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public abstract class RedisQueueMQ implements RedisMQ{
-
-    protected final static RedisSerializer DEFAULT_KEY_SERIALIZER=new StringRedisSerializer();
-    protected final static RedisSerializer DEFAULT_VALUE_SERIALIZER=new Jackson2JsonRedisSerializer(Object.class);
-
+public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
     private final static Logger logger=LoggerFactory.getLogger(RedisQueueMQ.class);
 
     protected String name;
 
-    protected RedisTemplate redisTemplate;
+    protected RedisTemplate<String,V> redisTemplate;
 
     private volatile boolean stop;
 
-    public RedisQueueMQ(String name,RedisTemplate redisTemplate) {
+    public RedisQueueMQ(String name,RedisTemplate<String,V> redisTemplate) {
         this.name=name;
         this.stop=false;
         this.redisTemplate=redisTemplate;
     }
 
-    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory){
+    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory,Class<V> clazz){
         this.name=name;
         this.stop=false;
-        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory);
+        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory,clazz);
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory){
-        RedisTemplate redisTemplate=new RedisTemplate();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(DEFAULT_KEY_SERIALIZER);
-        redisTemplate.setHashKeySerializer(DEFAULT_KEY_SERIALIZER);
-        redisTemplate.setValueSerializer(DEFAULT_VALUE_SERIALIZER);
-        redisTemplate.setHashValueSerializer(DEFAULT_VALUE_SERIALIZER);
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory,Class<V> clazz){
+        if(String.class.isAssignableFrom(clazz)){
+            return RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
+        }else if(Serializable.class.isAssignableFrom(clazz)){
+            return RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
+        } else{
+            return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory,clazz);
+        }
     }
 
     @Override
-    public void send(Object data) {
+    public void send(V data) {
         redisTemplate.opsForList().leftPush(name,data);
     }
 
     @Override
-    public void sendBatch(List dataList) {
+    public void sendBatch(List<V> dataList) {
         redisTemplate.opsForList().leftPushAll(name,dataList);
     }
 
@@ -87,7 +81,7 @@ public abstract class RedisQueueMQ implements RedisMQ{
         public static void init(RedisQueueMQ redisQueueMQ){
             POOL.execute(()->{
                 ListOperations listOperations= redisQueueMQ.redisTemplate.opsForList();
-                long timeout=((LettuceConnectionFactory)redisQueueMQ.redisTemplate.getConnectionFactory()).getClientConfiguration().getCommandTimeout().getSeconds();
+                long timeout=((LettuceConnectionFactory)redisQueueMQ.redisTemplate.getConnectionFactory()).getTimeout();
                 while(!redisQueueMQ.stop){
                     try {
                         Object data = listOperations.rightPop(redisQueueMQ.name, timeout / 2, TimeUnit.MILLISECONDS);
@@ -101,8 +95,7 @@ public abstract class RedisQueueMQ implements RedisMQ{
                             });
                         }
                     } catch (Exception e) {
-                        logger.error("Redis Queue["+redisQueueMQ.name+"] Stop", e);
-                        break;
+                        logger.error("Redis Queue["+redisQueueMQ.name+"] Cycle Error", e);
                     }
                 }
             });

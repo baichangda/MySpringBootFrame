@@ -7,13 +7,13 @@ public interface RedisMQ<V> {
      * 发送信息到mq
      * @param data
      */
-    void send(Object data);
+    void send(V data);
 
     /**
      * 批量发送信息到mq
      * @param dataList
      */
-    void sendBatch(List dataList);
+    void sendBatch(List<V> dataList);
 
     /**
      * 当有消息时候回调方法

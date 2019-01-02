@@ -6,7 +6,7 @@ import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.cluster.TaskUtil;
+import com.bcd.sys.task.TaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
