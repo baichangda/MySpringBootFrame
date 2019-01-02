@@ -96,6 +96,7 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
                         }
                     } catch (Exception e) {
                         logger.error("Redis Queue["+redisQueueMQ.name+"] Cycle Error", e);
+                        return;
                     }
                 }
             });
