@@ -23,7 +23,6 @@ import java.util.*;
  * @see #NullParamSqlReplaceVisitor(String, List)
  * 2、JdbcNamedParameter格式,参数以 :param1 方式传递
  * @see #NullParamSqlReplaceVisitor(String, Map)
- * 参数中val不支持数组,只支持List
  *
  * 性能方面:
  * 根据sql的复杂程度,sql越复杂,性能越低

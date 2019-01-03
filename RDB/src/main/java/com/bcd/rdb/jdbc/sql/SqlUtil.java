@@ -86,7 +86,7 @@ public class SqlUtil {
         Map<String,Object> newParamMap=new LinkedHashMap<>();
         //2、循环参数map
         //去除Null元素
-        //去除val为List类型且为empty的元素,List中的Null元素也会被移除
+        //去除val为List或Array类型且为空的元素,List或者Array中的Null元素也会被移除
         paramMap.forEach((k,v)->{
             if(v!=null){
                 if(v instanceof List){
