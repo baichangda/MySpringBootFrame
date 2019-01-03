@@ -19,6 +19,11 @@ import java.time.Duration;
 @EnableCaching
 @Configuration
 public class CacheConfig {
+    @Bean("cacheRedisSerializer")
+    public RedisSerializer<String> redisSerializer(){
+        return new Jackson2JsonRedisSerializer(Object.class);
+    }
+
     /**
      * 定义两级缓存
      * 一级:过期的concurrentHashMap(过期时间5s);  key: myCache_1::${key}
@@ -26,7 +31,7 @@ public class CacheConfig {
      * @return
      */
     @Bean("myCache")
-    public MultiLevelCache filterCache(RedisConnectionFactory factory,@Qualifier("cacheRedisSerializer")RedisSerializer redisSerializer){
+    public MultiLevelCache filterCache(RedisConnectionFactory factory,@Qualifier("cacheRedisSerializer")RedisSerializer<String> redisSerializer){
         RedisCacheManager redisCacheManager=new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()
@@ -40,8 +45,5 @@ public class CacheConfig {
         return cache;
     }
 
-    @Bean("cacheRedisSerializer")
-    public RedisSerializer<String> redisSerializer(){
-        return new Jackson2JsonRedisSerializer(Object.class);
-    }
+
 }
