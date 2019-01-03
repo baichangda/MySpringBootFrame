@@ -59,9 +59,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         Subject currentUser = SecurityUtils.getSubject();
         //4、进行登录操作
         currentUser.login(token);
-        //5、设置过期时间
-        currentUser.getSession().setTimeout(-1000l);
-        //6、设置用户信息到session中
+        //5、设置用户信息到session中
         UserBean user= findOne(
                 new StringCondition("username",username, StringCondition.Handler.EQUAL)
         );
