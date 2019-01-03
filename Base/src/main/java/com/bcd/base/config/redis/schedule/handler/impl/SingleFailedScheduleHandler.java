@@ -11,6 +11,11 @@ import org.springframework.lang.Nullable;
 
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果
+ *
+ * 原理:
+ * 1、到达任务时间点,集群多个实例开始争夺redis锁
+ * 2、获取到锁的实例开始执行任务,并设置标记redis锁状态,时间为aliveTime
+ * 3、其他实例会直接不执行任务
  */
 @SuppressWarnings("unchecked")
 public class SingleFailedScheduleHandler extends RedisScheduleHandler {
@@ -18,8 +23,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     private final static Long DEFAULT_ALIVE_TIME=2000L;
 
     /**
-     * 任务执行超时时间(请确保任务执行时间不会超过此时间)
-     * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
+     * 锁获取后存活时间
      * 单位(毫秒)
      */
     private long aliveTime;
