@@ -12,5 +12,5 @@ public class MessageDefine {
 
    public final static ErrorMessage ERROR_CHANGE_LOCALE= ErrorMessage.getMessage(I18NData.getI18NData("I18NController.changeLocale.FAILED"));
 
-   public final static Message SUCCESS_CHANGE_LOCALE= Message.getMessage(I18NData.getI18NData("I18NController.changeLocale.SUCCESSED"));
+   public final static Message SUCCESS_CHANGE_LOCALE= Message.getMessage(I18NData.getI18NData("I18NController.changeLocale.SUCCEEDED"));
 }
