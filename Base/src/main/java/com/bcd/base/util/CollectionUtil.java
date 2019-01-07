@@ -135,10 +135,8 @@ public class CollectionUtil {
             }
             Set<K> removeKeySet=new HashSet<>();
             map.forEach((k,v)->{
-                if(predicate!=null){
-                    if(predicate.test(k,v)){
-                        removeKeySet.add(k);
-                    }
+                if(predicate!=null&&predicate.test(k,v)){
+                    removeKeySet.add(k);
                 }
             });
             removeKeySet.forEach(k->map.remove(k));

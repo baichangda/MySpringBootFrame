@@ -34,7 +34,7 @@ public class IPUtil {
         String XFor = request.getHeader("X-Forwarded-For");
         if(StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)){
             //多次反向代理后会有多个ip值，第一个ip才是真实ip
-            int index = XFor.indexOf(",");
+            int index = XFor.indexOf(',');
             if(index != -1){
                 return XFor.substring(0,index);
             }else{

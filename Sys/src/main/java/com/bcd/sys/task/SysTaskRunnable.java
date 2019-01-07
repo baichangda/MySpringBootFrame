@@ -40,6 +40,7 @@ public class SysTaskRunnable implements Runnable{
                 Thread.sleep(10L);
             } catch (InterruptedException e) {
                 //忽略打断等待结果加入future结果集的请求
+                Thread.currentThread().interrupt();
             }
         }
         //2、如果检测到已经打断,则移除future并直接返回(因为步骤1的打断是忽略的)

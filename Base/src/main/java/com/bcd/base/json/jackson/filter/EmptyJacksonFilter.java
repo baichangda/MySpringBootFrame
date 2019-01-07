@@ -19,14 +19,14 @@ public class EmptyJacksonFilter implements PropertyFilter{
         writer.serializeAsElement(elementValue, gen, prov);
     }
 
-    @Override
+    /** @deprecated */
     @Deprecated
+    @Override
     public void depositSchemaProperty(PropertyWriter writer, ObjectNode propertiesNode, SerializerProvider provider) throws JsonMappingException {
         writer.depositSchemaProperty(propertiesNode, provider);
     }
 
     @Override
-    @Deprecated
     public void depositSchemaProperty(PropertyWriter writer, JsonObjectFormatVisitor objectVisitor, SerializerProvider provider) throws JsonMappingException {
         writer.depositSchemaProperty(objectVisitor, provider);
     }

@@ -15,13 +15,15 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserService  extends BaseService<UserBean,Long> {
+
+    private final static Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private MyShiroRealm myShiroRealm;
@@ -121,27 +125,29 @@ public class UserService  extends BaseService<UserBean,Long> {
 
 
     public static void main(String [] args){
-        String pwd="123qwe";
-        String publicKeyStr="MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAighwVytpiItt2nqesNkS12uxr575syUJXk+bwZqQteRCgCRfOjV+bCrLNTEAP4JozyAzbTYF8lEbOn86V5nq9SDqxBCN/+m6kysGrGOTFcHbBA8oCdykhgMUdok7rUBu2b4TLy29dYg9560xsku1g4i4+P8cv0Z2+T7TgeqaganlGQF5wJZ3NmIvVztSTn8HLLZOyy6QHQh1xTeYOq+3O9GbOUwwJK3i62115V2jHWhykhlt+wxkq5YSQGsZzT0VDevjfDZa37QWySitBg9K1YwC5Rqfe3tA+ezPR8yfj/cm2eOeeZw1gPohDy1CNuCDUUMlu8qr5PGBUq99Hdd2wQIDAQAB";
-        String privateKeyStr="";
-        PublicKey publicKey= RSASecurity.restorePublicKey(Base64.decodeBase64(publicKeyStr));
+        String username="admin";
+        String password="123qwe";
         // 加密
-        byte[] encodedText = RSASecurity.encode(publicKey, pwd.getBytes());
-        System.out.println("RSA encoded: " + Base64.encodeBase64String(encodedText));
+        String encodedText = Base64.encodeBase64String(RSASecurity.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
+
+        System.out.println(String.format("RSA encoded: %s",encodedText));
+
+        //数据库密码
+        String dbPwd=new Md5Hash(password,username).toBase64();
+        System.out.println(String.format("dbPwd: %s",dbPwd));
 
         // 解密
-//        PrivateKey privateKey = RSASecurity.restorePrivateKey(Base64.decodeBase64(privateKeyStr));
-//        System.out.println("RSA decoded: "
-//                + RSASecurity.decode(privateKey, Base64.decodeBase64(Base64.encodeBase64String(encodedText))));
+        String decodedText=RSASecurity.decode(KeysConst.PRIVATE_KEY, Base64.decodeBase64(encodedText));
+        System.out.println(String.format("RSA decoded: %s",decodedText));
     }
 
     public void resetPassword(Long userId) {
         //1、重置密码
         UserBean userBean= findById(userId);
         //2、设置默认密码
-        update(new NumberCondition("id",userId),new HashMap<String,Object>(){{
-            put("password",encryptPassword(userBean.getUsername(),CommonConst.INITIAL_PASSWORD));
-        }});
+        Map<String,Object> paramMap=new HashMap<>();
+        paramMap.put("password",encryptPassword(userBean.getUsername(),CommonConst.INITIAL_PASSWORD));
+        update(new NumberCondition("id",userId),paramMap);
     }
 
     public void runAs(Long ... ids) {
@@ -151,7 +157,7 @@ public class UserService  extends BaseService<UserBean,Long> {
         }
         List<UserBean> userBeanList= findAllById(ids);
         SimplePrincipalCollection simplePrincipalCollection=new SimplePrincipalCollection();
-        simplePrincipalCollection.add(userBeanList.stream().map(e->e.getUsername()).collect(Collectors.toList()),myShiroRealm.getName());
+        simplePrincipalCollection.add(userBeanList.stream().map(UserBean::getUsername).collect(Collectors.toList()),myShiroRealm.getName());
         subject.runAs(simplePrincipalCollection);
     }
 

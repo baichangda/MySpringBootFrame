@@ -35,10 +35,10 @@ public class StopSysTaskListener extends RedisTopicMQ<JsonNode>{
         });
         //3、推送结果map和code到redis中,给请求的源服务器接收
         if(resultMap.size()>0){
-            redisTemplate.convertAndSend(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL,new HashMap<String,Object>(){{
-                put("result",resultMap);
-                put("code",code);
-            }});
+            Map<String,Object> dataMap=new HashMap<>();
+            dataMap.put("result",resultMap);
+            dataMap.put("code",code);
+            redisTemplate.convertAndSend(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL,dataMap);
         }
     }
 }

@@ -84,6 +84,7 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
        return WebUtils.toHttp(request).getHeader(sessionHeaderKeyName);
     }
 
+    @Override
     protected Session createExposedSession(Session session, SessionContext context) {
         if (!WebUtils.isWeb(context)) {
             return super.createExposedSession(session, context);
@@ -94,6 +95,7 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
         return new DelegatingSession(this, key);
     }
 
+    @Override
     protected Session createExposedSession(Session session, SessionKey key) {
         if (!WebUtils.isWeb(key)) {
             return super.createExposedSession(session, key);

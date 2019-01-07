@@ -1,5 +1,7 @@
 package com.bcd.config.websocket.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -13,6 +15,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint(value = "/carRealTimeWebSocket")
 @Component
 public class CarRealTimeWebSocket {
+
+    private final static Logger logger= LoggerFactory.getLogger(CarRealTimeWebSocket.class);
+
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     private final static CopyOnWriteArraySet<CarRealTimeWebSocket> webSocketSet = new CopyOnWriteArraySet<CarRealTimeWebSocket>();
 
@@ -41,7 +46,7 @@ public class CarRealTimeWebSocket {
      * @param message 客户端发送过来的消息*/
     @OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("来自客户端的消息:" + message);
+        logger.debug("来自客户端的消息: {}" , message);
 
         //群发消息
         for (CarRealTimeWebSocket item : webSocketSet) {
@@ -61,7 +66,7 @@ public class CarRealTimeWebSocket {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        System.out.println("发生错误");
+        logger.error("发生错误");
         error.printStackTrace();
     }
 

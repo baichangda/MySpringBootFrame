@@ -2,10 +2,13 @@ package com.bcd.base.i18n;
 
 import com.bcd.base.util.I18nUtil;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class I18NData {
+public class I18NData implements Serializable{
+    private static final long serialVersionUID = 1L;
     private String key;
     private Object[] params;
 
@@ -26,7 +29,7 @@ public class I18NData {
         return params;
     }
 
-    public void setParams(Object[] params) {
+    public void setParams(Serializable[] params) {
         this.params = params;
     }
 

@@ -34,6 +34,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      * @param session
      * @return
      */
+    @Override
     protected Serializable doCreate(Session session) {
         Serializable sessionId= super.doCreate(session);
         //在这里创建session到redis中
@@ -46,6 +47,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      * @param sessionId
      * @return
      */
+    @Override
     protected Session doReadSession(Serializable sessionId) {
         Session session= super.doReadSession(sessionId);
         if(session==null){
@@ -60,6 +62,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      * 更新session
      * @param session
      */
+    @Override
     protected void doUpdate(Session session) {
         super.doUpdate(session);
         //这里更新redis用户信息过期时间
@@ -79,6 +82,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
      * 删除session
      * @param session
      */
+    @Override
     protected void doDelete(Session session) {
         super.doDelete(session);
         //这里从redis里面移除

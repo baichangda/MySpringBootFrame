@@ -14,12 +14,10 @@ import javax.persistence.criteria.*;
 public class NullConditionConverter implements Converter<NullCondition,Predicate> {
     @Override
     public Predicate convert(NullCondition condition, Object... exts) {
-        Predicate predicate=null;
+        Predicate predicate;
         NullCondition.Handler handler= condition.handler;
-        Object val=condition.val;
         String fieldName=condition.fieldName;
         Root root=(Root)exts[0];
-        CriteriaQuery query=(CriteriaQuery)exts[1];
         CriteriaBuilder cb=(CriteriaBuilder)exts[2];
         Path path = ConditionUtil.parseRootPath(root,fieldName);
         switch (handler) {

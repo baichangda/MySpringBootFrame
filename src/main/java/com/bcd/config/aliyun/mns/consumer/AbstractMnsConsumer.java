@@ -16,7 +16,7 @@ import java.util.List;
 
 
 public abstract class AbstractMnsConsumer implements Runnable{
-    private Logger LOGGER = LoggerFactory.getLogger(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final int BATCH_NUM = 10;
 
@@ -41,7 +41,7 @@ public abstract class AbstractMnsConsumer implements Runnable{
         while (true) {
             try {
                 List<Message> messages = queue.batchPopMessage(BATCH_NUM);
-                if (messages != null && messages.size() != 0) {
+                if (messages != null && !messages.isEmpty()) {
                     //消费消息
                     for (Message msg : messages) {
                         handle(msg);
@@ -51,11 +51,10 @@ public abstract class AbstractMnsConsumer implements Runnable{
                 }
                 Thread.sleep(100L);
             } catch (ServiceException se) {
-                LOGGER.error("----MNS----   RequestId:[" + se.getRequestId() + "], ErrorCode:[" + se.getErrorCode() + "], message" + se.getMessage());
-                continue;
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
+                logger.error("----MNS----   RequestId:{}, ErrorCode:{}, message {}" ,se.getRequestId(),se.getErrorCode(),se.getMessage());
+            } catch (InterruptedException e) {
+                logger.warn("Mns Interrupted",e);
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -104,7 +103,7 @@ public abstract class AbstractMnsConsumer implements Runnable{
             subscriptionMeta.setSubscriptionName(subscriptionName);
             subscriptionMeta.setNotifyContentFormat(SubscriptionMeta.NotifyContentFormat.SIMPLIFIED);
             //此属性会在推送时候进行过滤,仅推送Message的FilterTag和当前订阅FilterTag一致的消息
-//            subscriptionMeta.setFilterTag("filterTag");
+            subscriptionMeta.setFilterTag("filterTag");
             //3.2、绑定订阅与队列和topic关系
             subscriptionMeta.setEndpoint(topic.generateQueueEndpoint(queueName));
             //3.3、创建订阅

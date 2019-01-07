@@ -48,7 +48,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
             try {
                 return toStoreValue(valueLoader.call());
             }
-            catch (Throwable ex) {
+            catch (Exception ex) {
                 throw new ValueRetrievalException(key, valueLoader, ex);
             }
         },this.aliveTime));

@@ -3,6 +3,8 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
 import com.bcd.base.exception.BaseRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
+
+    private final static Logger logger= LoggerFactory.getLogger(ClusterFailedScheduleHandler.class);
 
     /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
@@ -144,7 +148,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                 }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Cluster Schedule Interrupted",e);
+            Thread.currentThread().interrupt();
             return false;
         }
     }

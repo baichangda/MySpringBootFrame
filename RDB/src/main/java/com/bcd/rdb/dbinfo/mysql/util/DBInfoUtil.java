@@ -31,17 +31,17 @@ public class DBInfoUtil {
             Map<String, Object> props = new HashMap<>();
             Yaml yaml = new Yaml();
             //1、加载spring配置
-            LinkedHashMap dataMap = (LinkedHashMap) yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
+            LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
             LinkedHashMap springMap = (LinkedHashMap) dataMap.get("spring");
             LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
             //1.1、取出配置文件后缀
             String suffix = springMap.get("profiles.active").toString();
             if (!StringUtils.isEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
-                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf(".")) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf(".") + 1);
+                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf(".")) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
                 Path activePath = Paths.get(activePathStr);
                 if (Files.exists(activePath)) {
-                    dataMap = (LinkedHashMap) yaml.load(new FileInputStream(activePath.toFile()));
+                    dataMap = yaml.load(new FileInputStream(activePath.toFile()));
                     springMap = (LinkedHashMap) dataMap.get("spring");
                     dataSourceMap = (LinkedHashMap) springMap.get("datasource");
                 }
@@ -51,7 +51,7 @@ public class DBInfoUtil {
             String username = dataSourceMap.get("username").toString();
             String password = dataSourceMap.get("password").toString();
             String pre = url.substring(0, url.indexOf("?"));
-            String propDbName = pre.substring(pre.lastIndexOf("/") + 1);
+            String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
             props.put("url", dbInfoUrl);
             props.put("dbName", propDbName);

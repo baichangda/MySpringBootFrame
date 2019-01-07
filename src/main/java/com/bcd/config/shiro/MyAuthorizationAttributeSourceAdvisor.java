@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
  */
 @SuppressWarnings("unchecked")
 public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPointcutAdvisor {
-    private static final Logger log = LoggerFactory.getLogger(AuthorizationAttributeSourceAdvisor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyAuthorizationAttributeSourceAdvisor.class);
 
     private static final Class<? extends Annotation>[] AUTHZ_ANNOTATION_CLASSES =
             new Class[] {

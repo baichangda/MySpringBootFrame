@@ -71,14 +71,15 @@ public class CodeConst {
         PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("short","1");
     }
 
-    public final static Set<String> IGNORE_PARAM_NAME=new HashSet<String>(){{
-        add("createTime");
-        add("updateTIme");
-        add("createUserId");
-        add("createUserName");
-        add("updateUserId");
-        add("updateUserName");
-        add("createIp");
-        add("updateIp");
-    }};
+    public final static Set<String> IGNORE_PARAM_NAME=new HashSet<>();
+    static{
+        IGNORE_PARAM_NAME.add("createTime");
+        IGNORE_PARAM_NAME.add("updateTIme");
+        IGNORE_PARAM_NAME.add("createUserId");
+        IGNORE_PARAM_NAME.add("createUserName");
+        IGNORE_PARAM_NAME.add("updateUserId");
+        IGNORE_PARAM_NAME.add("updateUserName");
+        IGNORE_PARAM_NAME.add("createIp");
+        IGNORE_PARAM_NAME.add("updateIp");
+    }
 }

@@ -8,7 +8,6 @@ public class AliyunProperties {
     public String accessKeyId;
     public String accessKeySecret;
     public RocketMqProperties rocketMq;
-    public TableStoreProperties tableStore;
     public MnsProperties mns;
     public SmsProperties sms;
     public OSSProperties oss;
@@ -36,14 +35,6 @@ public class AliyunProperties {
 
     public void setRocketMq(RocketMqProperties rocketMq) {
         this.rocketMq = rocketMq;
-    }
-
-    public TableStoreProperties getTableStore() {
-        return tableStore;
-    }
-
-    public void setTableStore(TableStoreProperties tableStore) {
-        this.tableStore = tableStore;
     }
 
     public MnsProperties getMns() {

@@ -111,7 +111,7 @@ public class JsonUtil {
      */
     public static SimpleFilterBean[] combineFilters(SimpleFilterBean... filters) {
         if(filters==null||filters.length==0){
-            return null;
+            return new SimpleFilterBean[0];
         }
         return Arrays.stream(filters).filter(e->e!=null).reduce(new HashMap<String,SimpleFilterBean>(),(res,filter)->{
             String key = filter.getClazz().getName();
@@ -145,7 +145,7 @@ public class JsonUtil {
     public static SimpleFilterBean[] parseJsonFiltersByParam(Class clazz, String... filterStrs) {
         //1、非空验证
         if (filterStrs == null || filterStrs.length == 0) {
-            return null;
+            return new SimpleFilterBean[0];
         }
         //2、构造过滤器集合，供返回
         Map<String, SimpleFilterBean> filterMap = new HashMap<>();
@@ -218,7 +218,7 @@ public class JsonUtil {
 
         //12、返回结果集
         if(filterMap.size()==0){
-            return null;
+            return new SimpleFilterBean[0];
         }
         return filterMap.values().stream().toArray(SimpleFilterBean[]::new);
     }
@@ -237,7 +237,7 @@ public class JsonUtil {
      */
     public static SimpleFilterBean[] parseJsonFiltersByParam(Object[]... paramArr) {
         if (paramArr == null || paramArr.length == 0) {
-            return null;
+            return new SimpleFilterBean[0];
         }
         List<SimpleFilterBean> SimpleFilterBeanList = new ArrayList<>();
         //1、循环调用生成filter数组
@@ -252,7 +252,7 @@ public class JsonUtil {
         }
         //2、合并多次调用的返回结果,将相同类的filter整合在一起
         if(SimpleFilterBeanList.size()==0){
-            return null;
+            return new SimpleFilterBean[0];
         }
         Map<String, SimpleFilterBean> filterMap = SimpleFilterBeanList.stream().collect(Collectors.toMap(
                 (filter) -> filter.getClazz().getName(),
@@ -264,7 +264,7 @@ public class JsonUtil {
         ));
         //3、返回结果集
         if(filterMap.size()==0){
-            return null;
+            return new SimpleFilterBean[0];
         }
         return filterMap.values().stream().toArray(SimpleFilterBean[]::new);
     }

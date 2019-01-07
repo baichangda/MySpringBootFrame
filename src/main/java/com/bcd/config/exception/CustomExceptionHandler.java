@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 @SuppressWarnings("unchecked")
 public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
-    protected final static Logger logger = LoggerFactory.getLogger(CustomExceptionHandler.class);
+    private final static Logger logger = LoggerFactory.getLogger(CustomExceptionHandler.class);
     private ExceptionResponseHandler handler;
 
     public CustomExceptionHandler(ExceptionResponseHandler handler) {

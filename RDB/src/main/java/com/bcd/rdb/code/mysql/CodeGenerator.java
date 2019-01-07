@@ -7,9 +7,6 @@ import com.bcd.rdb.code.Config;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -80,7 +77,7 @@ public class CodeGenerator {
                             }
                             //1、先创建对应的文件
                             Path sub = file.subpath(templateDirPathObj.getNameCount(), file.getNameCount());
-                            StringBuffer newPath = new StringBuffer();
+                            StringBuilder newPath = new StringBuilder();
                             newPath.append(dirPath.toString());
                             newPath.append(File.separator);
                             newPath.append(sub.toString());
@@ -232,7 +229,7 @@ public class CodeGenerator {
      * @param config
      */
     private static void initPackage(TableConfig config) {
-        StringBuffer springSrcPathSb=new StringBuffer();
+        StringBuilder springSrcPathSb=new StringBuilder();
         springSrcPathSb.append("src");
         springSrcPathSb.append(File.separatorChar);
         springSrcPathSb.append("main");
@@ -245,7 +242,7 @@ public class CodeGenerator {
             String pgk = descDirPath.split(springSrcPath)[1].replaceAll(File.separator, ".");
             config.getValueMap().put("package", pgk);
             if(config.getRequestMappingPre()==null){
-                config.getValueMap().put("requestMappingPre","/"+pgk.substring(pgk.lastIndexOf(".")+1));
+                config.getValueMap().put("requestMappingPre","/"+pgk.substring(pgk.lastIndexOf('.')+1));
             }
         }
     }
@@ -340,8 +337,8 @@ public class CodeGenerator {
         Set<String> ignoreColumnSet = (Set<String>) config.getDataMap().get("ignoreColumnSet");
         String blank = "    ";
         List<JavaColumn> javaColumnList = (List<JavaColumn>) config.getDataMap().get("fieldList");
-        StringBuffer fieldSb = new StringBuffer();
-        StringBuffer methodSb = new StringBuffer();
+        StringBuilder fieldSb = new StringBuilder();
+        StringBuilder methodSb = new StringBuilder();
         for (JavaColumn javaColumn : javaColumnList) {
             if (ignoreColumnSet.contains(javaColumn.getName())) {
                 continue;
@@ -350,7 +347,7 @@ public class CodeGenerator {
             String columnCommentPre;
             StringBuilder fieldValidateInfo=new StringBuilder();
             if(columnComment.contains("(")){
-                columnCommentPre=columnComment.substring(0,columnComment.indexOf("("));
+                columnCommentPre=columnComment.substring(0,columnComment.indexOf('('));
             }else{
                 columnCommentPre=columnComment;
             }

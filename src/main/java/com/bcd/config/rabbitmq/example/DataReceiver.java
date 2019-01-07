@@ -3,6 +3,8 @@ package com.bcd.config.rabbitmq.example;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 import java.io.File;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 
 public class DataReceiver {
+    private final static Logger logger= LoggerFactory.getLogger(DataReceiver.class);
     @RabbitListener(queues = "dataQueue")
     public void process(Map<String,Object> data) {
         String dataStr= null;
@@ -21,25 +24,6 @@ public class DataReceiver {
         } catch (JsonProcessingException e) {
             throw BaseRuntimeException.getException(e);
         }
-        System.out.println("Receiver  : " + dataStr);
-        saveDataToFile(dataStr);
+        logger.debug("Receiver  : {}" , dataStr);
     }
-
-    private void saveDataToFile(String data) {
-        File file = new File("d:/ldData.txt");
-        if (file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try (PrintWriter pw = new PrintWriter(new FileWriter(file, true))) {
-            pw.println(data);
-            pw.flush();
-        } catch (IOException e) {
-
-        }
-    }
-
 }

@@ -72,7 +72,7 @@ public abstract class RedisTopicMQ<V> implements RedisMQ<V> {
 
     @Override
     public void sendBatch(List<V> dataList) {
-        dataList.forEach(data->send(data));
+        dataList.forEach(this::send);
     }
 
     @Override

@@ -216,7 +216,7 @@ public class BaseService<T,K extends Serializable>{
             }
         }else{
             Set<K> idSet= Arrays.stream(excludeIds).collect(Collectors.toSet());
-            List filterList=resultList.stream().filter(e->!idSet.contains(e)).collect(Collectors.toList());
+            List filterList=resultList.stream().filter(e->!idSet.contains(MongoUtil.getPKVal(e))).collect(Collectors.toList());
             if (filterList!=null&&filterList.size()>0){
                 flag= false;
             }

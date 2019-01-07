@@ -1,6 +1,8 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,8 @@ import java.util.*;
  *
  */
 public class DateUtil {
+
+    private final static Logger logger= LoggerFactory.getLogger(DateUtil.class);
 
     public final static String DATE_FORMAT_DAY="yyyy-MM-dd";
     public final static String DATE_FORMAT_SECOND="yyyy-MM-dd HH:mm:ss";
@@ -77,7 +81,6 @@ public class DateUtil {
         ZonedDateTime zdt=ZonedDateTime.ofInstant(date.toInstant(),zoneId);
         if(unit.ordinal()<=ChronoUnit.DAYS.ordinal()){
             zdt=zdt.truncatedTo(unit);
-
         }else{
             zdt=zdt.truncatedTo(ChronoUnit.DAYS);
             switch (unit){
@@ -88,6 +91,9 @@ public class DateUtil {
                 case YEARS:{
                     zdt=zdt.withDayOfMonth(1);
                     zdt=zdt.withMonth(1);
+                    break;
+                }
+                default:{
                     break;
                 }
             }
@@ -129,6 +135,9 @@ public class DateUtil {
                     zdt=zdt.withDayOfMonth(1);
                     zdt=zdt.withMonth(1);
                     zdt=zdt.plusYears(1);
+                    break;
+                }
+                default:{
                     break;
                 }
             }
@@ -304,7 +313,7 @@ public class DateUtil {
         if(!Arrays.stream(units).anyMatch(e->e==unit)){
             throw BaseRuntimeException.getException("[DateUtil.getDateNum],ChronoUnit["+unit.toString()+"] Not Support!");
         }
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         ZonedDateTime zdt=ZonedDateTime.ofInstant(date.toInstant(),zoneId);
         int unitIndex=unit.ordinal();
         if(unitIndex<=ChronoUnit.YEARS.ordinal()){
@@ -366,8 +375,8 @@ public class DateUtil {
         ZoneId zoneId2= ZoneId.of("+8");
         ZonedDateTime zdt1=LocalDateTime.of(1988,6,30,11,11).atZone(zoneId1);
         ZonedDateTime zdt2=LocalDateTime.of(1988,6,30,11,11).atZone(zoneId2);
-        System.out.println(zdt1.toInstant().toEpochMilli());
-        System.out.println(zdt2.toInstant().toEpochMilli());
-        System.out.println(OffsetDateTime.now().getOffset());
+        logger.debug("{}",zdt1.toInstant().toEpochMilli());
+        logger.debug("{}",zdt2.toInstant().toEpochMilli());
+        logger.debug("{}",OffsetDateTime.now().getOffset());
     }
 }

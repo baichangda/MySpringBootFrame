@@ -5,6 +5,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
 import com.bcd.mongodb.test.bean.TestBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 public class CodeGenerator {
+
+    private final static Logger logger= LoggerFactory.getLogger(CodeGenerator.class);
 
     private final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/MongoDB/src/main/resources/template";
 
@@ -158,7 +162,7 @@ public class CodeGenerator {
             String pgk = formatDirPath.split(springSrcPath)[1].replaceAll("/", ".");
             collectionConfig.getValueMap().put("package", pgk);
             if(collectionConfig.getRequestMappingPre()==null){
-                collectionConfig.getValueMap().put("requestMappingPre","/"+pgk.substring(pgk.lastIndexOf(".")+1));
+                collectionConfig.getValueMap().put("requestMappingPre","/"+pgk.substring(pgk.lastIndexOf('.')+1));
             }
         }
     }
@@ -170,7 +174,7 @@ public class CodeGenerator {
      */
     private static void initPkType(CollectionConfig config){
         String pkType=((ParameterizedType) config.getClazz().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName();
-        config.getValueMap().put("pkType",pkType.substring(pkType.lastIndexOf(".")+1));
+        config.getValueMap().put("pkType",pkType.substring(pkType.lastIndexOf('.')+1));
     }
 
     /**
@@ -268,8 +272,8 @@ public class CodeGenerator {
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             //1、先创建对应的文件
                             Path sub = file.subpath(templateDirPathObj.getNameCount(), file.getNameCount());
-                            StringBuffer newPath = new StringBuffer();
-                            newPath.append(dirPath.toString());
+                            StringBuilder newPath = new StringBuilder();
+                            newPath.append(dirPath);
                             newPath.append(File.separator);
                             newPath.append(sub.toString());
                             String newPathStr = newPath.toString().replace(".txt", ".java").replace("Template", upperModuleName);
@@ -288,7 +292,7 @@ public class CodeGenerator {
                                 }
                                 pw.flush();
                             }
-                            System.out.println(newPathObj.toString() + " generate success!");
+                            logger.info("{} generate success!",newPathObj);
                             return FileVisitResult.CONTINUE;
                         }
 
@@ -303,10 +307,10 @@ public class CodeGenerator {
                         }
                     });
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error",e);
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("Error",e);
                 return;
             }
         }

@@ -24,11 +24,13 @@ public class MyProducerBean extends ProducerBean{
     }
 
     @PostConstruct
+    @Override
     public void start(){
         super.start();
     }
 
     @PreDestroy
+    @Override
     public void shutdown(){
         super.shutdown();
     }

@@ -1,6 +1,10 @@
 package com.bcd.base.map;
 
 
+import com.bcd.base.exception.BaseRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -21,6 +25,7 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unchecked")
 public class ExpireConcurrentMap<K,V> {
+    private final static Logger logger= LoggerFactory.getLogger(ExpireConcurrentMap.class);
     private final ConcurrentHashMap<K,ExpireValue<V>> dataMap=new ConcurrentHashMap<>();
 
     public ExpireConcurrentMap() {
@@ -32,7 +37,7 @@ public class ExpireConcurrentMap<K,V> {
             try {
                 expireValue.getCallback().accept(k, expireValue.getVal());
             }catch (Exception e){
-                e.printStackTrace();
+                throw BaseRuntimeException.getException(e);
             }
         }
     }
@@ -92,6 +97,9 @@ public class ExpireConcurrentMap<K,V> {
     }
 
     static class ExpireWorker {
+        private ExpireWorker() {
+        }
+
         /**
          * 用于存放所有的ExpireConcurrentMap的实例
          */
@@ -105,32 +113,29 @@ public class ExpireConcurrentMap<K,V> {
          */
         private static ExecutorService EXPIRE_WORK_POOL= Executors.newCachedThreadPool();
         static {
-            EXPIRE_SES.scheduleWithFixedDelay(()->{
-                EXPIRE_MAP_LIST.forEach(map->{
+            EXPIRE_SES.scheduleWithFixedDelay(()->
+                EXPIRE_MAP_LIST.forEach(map->
                     map.dataMap.forEach((k,v)->{
                         if(((ExpireValue)v).isExpired()){
                             map.dataMap.remove(k);
                             EXPIRE_WORK_POOL.execute(()-> map.callback(k,(ExpireValue) v));
                         }
-                    });
-                });
-            },1000L,1000L, TimeUnit.MILLISECONDS);
+                    })
+                )
+            ,1000L,1000L, TimeUnit.MILLISECONDS);
         }
     }
 
     public static void main(String [] args) throws InterruptedException {
         ExpireConcurrentMap<String,Object> map=new ExpireConcurrentMap<>();
-        BiConsumer biConsumer=(k,v)->System.out.println("已过期:"+k+"  "+v);
+        BiConsumer biConsumer=(k,v)->logger.debug("已过期:{} {}",k,v);
         map.put("a","a",1000L,biConsumer);
         map.put("b","b",5000L,biConsumer);
-        System.out.println(map.get("a"));
-        System.out.println(map.get("b"));
+        logger.debug((String)map.get("a"));
+        logger.debug((String)map.get("b"));
         Thread.sleep(1000L);
-//        System.out.println(map.get("a"));
-//        System.out.println(map.get("b"));
         Thread.sleep(5000L);
-//        System.out.println(map.get("a"));
-        System.out.println(map.get("b"));
+        logger.debug((String) map.get("b"));
     }
 
 }

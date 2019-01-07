@@ -33,15 +33,13 @@ public class SimpleJacksonFilter implements PropertyFilter{
                 Set<String> includes = filterBean.getIncludes();
                 Set<String> excludes = filterBean.getExcludes();
                 if (clazz == null || clazz.isAssignableFrom(pojo.getClass())) {
-                    if (includes.size() > 0) {
+                    if (!includes.isEmpty()) {
                         if (!includes.contains(writer.getName())) {
                             return false;
                         }
                     } else {
-                        if (excludes.size() > 0) {
-                            if (excludes.contains(writer.getName())) {
-                                return false;
-                            }
+                        if (!excludes.isEmpty()&&excludes.contains(writer.getName())) {
+                            return false;
                         }
                     }
                 }
@@ -65,6 +63,7 @@ public class SimpleJacksonFilter implements PropertyFilter{
         writer.serializeAsElement(elementValue, gen, prov);
     }
 
+    /** @deprecated */
     @Override
     @Deprecated
     public void depositSchemaProperty(PropertyWriter writer, ObjectNode propertiesNode, SerializerProvider provider) throws JsonMappingException {

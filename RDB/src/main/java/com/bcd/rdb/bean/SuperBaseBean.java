@@ -14,7 +14,7 @@ import java.io.Serializable;
 @JsonFilter("bcd")
 @MappedSuperclass
 @SuppressWarnings("unchecked")
-public abstract class SuperBaseBean<K> implements Serializable {
+public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
     @ApiModelProperty(value = "主键(唯一标识符,自动生成)(不需要赋值)")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,13 +4,14 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Administrator on 2017/4/11.
  */
 @MappedSuperclass
-public class BaseBean<K> extends SuperBaseBean<K> {
+public class BaseBean<K extends Serializable> extends SuperBaseBean<K> {
 
     @ApiModelProperty(value = "创建时间(不需要赋值)")
     private Date createTime;

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
-    private final static Logger logger=LoggerFactory.getLogger(RedisQueueMQ.class);
+    protected Logger logger=LoggerFactory.getLogger(this.getClass());
 
     protected String name;
 
@@ -68,6 +68,9 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
     }
 
     static class Worker{
+        private Worker() {
+        }
+
         /**
          * 从redis中遍历数据的线程池
          */
@@ -90,12 +93,12 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
                                 try {
                                     redisQueueMQ.onMessage(data);
                                 } catch (Exception e) {
-                                    logger.error(e.getMessage(), e);
+                                    redisQueueMQ.logger.error(e.getMessage(), e);
                                 }
                             });
                         }
                     } catch (Exception e) {
-                        logger.error("Redis Queue["+redisQueueMQ.name+"] Cycle Error", e);
+                        redisQueueMQ.logger.error("Redis Queue["+redisQueueMQ.name+"] Cycle Error", e);
                         return;
                     }
                 }

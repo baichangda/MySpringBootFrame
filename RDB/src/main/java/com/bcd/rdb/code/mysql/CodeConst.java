@@ -84,14 +84,15 @@ public class CodeConst {
         SUPPORT_PK_TYPE.add("Integer");
     }
 
-    public final static Set<String> IGNORE_FIELD_NAME =new HashSet<String>(){{
-        add("createTime");
-        add("updateTime");
-        add("createUserId");
-        add("createUserName");
-        add("updateUserId");
-        add("updateUserName");
-        add("createIp");
-        add("updateIp");
-    }};
+    public final static Set<String> IGNORE_FIELD_NAME =new HashSet<>();
+    static{
+        IGNORE_FIELD_NAME.add("createTime");
+        IGNORE_FIELD_NAME.add("updateTime");
+        IGNORE_FIELD_NAME.add("createUserId");
+        IGNORE_FIELD_NAME.add("createUserName");
+        IGNORE_FIELD_NAME.add("updateUserId");
+        IGNORE_FIELD_NAME.add("updateUserName");
+        IGNORE_FIELD_NAME.add("createIp");
+        IGNORE_FIELD_NAME.add("updateIp");
+    }
 }

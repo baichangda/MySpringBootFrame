@@ -56,7 +56,7 @@ public class DBColumn {
         JavaColumn javaColumn=new JavaColumn();
         String jName=name;
         int curIndex;
-        while((curIndex=jName.indexOf("_"))!=-1){
+        while((curIndex=jName.indexOf('_'))!=-1){
             jName=jName.substring(0,curIndex)+
                     jName.substring(curIndex+1,curIndex+2).toUpperCase()+
                     jName.substring(curIndex+2);

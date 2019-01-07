@@ -23,16 +23,14 @@ public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
         String[] usernames=((RequiresUserInfo)a).username();
         Logical logical=((RequiresUserInfo)a).logical();
         UserBean userBean= ShiroUtil.getCurrentUser();
-        Stream<Boolean> idStream= Arrays.stream(ids).mapToObj(e->e==userBean.getId());
-        Stream<Boolean> userNameStream= Arrays.stream(usernames).map(e->e.equals(userBean.getUsername()));
         if(logical==Logical.AND){
-            if((ids.length==0||idStream.allMatch(e->e)) &&
-                    (usernames.length==0||userNameStream.allMatch(e->e))){
+            if((ids.length==0||Arrays.stream(ids).mapToObj(e->e==userBean.getId()).allMatch(e->e)) &&
+                    (usernames.length==0||Arrays.stream(usernames).map(e->e.equals(userBean.getUsername())).allMatch(e->e))){
                 throw new AuthorizationException("");
             }
         }else if(logical==Logical.OR){
-            if((ids.length==0||idStream.anyMatch(e->e)) &&
-                    (usernames.length==0||userNameStream.anyMatch(e->e))){
+            if((ids.length==0||Arrays.stream(ids).mapToObj(e->e==userBean.getId()).anyMatch(e->e)) &&
+                    (usernames.length==0||Arrays.stream(usernames).map(e->e.equals(userBean.getUsername())).anyMatch(e->e))){
                 throw new AuthorizationException("");
             }
         }

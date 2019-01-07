@@ -91,7 +91,7 @@ public class BaseController {
      * @return
      */
     protected String toDateFileName(String fileName){
-        int index=fileName.lastIndexOf(".");
+        int index=fileName.lastIndexOf('.');
         long dateNum= DateZoneUtil.getDateNum(new Date(), ChronoUnit.MILLIS);
         if(index==-1){
             return fileName +"-"+ dateNum;

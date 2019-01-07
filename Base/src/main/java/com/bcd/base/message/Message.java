@@ -3,10 +3,13 @@ package com.bcd.base.message;
 import com.bcd.base.i18n.I18NData;
 import com.bcd.base.util.StringUtil;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class Message {
+public class Message implements Serializable{
+    private static final long serialVersionUID = 1L;
     protected String code;
     protected String msg;
     //对应的是message的I18NData

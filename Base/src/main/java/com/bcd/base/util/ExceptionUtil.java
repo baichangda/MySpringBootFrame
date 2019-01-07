@@ -45,7 +45,7 @@ public class ExceptionUtil {
      */
     public static void printException(Throwable throwable){
         Throwable realException=parseRealException(throwable);
-        realException.printStackTrace();
+        logger.error("Error",realException);
     }
 
     /**
@@ -55,6 +55,9 @@ public class ExceptionUtil {
      */
     public static JsonMessage toJsonMessage(Throwable throwable){
         Throwable realException=parseRealException(throwable);
+        if(realException==null){
+            throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
+        }
         if(realException instanceof BaseRuntimeException){
             return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode(),getStackTraceMessage(realException));
         }else if(realException instanceof ConstraintViolationException) {

@@ -27,7 +27,7 @@ public class ConditionUtil {
     }
     public static <T>Path parseRootPath(Root<T> root, String attrName){
         Path path=null;
-        if(attrName.indexOf(".")!=-1){
+        if(attrName.indexOf('.')!=-1){
             String [] attrArr=attrName.split("\\.");
             for(int i=0;i<=attrArr.length-1;i++){
                 if(path==null){

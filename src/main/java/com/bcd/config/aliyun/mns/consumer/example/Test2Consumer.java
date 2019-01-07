@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * 下行控制 车身数据信息 消费者
  */
 public class Test2Consumer extends AbstractMnsConsumer {
-    private Logger logger = LoggerFactory.getLogger(Test2Consumer.class) ;
+    private final static Logger logger = LoggerFactory.getLogger(Test2Consumer.class) ;
 
     public Test2Consumer(MNSClient mnsClient, AliyunProperties aliyunProperties) {
         super(mnsClient, aliyunProperties.mns.test2);

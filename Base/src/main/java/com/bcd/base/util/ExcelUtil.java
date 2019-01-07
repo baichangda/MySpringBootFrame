@@ -95,10 +95,13 @@ public class ExcelUtil {
      * @return
      */
     public static XSSFWorkbook exportExcel_2007(List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        XSSFWorkbook workBook = new XSSFWorkbook();
-        Sheet sheet = workBook.createSheet();
-        writeSheet(sheet,1,1,cellBiConsumer,dataList);
-        return workBook;
+        try(XSSFWorkbook workBook = new XSSFWorkbook()) {
+            Sheet sheet = workBook.createSheet();
+            writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
+            return workBook;
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     /**
@@ -107,10 +110,13 @@ public class ExcelUtil {
      * @return
      */
     public static HSSFWorkbook exportExcel_2003(List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        HSSFWorkbook workBook = new HSSFWorkbook();
-        Sheet sheet = workBook.createSheet();
-        writeSheet(sheet,1,1,cellBiConsumer,dataList);
-        return workBook;
+        try(HSSFWorkbook workBook = new HSSFWorkbook()) {
+            Sheet sheet = workBook.createSheet();
+            writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
+            return workBook;
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     /**
@@ -125,8 +131,8 @@ public class ExcelUtil {
      */
     public static void writeExcel(final Path sourcePath,final Path targetPath,final int sheetIndex, final int beginRowIndex, final int beginColIndex,BiConsumer<Cell,Object> cellBiConsumer, List<List> dataList){
         try (InputStream is = Files.newInputStream(sourcePath);
-             OutputStream os = Files.newOutputStream(targetPath)) {
-            Workbook workbook=WorkbookFactory.create(is);
+             OutputStream os = Files.newOutputStream(targetPath);
+             Workbook workbook=WorkbookFactory.create(is)) {
             if(sheetIndex>workbook.getNumberOfSheets()){
                 return;
             }
@@ -250,15 +256,14 @@ public class ExcelUtil {
 
     public static List<List> readExcel(final InputStream is,final int sheetIndex,final int beginRowIndex,final int beginColIndex,final int endColIndex,
                                        final Function<Row,Boolean> rowFunction,final Function<Cell,Object> cellFunction){
-        try {
-            Workbook workbook=WorkbookFactory.create(is);
+        try (Workbook workbook=WorkbookFactory.create(is)){
             if(sheetIndex>workbook.getNumberOfSheets()){
                 return new ArrayList<>();
             }
             Sheet sheet= workbook.getSheetAt(sheetIndex-1);
             return readExcel(sheet,beginRowIndex,beginColIndex,endColIndex,rowFunction,cellFunction);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw BaseRuntimeException.getException(e);
         }
     }
 
@@ -294,62 +299,5 @@ public class ExcelUtil {
 //                Arrays.asList("a","b","c","d","a","b","c","d","1","3")
 //        );
 //        overWriteExcel(Paths.get("/Users/baichangda/test.xlsx"),1,1,1,null,dataList);
-        doBoyu();
-    }
-
-    private static void doBoyu() throws IOException {
-        Path p1=Paths.get("/Users/baichangda/Downloads/1.txt");
-        Path p2=Paths.get("/Users/baichangda/Downloads/2.xlsx");
-        List<List> dataList=new ArrayList<>();
-        try(BufferedReader br=Files.newBufferedReader(p1, Charset.forName("UTF-8"))){
-            int index=1;
-            String line;
-            while((line=br.readLine())!=null){
-                if(index>1){
-                    String [] arr=line.split("\t");
-                    dataList.add(Arrays.asList(arr));
-                }
-                index++;
-            }
-        }
-
-        Map<String,List> map= dataList.stream().collect(Collectors.toMap(e->e.get(0).toString(),e->{
-            String no=e.get(0).toString();
-            String date=e.get(1).toString();
-            String type=e.get(2).toString();
-            String driverName="";
-            String vehicleNo="";
-            if("2".equals(type)){
-                type="预结算";
-            }else if("3".equals(type)){
-                type="已结算";
-            }else if("4".equals(type)){
-                type="已关账";
-            }
-
-            String json=e.get(3).toString();
-            double val1=0d;
-            double val2=0d;
-            try {
-                try {
-                    JsonNode jsonNode=JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(json);
-                    driverName = jsonNode.get("drivername").asText();
-                    vehicleNo = jsonNode.get("carnum").asText();
-                    val1 = jsonNode.get("dispatchSubsidy").asDouble();
-                    val2 = jsonNode.get("lifeSubsidy").asDouble();
-                }catch (NullPointerException e2){
-                    e2.printStackTrace();
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            return Arrays.asList(no,date,driverName,vehicleNo,type,val1,val2);
-        },(e1,e2)->{
-            return Arrays.asList(e1.get(0),e1.get(1),e1.get(2),e1.get(3),e1.get(4),(double)e1.get(5)+(double)e2.get(5),(double)e1.get(6)+(double)e2.get(6));
-        }));
-
-
-        writeExcel_2007(p2,map.values().stream().collect(Collectors.toList()),(cell,val)->inputValue(cell,val));
-
     }
 }

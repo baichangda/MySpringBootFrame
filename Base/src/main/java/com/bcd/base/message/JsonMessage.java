@@ -17,6 +17,7 @@ import java.io.Serializable;
  * @param <T>
  */
 public class JsonMessage<T> implements Serializable{
+    private static final long serialVersionUID = 1L;
     @ApiModelProperty("Api是否调用成功(true/false)")
     private boolean result;
     @ApiModelProperty("Api调用失败时提示信息")

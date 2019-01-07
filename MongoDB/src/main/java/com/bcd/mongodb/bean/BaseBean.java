@@ -4,12 +4,13 @@ package com.bcd.mongodb.bean;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Administrator on 2017/8/25.
  */
-public class BaseBean<K> extends SuperBaseBean<K>{
+public class BaseBean<K extends Serializable> extends SuperBaseBean<K>{
     @ApiModelProperty(value = "创建时间(不需要赋值)")
     private Date createTime;
 
