@@ -58,5 +58,4 @@ public class AnonymousController extends BaseController{
         return JsonMessage.success();
     }
 
-
 }
