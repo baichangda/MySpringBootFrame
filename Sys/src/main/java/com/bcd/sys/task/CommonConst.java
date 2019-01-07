@@ -1,6 +1,5 @@
 package com.bcd.sys.task;
 
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class CommonConst {
@@ -26,5 +25,5 @@ public class CommonConst {
     /**
      * 用来执行系统任务的线程池
      */
-    public static ThreadPoolExecutor SYS_TASK_POOL= (ThreadPoolExecutor)Executors.newFixedThreadPool(2) ;
+    public final static ThreadPoolExecutor SYS_TASK_POOL= (ThreadPoolExecutor)Executors.newFixedThreadPool(2) ;
 }

@@ -11,13 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -115,7 +110,7 @@ public class ApiService {
      */
     public String[] getApiMethods(Method method){
         RequestMapping methodRequestMapping=method.getAnnotation(RequestMapping.class);
-        return Arrays.stream(methodRequestMapping.method()).map(e->e.toString()).toArray(len->new String[len]);
+        return Arrays.stream(methodRequestMapping.method()).map(RequestMethod::toString).toArray(len->new String[len]);
     }
 
     /**

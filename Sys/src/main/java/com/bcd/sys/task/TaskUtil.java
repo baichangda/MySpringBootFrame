@@ -128,6 +128,7 @@ public class TaskUtil {
                 //3.7、根据返回的数据构造结果集(结果集不一定准确,因为有可能在规定时间之内没有收到结果,会判定为终止失败)
                 return Arrays.stream(ids).map(id->resultMap.getOrDefault(id,false)).toArray(len->new Boolean[len]);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw BaseRuntimeException.getException(e);
             }
         }

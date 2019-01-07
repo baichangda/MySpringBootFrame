@@ -19,7 +19,7 @@ public class CarRealTimeWebSocket {
     private final static Logger logger= LoggerFactory.getLogger(CarRealTimeWebSocket.class);
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private final static CopyOnWriteArraySet<CarRealTimeWebSocket> webSocketSet = new CopyOnWriteArraySet<CarRealTimeWebSocket>();
+    private final static CopyOnWriteArraySet<CarRealTimeWebSocket> webSocketSet = new CopyOnWriteArraySet<>();
 
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
@@ -53,7 +53,7 @@ public class CarRealTimeWebSocket {
             try {
                 item.sendMessage(message);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error",e);
             }
         }
     }
@@ -66,8 +66,7 @@ public class CarRealTimeWebSocket {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        logger.error("发生错误");
-        error.printStackTrace();
+        logger.error("Error",error);
     }
 
 

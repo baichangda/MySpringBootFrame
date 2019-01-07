@@ -9,7 +9,6 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class UserInfoAnnotationHandler extends AuthorizingAnnotationHandler {
 

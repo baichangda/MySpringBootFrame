@@ -24,10 +24,10 @@ public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler
     }
 
     @Override
-    public void assertAuthorized(Annotation a) throws AuthorizationException {
+    public void assertAuthorized(Annotation a){
         Subject subject = getSubject();
         Set<String> permissionSet=getActionPermission();
-        if(permissionSet==null||permissionSet.size()==0){
+        if(permissionSet==null||permissionSet.isEmpty()){
             return;
         }
         boolean flag=false;

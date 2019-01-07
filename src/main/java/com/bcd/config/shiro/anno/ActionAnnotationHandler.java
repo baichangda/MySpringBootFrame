@@ -1,7 +1,6 @@
 package com.bcd.config.shiro.anno;
 
 import com.bcd.base.config.shiro.anno.RequiresAction;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 import org.apache.shiro.subject.Subject;
 import org.springframework.util.StringUtils;
@@ -23,7 +22,7 @@ public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
     }
 
     @Override
-    public void assertAuthorized(Annotation a) throws AuthorizationException {
+    public void assertAuthorized(Annotation a){
         Subject subject = getSubject();
         /**
          * 此处使用拼装出的字符串『ClassName : MethodName』

@@ -29,7 +29,7 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
      * @throws AuthorizationException
      */
     @Override
-    protected void assertAuthorized(MethodInvocation methodInvocation) throws AuthorizationException {
+    protected void assertAuthorized(MethodInvocation methodInvocation){
         if(authorizationHandler.skip(methodInvocation)){
             return;
         }

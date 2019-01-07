@@ -6,6 +6,8 @@ import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.code.Config;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.*;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 public class CodeGenerator {
+    private final static Logger logger= LoggerFactory.getLogger(CodeGenerator.class);
     public static void generate(List<Config> configList) {
         configList.forEach(config -> generate(config));
     }
@@ -74,11 +77,14 @@ public class CodeGenerator {
                                         break;
                                     }
                                 }
+                                default:{
+                                    return FileVisitResult.CONTINUE;
+                                }
                             }
                             //1、先创建对应的文件
                             Path sub = file.subpath(templateDirPathObj.getNameCount(), file.getNameCount());
                             StringBuilder newPath = new StringBuilder();
-                            newPath.append(dirPath.toString());
+                            newPath.append(dirPath);
                             newPath.append(File.separator);
                             newPath.append(sub.toString());
                             String newPathStr = newPath.toString().replace(".txt", ".java").replace("Template", tableConfig.getModuleName());
@@ -112,12 +118,11 @@ public class CodeGenerator {
                         }
                     });
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Error",e);
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println(e.getMessage());
+                logger.error("Error",e);
                 return;
             }
     }
@@ -219,7 +224,7 @@ public class CodeGenerator {
             dbColumn.setStrLen(Integer.parseInt(e.get("CHARACTER_MAXIMUM_LENGTH").toString()));
             JavaColumn javaColumn=dbColumn.toJavaColumn();
             return javaColumn;
-        }).filter(e->e!=null).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         config.getDataMap().put("fieldList", javaColumnList);
     }
 

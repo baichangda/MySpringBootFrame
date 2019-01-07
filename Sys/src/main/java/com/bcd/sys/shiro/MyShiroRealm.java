@@ -2,7 +2,6 @@ package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.config.shiro.ShiroConst;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -17,7 +16,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -42,7 +40,7 @@ public class MyShiroRealm extends AuthorizingRealm {
      * 登录认证
      */  
     @Override  
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken){
         //UsernamePasswordToken用于存放提交的登录信息
         UsernamePasswordToken token = (UsernamePasswordToken)authenticationToken;
         UserBean user = userService.findOne(

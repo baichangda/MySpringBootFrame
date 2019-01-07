@@ -1,7 +1,6 @@
 package com.bcd.config.shiro.anno;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
-import com.bcd.config.define.MessageDefine;
 import org.apache.shiro.aop.AnnotationResolver;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;

@@ -149,7 +149,7 @@ public class ShiroConfiguration{
      */
     private void loadShiroFilterChain(ShiroFilterFactoryBean factoryBean) {
         /**下面这些规则配置最好配置到配置文件中*/
-        Map<String, String> filterChainMap = new LinkedHashMap<String, String>();
+        Map<String, String> filterChainMap = new LinkedHashMap<>();
         //authc：该过滤器下的页面必须验证后才能访问，它是Shiro内置的一个拦截器
         //anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         //user: authc后或者rememberMe的都可以访问

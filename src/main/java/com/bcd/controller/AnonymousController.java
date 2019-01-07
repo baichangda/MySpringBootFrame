@@ -1,28 +1,21 @@
 package com.bcd.controller;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.DateZoneUtil;
 import com.bcd.base.util.I18nUtil;
-import com.bcd.base.util.JsonUtil;
-import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.service.ApiService;
 import com.bcd.sys.keys.KeysConst;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Optional;
 
 
@@ -50,7 +43,7 @@ public class AnonymousController extends BaseController{
     @ApiResponse(code = 200,message = "当前浏览器的cookie")
     public JsonMessage<String> getCookie(){
         Subject subject=SecurityUtils.getSubject();
-        String cookie=Optional.ofNullable(subject).map(e->e.getSession()).map(e->e.getId()).orElse("").toString();
+        String cookie=Optional.ofNullable(subject).map(Subject::getSession).map(Session::getId).orElse("").toString();
         return JsonMessage.success(cookie);
     }
 

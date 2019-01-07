@@ -45,7 +45,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
         try {
             handler.handle(response,exception);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error",e);
         }
         return new ModelAndView();
     }
@@ -66,7 +66,7 @@ public class CustomExceptionHandler extends DefaultHandlerExceptionResolver {
         try {
             this.handler.handle(response,result);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error",e);
         }
         return new ModelAndView();
     }

@@ -1,7 +1,6 @@
 package com.bcd.sys.task;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;

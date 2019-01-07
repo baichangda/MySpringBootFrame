@@ -24,12 +24,12 @@ public class StopSysTaskResultListener extends RedisTopicMQ<JsonNode>{
             //2.1、如果结果集为null,说明结果超过了设定的超时时间,忽略处理结果
             return;
         }
-        jsonNode.get("result").fields().forEachRemaining(e->{
-            resultMap.put(Long.parseLong(e.getKey()),e.getValue().asBoolean());
-        });
+        jsonNode.get("result").fields().forEachRemaining(e->
+            resultMap.put(Long.parseLong(e.getKey()),e.getValue().asBoolean())
+        );
         //3、最后唤醒主线程
         synchronized (resultMap){
-            resultMap.notify();
+            resultMap.notifyAll();
         }
     }
 }

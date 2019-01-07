@@ -69,7 +69,7 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
         Boolean res=(Boolean)redisOp.getOperations().execute(new RedisCallback<Object>() {
             @Nullable
             @Override
-            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+            public Object doInRedis(RedisConnection connection){
                 return connection.set(redisOp.getOperations().getKeySerializer().serialize(session.getId()),redisOp.getOperations().getValueSerializer().serialize(session),Expiration.seconds(TIME_OUT_SECONDS), RedisStringCommands.SetOption.SET_IF_PRESENT);
             }
         });

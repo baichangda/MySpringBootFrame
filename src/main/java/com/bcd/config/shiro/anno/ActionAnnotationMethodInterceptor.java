@@ -1,7 +1,6 @@
 package com.bcd.config.shiro.anno;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
-import com.bcd.config.define.MessageDefine;
 import org.apache.shiro.aop.AnnotationResolver;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -19,7 +18,7 @@ public class ActionAnnotationMethodInterceptor extends AuthorizingAnnotationMeth
     }
 
     @Override
-    public void assertAuthorized(MethodInvocation mi) throws AuthorizationException {
+    public void assertAuthorized(MethodInvocation mi){
         try {
             ActionAnnotationHandler handler= (ActionAnnotationHandler)getHandler();
             StringBuilder sb = new StringBuilder();
