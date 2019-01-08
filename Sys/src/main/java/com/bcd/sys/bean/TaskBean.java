@@ -1,6 +1,13 @@
 package com.bcd.sys.bean;
 
+import com.bcd.base.util.ExceptionUtil;
+import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.SuperBaseBean;
+import com.bcd.sys.task.TaskStatus;
+import com.bcd.sys.task.entity.ClusterSupport;
+import com.bcd.sys.task.entity.ClusterTask;
+import com.bcd.sys.task.entity.Task;
+import com.bcd.sys.util.ShiroUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -16,7 +23,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Entity
 @Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> {
+public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
 
 
     //field
@@ -32,9 +39,9 @@ public class TaskBean extends SuperBaseBean<Long> {
     @ApiModelProperty(value = "任务类型(1:普通任务;2:文件类型任务)(不能为空)")
     private Integer type;
 
-    @Length(max = 255,message = "[备注]长度不能超过255")
-    @ApiModelProperty(value = "备注(失败时记录失败原因)(长度不能超过255)")
-    private String remark;
+    @Length(max = 255,message = "[任务信息]长度不能超过255")
+    @ApiModelProperty(value = "任务信息(失败时记录失败原因)(长度不能超过255)")
+    private String message;
 
     @Length(max = 65535,message = "[失败堆栈信息]长度不能超过65535")
     @ApiModelProperty(hidden = true,readOnly = true,value = "失败堆栈信息(失败时后台异常堆栈信息)(长度不能超过65535)")
@@ -66,6 +73,12 @@ public class TaskBean extends SuperBaseBean<Long> {
     @Length(max = 50,message = "[创建ip]长度不能超过50")
     @ApiModelProperty(value = "创建ip(长度不能超过50)")
     private String createIp;
+
+    @Transient
+    private Object[] params;
+
+    @Transient
+    private String functionName;
 
     public TaskBean(String name) {
         this.name=name;
@@ -99,12 +112,12 @@ public class TaskBean extends SuperBaseBean<Long> {
         return this.type;
     }
 
-    public void setRemark(String remark){
-        this.remark=remark;
+    public String getMessage() {
+        return message;
     }
 
-    public String getRemark(){
-        return this.remark;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public void setStartTime(Date startTime){
@@ -169,5 +182,62 @@ public class TaskBean extends SuperBaseBean<Long> {
 
     public void setStackMessage(String stackMessage) {
         this.stackMessage = stackMessage;
+    }
+
+    @Override
+    public void onCreate() {
+        createTime=new Date();
+        status= TaskStatus.WAITING.getStatus();
+        UserBean userBean= ShiroUtil.getCurrentUser();
+        if(userBean!=null) {
+            createUserId = userBean.getCreateUserId();
+            createUserName = userBean.getCreateUserName();
+        }
+        createIp= IPUtil.getIpAddress();
+    }
+
+    @Override
+    public void onStart() {
+        startTime=new Date();
+        status= TaskStatus.EXECUTING.getStatus();
+    }
+
+    @Override
+    public void onStop() {
+        finishTime=new Date();
+        status= TaskStatus.STOPPED.getStatus();
+    }
+
+    @Override
+    public void onSucceed() {
+        finishTime=new Date();
+        status= TaskStatus.SUCCEED.getStatus();
+    }
+
+    @Override
+    public void onFailed(Exception ex) {
+        finishTime=new Date();
+        status= TaskStatus.FAILED.getStatus();
+        Throwable realException= ExceptionUtil.parseRealException(ex);
+        message= realException.getMessage();
+        stackMessage=ExceptionUtil.getStackTraceMessage(realException);
+    }
+
+    public void setParams(Object[] params) {
+        this.params = params;
+    }
+
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
+    @Override
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    @Override
+    public Object[] getParams() {
+        return params;
     }
 }

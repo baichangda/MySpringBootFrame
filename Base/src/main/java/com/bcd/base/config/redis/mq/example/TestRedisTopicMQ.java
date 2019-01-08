@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestRedisTopicMQ extends RedisTopicMQ<String>{
     public TestRedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super("test", redisMessageListenerContainer,String.class);
+        super("test", redisMessageListenerContainer,String.class,ValueSerializer.STRING);
         watch();
     }
 

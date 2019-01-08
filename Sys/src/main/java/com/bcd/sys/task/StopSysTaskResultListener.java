@@ -5,28 +5,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class StopSysTaskResultListener extends RedisTopicMQ<JsonNode>{
+public class StopSysTaskResultListener extends RedisTopicMQ<Map>{
     public StopSysTaskResultListener(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL, redisMessageListenerContainer, JsonNode.class);
+        super(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.SERIALIZABLE);
         watch();
     }
 
     @Override
-    public void onMessage(JsonNode jsonNode) {
+    public void onMessage(Map data) {
         //1、解析接收到的停止结果
-        String code=jsonNode.get("code").asText();
+        String code=data.get("code").toString();
         //2、找到对应的请求,并将此次的结果集合并到请求的总结果集中
-        ConcurrentHashMap<Long,Boolean> resultMap= CommonConst.SYS_TASK_CODE_TO_RESULT_MAP.get(code);
+        ConcurrentHashMap<Serializable,Boolean> resultMap= CommonConst.SYS_TASK_CODE_TO_RESULT_MAP.get(code);
         if(resultMap==null){
             //2.1、如果结果集为null,说明结果超过了设定的超时时间,忽略处理结果
             return;
         }
-        jsonNode.get("result").fields().forEachRemaining(e->
-            resultMap.put(Long.parseLong(e.getKey()),e.getValue().asBoolean())
-        );
+        Map<Serializable,Boolean> dataMap=(Map<Serializable,Boolean>)data.get("result");
+        resultMap.putAll(dataMap);
         //3、最后唤醒主线程
         synchronized (resultMap){
             resultMap.notifyAll();

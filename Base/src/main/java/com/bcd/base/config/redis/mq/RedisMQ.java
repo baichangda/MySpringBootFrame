@@ -2,7 +2,7 @@ package com.bcd.base.config.redis.mq;
 
 import java.util.List;
 
-public interface RedisMQ<V> {
+public interface RedisMQ<V>{
     /**
      * 发送信息到mq
      * @param data
@@ -30,4 +30,10 @@ public interface RedisMQ<V> {
      * 取消监听
      */
     void unWatch();
+
+    enum ValueSerializer {
+        STRING,
+        JACKSON,
+        SERIALIZABLE
+    }
 }

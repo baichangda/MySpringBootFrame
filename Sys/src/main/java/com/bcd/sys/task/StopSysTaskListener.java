@@ -2,30 +2,36 @@ package com.bcd.sys.task;
 
 import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
 @Component
-public class StopSysTaskListener extends RedisTopicMQ<JsonNode>{
+public class StopSysTaskListener extends RedisTopicMQ<Map>{
+
+    @Autowired
+    StopSysTaskResultListener stopSysTaskResultListener;
 
     public StopSysTaskListener(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super(CommonConst.STOP_SYS_TASK_CHANNEL, redisMessageListenerContainer, JsonNode.class);
+        super(CommonConst.STOP_SYS_TASK_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.SERIALIZABLE);
         watch();
     }
 
     @Override
-    public void onMessage(JsonNode jsonNode) {
+    public void onMessage(Map data) {
         //1、接收到停止任务的请求后,先解析
-        String code=jsonNode.get("code").asText();
-        Boolean mayInterruptIfRunning=jsonNode.get("mayInterruptIfRunning").asBoolean();
+        String code=data.get("code").toString();
+        Boolean mayInterruptIfRunning=(Boolean) data.get("mayInterruptIfRunning");
         //2、依次停止每个任务,将结束的任务记录到结果map中
-        Map<Long,Boolean> resultMap=new HashMap<>();
-        jsonNode.get("ids").forEach(e->{
-            Long id=e.asLong();
+        Map<Serializable,Boolean> resultMap=new HashMap<>();
+        Serializable[] ids=(Serializable[]) data.get("ids");
+        Arrays.stream(ids).forEach(id->{
             Future future= CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.get(id);
             if(future==null){
                 return;
@@ -38,7 +44,8 @@ public class StopSysTaskListener extends RedisTopicMQ<JsonNode>{
             Map<String,Object> dataMap=new HashMap<>();
             dataMap.put("result",resultMap);
             dataMap.put("code",code);
-            redisTemplate.convertAndSend(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL,dataMap);
+            stopSysTaskResultListener.send(dataMap);
         }
     }
+
 }

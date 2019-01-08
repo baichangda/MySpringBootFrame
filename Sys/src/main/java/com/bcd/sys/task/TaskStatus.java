@@ -4,7 +4,7 @@ public enum TaskStatus{
         WAITING(1,"等待中"),
         EXECUTING(2,"执行中"),
         STOPPED(3,"任务被终止"),
-        FINISHED(4,"已完成"),
+        SUCCEED(4,"执行成功"),
         FAILED(5,"执行失败");
 
         private int status;

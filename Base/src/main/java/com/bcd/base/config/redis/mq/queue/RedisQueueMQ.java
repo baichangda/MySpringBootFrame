@@ -2,12 +2,14 @@ package com.bcd.base.config.redis.mq.queue;
 
 import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.redis.mq.RedisMQ;
+import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.io.Serializable;
 import java.util.List;
@@ -31,19 +33,26 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
         this.redisTemplate=redisTemplate;
     }
 
-    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory,Class<V> clazz){
+    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory,Class<V> clazz,ValueSerializer valueSerializer){
         this.name=name;
         this.stop=false;
-        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory,clazz);
+        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory,clazz,valueSerializer);
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory,Class<V> clazz){
-        if(String.class.isAssignableFrom(clazz)){
-            return RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
-        }else if(Serializable.class.isAssignableFrom(clazz)){
-            return RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
-        } else{
-            return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory,clazz);
+    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory, Class<V> clazz, ValueSerializer valueSerializer){
+        switch (valueSerializer){
+            case STRING:{
+                return RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
+            }
+            case SERIALIZABLE:{
+                return RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
+            }
+            case JACKSON:{
+                return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory,clazz);
+            }
+            default:{
+                throw BaseRuntimeException.getException("Not Support");
+            }
         }
     }
 

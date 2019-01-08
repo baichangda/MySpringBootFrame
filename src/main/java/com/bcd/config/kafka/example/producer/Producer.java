@@ -21,7 +21,7 @@ public class Producer {
 
             @Override
             public void onSuccess(SendResult<byte[],byte[]> result) {
-                System.out.println("onSuccess!");
+                System.out.println("onSucceed!");
             }
         });
     }

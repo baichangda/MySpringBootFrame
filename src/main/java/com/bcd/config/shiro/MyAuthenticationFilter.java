@@ -81,11 +81,11 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected void cleanup(ServletRequest request, ServletResponse response, Exception existing) throws ServletException, IOException {
         /**
-         * 此处是 BasicHttpAuthenticationFilter cleanup逻辑,进行重写 start
+         * 此处是 BasicHttpAuthenticationFilter cleanup逻辑,进行重写 onStart
          */
         try {
             /**
-             * 此处是 onAccessDenied方法实现 start
+             * 此处是 onAccessDenied方法实现 onStart
              * */
             if(existing!=null){
 //                boolean loggedIn = false; //false by default or we wouldn't be in this method
@@ -108,7 +108,7 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
          */
 
         /**
-         * 以下是 AdviceFilter cleanup逻辑,直接复制过来 start
+         * 以下是 AdviceFilter cleanup逻辑,直接复制过来 onStart
          */
         Exception exception = existing;
         try {

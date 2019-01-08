@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String>{
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
-        super("test",redisConnectionFactory,String.class);
+        super("test",redisConnectionFactory,String.class,ValueSerializer.STRING);
         watch();
     }
 

@@ -59,7 +59,7 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
         PathMatchingFilterChainResolver chainResolver = new PathMatchingFilterChainResolver();
         chainResolver.setFilterChainManager(manager);
 
-        //Now create a concrete ShiroFilter instance and apply the acquired SecurityManager and built
+        //Now onCreate a concrete ShiroFilter instance and apply the acquired SecurityManager and built
         //FilterChainResolver.  It doesn't matter that the instance is an anonymous inner class
         //here - we're just using it because it is a concrete AbstractShiroFilter instance that accepts
         //injection of the SecurityManager and FilterChainResolver:

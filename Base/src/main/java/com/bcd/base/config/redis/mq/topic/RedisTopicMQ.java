@@ -2,6 +2,7 @@ package com.bcd.base.config.redis.mq.topic;
 
 import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.redis.mq.RedisMQ;
+import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
@@ -33,20 +34,28 @@ public abstract class RedisTopicMQ<V> implements RedisMQ<V> {
         this.messageListener=getMessageListener();
     }
 
-    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz) {
+
+    public RedisTopicMQ(String name, RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz,ValueSerializer valueSerializer) {
         this.name = name;
         this.redisMessageListenerContainer=redisMessageListenerContainer;
-        this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer,clazz);
+        this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer,clazz,valueSerializer);
         this.messageListener=getMessageListener();
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz){
-        if(String.class.isAssignableFrom(clazz)){
-            return RedisUtil.newString_StringRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
-        }else if(Serializable.class.isAssignableFrom(clazz)){
-            return RedisUtil.newString_SerializableRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
-        } else{
-            return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(),clazz);
+    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer,Class<V> clazz,ValueSerializer valueSerializer){
+        switch (valueSerializer){
+            case STRING:{
+                return RedisUtil.newString_StringRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+            }
+            case SERIALIZABLE:{
+                return RedisUtil.newString_SerializableRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+            }
+            case JACKSON:{
+                return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(),clazz);
+            }
+            default:{
+                throw BaseRuntimeException.getException("Not Support");
+            }
         }
     }
 

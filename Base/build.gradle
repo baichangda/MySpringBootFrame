@@ -1,5 +1,5 @@
 dependencies {
-    //spring支持
+    //springboot支持
     compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
     //springboot web支持
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
