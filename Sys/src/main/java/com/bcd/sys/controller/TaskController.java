@@ -42,8 +42,8 @@ public class TaskController extends BaseController {
             @RequestParam(value = "status",required = false) Integer status,
             @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
-            @ApiParam(value = "备注(失败时记录失败原因)")
-            @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "任务信息(失败时记录失败原因)")
+            @RequestParam(value = "message",required = false) String message,
             @ApiParam(value = "任务开始时间开始")
             @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
             @ApiParam(value = "任务开始时间截止")
@@ -60,7 +60,7 @@ public class TaskController extends BaseController {
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("message",message, StringCondition.Handler.ALL_LIKE),
             new DateCondition("startTime",startTimeBegin, DateCondition.Handler.GE),
             new DateCondition("startTime",startTimeEnd, DateCondition.Handler.LE),
             new DateCondition("finishTime",finishTimeBegin, DateCondition.Handler.GE),
@@ -86,8 +86,8 @@ public class TaskController extends BaseController {
             @RequestParam(value = "status",required = false) Integer status,
             @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)",example="1")
             @RequestParam(value = "type",required = false) Byte type,
-            @ApiParam(value = "备注(失败时记录失败原因)")
-            @RequestParam(value = "remark",required = false) String remark,
+            @ApiParam(value = "任务信息(失败时记录失败原因)")
+            @RequestParam(value = "message",required = false) String message,
             @ApiParam(value = "任务开始时间开始")
             @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
             @ApiParam(value = "任务开始时间截止")
@@ -108,7 +108,7 @@ public class TaskController extends BaseController {
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("message",message, StringCondition.Handler.ALL_LIKE),
             new DateCondition("startTime",startTimeBegin, DateCondition.Handler.GE),
             new DateCondition("startTime",startTimeEnd, DateCondition.Handler.LE),
             new DateCondition("finishTime",finishTimeBegin, DateCondition.Handler.GE),
