@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("unchecked")
 @Component
 public class StopSysTaskResultListener extends RedisTopicMQ<Map>{
     public StopSysTaskResultListener(RedisMessageListenerContainer redisMessageListenerContainer) {

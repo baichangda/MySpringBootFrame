@@ -63,7 +63,7 @@ allprojects{
         //阿里云oss对象存储集成
         compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
         //ics
-        compile ("com.incarcloud.ics:ics-map-tracking:4.4-SNAPSHOT")
+        compile ("com.incarcloud.ics:ics-map-tracking:5.0-SNAPSHOT")
     }
 
     gradle.projectsEvaluated {

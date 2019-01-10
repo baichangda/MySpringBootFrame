@@ -1,10 +1,8 @@
 package com.bcd.sys.task;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.dao.TaskDAO;
 import com.bcd.sys.task.entity.ClusterTask;
-import com.bcd.sys.task.entity.Task;
 import com.bcd.sys.task.function.NamedTaskFunction;
 import com.bcd.sys.task.function.TaskFunction;
 import org.slf4j.Logger;
@@ -23,8 +21,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @Component
-public class SysTaskRedisQueue<T extends Task> implements ApplicationListener<ContextRefreshedEvent>{
+public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationListener<ContextRefreshedEvent>{
     private final static Logger logger= LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
     private Map<String,NamedTaskFunction<T>> taskFunctionMap;
@@ -71,7 +70,7 @@ public class SysTaskRedisQueue<T extends Task> implements ApplicationListener<Co
      */
     public void onTask(Object data) {
         //1、接收并解析任务数据
-        ClusterTask task=(ClusterTask) data;
+        T task=(T) data;
         Serializable id=task.getId();
         String functionName=task.getFunctionName();
         Object[] params=task.getParams();

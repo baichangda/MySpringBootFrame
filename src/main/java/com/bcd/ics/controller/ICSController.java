@@ -1,5 +1,6 @@
 package com.bcd.ics.controller;
 
+import com.bcd.base.message.JsonMessage;
 import com.incarcloud.skeleton.Starter;
 import com.incarcloud.skeleton.config.Config;
 import com.incarcloud.skeleton.context.Context;
@@ -22,12 +23,13 @@ public class ICSController {
     public ICSController(){
         this.context=Starter.getContext();
         Config config= this.context.getConfig();
-        config.withRequestMappingPre("/ics/test");
-        config.withExtFileStaticMappingPres("/ics/test/");
+        config.withRequestMappingPre("/ics");
+        config.withScanPackages("com.bcd");
+        this.context.init();
     }
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/test/**",method = RequestMethod.GET)
+    @RequestMapping(value = "/**",method = RequestMethod.GET)
     @ApiOperation(value = "测试ics",notes = "测试ics")
     @ApiResponse(code = 200,message = "测试ics")
     public void test(HttpServletRequest request, HttpServletResponse response){
@@ -36,5 +38,13 @@ public class ICSController {
         } catch (NoHandlerException e) {
             throw BaseRuntimeException.getException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @RequestMapping(value = "/vehicle/list",method = RequestMethod.GET)
+    @ApiOperation(value = "测试覆盖vehicleList",notes = "测试覆盖vehicleList")
+    @ApiResponse(code = 200,message = "测试覆盖vehicleList")
+    public JsonMessage testVehicleList(HttpServletRequest request, HttpServletResponse response){
+        return JsonMessage.success(null,"哈哈");
     }
 }

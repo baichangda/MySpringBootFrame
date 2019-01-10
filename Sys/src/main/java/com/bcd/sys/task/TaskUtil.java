@@ -2,7 +2,7 @@ package com.bcd.sys.task;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.dao.TaskDAO;
-import com.bcd.sys.task.entity.ClusterSupport;
+import com.bcd.sys.task.entity.ClusterTask;
 import com.bcd.sys.task.entity.Task;
 import com.bcd.sys.task.function.TaskFunction;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -42,11 +42,7 @@ public class TaskUtil {
      * @param <T> 任务泛型
      * @return
      */
-    public static <T extends Task>Serializable registerClusterTask(T task, String functionName, Object ... params){
-        if(task instanceof ClusterSupport){
-            ((ClusterSupport) task).setFunctionName(functionName);
-            ((ClusterSupport) task).setParams(params);
-        }
+    public static <T extends ClusterTask>Serializable registerClusterTask(T task, String functionName, Object ... params){
         Serializable id;
         try {
             task.onCreate();
