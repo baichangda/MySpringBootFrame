@@ -31,7 +31,7 @@ allprojects{
     idea {
         module {
             downloadSources=true
-            downloadJavadoc=true
+//            downloadJavadoc=true
         }
     }
     dependencies{
@@ -63,7 +63,7 @@ allprojects{
         //阿里云oss对象存储集成
         compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
         //ics
-        compile ("com.incarcloud.ics:ics-map-tracking:5.2-SNAPSHOT")
+        compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
     }
 
     gradle.projectsEvaluated {
@@ -91,12 +91,19 @@ allprojects{
         }
     }
 
+    //生成jar时打包源码
+    task sourceJar(type: Jar) {
+        from sourceSets.main.java.srcDirs
+        classifier "sources"
+    }
+
     //发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
     //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
     publishing{
         publications {
             maven(MavenPublication){
                 from components.java
+                artifact(sourceJar)
             }
         }
         repositories {
