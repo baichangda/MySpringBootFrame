@@ -1,7 +1,6 @@
 package com.bcd.base.config.redis.mq.example;
 
 import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
-import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +13,6 @@ public class TestRedisTopicMQ extends RedisTopicMQ<String>{
 
     @Override
     public void onMessage(String data) {
-        System.out.println(new String(data));
+        logger.info(data);
     }
 }

@@ -5,7 +5,6 @@ import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
@@ -162,7 +161,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
         return (boolean)redisTemplate.execute(new RedisCallback<Object>() {
             @Nullable
             @Override
-            public Object doInRedis(RedisConnection connection) throws DataAccessException {
+            public Object doInRedis(RedisConnection connection){
                 return connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT);
             }
         });

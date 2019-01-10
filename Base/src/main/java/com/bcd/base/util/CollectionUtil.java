@@ -26,7 +26,7 @@ public class CollectionUtil {
             return resList;
         }
         //2、如果非空的集合为0则返回非null集合第一个元素,为1则直接返回这个元素
-        List<T>[] notEmptyLists= Arrays.stream(lists).filter(e->e!=null&&e.size()>0).toArray(len->new List[len]);
+        List<T>[] notEmptyLists= Arrays.stream(lists).filter(e->e!=null&&!e.isEmpty()).toArray(len->new List[len]);
         if(notEmptyLists.length==0){
             return resList;
         }else if(notEmptyLists.length==1){
@@ -211,7 +211,7 @@ public class CollectionUtil {
         List<T> res1=list1==null?new ArrayList<>():new ArrayList<>(list1);
         List<Object[]> res2=new ArrayList<>();
         List<U> res3=list2==null?new ArrayList<>():new ArrayList<>(list2);
-        if(list1!=null&&list1.size()!=0&&list2!=null&&list2.size()!=0){
+        if(list1!=null&&!list1.isEmpty()&&list2!=null&&!list2.isEmpty()){
             for (T t : list1) {
                 for(U u : list2){
                     if(compareFunc.apply(t,u)){

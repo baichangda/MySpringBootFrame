@@ -49,9 +49,9 @@ public class StringUtil {
      */
     public static String replaceStrs(String str, Map<String,String> dataMap){
         String[] newStr=new String[]{str};
-        dataMap.forEach((k,v)->{
-            newStr[0]=newStr[0].replaceAll("\\$\\{"+escapeExprSpecialWord(k)+"\\}",escapeExprSpecialWord(v));
-        });
+        dataMap.forEach((k,v)->
+            newStr[0]=newStr[0].replaceAll("\\$\\{"+escapeExprSpecialWord(k)+"\\}",escapeExprSpecialWord(v))
+        );
         return newStr[0];
     }
 

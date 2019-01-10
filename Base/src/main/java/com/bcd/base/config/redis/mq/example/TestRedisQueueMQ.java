@@ -13,6 +13,6 @@ public class TestRedisQueueMQ extends RedisQueueMQ<String>{
 
     @Override
     public void onMessage(String data) {
-        System.out.println(data);
+        logger.info(data);
     }
 }

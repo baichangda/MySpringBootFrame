@@ -1,7 +1,6 @@
 package com.bcd.sys.task;
 
 import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;

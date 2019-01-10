@@ -2,7 +2,8 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 
 import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
-import org.springframework.dao.DataAccessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
@@ -19,6 +20,8 @@ import org.springframework.lang.Nullable;
  */
 @SuppressWarnings("unchecked")
 public class SingleFailedScheduleHandler extends RedisScheduleHandler {
+
+    private final static Logger logger= LoggerFactory.getLogger(SingleFailedScheduleHandler.class);
 
     private final static Long DEFAULT_ALIVE_TIME=2000L;
 
@@ -52,13 +55,13 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
             boolean isLock=(boolean)redisTemplate.execute(new RedisCallback<Object>() {
                 @Nullable
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public Object doInRedis(RedisConnection connection){
                     return connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT);
                 }
             });
             return isLock;
         }catch (Exception e){
-            e.printStackTrace();
+            logger.error("Error",e);
             return false;
         }
     }

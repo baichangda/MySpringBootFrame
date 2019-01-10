@@ -2,7 +2,6 @@ package com.bcd.base.message;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.i18n.I18NData;
-import com.bcd.base.util.StringUtil;
 
 /**
  * Created by Administrator on 2017/7/26.

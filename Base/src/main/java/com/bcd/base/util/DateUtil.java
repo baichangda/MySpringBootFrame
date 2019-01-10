@@ -75,7 +75,7 @@ public class DateUtil {
             return null;
         }
         ChronoUnit[] units=new ChronoUnit[]{ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS};
-        if(!Arrays.stream(units).anyMatch(e->e==unit)){
+        if(Arrays.stream(units).noneMatch(e->e==unit)){
             throw BaseRuntimeException.getException("[DateUtil.getFloorDate],ChronoUnit["+unit.toString()+"] Not Support!");
         }
         ZonedDateTime zdt=ZonedDateTime.ofInstant(date.toInstant(),zoneId);
@@ -115,7 +115,7 @@ public class DateUtil {
             return null;
         }
         ChronoUnit[] units=new ChronoUnit[]{ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS};
-        if(!Arrays.stream(units).anyMatch(e->e==unit)){
+        if(Arrays.stream(units).noneMatch(e->e==unit)){
             throw BaseRuntimeException.getException("[DateUtil.getCeilDate],ChronoUnit["+unit.toString()+"] Not Support!");
         }
         ZonedDateTime zdt=ZonedDateTime.ofInstant(date.toInstant(),zoneId);
@@ -237,7 +237,7 @@ public class DateUtil {
     public static long getDiff(Date d1,Date d2,ChronoUnit unit)
     {
         ChronoUnit[] units=new ChronoUnit[]{ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS};
-        if(!Arrays.stream(units).anyMatch(e->e==unit)){
+        if(Arrays.stream(units).noneMatch(e->e==unit)){
             throw BaseRuntimeException.getException("[DateUtil.getDiff],ChronoUnit["+unit.toString()+"] Not Support!");
         }
         long diff;
@@ -310,7 +310,7 @@ public class DateUtil {
             return null;
         }
         ChronoUnit[] units=new ChronoUnit[]{ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS};
-        if(!Arrays.stream(units).anyMatch(e->e==unit)){
+        if(Arrays.stream(units).noneMatch(e->e==unit)){
             throw BaseRuntimeException.getException("[DateUtil.getDateNum],ChronoUnit["+unit.toString()+"] Not Support!");
         }
         StringBuilder sb=new StringBuilder();
@@ -351,7 +351,7 @@ public class DateUtil {
      */
     public static boolean isEqual(Date d1,Date d2,ChronoField field){
         ChronoField[] fields=new ChronoField[]{ChronoField.YEAR,ChronoField.MONTH_OF_YEAR,ChronoField.DAY_OF_MONTH,ChronoField.HOUR_OF_DAY,ChronoField.MINUTE_OF_HOUR,ChronoField.SECOND_OF_MINUTE,ChronoField.MILLI_OF_SECOND};
-        if(!Arrays.stream(fields).anyMatch(e->e==field)){
+        if(Arrays.stream(fields).noneMatch(e->e==field)){
             throw BaseRuntimeException.getException("[DateUtil.isEqual],ChronoField["+field.toString()+"] Not Support!");
         }
         ZoneId zoneId=ZoneId.systemDefault();

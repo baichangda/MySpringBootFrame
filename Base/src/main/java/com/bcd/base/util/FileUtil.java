@@ -35,7 +35,7 @@ public class FileUtil {
             return;
         }
         try {
-            if (Files.exists(path)) {
+            if (path.toFile().exists()) {
                 return;
             }
             Files.createDirectories(path.getParent());

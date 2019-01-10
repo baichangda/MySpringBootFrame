@@ -1,12 +1,9 @@
 package com.bcd.base.util;
 
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import java.lang.annotation.Annotation;
-import java.util.Map;
 
 
 /**
@@ -19,7 +16,7 @@ public class SpringUtil implements ApplicationContextAware{
 
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext){
         SpringUtil.applicationContext=applicationContext;
     }
 

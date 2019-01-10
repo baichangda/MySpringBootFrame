@@ -21,7 +21,7 @@ public class SimpleJacksonFilter implements PropertyFilter{
     }
 
     public SimpleJacksonFilter(Collection<SimpleFilterBean> beans){
-        if(beans!=null&&beans.size()>0){
+        if(beans!=null&&!beans.isEmpty()){
             this.filterBeans=beans.stream().toArray(len->new SimpleFilterBean[len]);
         }
     }

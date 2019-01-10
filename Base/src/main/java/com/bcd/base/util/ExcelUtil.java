@@ -1,19 +1,14 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -187,7 +182,7 @@ public class ExcelUtil {
      * @param dataList 数据集合
      */
     public static void writeSheet(Sheet sheet, final int beginRowIndex, final int beginColIndex, BiConsumer<Cell,Object> cellBiConsumer, List<List> dataList){
-        if(dataList==null||dataList.size()==0){
+        if(dataList==null||dataList.isEmpty()){
            return;
         }
         for(int i=0;i<=dataList.size()-1;i++){

@@ -4,13 +4,16 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * Created by Administrator on 2017/7/27.
@@ -61,10 +64,10 @@ public class ExceptionUtil {
         if(realException instanceof BaseRuntimeException){
             return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode(),getStackTraceMessage(realException));
         }else if(realException instanceof ConstraintViolationException) {
-            String message=((ConstraintViolationException)realException).getConstraintViolations().stream().map(e->e.getMessage()).reduce((e1,e2)->e1+","+e2).orElse("");
+            String message=((ConstraintViolationException)realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2)->e1+","+e2).orElse("");
             return JsonMessage.fail(message);
         }else if(realException instanceof MethodArgumentNotValidException) {
-            String message=((MethodArgumentNotValidException)realException).getBindingResult().getAllErrors().stream().map(e->e.getDefaultMessage()).filter(e->e!=null).reduce((e1,e2)->e1+","+e2).orElse("");
+            String message=((MethodArgumentNotValidException)realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2)->e1+","+e2).orElse("");
             return JsonMessage.fail(message);
         }else {
             return JsonMessage.fail(realException.getMessage());

@@ -113,7 +113,7 @@ public class JsonUtil {
         if(filters==null||filters.length==0){
             return new SimpleFilterBean[0];
         }
-        return Arrays.stream(filters).filter(e->e!=null).reduce(new HashMap<String,SimpleFilterBean>(),(res,filter)->{
+        return Arrays.stream(filters).filter(Objects::nonNull).reduce(new HashMap<String,SimpleFilterBean>(),(res,filter)->{
             String key = filter.getClazz().getName();
             SimpleFilterBean val = res.get(key);
             if (val == null) {
@@ -251,7 +251,7 @@ public class JsonUtil {
             SimpleFilterBeanList.addAll(Arrays.asList(curSimpleFilterBean));
         }
         //2、合并多次调用的返回结果,将相同类的filter整合在一起
-        if(SimpleFilterBeanList.size()==0){
+        if(SimpleFilterBeanList.isEmpty()){
             return new SimpleFilterBean[0];
         }
         Map<String, SimpleFilterBean> filterMap = SimpleFilterBeanList.stream().collect(Collectors.toMap(
