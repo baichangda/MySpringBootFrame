@@ -18,15 +18,11 @@ public class SysTaskRunnable<T extends Task> implements Runnable{
 
     private TaskDAO taskDAO;
 
-    private Object[] params;
 
-
-
-    public SysTaskRunnable(T task, TaskFunction<T> function, TaskDAO taskDAO,Object... params) {
+    public SysTaskRunnable(T task, TaskFunction<T> function, TaskDAO taskDAO) {
         this.task = task;
         this.function=function;
         this.taskDAO=taskDAO;
-        this.params=params;
     }
 
     @Override

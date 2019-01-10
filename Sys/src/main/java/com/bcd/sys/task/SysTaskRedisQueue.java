@@ -73,7 +73,6 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
         T task=(T) data;
         Serializable id=task.getId();
         String functionName=task.getFunctionName();
-        Object[] params=task.getParams();
         TaskFunction<T> taskFunction= taskFunctionMap.get(functionName);
         //2、如果找不到对应执行方法实体,则任务执行失败并抛出异常
         if(taskFunction==null){
@@ -85,7 +84,7 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
         //3、使用线程池执行任务
         Future future= CommonConst.SYS_TASK_POOL.submit(()->{
             //3.1、执行任务
-            new SysTaskRunnable(task,taskFunction,taskDAO,params).run();
+            new SysTaskRunnable(task,taskFunction,taskDAO).run();
             //3.2、执行完毕后释放锁
             lock.release();
         });
