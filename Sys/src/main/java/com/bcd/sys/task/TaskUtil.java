@@ -45,6 +45,8 @@ public class TaskUtil {
     public static <T extends ClusterTask>Serializable registerClusterTask(T task, String functionName, Object ... params){
         Serializable id;
         try {
+            task.setFunctionName(functionName);
+            task.setParams(params);
             task.onCreate();
             id=taskDAO.doCreate(task);
         }catch (Exception e){
