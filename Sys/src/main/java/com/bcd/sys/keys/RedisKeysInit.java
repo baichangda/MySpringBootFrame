@@ -16,9 +16,9 @@ import java.security.interfaces.RSAPublicKey;
 public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>{
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        //1、判断此虚拟机公钥私钥是否为空
+        //1、判断是否是集群环境
         if(KeysConst.IS_CLUSTER){
-            //2、为空则初始化,取出redis中的公钥私钥
+            //2、如果是集群环境则从redis中取出公钥私钥
             ApplicationContext applicationContext= contextRefreshedEvent.getApplicationContext();
             RedisTemplate redisTemplate=(RedisTemplate) applicationContext.getBean("string_serializable_redisTemplate");
             Object[] keys=(Object[])redisTemplate.opsForValue().get(KeysConst.REDIS_KEY_NAME);

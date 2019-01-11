@@ -90,7 +90,7 @@ public class SqlUtil {
         paramMap.forEach((k,v)->{
             if(v!=null){
                 if(v instanceof List){
-                    List<Object> validList = ((List<Object>) v).stream().filter(e -> e != null).collect(Collectors.toList());
+                    List<Object> validList = ((List<Object>) v).stream().filter(Objects::nonNull).collect(Collectors.toList());
                     if(!validList.isEmpty()){
                         newParamMap.put(k,validList);
                     }
@@ -103,7 +103,7 @@ public class SqlUtil {
                             validList.add(val);
                         }
                     }
-                    if(validList.size()>0){
+                    if(!validList.isEmpty()){
                         newParamMap.put(k,validList.toArray());
                     }
                 }else{
@@ -133,11 +133,11 @@ public class SqlUtil {
         if(paramList==null){
             throw BaseRuntimeException.getException("Param[paramList] Can Not Be Null");
         }
-        if(paramList.size()==0){
+        if(paramList.isEmpty()){
             return new SqlListResult(sql,new ArrayList<>());
         }
         //1、判断参数集合是否有Null元素
-        boolean hasNull=paramList.stream().anyMatch(e->e==null);
+        boolean hasNull=paramList.stream().anyMatch(Objects::isNull);
         //1.1、如果全部不为Null,直接返回
         if(!hasNull){
             return new SqlListResult(sql,new ArrayList<>(paramList));
@@ -146,7 +146,7 @@ public class SqlUtil {
         NullParamSqlReplaceVisitor visitor= new NullParamSqlReplaceVisitor(sql,paramList);
         String newSql=visitor.parseSql();
         //3、返回新sql和移除掉Null参数的新集合
-        return new SqlListResult(newSql,paramList.stream().filter(e->e!=null).collect(Collectors.toList()));
+        return new SqlListResult(newSql,paramList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
 

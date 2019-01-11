@@ -211,7 +211,7 @@ public class DateUtil {
                         temp=temp.plusMonths(1);
                     }
                 }
-                if(returnList.size()>0){
+                if(!returnList.isEmpty()){
                     Date[] firstEle=returnList.get(0);
                     Date[] lastEle=returnList.get(returnList.size()-1);
                     firstEle[0]=Date.from(zdt1.with(ChronoField.SECOND_OF_DAY,0).toInstant());
