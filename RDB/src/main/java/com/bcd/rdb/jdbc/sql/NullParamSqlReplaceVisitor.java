@@ -158,7 +158,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                             });
                             if(isJdbcParam[0]){
                                 //如果是jdbcParam模式,自己拼装in条件
-                                if(inParamList.size()>0){
+                                if(!inParamList.isEmpty()){
                                     Expression leftExpression= inExpression.getLeftExpression();
                                     leftExpression.accept(new ExpressionVisitorAdapter(){
                                         @Override
@@ -208,7 +208,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                                             if(size==0){
                                                                 isParamEmpty[0]=true;
                                                             }else {
-                                                                long count=((List) param).stream().filter(e->e!=null).count();
+                                                                long count=((List) param).stream().filter(Objects::nonNull).count();
                                                                 if(count==0){
                                                                     isParamEmpty[0]=true;
                                                                 }
@@ -227,7 +227,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                                                         validList.add(val);
                                                                     }
                                                                 }
-                                                                if(validList.size()==0){
+                                                                if(validList.isEmpty()){
                                                                     isParamEmpty[0]=true;
                                                                 }
                                                             }

@@ -368,15 +368,15 @@ public class BaseService<T,K extends Serializable> {
                 return predicate;
             }
         });
-        if(resultList==null||resultList.size()==0){
+        if(resultList==null||resultList.isEmpty()){
             return true;
         }else{
-            if(excludeIds==null||excludeIds.length==0||Arrays.stream(excludeIds).filter(id->id!=null).count()==0) {
+            if(excludeIds==null||excludeIds.length==0||Arrays.stream(excludeIds).filter(Objects::nonNull).count()==0) {
                 return false;
             }else{
-                Set<K> idSet= Arrays.stream(excludeIds).filter(id->id!=null).collect(Collectors.toSet());
+                Set<K> idSet= Arrays.stream(excludeIds).filter(Objects::nonNull).collect(Collectors.toSet());
                 List filterList=resultList.stream().filter(e->!idSet.contains(RDBUtil.getPKVal(e))).collect(Collectors.toList());
-                if (filterList!=null&&filterList.size()>0){
+                if (filterList!=null&&!filterList.isEmpty()){
                     flag= false;
                 }
             }

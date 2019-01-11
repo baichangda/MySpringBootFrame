@@ -8,6 +8,7 @@ import com.bcd.rdb.util.ConditionUtil;
 import javax.persistence.criteria.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +54,7 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Pred
                 }
                 case IN: {
                     if(val instanceof Collection){
-                       List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null).collect(Collectors.toList());
+                       List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         predicate=path.in(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
@@ -62,7 +63,7 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Pred
                 }
                 case NOT_IN: {
                     if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null).collect(Collectors.toList());
+                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         predicate=cb.not(path.in(notEmptyList));
                     }else{
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");

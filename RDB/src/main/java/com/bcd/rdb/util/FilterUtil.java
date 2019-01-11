@@ -9,6 +9,8 @@ import com.bcd.rdb.bean.info.BeanInfo;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 
 import java.lang.reflect.Field;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class FilterUtil {
+
+    private final static Logger logger= LoggerFactory.getLogger(FilterUtil.class);
 
     public static Cache getBeanFilterCache(){
         if(SpringUtil.applicationContext==null){
@@ -271,7 +275,7 @@ public class FilterUtil {
                         clear(PropertyUtils.getProperty(o, field.getName()), level - 1,isJpaField);
                     }
                 } catch (IllegalAccessException |InvocationTargetException |NoSuchMethodException e) {
-                    e.printStackTrace();
+                    logger.error("Error",e);
                 }
             }
         });

@@ -10,6 +10,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -23,7 +24,7 @@ public class ConditionImplConverter implements Converter<ConditionImpl,Predicate
         Root root=(Root)exts[0];
         CriteriaQuery query=(CriteriaQuery)exts[1];
         CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(c->c!=null).toArray(len->new Predicate[len]);
+        Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(Objects::nonNull).toArray(len->new Predicate[len]);
         if(ConditionImpl.ConcatWay.AND.equals(concatWay)){
             return cb.and(predicates);
         }else if(ConditionImpl.ConcatWay.OR.equals(concatWay)){

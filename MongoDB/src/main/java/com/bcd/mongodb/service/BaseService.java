@@ -211,13 +211,13 @@ public class BaseService<T,K extends Serializable>{
         Query query=new Query(Criteria.where(fieldName).is(val));
         List<T> resultList= mongoTemplate.find(query,beanClass);
         if(excludeIds==null||excludeIds.length==0){
-            if (resultList!=null&&resultList.size()>0){
+            if (resultList!=null&&!resultList.isEmpty()){
                 flag= false;
             }
         }else{
             Set<K> idSet= Arrays.stream(excludeIds).collect(Collectors.toSet());
             List filterList=resultList.stream().filter(e->!idSet.contains(MongoUtil.getPKVal(e))).collect(Collectors.toList());
-            if (filterList!=null&&filterList.size()>0){
+            if (filterList!=null&&!filterList.isEmpty()){
                 flag= false;
             }
         }

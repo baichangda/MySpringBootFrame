@@ -1,7 +1,6 @@
 package com.bcd.rdb.dbinfo.controller;
 
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.DateZoneUtil;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.dbinfo.service.TablesService;
@@ -14,10 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/tables")

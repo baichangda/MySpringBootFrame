@@ -10,7 +10,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +80,7 @@ public class BeanInfo{
 
     public void initUnique(){
         uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
-        if(uniqueFieldList.size()==0){
+        if(uniqueFieldList.isEmpty()){
             isCheckUnique =false;
         }else{
             isCheckUnique =true;

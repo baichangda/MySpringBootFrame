@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -46,7 +47,7 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                 }
                 case IN: {
                     if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null).collect(Collectors.toList());
+                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.in(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");
@@ -55,7 +56,7 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                 }
                 case NOT_IN: {
                     if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null).collect(Collectors.toList());
+                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.nin(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");

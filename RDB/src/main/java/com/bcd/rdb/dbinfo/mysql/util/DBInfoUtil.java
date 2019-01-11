@@ -6,7 +6,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -38,9 +37,9 @@ public class DBInfoUtil {
             String suffix = springMap.get("profiles.active").toString();
             if (!StringUtils.isEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
-                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf(".")) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
+                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
                 Path activePath = Paths.get(activePathStr);
-                if (Files.exists(activePath)) {
+                if (activePath.toFile().exists()) {
                     dataMap = yaml.load(new FileInputStream(activePath.toFile()));
                     springMap = (LinkedHashMap) dataMap.get("spring");
                     dataSourceMap = (LinkedHashMap) springMap.get("datasource");
@@ -50,7 +49,7 @@ public class DBInfoUtil {
             String url = dataSourceMap.get("url").toString();
             String username = dataSourceMap.get("username").toString();
             String password = dataSourceMap.get("password").toString();
-            String pre = url.substring(0, url.indexOf("?"));
+            String pre = url.substring(0, url.indexOf('?'));
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
             props.put("url", dbInfoUrl);
@@ -163,7 +162,7 @@ public class DBInfoUtil {
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
                 List<Map<String, Object>> jsonArray = parseResult(rs);
-                if (jsonArray == null || jsonArray.size() == 0) {
+                if (jsonArray == null || jsonArray.isEmpty()) {
                     return null;
                 }
                 res = jsonArray.get(0);
@@ -212,7 +211,7 @@ public class DBInfoUtil {
             pstsm.setString(4, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
                 List<Map<String, Object>> res = parseResult(rs);
-                if (res.size() == 0) {
+                if (res.isEmpty()) {
                     return null;
                 } else {
                     return res.get(0);
