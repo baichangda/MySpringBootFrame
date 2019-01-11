@@ -4,11 +4,9 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.lang.Nullable;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
@@ -65,15 +63,12 @@ public class MySessionRedisDAO extends EnterpriseCacheSessionDAO {
     protected void doUpdate(Session session) {
         super.doUpdate(session);
         //这里更新redis用户信息过期时间
-        Boolean res=(Boolean)redisOp.getOperations().execute(new RedisCallback<Object>() {
-            @Nullable
-            @Override
-            public Object doInRedis(RedisConnection connection){
-                return connection.set(redisOp.getOperations().getKeySerializer().serialize(session.getId()),redisOp.getOperations().getValueSerializer().serialize(session),Expiration.seconds(TIME_OUT_SECONDS), RedisStringCommands.SetOption.SET_IF_PRESENT);
-            }
-        });
+        Boolean res=(Boolean)redisOp.getOperations().execute((RedisConnection connection)->
+             connection.set(redisOp.getOperations().getKeySerializer().serialize(session.getId()),redisOp.getOperations().getValueSerializer().serialize(session),Expiration.seconds(TIME_OUT_SECONDS), RedisStringCommands.SetOption.SET_IF_PRESENT)
+        );
         if(!res){
-            session.stop();
+            //设置session立即过期
+            session.setTimeout(0L);
         }
     }
 

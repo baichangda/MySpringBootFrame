@@ -2,6 +2,7 @@ package com.bcd.config.exception.handler.impl;
 
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.message.ErrorMessage;
+import com.bcd.base.message.Message;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.base.config.shiro.ShiroConst;
@@ -31,6 +32,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
         }
         handle(response, result);
     }
+
 
     @Override
     public void handle(HttpServletResponse response, Object result) throws IOException {

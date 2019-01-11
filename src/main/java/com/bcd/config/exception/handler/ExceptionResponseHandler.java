@@ -1,5 +1,8 @@
 package com.bcd.config.exception.handler;
 
+import com.bcd.base.message.ErrorMessage;
+import com.bcd.base.message.Message;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 

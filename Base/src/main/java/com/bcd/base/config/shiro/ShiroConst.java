@@ -6,6 +6,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
+import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.UnknownSessionException;
 
 import java.util.HashMap;
@@ -24,9 +25,11 @@ public class ShiroConst {
         EXCEPTION_ERROR_MESSAGE_MAP.put(DisabledAccountException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_DISABLED_ACCOUNT);
         EXCEPTION_ERROR_MESSAGE_MAP.put(AuthenticationException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_AUTHENTICATION);
         EXCEPTION_ERROR_MESSAGE_MAP.put(UnauthenticatedException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED);
+        EXCEPTION_ERROR_MESSAGE_MAP.put(UnauthorizedException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_UNAUTHORIZEDEXCEPTION);
         EXCEPTION_ERROR_MESSAGE_MAP.put(ExpiredCredentialsException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_EXPIRED_CREDENTIALS);
         EXCEPTION_ERROR_MESSAGE_MAP.put(AuthorizationException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_AUTHORIZATION);
         EXCEPTION_ERROR_MESSAGE_MAP.put(UnauthorizedException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_AUTHORIZATION);
         EXCEPTION_ERROR_MESSAGE_MAP.put(UnknownSessionException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_UNKNOWNSESSIONEXCEPTION);
+        EXCEPTION_ERROR_MESSAGE_MAP.put(ExpiredSessionException.class.getName(), ShiroMessageDefine.ERROR_SHIRO_EXPIREDSESSIONEXCEPTION);
     }
 }

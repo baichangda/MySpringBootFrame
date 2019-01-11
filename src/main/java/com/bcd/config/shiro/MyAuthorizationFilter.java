@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.shiro.AuthorizationHandler;
 import org.apache.shiro.authz.AuthorizationException;
@@ -68,7 +69,7 @@ public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
                 WebUtils.issueRedirect(request, response, unauthorizedUrl);
             } else {
                 //这里返回自定义异常
-                handler.handle(WebUtils.toHttp(response),new AuthorizationException());
+                handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_AUTHORIZATION.toJsonMessage());
             }
         }
         return false;

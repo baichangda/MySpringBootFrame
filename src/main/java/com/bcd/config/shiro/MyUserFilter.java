@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.web.filter.authc.UserFilter;
@@ -17,7 +18,7 @@ public class MyUserFilter extends UserFilter{
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        handler.handle(WebUtils.toHttp(response),new UnauthenticatedException());
+        handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
         return false;
     }
 }
