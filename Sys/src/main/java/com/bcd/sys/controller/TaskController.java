@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import com.bcd.sys.service.TaskService;
@@ -128,7 +131,9 @@ public class TaskController extends BaseController {
     @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
     @ApiResponse(code = 200,message = "停止系统任务结果")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
-        TaskUtil.stopTask(true,ids);
+        if(ids!=null&&ids.length>0){
+            TaskUtil.stopTask(true,Arrays.stream(ids).map(e->(Serializable)e).toArray(len->new Serializable[len]));
+        }
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 

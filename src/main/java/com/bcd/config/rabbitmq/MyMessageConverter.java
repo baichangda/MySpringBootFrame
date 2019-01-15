@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
 @SuppressWarnings("unchecked")
 public class MyMessageConverter implements MessageConverter{
     @Override
-    public Message toMessage(Object object, MessageProperties messageProperties) throws MessageConversionException {
+    public Message toMessage(Object object, MessageProperties messageProperties){
         return null;
     }
 
@@ -28,7 +28,7 @@ public class MyMessageConverter implements MessageConverter{
      * @throws MessageConversionException
      */
     @Override
-    public Object fromMessage(Message message) throws MessageConversionException {
+    public Object fromMessage(Message message){
         MessageProperties properties = message.getMessageProperties();
         if(properties==null){
             return message;

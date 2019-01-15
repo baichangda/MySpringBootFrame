@@ -66,17 +66,19 @@ allprojects{
         compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
     }
 
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-
-            options.compilerArgs << "-Xlint:unchecked"
-            options.compilerArgs << "-parameters"
-            options.encoding = "UTF-8"
-            options.warnings = false
-        }
+    compileJava{
+        options.compilerArgs << "-Xlint:unchecked"
+        options.compilerArgs << "-parameters"
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xdiags:verbose"
     }
 
-
+    compileTestJava{
+        options.compilerArgs << "-Xlint:unchecked"
+        options.compilerArgs << "-parameters"
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xdiags:verbose"
+    }
 
     jar {
         enabled = true
