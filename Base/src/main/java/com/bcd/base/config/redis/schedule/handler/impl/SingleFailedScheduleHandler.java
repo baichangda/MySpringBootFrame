@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.lang.Nullable;
 
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果
@@ -52,13 +50,9 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     public boolean doBeforeStart() {
         try {
             //1、获取锁
-            boolean isLock=(boolean)redisTemplate.execute(new RedisCallback<Object>() {
-                @Nullable
-                @Override
-                public Object doInRedis(RedisConnection connection){
-                    return connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT);
-                }
-            });
+            boolean isLock=(boolean)redisTemplate.execute((RedisConnection connection)->
+                    connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
+            );
             return isLock;
         }catch (Exception e){
             logger.error("Error",e);

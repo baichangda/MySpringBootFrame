@@ -2,7 +2,6 @@ package com.bcd.config.shiro;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.apache.shiro.web.util.WebUtils;
 

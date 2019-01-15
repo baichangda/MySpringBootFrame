@@ -7,9 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.types.Expiration;
-import org.springframework.lang.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -158,13 +156,9 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * @return
      */
     private boolean getLock(){
-        return (boolean)redisTemplate.execute(new RedisCallback<Object>() {
-            @Nullable
-            @Override
-            public Object doInRedis(RedisConnection connection){
-                return connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT);
-            }
-        });
+        return (boolean)redisTemplate.execute((RedisConnection connection)->
+            connection.set(redisTemplate.getKeySerializer().serialize(lockId),redisTemplate.getValueSerializer().serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT)
+        );
     }
 
     /**
