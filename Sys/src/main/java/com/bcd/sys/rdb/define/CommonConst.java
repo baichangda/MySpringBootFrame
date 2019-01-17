@@ -1,4 +1,4 @@
-package com.bcd.sys.define;
+package com.bcd.sys.rdb.define;
 
 
 public class CommonConst {

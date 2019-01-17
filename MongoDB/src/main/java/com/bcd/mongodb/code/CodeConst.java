@@ -74,7 +74,7 @@ public class CodeConst {
     public final static Set<String> IGNORE_PARAM_NAME=new HashSet<>();
     static{
         IGNORE_PARAM_NAME.add("createTime");
-        IGNORE_PARAM_NAME.add("updateTIme");
+        IGNORE_PARAM_NAME.add("updateTime");
         IGNORE_PARAM_NAME.add("createUserId");
         IGNORE_PARAM_NAME.add("createUserName");
         IGNORE_PARAM_NAME.add("updateUserId");

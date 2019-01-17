@@ -2,7 +2,7 @@ package com.bcd.config.shiro;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.sys.shiro.AuthorizationHandler;
+import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.StringUtils;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;

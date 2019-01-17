@@ -1,6 +1,6 @@
 package com.bcd;
 
-import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.rdb.bean.TaskBean;
 import com.bcd.sys.task.function.NamedTaskFunction;
 import org.springframework.stereotype.Component;
 

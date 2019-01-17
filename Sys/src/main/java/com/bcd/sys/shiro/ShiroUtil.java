@@ -1,7 +1,7 @@
-package com.bcd.sys.rdb.util;
+package com.bcd.sys.shiro;
 
-import com.bcd.sys.rdb.bean.UserBean;
-import com.bcd.sys.rdb.shiro.MyShiroRealm;
+import com.bcd.sys.MyAuthorizingRealm;
+import com.bcd.sys.UserDataAccess;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -11,13 +11,14 @@ import java.util.Collection;
 /**
  * Created by Administrator on 2017/4/26.
  */
+@SuppressWarnings("unchecked")
 public class ShiroUtil {
     /**
      * 清除当前登录用户缓存权限信息
      */
     public static void clearCurrentUserCachedAuthorizationInfo(){
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyShiroRealm realm=  (MyShiroRealm)rsm.getRealms().iterator().next();
+        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
         realm.clearCurrentUserCachedAuthorizationInfo();
     }
 
@@ -25,10 +26,10 @@ public class ShiroUtil {
      * 获取当前登录用户
      * @return
      */
-    public static UserBean getCurrentUser(){
-        UserBean user;
+    public static <T extends UserDataAccess>T getCurrentUser(){
+        T user;
         try{
-            user=(UserBean)SecurityUtils.getSubject().getSession().getAttribute("user");
+            user=(T)SecurityUtils.getSubject().getSession().getAttribute("user");
         }catch (UnavailableSecurityManagerException e){
             user=null;
         }
@@ -41,7 +42,7 @@ public class ShiroUtil {
      */
     public static Collection<String> getCurrentUserRoles(){
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyShiroRealm realm=  (MyShiroRealm)rsm.getRealms().iterator().next();
+        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
         return realm.getAllRoles();
     }
 
@@ -51,7 +52,7 @@ public class ShiroUtil {
      */
     public static Collection<String> getCurrentUserPermissions(){
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyShiroRealm realm=  (MyShiroRealm)rsm.getRealms().iterator().next();
+        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
         return realm.getAllPermissions();
     }
 

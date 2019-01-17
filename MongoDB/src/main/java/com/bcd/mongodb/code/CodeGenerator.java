@@ -7,6 +7,7 @@ import com.bcd.mongodb.test.bean.TestBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Transient;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -186,9 +187,11 @@ public class CodeGenerator {
      * @param beanFilePath
      */
     public static void parseBeanClass(CollectionConfig collectionConfig,Class beanClass, String beanFilePath){
-        String classRegex="( *)public( +)class( +)"+beanClass.getSimpleName()+"(.*)";
-        Pattern classPattern=Pattern.compile(classRegex);
+        collectionConfig.getValueMap().put("moduleNameCN",collectionConfig.getModuleNameCN());
         List<Field> fieldList=FieldUtils.getAllFieldsList(beanClass).stream().filter(e->{
+            if(e.getAnnotation(Transient.class)!=null){
+                return false;
+            }
             if("id".equals(e.getName())){
                 return true;
             }
@@ -221,11 +224,6 @@ public class CodeGenerator {
                     prevStr=str;
                     continue;
                 }
-                //解析实体类注释
-                if(classPattern.matcher(str).matches()){
-                    String moduleNameCN=prevStr.substring(prevStr.indexOf("//")+2).trim();
-                    collectionConfig.getValueMap().put("moduleNameCN",moduleNameCN);
-                }
                 //解析实体类字段
                 for (Field field : fieldList) {
                     String typeName=field.getType().getSimpleName();
@@ -251,7 +249,7 @@ public class CodeGenerator {
     /**
      * @param config
      */
-    private static void generate(Config config) {
+    public static void generate(Config config) {
         CollectionConfig[] collectionConfigs = config.getCollectionConfigs();
         for (CollectionConfig collectionConfig : collectionConfigs) {
             try {

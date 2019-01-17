@@ -1,11 +1,11 @@
-package com.bcd.sys.controller;
+package com.bcd.sys.rdb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.define.MessageDefine;
+import com.bcd.sys.rdb.define.CommonConst;
+import com.bcd.sys.rdb.define.MessageDefine;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -15,8 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.service.UserService;
+import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.rdb.service.UserService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController

@@ -1,6 +1,6 @@
 import com.bcd.*;
-import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.service.OrgService;
+import com.bcd.sys.rdb.bean.TaskBean;
+import com.bcd.sys.rdb.service.OrgService;
 import com.bcd.sys.task.CommonConst;
 import com.bcd.sys.task.TaskUtil;
 import org.junit.runner.RunWith;

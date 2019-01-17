@@ -382,7 +382,7 @@ public class CodeGenerator {
             if("String".equals(javaColumn.getType())){
                 if(config.isNeedBeanValidate()) {
                     fieldSb.append(blank);
-                    fieldSb.append("@Length(max = ");
+                    fieldSb.append("@Size(max = ");
                     fieldSb.append(javaColumn.getStrLen());
                     fieldSb.append(",message = \"[");
                     fieldSb.append(columnCommentPre);

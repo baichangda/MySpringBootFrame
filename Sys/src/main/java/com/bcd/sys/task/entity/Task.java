@@ -1,4 +1,4 @@
-package com.bcd.sys.rdb.task.entity;
+package com.bcd.sys.task.entity;
 
 import java.io.Serializable;
 

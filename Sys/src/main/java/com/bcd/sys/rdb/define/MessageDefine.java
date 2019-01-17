@@ -1,4 +1,4 @@
-package com.bcd.sys.define;
+package com.bcd.sys.rdb.define;
 
 import com.bcd.base.i18n.I18NData;
 import com.bcd.base.message.ErrorMessage;

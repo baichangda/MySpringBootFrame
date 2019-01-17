@@ -1,4 +1,4 @@
-package com.bcd.sys.rdb.shiro;
+package com.bcd.base.config.shiro;
 
 import org.apache.shiro.aop.MethodInvocation;
 

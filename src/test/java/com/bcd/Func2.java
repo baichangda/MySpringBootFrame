@@ -1,9 +1,9 @@
 package com.bcd;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.bean.OrgBean;
-import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.service.OrgService;
+import com.bcd.sys.rdb.bean.OrgBean;
+import com.bcd.sys.rdb.bean.TaskBean;
+import com.bcd.sys.rdb.service.OrgService;
 import com.bcd.sys.task.function.NamedTaskFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

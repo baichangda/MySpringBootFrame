@@ -1,9 +1,9 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.sys.shiro.MyShiroRealm;
-import com.bcd.sys.shiro.AuthorizationHandler;
-import com.bcd.sys.shiro.impl.DefaultAuthorizationHandler;
+import com.bcd.sys.rdb.shiro.MyShiroRealm;
+import com.bcd.base.config.shiro.AuthorizationHandler;
+import com.bcd.sys.rdb.shiro.impl.DefaultAuthorizationHandler;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -93,16 +93,6 @@ public class ShiroConfiguration{
         sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));
         sessionManager.setGlobalSessionTimeout(-1000L);
         return sessionManager;
-    }
-
-    /**
-     * 当前用户验证处理器,用于跳过不需要验证的用户
-     * @return
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public AuthorizationHandler currentUserValidateHandler(){
-        return new DefaultAuthorizationHandler();
     }
 
     /**

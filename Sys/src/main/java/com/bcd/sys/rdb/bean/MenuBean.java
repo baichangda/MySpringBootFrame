@@ -1,17 +1,12 @@
-package com.bcd.sys.bean;
+package com.bcd.sys.rdb.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
+
 import javax.persistence.*;
-import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
-
-
-
-import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 /**
  *  菜单表
@@ -24,15 +19,15 @@ public class MenuBean extends BaseBean<Long> {
     private Long parentId;
 
     @NotBlank(message = "[菜单名称]不能为空")
-    @Length(max = 50,message = "[菜单名称]长度不能超过50")
+    @Size(max = 50,message = "[菜单名称]长度不能超过50")
     @ApiModelProperty(value = "菜单名称(不能为空,长度不能超过50)")
     private String name;
 
-    @Length(max = 256,message = "[url地址]长度不能超过256")
+    @Size(max = 256,message = "[url地址]长度不能超过256")
     @ApiModelProperty(value = "url地址(长度不能超过256)")
     private String url;
 
-    @Length(max = 256,message = "[图标]长度不能超过256")
+    @Size(max = 256,message = "[图标]长度不能超过256")
     @ApiModelProperty(value = "图标(长度不能超过256)")
     private String icon;
 

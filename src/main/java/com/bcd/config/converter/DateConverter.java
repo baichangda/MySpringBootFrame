@@ -3,7 +3,7 @@ package com.bcd.config.converter;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateUtil;
 import com.bcd.define.MessageDefine;
-import com.bcd.sys.util.ShiroUtil;
+import com.bcd.sys.shiro.ShiroUtil;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

@@ -1,11 +1,11 @@
-package com.bcd.sys.controller;
+package com.bcd.sys.rdb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.rdb.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.rdb.bean.TaskBean;
 import com.bcd.sys.task.TaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.service.TaskService;
+import com.bcd.sys.rdb.service.TaskService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController

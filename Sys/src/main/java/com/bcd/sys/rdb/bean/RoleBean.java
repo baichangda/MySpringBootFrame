@@ -1,17 +1,12 @@
-package com.bcd.sys.bean;
+package com.bcd.sys.rdb.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.Date;
+
 import javax.persistence.*;
-import org.hibernate.validator.constraints.Length;
-import javax.validation.constraints.NotNull;
+
 import javax.validation.constraints.NotBlank;
-import java.math.BigDecimal;
-
-
-
-import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 /**
  *  角色表
@@ -21,16 +16,16 @@ import javax.persistence.*;
 public class RoleBean extends BaseBean<Long> {
     //field
     @NotBlank(message = "[角色名称]不能为空")
-    @Length(max = 20,message = "[角色名称]长度不能超过20")
+    @Size(max = 20,message = "[角色名称]长度不能超过20")
     @ApiModelProperty(value = "角色名称(不能为空,长度不能超过20)")
     private String name;
 
     @NotBlank(message = "[编码]不能为空")
-    @Length(max = 100,message = "[编码]长度不能超过100")
+    @Size(max = 100,message = "[编码]长度不能超过100")
     @ApiModelProperty(value = "编码(不能为空,长度不能超过100)")
     private String code;
 
-    @Length(max = 256,message = "[备注]长度不能超过256")
+    @Size(max = 256,message = "[备注]长度不能超过256")
     @ApiModelProperty(value = "备注(长度不能超过256)")
     private String remark;
 

@@ -1,4 +1,4 @@
-package com.bcd.sys.controller;
+package com.bcd.sys.rdb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
-import com.bcd.sys.bean.RoleBean;
-import com.bcd.sys.service.RoleService;
+import com.bcd.sys.rdb.bean.RoleBean;
+import com.bcd.sys.rdb.service.RoleService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController

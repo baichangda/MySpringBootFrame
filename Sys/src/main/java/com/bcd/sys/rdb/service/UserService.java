@@ -1,14 +1,14 @@
-package com.bcd.sys.service;
+package com.bcd.sys.rdb.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.define.MessageDefine;
+import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.rdb.define.CommonConst;
+import com.bcd.sys.rdb.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
-import com.bcd.sys.shiro.MyShiroRealm;
+import com.bcd.sys.rdb.shiro.MyShiroRealm;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;

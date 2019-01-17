@@ -1,7 +1,7 @@
-package com.bcd.sys.service;
+package com.bcd.sys.rdb.service;
 
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.bean.PermissionBean;
+import com.bcd.sys.rdb.bean.PermissionBean;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,11 +1,12 @@
-package com.bcd.sys.shiro;
+package com.bcd.sys.rdb.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.service.UserService;
+import com.bcd.sys.MyAuthorizingRealm;
+import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.rdb.define.CommonConst;
+import com.bcd.sys.rdb.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -23,7 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class MyShiroRealm extends AuthorizingRealm {
+public class MyShiroRealm extends MyAuthorizingRealm {
   
     @Autowired
     private UserService userService;
@@ -87,30 +88,5 @@ public class MyShiroRealm extends AuthorizingRealm {
         }
          //返回null将会导致用户访问任何被拦截的请求时都会自动跳转到unauthorizedUrl指定的地址
         return info;
-    }
-
-    /**
-     * 清除当前用户的缓存权限数据,便于重新调用doGetAuthorizationInfo获取权限数据
-     */
-    public void clearCurrentUserCachedAuthorizationInfo(){
-        clearCachedAuthorizationInfo(SecurityUtils.getSubject().getPrincipals());
-    }
-
-    /**
-     * 获取当前用户的所有角色
-     * @return
-     */
-    public Collection<String> getAllRoles(){
-        AuthorizationInfo authorizationInfo= getAuthorizationInfo(SecurityUtils.getSubject().getPrincipals());
-        return authorizationInfo.getRoles();
-    }
-
-    /**
-     * 获取当前用户的所有权限
-     * @return
-     */
-    public Collection<String> getAllPermissions(){
-        AuthorizationInfo authorizationInfo= getAuthorizationInfo(SecurityUtils.getSubject().getPrincipals());
-        return authorizationInfo.getStringPermissions();
     }
 }
