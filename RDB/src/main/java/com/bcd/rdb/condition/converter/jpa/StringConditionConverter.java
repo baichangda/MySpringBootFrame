@@ -4,6 +4,7 @@ import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.util.ConditionUtil;
+import org.assertj.core.util.Arrays;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
@@ -51,6 +52,9 @@ public class StringConditionConverter implements Converter<StringCondition,Predi
                 case IN: {
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null).collect(Collectors.toList());
+                        predicate=path.in(notEmptyList);
+                    }else if(Arrays.isArray(val)){
+                        List notEmptyList=Arrays.asList(val).stream().filter(e->e!=null).collect(Collectors.toList());
                         predicate=path.in(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");

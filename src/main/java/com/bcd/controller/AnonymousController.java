@@ -1,8 +1,8 @@
 package com.bcd.controller;
 
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
-import com.bcd.rdb.controller.BaseController;
 import com.bcd.service.ApiService;
 import com.bcd.sys.keys.KeysConst;
 import io.swagger.annotations.*;

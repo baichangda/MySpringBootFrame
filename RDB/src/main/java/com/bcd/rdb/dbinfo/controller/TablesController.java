@@ -1,8 +1,8 @@
 package com.bcd.rdb.dbinfo.controller;
 
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
-import com.bcd.rdb.controller.BaseController;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import io.swagger.annotations.*;
 import org.apache.poi.ss.usermodel.Workbook;

@@ -1,11 +1,10 @@
 package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.sys.rdb.shiro.MyShiroRealm;
 import com.bcd.base.config.shiro.AuthorizationHandler;
-import com.bcd.sys.rdb.shiro.impl.DefaultAuthorizationHandler;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
+import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -13,7 +12,6 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,7 +64,7 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager defaultWebSecurityManager(MyShiroRealm realm,SessionManager sessionManager,EhCacheManager ehCacheManager){
+    public DefaultWebSecurityManager defaultWebSecurityManager(AuthorizingRealm realm, SessionManager sessionManager, EhCacheManager ehCacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealm(realm);

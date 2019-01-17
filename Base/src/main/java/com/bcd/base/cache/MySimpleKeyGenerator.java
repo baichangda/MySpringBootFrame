@@ -1,4 +1,4 @@
-package com.bcd.rdb.cache;
+package com.bcd.base.cache;
 
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.stereotype.Component;

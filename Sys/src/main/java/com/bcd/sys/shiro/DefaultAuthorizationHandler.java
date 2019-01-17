@@ -1,9 +1,8 @@
-package com.bcd.sys.rdb.shiro.impl;
+package com.bcd.sys.shiro;
 
-import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.UserDataAccess;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.base.config.shiro.AuthorizationHandler;
-import com.bcd.sys.shiro.ShiroUtil;
 import org.apache.shiro.aop.MethodInvocation;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +26,8 @@ public class DefaultAuthorizationHandler implements AuthorizationHandler {
      * @return
      */
     private boolean skip(){
-        UserBean userBean= ShiroUtil.getCurrentUser();
-        if(userBean!=null&& CommonConst.ADMIN_ID.equals(userBean.getId())){
+        UserDataAccess user= ShiroUtil.getCurrentUser();
+        if(user!=null&& CommonConst.ADMIN_ID.equals(user.getId())){
             return true;
         }else{
             return false;

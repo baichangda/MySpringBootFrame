@@ -1,4 +1,4 @@
-package com.bcd.rdb.cache.anno;
+package com.bcd.base.cache;
 
 import org.springframework.cache.annotation.CacheConfig;
 

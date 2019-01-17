@@ -72,12 +72,12 @@ public class UserBean extends BaseBean<String> implements UserDataAccess<String>
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     @Override
     public String getTimeZone() {
-        return null;
+        return timeZone;
     }
 
     public void setUsername(String username) {

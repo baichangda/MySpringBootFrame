@@ -2,7 +2,7 @@ package @{package}.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.mongodb.controller.BaseController;
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import io.swagger.annotations.*;

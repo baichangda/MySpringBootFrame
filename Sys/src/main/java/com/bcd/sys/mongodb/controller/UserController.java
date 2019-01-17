@@ -2,17 +2,19 @@ package com.bcd.sys.mongodb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.mongodb.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.sys.define.CommonConst;
 import io.swagger.annotations.*;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
-import org.springframework.validation.annotation.Validated;
+
 import com.bcd.sys.mongodb.bean.UserBean;
 import com.bcd.sys.mongodb.service.UserService;
 
@@ -133,9 +135,12 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "用户实体")  @RequestBody UserBean user){
+    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody UserBean user){
+        if(user.getId()==null){
+            user.setPassword(userService.encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
+        }
         userService.save(user);
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 
 
@@ -149,6 +154,104 @@ public class UserController extends BaseController {
     @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "用户id数组") @RequestParam String[] ids){
         userService.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return com.bcd.base.define.MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+    }
+
+    /**
+     * 登录
+     * @param username
+     * @param password
+     * @param timeZone
+     * @return
+     */
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @ApiOperation(value="用户登录",notes = "根据帐号密码登录")
+    @ApiResponse(code = 200,message = "登录的用户信息")
+    public JsonMessage login(
+            @ApiParam(value = "用户名")
+            @RequestParam(value = "username",required = true) String username,
+            @ApiParam(value = "密码")
+            @RequestParam(value = "password",required = true) String password,
+            @ApiParam(value = "时区")
+            @RequestParam(value="timeZone",required = true)String timeZone){
+        UserBean user= userService.login(username,password,timeZone);
+        return JsonMessage.success(user);
+    }
+
+    /**
+     * 注销
+     * @return
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @ApiOperation(value="用户注销",notes = "用户注销")
+    @ApiResponse(code = 200,message = "注销结果")
+    public JsonMessage logout() {
+        Subject currentUser = SecurityUtils.getSubject();
+        JsonMessage jsonMessage= com.bcd.sys.define.MessageDefine.SUCCESS_LOGOUT.toJsonMessage(true);
+        //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
+        currentUser.logout();
+        return jsonMessage;
+    }
+
+    /**
+     * 重置密码
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    @ApiOperation(value="重置密码",notes = "重置密码")
+    @ApiResponse(code = 200,message = "重制密码结果")
+    public JsonMessage resetPassword(@ApiParam(value = "用户主键") @RequestParam(value = "userId") String userId){
+        userService.resetPassword(userId);
+        return com.bcd.sys.define.MessageDefine.SUCCESS_RESET_PASSWORD.toJsonMessage(true);
+    }
+
+
+    /**
+     * 修改密码
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
+    @ApiOperation(value="修改密码",notes = "修改密码")
+    @ApiResponse(code = 200,message = "修改密码结果")
+    public JsonMessage updatePassword(
+            @ApiParam(value = "用户主键")
+            @RequestParam(value = "userId") String userId,
+            @ApiParam(value = "旧密码")
+            @RequestParam(value = "oldPassword") String oldPassword,
+            @ApiParam(value = "新密码")
+            @RequestParam(value = "newPassword") String newPassword){
+        boolean flag= userService.updatePassword(userId,oldPassword,newPassword);
+        if(flag){
+            return com.bcd.base.define.MessageDefine.SUCCESS_UPDATE.toJsonMessage(true);
+        }else{
+            return com.bcd.sys.define.MessageDefine.ERROR_PASSWORD_WRONG.toJsonMessage();
+        }
+    }
+
+    /**
+     * 授予当前登录用户其他身份
+     * @param ids
+     * @return
+     */
+    @RequestMapping(value = "/runAs", method = RequestMethod.POST)
+    @ApiOperation(value="授予当前登录用户其他身份",notes = "授予当前登录用户其他身份")
+    @ApiResponse(code = 200,message = "授权结果")
+    public JsonMessage runAs(String ... ids){
+        userService.runAs(ids);
+        return com.bcd.sys.define.MessageDefine.SUCCESS_AUTHORITY.toJsonMessage(true);
+    }
+
+    /**
+     * 解除当前登录用户的其他身份
+     * @return
+     */
+    @RequestMapping(value = "/releaseRunAs", method = RequestMethod.POST)
+    @ApiOperation(value="解除当前登录用户的其他身份",notes = "解除当前登录用户的其他身份")
+    @ApiResponse(code = 200,message = "解除授权结果")
+    public JsonMessage releaseRunAs(){
+        userService.releaseRunAs();
+        return com.bcd.sys.define.MessageDefine.SUCCESS_RELEASE.toJsonMessage(true);
     }
 }

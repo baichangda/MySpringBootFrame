@@ -1,4 +1,4 @@
-package com.bcd.rdb.cache;
+package com.bcd.base.cache;
 
 import com.bcd.base.util.JsonUtil;
 

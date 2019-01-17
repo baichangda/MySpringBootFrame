@@ -1,4 +1,4 @@
-package com.bcd.rdb.cache;
+package com.bcd.base.cache;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.EnableCaching;

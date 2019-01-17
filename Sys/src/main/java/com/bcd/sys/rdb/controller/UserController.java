@@ -2,10 +2,10 @@ package com.bcd.sys.rdb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.rdb.controller.BaseController;
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.rdb.define.CommonConst;
-import com.bcd.sys.rdb.define.MessageDefine;
+import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.define.MessageDefine;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;

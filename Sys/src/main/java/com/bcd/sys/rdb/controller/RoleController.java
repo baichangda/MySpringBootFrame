@@ -2,7 +2,7 @@ package com.bcd.sys.rdb.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
-import com.bcd.rdb.controller.BaseController;
+import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import io.swagger.annotations.*;

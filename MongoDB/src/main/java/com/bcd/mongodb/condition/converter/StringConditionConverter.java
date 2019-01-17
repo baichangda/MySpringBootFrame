@@ -3,6 +3,7 @@ package com.bcd.mongodb.condition.converter;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
+import org.assertj.core.util.Arrays;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.util.StringUtils;
 
@@ -48,6 +49,9 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                 case IN: {
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                        criteria.in(notEmptyList);
+                    }else if(Arrays.isArray(val)){
+                        List notEmptyList=Arrays.asList(val).stream().filter(e->e!=null).collect(Collectors.toList());
                         criteria.in(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");
