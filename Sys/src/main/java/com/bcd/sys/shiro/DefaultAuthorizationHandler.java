@@ -1,11 +1,10 @@
 package com.bcd.sys.rdb.shiro.impl;
 
 import com.bcd.sys.rdb.bean.UserBean;
-import com.bcd.sys.rdb.define.CommonConst;
+import com.bcd.sys.define.CommonConst;
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import com.bcd.sys.shiro.ShiroUtil;
 import org.apache.shiro.aop.MethodInvocation;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletRequest;
