@@ -1,7 +1,7 @@
-package com.bcd.sys.util;
+package com.bcd.sys.rdb.util;
 
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.shiro.MyShiroRealm;
+import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.rdb.shiro.MyShiroRealm;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.RealmSecurityManager;

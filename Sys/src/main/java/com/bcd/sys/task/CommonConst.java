@@ -1,4 +1,4 @@
-package com.bcd.sys.task;
+package com.bcd.sys.rdb.task;
 
 import java.io.Serializable;
 import java.util.concurrent.*;
