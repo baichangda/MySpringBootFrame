@@ -1,6 +1,6 @@
 package com.bcd.base.controller;
 
-import com.bcd.base.cache.MyCacheClass;
+import com.bcd.base.cache.anno.MyCacheClass;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateZoneUtil;
 import com.bcd.base.util.FileUtil;
