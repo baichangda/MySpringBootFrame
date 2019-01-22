@@ -58,7 +58,7 @@ spring:
       #公用配置
       ssl: false
       database: 0
-      timeout: 10
+      timeout: 10000
       password:
       #同步jedis连接池
 #      jedis:

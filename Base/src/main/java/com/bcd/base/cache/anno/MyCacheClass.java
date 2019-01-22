@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 @Inherited
 public @interface MyCacheClass {
 
-    
+
 }

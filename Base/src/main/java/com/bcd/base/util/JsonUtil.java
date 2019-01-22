@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -30,6 +31,7 @@ public class JsonUtil {
     public final static ObjectMapper GLOBAL_OBJECT_MAPPER= withConfig(new ObjectMapper());
 
 
+
     /**
      * 1、为ObjectMapper重新设置MapSerializer,使其能使用PropertyFilter过滤属性,并为所有的Map添加过滤器
      *    如果设置了map过滤,则必须为objectMapper设置默认过滤器(默认设置空的过滤器)
@@ -38,25 +40,25 @@ public class JsonUtil {
      * 4、设置在解析json字符串为实体类时候,忽略多余的属性
      * 不会生成新的ObjectMapper,只会改变当前传入的ObjectMapper
      *
-     * @param objectMapper
+     * @param t
      * @return
      */
-    public static ObjectMapper withConfig(ObjectMapper objectMapper){
+    public static <T extends ObjectMapper>T withConfig(T t){
         try {
             //1、设置map过滤器
-            SerializerProvider provider=new DefaultSerializerProvider.Impl().createInstance(objectMapper.getSerializationConfig(),objectMapper.getSerializerFactory());
+            SerializerProvider provider=new DefaultSerializerProvider.Impl().createInstance(t.getSerializationConfig(),t.getSerializerFactory());
             JsonSerializer mapSerializer = provider.findValueSerializer(Map.class);
             SimpleModule simpleModule=new SimpleModule();
-            simpleModule.addSerializer(Map.class,mapSerializer.withFilterId("incar"));
+            simpleModule.addSerializer(Map.class,mapSerializer.withFilterId("bcd"));
             //2、设置所有Number属性的 输出为字符串
             simpleModule.addSerializer(Number.class, ToStringSerializer.instance);
-            objectMapper.registerModule(simpleModule);
-            objectMapper.setFilterProvider(EMPTY);
+            t.registerModule(simpleModule);
+            t.setFilterProvider(EMPTY);
             //3、设置忽略null属性输出
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            t.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             //4、设置在解析json字符串为实体类时候,忽略多余的属性
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
-            return objectMapper;
+            t.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+            return t;
         } catch (JsonMappingException e) {
             throw BaseRuntimeException.getException(e);
         }
