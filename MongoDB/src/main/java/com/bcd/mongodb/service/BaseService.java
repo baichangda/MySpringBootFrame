@@ -188,7 +188,6 @@ public class BaseService<T,K extends Serializable>{
         repository.deleteById(id);
     }
 
-    @Transactional
     public void deleteById(K[] ids){
         for(int i=0;i<=ids.length-1;i++){
             repository.deleteById(ids[i]);
@@ -197,6 +196,11 @@ public class BaseService<T,K extends Serializable>{
 
     public void deleteAll(){
         repository.deleteAll();
+    }
+
+    public void delete(Condition condition){
+        Query query= ConditionUtil.toQuery(condition);
+        mongoTemplate.remove(query,beanClass);
     }
 
     /**
