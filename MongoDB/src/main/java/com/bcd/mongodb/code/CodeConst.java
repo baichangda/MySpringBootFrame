@@ -32,15 +32,6 @@ public class CodeConst {
         TYPE_TO_CONDITION.put("boolean","BooleanCondition");
     }
 
-    public final static Map<String,String> FIELD_TO_COMMENT =new HashMap<>();
-    static{
-        FIELD_TO_COMMENT.put("id","主键");
-        FIELD_TO_COMMENT.put("createTime","创建时间");
-        FIELD_TO_COMMENT.put("updateTime","更新时间");
-        FIELD_TO_COMMENT.put("createUserId","创建人id");
-        FIELD_TO_COMMENT.put("updateUserId","更新人id");
-    }
-
     public final static Set<String> ID_FIELD_SET= Stream.of("id","createUserId","updateUserId").collect(Collectors.toSet());
 
     public final static Map<String,String> BASE_TYPE_TO_PACKAGE_TYPE =new HashMap<>();

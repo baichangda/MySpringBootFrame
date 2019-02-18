@@ -4,6 +4,7 @@ import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
 import com.bcd.mongodb.test.bean.TestBean;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,8 +148,7 @@ public class CodeGenerator {
         String dirPath=Paths.get(beanPath).getParent().toString();
         dataMap.put("dirPath",dirPath);
         //3、解析出所有的字段和实体类的注释
-        String beanFilePath=beanPath+beanClass.getSimpleName()+".java";
-        parseBeanClass(collectionConfig,beanClass,beanFilePath);
+        parseBeanClass(collectionConfig,beanClass);
         //4、解析包名
         initPackage(collectionConfig);
         //5、解析主键
@@ -184,9 +184,8 @@ public class CodeGenerator {
      * 2、实体类字段集合
      * @param collectionConfig
      * @param beanClass
-     * @param beanFilePath
      */
-    public static void parseBeanClass(CollectionConfig collectionConfig,Class beanClass, String beanFilePath){
+    public static void parseBeanClass(CollectionConfig collectionConfig,Class beanClass){
         collectionConfig.getValueMap().put("moduleNameCN",collectionConfig.getModuleNameCN());
         List<Field> fieldList=FieldUtils.getAllFieldsList(beanClass).stream().filter(e->{
             if(e.getAnnotation(Transient.class)!=null){
@@ -202,6 +201,8 @@ public class CodeGenerator {
             }
             return false;
         }).collect(Collectors.toList());
+
+
         Map<String,JavaColumn> columnMap= fieldList.stream().map(f-> {
             String fieldName = f.getName();
             Class fieldType;
@@ -210,39 +211,25 @@ public class CodeGenerator {
             } else {
                 fieldType = f.getType();
             }
-            return new JavaColumn(fieldName, fieldType.getSimpleName());
+
+            JavaColumn javaColumn= new JavaColumn(fieldName, fieldType.getSimpleName());
+
+            ApiModelProperty apiModelProperty= f.getAnnotation(ApiModelProperty.class);
+            if(apiModelProperty!=null){
+                String comment=apiModelProperty.value();
+                int index=comment.indexOf("(");
+                if(index>0){
+                    comment=comment.substring(0,index);
+                }
+                javaColumn.setComment(comment);
+            }
+            return javaColumn;
         }).collect(Collectors.toMap(
                 e->e.getName(),
                 e->e,
                 (e1,e2)->e1
         ));
-        try(BufferedReader br=new BufferedReader(new FileReader(beanFilePath))) {
-            String prevStr=null;
-            String str;
-            while((str=br.readLine())!=null){
-                if(prevStr==null||!prevStr.trim().startsWith("//")){
-                    prevStr=str;
-                    continue;
-                }
-                //解析实体类字段
-                for (Field field : fieldList) {
-                    String typeName=field.getType().getSimpleName();
-                    String fieldName=field.getName();
-                    if(CodeConst.FIELD_TO_COMMENT.containsKey(fieldName)){
-                        columnMap.get(fieldName).setComment(CodeConst.FIELD_TO_COMMENT.get(fieldName));
-                    }
-                    String fieldRegex="(.*)"+typeName+"( +)"+fieldName+"( *)(;)( *)";
-                    Pattern p=Pattern.compile(fieldRegex);
-                    if(p.matcher(str).matches()){
-                        String comment=prevStr.substring(prevStr.indexOf("//")+2).trim();
-                        columnMap.get(fieldName).setComment(comment);
-                    }
-                }
-                prevStr=str;
-            }
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+
         collectionConfig.getDataMap().put("fieldList",columnMap.values().stream().collect(Collectors.toList()));
     }
 

@@ -10,15 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Date;
 import java.util.List;
-
+import org.springframework.validation.annotation.Validated;
 import com.bcd.mongodb.test.bean.TestBean;
 import com.bcd.mongodb.test.service.TestService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/test/test")
+@RequestMapping("/api/test")
 public class TestController extends BaseController {
 
     @Autowired
@@ -26,12 +26,12 @@ public class TestController extends BaseController {
 
 
     /**
-     * 查询测试类列表
+     * 查询测试列表
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value="查询测试类列表",notes = "查询测试类列表")
-    @ApiResponse(code = 200,message = "测试类列表")
+    @ApiOperation(value="查询测试列表",notes = "查询测试列表")
+    @ApiResponse(code = 200,message = "测试列表")
     public JsonMessage<List<TestBean>> list(
             @ApiParam(value = "班线code")
             @RequestParam(value = "postlinecode",required = false) String postlinecode,
@@ -50,12 +50,12 @@ public class TestController extends BaseController {
 
 
     /**
-     * 查询测试类列表
+     * 查询测试列表
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询测试类分页",notes = "查询测试类分页")
-    @ApiResponse(code = 200,message = "测试类分页结果集")
+    @ApiOperation(value="查询测试分页",notes = "查询测试分页")
+    @ApiResponse(code = 200,message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
             @ApiParam(value = "班线code")
             @RequestParam(value = "postlinecode",required = false) String postlinecode,
@@ -78,28 +78,28 @@ public class TestController extends BaseController {
     }
 
     /**
-     * 保存测试类
+     * 保存测试
      * @param test
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ApiOperation(value = "保存测试类",notes = "保存测试类")
+    @ApiOperation(value = "保存测试",notes = "保存测试")
     @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "测试类实体")  @RequestBody TestBean test){
+    public JsonMessage save(@ApiParam(value = "测试实体")  @RequestBody TestBean test){
         testService.save(test);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 
 
     /**
-     * 删除测试类
+     * 删除测试
      * @param ids
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除测试类",notes = "删除测试类")
+    @ApiOperation(value = "删除测试",notes = "删除测试")
     @ApiResponse(code = 200,message = "删除结果")
-    public JsonMessage delete(@ApiParam(value = "测试类id数组") @RequestParam String[] ids){
+    public JsonMessage delete(@ApiParam(value = "测试id数组") @RequestParam String[] ids){
         testService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
