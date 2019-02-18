@@ -18,7 +18,7 @@ import com.bcd.mongodb.test.service.TestService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/api/test/test")
 public class TestController extends BaseController {
 
     @Autowired
