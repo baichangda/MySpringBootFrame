@@ -2,7 +2,7 @@ package com.bcd.sys.aop;
 
 import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.BaseBean;
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import com.bcd.sys.shiro.ShiroUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -35,7 +35,7 @@ public class EntityAopConfig {
     @Before("savePointCut()")
     public void doBeforeDAOSave(JoinPoint pjp){
         Object[] paramArr= pjp.getArgs();
-        UserDataAccess user= ShiroUtil.getCurrentUser();
+        UserData user= ShiroUtil.getCurrentUser();
         Arrays.stream(paramArr).forEach(param->{
             if(param==null){
                 return;
@@ -59,7 +59,7 @@ public class EntityAopConfig {
      * @param bean
      * @param user
      */
-    private void setValueBeforeSave(BaseBean bean, UserDataAccess user){
+    private void setValueBeforeSave(BaseBean bean, UserData user){
         //1、判断主键id是否为null,因此判断其为新增还是修改
         Object id=bean.getId();
         //2、属性注入

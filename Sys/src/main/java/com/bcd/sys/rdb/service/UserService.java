@@ -4,6 +4,7 @@ import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
+import com.bcd.sys.UserDataInit;
 import com.bcd.sys.rdb.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
@@ -30,12 +31,31 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserServiceImpl extends BaseService<UserBean,Long> {
+public class UserService extends BaseService<UserBean,Long>  implements UserDataInit {
 
-    private final static Logger logger= LoggerFactory.getLogger(UserServiceImpl.class);
+    private final static Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private MyShiroRealm myShiroRealm;
+
+    @Override
+    public void init() {
+        String username="admin";
+        UserBean userBean= findOne(new StringCondition("username",username));
+        if(userBean==null){
+            userBean=new UserBean();
+            userBean.setUsername(username);
+            String password;
+            if(CommonConst.IS_PASSWORD_ENCODED){
+                password=encryptPassword(username, CommonConst.INITIAL_PASSWORD);
+            }else{
+                password= CommonConst.INITIAL_PASSWORD;
+            }
+            userBean.setPassword(password);
+            userBean.setStatus(1);
+            save(userBean);
+        }
+    }
 
     /**
      * 登录
@@ -80,7 +100,7 @@ public class UserServiceImpl extends BaseService<UserBean,Long> {
      */
     public boolean updatePassword(Long userId,String encryptOldPassword,String encryptNewPassword){
         //1、查找当前用户
-        UserBean sysUserDTO= findById(userId);
+        UserBean userBean= findById(userId);
         //2、根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
             //2.1、获取私钥
@@ -89,19 +109,19 @@ public class UserServiceImpl extends BaseService<UserBean,Long> {
             String oldPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
             String newPassword= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
             //2.3、将原始密码MD5加密后与数据库中进行对比
-            if(sysUserDTO.getPassword().equals(encryptPassword(sysUserDTO.getUsername(), oldPassword))) {
+            if(userBean.getPassword().equals(encryptPassword(userBean.getUsername(), oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名
-                sysUserDTO.setPassword(encryptPassword(sysUserDTO.getUsername(), newPassword));
-                save(sysUserDTO);
+                userBean.setPassword(encryptPassword(userBean.getUsername(), newPassword));
+                save(userBean);
                 return true;
             }else{
                 return false;
             }
         }else{
             //3、如果不加密,则直接对比
-            if(sysUserDTO.getPassword().equals(encryptOldPassword)){
-                sysUserDTO.setPassword(encryptNewPassword);
-                save(sysUserDTO);
+            if(userBean.getPassword().equals(encryptOldPassword)){
+                userBean.setPassword(encryptNewPassword);
+                save(userBean);
                 return true;
             }else{
                 return false;

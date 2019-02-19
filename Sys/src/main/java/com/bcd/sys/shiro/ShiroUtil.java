@@ -1,7 +1,7 @@
 package com.bcd.sys.shiro;
 
 import com.bcd.sys.MyAuthorizingRealm;
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -26,7 +26,7 @@ public class ShiroUtil {
      * 获取当前登录用户
      * @return
      */
-    public static <T extends UserDataAccess>T getCurrentUser(){
+    public static <T extends UserData>T getCurrentUser(){
         T user;
         try{
             user=(T)SecurityUtils.getSubject().getSession().getAttribute("user");

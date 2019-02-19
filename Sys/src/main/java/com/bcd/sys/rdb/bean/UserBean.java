@@ -1,7 +1,7 @@
 package com.bcd.sys.rdb.bean;
 
 import com.bcd.rdb.bean.BaseBean;
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "t_sys_user")
-public class UserBean extends BaseBean<Long> implements UserDataAccess<Long>{
+public class UserBean extends BaseBean<Long> implements UserData<Long> {
     //field
     @ApiModelProperty(value = "关联机构id")
     private Long orgId;

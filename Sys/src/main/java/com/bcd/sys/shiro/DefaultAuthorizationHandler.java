@@ -1,6 +1,6 @@
 package com.bcd.sys.shiro;
 
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.aop.MethodInvocation;
@@ -26,7 +26,7 @@ public class DefaultAuthorizationHandler implements AuthorizationHandler {
      * @return
      */
     private boolean skip(){
-        UserDataAccess user= ShiroUtil.getCurrentUser();
+        UserData user= ShiroUtil.getCurrentUser();
         if(user!=null&& CommonConst.ADMIN_ID.equals(user.getId())){
             return true;
         }else{

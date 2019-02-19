@@ -4,7 +4,7 @@ import com.bcd.mongodb.bean.BaseBean;
 import com.bcd.mongodb.code.CodeGenerator;
 import com.bcd.mongodb.code.CollectionConfig;
 import com.bcd.mongodb.code.Config;
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.Transient;
@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Document(collection = "user")
-public class UserBean extends BaseBean<String> implements UserDataAccess<String>{
+public class UserBean extends BaseBean<String> implements UserData<String> {
 
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50,message = "[用户名]长度不能超过50")

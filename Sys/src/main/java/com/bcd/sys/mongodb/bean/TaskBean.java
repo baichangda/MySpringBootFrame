@@ -6,7 +6,7 @@ import com.bcd.mongodb.bean.SuperBaseBean;
 import com.bcd.mongodb.code.CodeGenerator;
 import com.bcd.mongodb.code.CollectionConfig;
 import com.bcd.mongodb.code.Config;
-import com.bcd.sys.UserDataAccess;
+import com.bcd.sys.UserData;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.task.entity.ClusterTask;
@@ -201,7 +201,7 @@ public class TaskBean extends SuperBaseBean<String> implements ClusterTask{
     public void onCreate() {
         createTime=new Date();
         status= TaskStatus.WAITING.getStatus();
-        UserDataAccess user= ShiroUtil.getCurrentUser();
+        UserData user= ShiroUtil.getCurrentUser();
         if(user!=null) {
             createUserId = user.getId().toString();
             createUserName = user.getUsername();

@@ -1,8 +1,8 @@
-package com.bcd.sys.data.bean;
+package com.bcd.sys;
 
 import java.io.Serializable;
 
-public interface CommonUserBean<K extends Serializable> {
+public interface UserData<K extends Serializable> {
     K getId();
 
     String getUsername();
