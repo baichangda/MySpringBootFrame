@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService  extends BaseService<UserBean,Long> {
+public class UserServiceImpl extends BaseService<UserBean,Long> {
 
-    private final static Logger logger= LoggerFactory.getLogger(UserService.class);
+    private final static Logger logger= LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private MyShiroRealm myShiroRealm;
