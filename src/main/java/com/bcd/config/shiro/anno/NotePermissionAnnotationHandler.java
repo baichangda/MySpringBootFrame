@@ -26,6 +26,7 @@ import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 import org.apache.shiro.subject.Subject;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 /**
  * Checks to see if a @{@link RequiresPermissions RequiresPermissions} annotation is
@@ -51,8 +52,8 @@ public class NotePermissionAnnotationHandler extends AuthorizingAnnotationHandle
      * @return the annotation's <code>value</code>, from which the Permission will be constructed.
      */
     protected String[] getAnnotationValue(Annotation a) {
-        RequiresPermissions rpAnnotation = (RequiresPermissions) a;
-        return rpAnnotation.value();
+        RequiresNotePermissions rpAnnotation = (RequiresNotePermissions) a;
+        return Arrays.stream(rpAnnotation.value()).map(e->e.getCode()).toArray(len->new String[len]);
     }
 
     /**

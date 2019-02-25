@@ -3,7 +3,7 @@ package @{package}.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.SuccessDefine;
+import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class @{upperModuleName}Controller extends BaseController {
     @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "@{moduleNameCN}实体") @{paramValidateAnno} @RequestBody @{upperModuleName}Bean @{lowerModuleName}){
         @{lowerModuleName}Service.save(@{lowerModuleName});
-        return SuccessDefine.SUCCESS_SAVE.toJsonMessage();
+        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 
 
@@ -86,7 +86,7 @@ public class @{upperModuleName}Controller extends BaseController {
     @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "@{moduleNameCN}id数组") @RequestParam @{pkType}[] ids){
         @{lowerModuleName}Service.deleteById(ids);
-        return SuccessDefine.SUCCESS_DELETE.toJsonMessage();
+        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
 
 }

@@ -192,8 +192,8 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
         status= TaskStatus.WAITING.getStatus();
         UserBean userBean= ShiroUtil.getCurrentUser();
         if(userBean!=null) {
-            createUserId = userBean.getCreateUserId();
-            createUserName = userBean.getCreateUserName();
+            createUserId = userBean.getId();
+            createUserName = userBean.getRealName();
         }
         createIp= IPUtil.getIpAddress();
     }

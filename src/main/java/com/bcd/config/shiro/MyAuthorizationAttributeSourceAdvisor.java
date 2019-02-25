@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.anno.RequiresUrlPermission;
 import com.bcd.base.config.shiro.anno.RequiresAction;
 import com.bcd.base.config.shiro.AuthorizationHandler;
@@ -24,7 +25,7 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
             new Class[] {
                     RequiresPermissions.class, RequiresRoles.class,
                     RequiresUser.class, RequiresGuest.class, RequiresAuthentication.class,
-                    RequiresAction.class , RequiresUrlPermission.class
+                    RequiresAction.class , RequiresUrlPermission.class, RequiresNotePermissions.class
             };
 
     protected SecurityManager securityManager = null;

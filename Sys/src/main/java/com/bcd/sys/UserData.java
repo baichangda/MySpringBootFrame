@@ -8,4 +8,6 @@ public interface UserData<K extends Serializable> {
     String getUsername();
 
     String getTimeZone();
+
+    String getRealName();
 }

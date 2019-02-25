@@ -68,7 +68,7 @@ public class EntityAopConfig {
             bean.setCreateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setCreateUserId(user.getId());
-                bean.setCreateUserName(user.getUsername());
+                bean.setCreateUserName(user.getRealName());
 
             }
         }else{
@@ -76,7 +76,7 @@ public class EntityAopConfig {
             bean.setUpdateIp(IPUtil.getIpAddress());
             if(user!=null){
                 bean.setUpdateUserId(user.getId());
-                bean.setUpdateUserName(user.getUsername());
+                bean.setUpdateUserName(user.getRealName());
             }
         }
     }
