@@ -145,3 +145,10 @@ spring:
 #   oss:
 #      endPoint: oss-cn-beijing.aliyuncs.com
 #      bucketName: iceasmp
+   mail:
+      host: smtp.qq.com
+      username:
+      password:
+      default-encoding: UTF-8
+   flyway:
+      out-of-order: true

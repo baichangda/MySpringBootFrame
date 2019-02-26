@@ -33,6 +33,8 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+        //邮件支持
+        compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
         //shiro权限框架集成
         compile("org.apache.shiro:shiro-spring:${shiroVersion}")
         compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
@@ -54,6 +56,8 @@ allprojects{
         compile ("com.aliyun:aliyun-java-sdk-live:${liveVersion}")
         //阿里云oss对象存储集成
         compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
+        //flyway支持
+        compile("org.flywaydb:flyway-core:${flywayVersion}")
         //ics
         compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
     }
@@ -152,12 +156,8 @@ buildscript {
         liveVersion='+'
         ossVersion='+'
         aliyunSdkCoreVersion='+'
-        flywayVersion = '+'
+        flywayVersion = '5.+'
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
-
-        INCAR_MAVEN_URL_SNAPSHOTS = 'https://repository.incarcloud.com/content/repositories/snapshots/'
-        INCAR_MAVEN_AUTH_USERNAME = 'deployment'
-        INCAR_MAVEN_AUTH_PASSWORD = 'deploy123456'
     }
 
     repositories {

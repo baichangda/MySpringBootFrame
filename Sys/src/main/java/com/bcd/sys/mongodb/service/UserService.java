@@ -1,9 +1,9 @@
 package com.bcd.sys.mongodb.service;
 
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.config.init.anno.SpringInitializable;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.mongodb.service.BaseService;
-import com.bcd.sys.UserDataInit;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.bcd.sys.mongodb.bean.UserBean;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.security.PrivateKey;
 import java.util.List;
@@ -27,14 +28,14 @@ import java.util.stream.Collectors;
  *
  */
 //@Service
-public class UserService extends BaseService<UserBean,String> implements UserDataInit {
+public class UserService extends BaseService<UserBean,String> implements SpringInitializable{
     private final static Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private MyShiroRealm myShiroRealm;
 
     @Override
-    public void init() {
+    public void init(ContextRefreshedEvent event) {
         String username="admin";
         UserBean userBean= findOne(new StringCondition("username",username));
         if(userBean==null){

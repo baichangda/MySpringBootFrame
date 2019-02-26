@@ -2,9 +2,9 @@ package com.bcd.sys.rdb.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.config.init.anno.SpringInitializable;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.UserDataInit;
 import com.bcd.sys.rdb.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
@@ -19,6 +19,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<UserBean,Long>  implements UserDataInit {
+public class UserService extends BaseService<UserBean,Long>  implements SpringInitializable {
 
     private final static Logger logger= LoggerFactory.getLogger(UserService.class);
 
@@ -39,7 +40,7 @@ public class UserService extends BaseService<UserBean,Long>  implements UserData
     private MyShiroRealm myShiroRealm;
 
     @Override
-    public void init() {
+    public void init(ContextRefreshedEvent event) {
         String username="admin";
         UserBean userBean= findOne(new StringCondition("username",username));
         if(userBean==null){
