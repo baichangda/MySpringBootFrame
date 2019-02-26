@@ -1,11 +1,3 @@
-//业务模块配置
-Set<Project> businessProjects=new HashSet<>()
-businessProjects.addAll(allprojects)
-businessProjects.removeAll(project(':Base'),project(':RDB'),project(':MongoDB'))
-for(project in businessProjects){
-    project.apply plugin: 'org.flywaydb.flyway'
-}
-
 //所有模块配置
 allprojects{
     group 'com.bcd'
@@ -118,13 +110,24 @@ allprojects{
             }
         }
     }
-
 }
 
+apply plugin: 'org.flywaydb.flyway'
 
+flyway {
+    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
+    user = 'root'
+    password = '123456'
+    def subLocations=[]
+    for(project in subprojects){
+        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration')
+    }
+    flyway.locations =subLocations
+}
 
-
-
+flywayMigrate {
+    outOfOrder=true
+}
 
 bootRun {
     /**
