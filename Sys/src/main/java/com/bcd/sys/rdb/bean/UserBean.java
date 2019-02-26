@@ -21,8 +21,9 @@ import javax.validation.constraints.Size;
 @Table(name = "t_sys_user")
 public class UserBean extends BaseBean<Long> implements UserData<Long> {
     //field
-    @ApiModelProperty(value = "关联机构id")
-    private Long orgId;
+    @Size(max = 100,message = "[关联机构编码]长度不能超过100")
+    @ApiModelProperty(value = "关联机构编码(长度不能超过100)")
+    private String orgCode;
 
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50,message = "[用户名]长度不能超过50")
@@ -68,12 +69,14 @@ public class UserBean extends BaseBean<Long> implements UserData<Long> {
     private String timeZone;
 
     //method
-    public void setOrgId(Long orgId){
-        this.orgId=orgId;
+
+
+    public String getOrgCode() {
+        return orgCode;
     }
 
-    public Long getOrgId(){
-        return this.orgId;
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
     }
 
     public void setUsername(String username){

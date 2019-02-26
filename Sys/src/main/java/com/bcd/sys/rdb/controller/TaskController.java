@@ -39,6 +39,8 @@ public class TaskController extends BaseController {
     public JsonMessage<List<TaskBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(value = "关联机构编码")
+            @RequestParam(value = "orgCode",required = false) String orgCode,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
             @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)",example="1")
@@ -60,6 +62,7 @@ public class TaskController extends BaseController {
         ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
@@ -83,6 +86,8 @@ public class TaskController extends BaseController {
     public JsonMessage<Page<TaskBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(value = "关联机构编码")
+            @RequestParam(value = "orgCode",required = false) String orgCode,
             @ApiParam(value = "任务名称")
             @RequestParam(value = "name",required = false) String name,
             @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败;)",example="1")
@@ -108,6 +113,7 @@ public class TaskController extends BaseController {
         ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),

@@ -1,6 +1,7 @@
 create table IF NOT EXISTS t_sys_task
 (
    id                   bigint unsigned not null auto_increment comment '主键',
+   org_code             varchar(100) comment '关联机构编码',
    name                 varchar(50) not null comment '任务名称',
    status               int not null comment '任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)',
    type                 int null comment '任务类型(1:普通任务;2:文件类型任务)',

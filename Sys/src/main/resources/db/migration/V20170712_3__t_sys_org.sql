@@ -2,6 +2,7 @@ create table IF NOT EXISTS t_sys_org
 (
    id                   bigint unsigned not null auto_increment comment '主键',
    parent_id            bigint comment '父组织id',
+   code                 varchar(100) not null comment '组织层级编码(格式为1_2_3_,必须以_结尾)',
    name                 varchar(50) not null comment '组织名称',
    address              varchar(256) comment '地址',
    phone                varchar(11) comment '电话',

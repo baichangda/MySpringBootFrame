@@ -2,7 +2,8 @@ create table IF NOT EXISTS t_sys_role
 (
    id                   bigint unsigned not null auto_increment comment '主键',
    name                 varchar(20) not null comment '角色名称',
-   code                 varchar(100) not null comment '编码',
+   org_code             varchar(100) comment '关联机构编码',
+   code                 varchar(50) not null comment '编码',
    remark               varchar(256) comment '备注',
    create_time          timestamp NULL default CURRENT_TIMESTAMP comment '创建时间',
    create_user_id       bigint comment '创建人id',

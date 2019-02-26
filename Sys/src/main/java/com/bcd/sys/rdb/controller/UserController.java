@@ -36,8 +36,8 @@ public class UserController extends BaseController {
     public JsonMessage<List<UserBean>> list(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "关联机构id",example="1")
-            @RequestParam(value = "orgId",required = false) Long orgId,
+            @ApiParam(value = "关联机构编码")
+            @RequestParam(value = "orgCode",required = false) String orgCode,
             @ApiParam(value = "用户名")
             @RequestParam(value = "username",required = false) String username,
             @ApiParam(value = "用户名")
@@ -61,7 +61,7 @@ public class UserController extends BaseController {
         ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new NumberCondition("orgId",orgId, NumberCondition.Handler.EQUAL),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
             new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
             new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
             new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
@@ -86,8 +86,8 @@ public class UserController extends BaseController {
     public JsonMessage<Page<UserBean>> page(
             @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "关联机构id",example="1")
-            @RequestParam(value = "orgId",required = false) Long orgId,
+            @ApiParam(value = "关联机构编码")
+            @RequestParam(value = "orgCode",required = false) String orgCode,
             @ApiParam(value = "用户名")
             @RequestParam(value = "username",required = false) String username,
             @ApiParam(value = "用户名")
@@ -115,7 +115,7 @@ public class UserController extends BaseController {
         ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new NumberCondition("orgId",orgId, NumberCondition.Handler.EQUAL),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
             new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
             new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
             new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),

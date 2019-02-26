@@ -29,6 +29,10 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
 
 
     //field
+    @Size(max = 100,message = "[关联机构编码]长度不能超过100")
+    @ApiModelProperty(value = "关联机构编码(长度不能超过100)")
+    private String orgCode;
+
     @NotBlank(message = "[任务名称]不能为空")
     @Size(max = 50,message = "[任务名称]长度不能超过50")
     @ApiModelProperty(value = "任务名称(不能为空,长度不能超过50)")
@@ -90,6 +94,14 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     }
 
     //method
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
     public void setName(String name){
         this.name=name;
     }
