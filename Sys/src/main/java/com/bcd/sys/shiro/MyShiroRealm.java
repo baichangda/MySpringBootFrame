@@ -1,12 +1,12 @@
-package com.bcd.sys.rdb.shiro;
+package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.sys.MyAuthorizingRealm;
-import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.rdb.service.UserService;
+import com.bcd.sys.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;

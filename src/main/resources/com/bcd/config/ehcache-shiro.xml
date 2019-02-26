@@ -30,7 +30,7 @@
     <!--/>-->
     <!-- 权限的缓存(设置权限缓存不过期,也就是如果需要刷新权限,必须重新登录) -->
     <cache
-            name="com.bcd.sys.rdb.shiro.MyShiroRealm.authorizationCache"
+            name="com.bcd.sys.shiro.MyShiroRealm.authorizationCache"
             maxElementsInMemory="10000"
             eternal="false"
             timeToIdleSeconds="0"

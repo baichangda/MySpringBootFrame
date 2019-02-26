@@ -1,4 +1,4 @@
-package com.bcd.sys.rdb.bean;
+package com.bcd.sys.bean;
 
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.IPUtil;

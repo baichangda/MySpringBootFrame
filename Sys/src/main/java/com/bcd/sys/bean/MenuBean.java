@@ -1,12 +1,20 @@
-package com.bcd.sys.rdb.bean;
+package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.util.List;
+
+
+import javax.persistence.*;
 
 /**
  *  菜单表
@@ -31,9 +39,12 @@ public class MenuBean extends BaseBean<Long> {
     @ApiModelProperty(value = "图标(长度不能超过256)")
     private String icon;
 
-    @NotNull(message = "排序不能为空")
+    @NotNull(message = "[排序]不能为空")
     @ApiModelProperty(value = "排序(不能为空)")
     private Integer orderNum;
+
+    @Transient
+    private List<MenuBean> children=new ArrayList<>();
 
 
     //method
@@ -77,5 +88,11 @@ public class MenuBean extends BaseBean<Long> {
         return this.orderNum;
     }
 
+    public List<MenuBean> getChildren() {
+        return children;
+    }
 
+    public void setChildren(List<MenuBean> children) {
+        this.children = children;
+    }
 }

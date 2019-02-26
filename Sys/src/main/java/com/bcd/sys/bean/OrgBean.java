@@ -1,12 +1,18 @@
-package com.bcd.sys.rdb.bean;
+package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+
+
 
 import javax.persistence.*;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  *  组织机构基础信息表
@@ -17,6 +23,11 @@ public class OrgBean extends BaseBean<Long> {
     //field
     @ApiModelProperty(value = "父组织id")
     private Long parentId;
+
+    @NotBlank(message = "[组织层级编码]不能为空")
+    @Size(max = 100,message = "[组织层级编码]长度不能超过100")
+    @ApiModelProperty(value = "组织层级编码(格式为1_2_3_,必须以_结尾)(不能为空,长度不能超过100)")
+    private String code;
 
     @NotBlank(message = "[组织名称]不能为空")
     @Size(max = 50,message = "[组织名称]长度不能超过50")
@@ -43,6 +54,14 @@ public class OrgBean extends BaseBean<Long> {
 
     public Long getParentId(){
         return this.parentId;
+    }
+
+    public void setCode(String code){
+        this.code=code;
+    }
+
+    public String getCode(){
+        return this.code;
     }
 
     public void setName(String name){

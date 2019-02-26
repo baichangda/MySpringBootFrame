@@ -1,8 +1,8 @@
-package com.bcd.sys.rdb.repository;
+package com.bcd.sys.repository;
 
 
 import com.bcd.rdb.repository.BaseRepository;
-import com.bcd.sys.rdb.bean.UserBean;
+import com.bcd.sys.bean.UserBean;
 import org.springframework.stereotype.Repository;
 
 

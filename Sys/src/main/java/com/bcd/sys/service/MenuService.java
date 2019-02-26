@@ -1,8 +1,16 @@
-package com.bcd.sys.rdb.service;
+package com.bcd.sys.service;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.rdb.bean.MenuBean;
+import com.bcd.sys.bean.MenuBean;
+import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.shiro.ShiroUtil;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -10,4 +18,97 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MenuService extends BaseService<MenuBean,Long> {
+    /**
+     * 查询当前用户所属组织的admin拥有的权限的菜单树
+     * @return
+     */
+    public List<MenuBean> adminMenuTree(){
+        //1、查出当前所有菜单
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        List<MenuBean> menuBeanList;
+        switch (curUser.getType()){
+            //1.1、管理用户
+            case 1:{
+                String sql="select * from t_sys_menu";
+                menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class));
+                break;
+            }
+            //1.2、企业用户
+            case 2:{
+                String sql="SELECT\n" +
+                        "\td.* \n" +
+                        "FROM\n" +
+                        "\t( SELECT * FROM t_sys_org WHERE org_code = ? ) a\n" +
+                        "\tINNER JOIN t_sys_user_role b ON a.admin_id = b.user_id\n" +
+                        "\tINNER JOIN t_sys_role_menu c ON b.role_id = c.role_id\n" +
+                        "\tINNER JOIN t_sys_menu d ON c.menu_id = d.id";
+                String orgCode=curUser.getOrgCode();
+                menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class),orgCode);
+                break;
+            }
+            default:{
+                throw BaseRuntimeException.getException("当前用户类型错误");
+            }
+        }
+        //3、组装成树并返回
+        return listToTree(menuBeanList);
+    }
+
+    /**
+     * 查询用户拥有的权限的菜单树
+     * @return
+     */
+    public List<MenuBean> userMenuTree(Long userId){
+        List<MenuBean> menuBeanList;
+        if(CommonConst.ADMIN_ID.equals(userId)){
+            String sql="select * from t_sys_menu";
+            menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class));
+        }else {
+            String sql = "SELECT\n" +
+                    "\tc.* \n" +
+                    "FROM\n" +
+                    "\t( SELECT * FROM t_sys_user_role WHERE user_id = ? ) a\n" +
+                    "\tINNER JOIN t_sys_role_menu b ON a.role_id = b.role_id\n" +
+                    "\tINNER JOIN t_sys_menu c ON b.menu_id = c.id";
+            menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class),userId);
+        }
+        return listToTree(menuBeanList);
+    }
+
+    private List<MenuBean> listToTree(List<MenuBean> menuBeanList){
+        if(menuBeanList==null||menuBeanList.isEmpty()){
+            return Collections.emptyList();
+        }
+        //1、组装菜单树,从顶级菜单开始
+        //1.1、转化数据集
+        Map<Long,List<MenuBean>> parentIdToChildrenMap= menuBeanList.stream().collect(Collectors.toMap(e->e.getParentId(), e->{
+            List<MenuBean> childrenList=new ArrayList<>();
+            childrenList.add(e);
+            return childrenList;
+        },(e1,e2)->{
+            e1.addAll(e2);
+            return e1;
+        }));
+        //1.2、取出根,依次遍历
+        List<MenuBean> rootList= parentIdToChildrenMap.get(null);
+        if(rootList==null||rootList.isEmpty()){
+            return Collections.emptyList();
+        }
+        //1.3、排序
+        rootList.sort(Comparator.comparing(e->e.getOrderNum()));
+        //1.4、循环填充
+        List<MenuBean> tempList=new ArrayList<>();
+        tempList.addAll(rootList);
+        for(int i=0;i<=tempList.size()-1;i++){
+            MenuBean cur= tempList.get(i);
+            List<MenuBean> curChildren= parentIdToChildrenMap.get(cur.getId());
+            if(curChildren!=null){
+                curChildren.sort(Comparator.comparing(e->e.getOrderNum()));
+                cur.setChildren(curChildren);
+                tempList.addAll(curChildren);
+            }
+        }
+        //2、返回根集合
+        return rootList;
+    }
 }

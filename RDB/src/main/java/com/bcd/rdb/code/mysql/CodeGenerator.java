@@ -476,8 +476,40 @@ public class CodeGenerator {
         String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/Sys/src/main/java/com/bcd/sys";
         List<Config> list = Arrays.asList(
                 new Config(path,
-                        new TableConfig("Role", "角色", "t_sys_role").setNeedCreateServiceFile(false).setNeedCreateControllerFile(true)
-                        .setNeedCreateRepositoryFile(false).setNeedBeanValidate(true).setNeedCreateBeanFile(false).setNeedParamValidate(true)
+                        new TableConfig("Role", "角色", "t_sys_role")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(true)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
+                ),
+                new Config(path,
+                        new TableConfig("Permission", "权限", "t_sys_permission")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(true)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
+                ),
+                new Config(path,
+                        new TableConfig("Org", "机构", "t_sys_org")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(true)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
+                ),
+                new Config(path,
+                        new TableConfig("Menu", "菜单", "t_sys_menu")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(true)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
                 )
         );
         CodeGenerator.generate(list);

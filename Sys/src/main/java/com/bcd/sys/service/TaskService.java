@@ -1,7 +1,7 @@
-package com.bcd.sys.rdb.service;
+package com.bcd.sys.service;
 
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.rdb.bean.TaskBean;
+import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.dao.TaskDAO;
 import com.bcd.sys.task.entity.Task;
 import org.springframework.stereotype.Service;

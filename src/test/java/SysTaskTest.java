@@ -1,8 +1,8 @@
 import com.bcd.Application;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.rdb.bean.OrgBean;
-import com.bcd.sys.rdb.bean.TaskBean;
-import com.bcd.sys.rdb.service.OrgService;
+import com.bcd.sys.bean.OrgBean;
+import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.service.OrgService;
 import com.bcd.sys.task.CommonConst;
 import com.bcd.sys.task.TaskUtil;
 import org.junit.runner.RunWith;

@@ -1,11 +1,14 @@
-package com.bcd.sys.rdb.controller;
+package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
+import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
+import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
+import com.bcd.sys.shiro.ShiroUtil;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -15,8 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.rdb.bean.UserBean;
-import com.bcd.sys.rdb.service.UserService;
+import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.service.UserService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -30,6 +33,7 @@ public class UserController extends BaseController {
      * 查询用户列表
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")
     @ApiResponse(code = 200,message = "用户列表")
@@ -59,6 +63,8 @@ public class UserController extends BaseController {
             @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
             @RequestParam(value = "status",required = false) Integer status
         ){
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
@@ -80,6 +86,7 @@ public class UserController extends BaseController {
      * 查询用户分页
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户分页")
     @ApiResponse(code = 200,message = "用户分页结果集")
@@ -113,6 +120,8 @@ public class UserController extends BaseController {
             @ApiParam(value = "分页参数(页大小)",example="20")
             @RequestParam(value = "pageSize",required = false) Integer pageSize
         ){
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
@@ -135,6 +144,7 @@ public class UserController extends BaseController {
      * @param user
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiResponse(code = 200,message = "保存结果")
@@ -152,6 +162,7 @@ public class UserController extends BaseController {
      * @param ids
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除用户",notes = "删除用户")
     @ApiResponse(code = 200,message = "删除结果")
@@ -201,6 +212,7 @@ public class UserController extends BaseController {
      * @param userId
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @ApiOperation(value="重置密码",notes = "重置密码")
     @ApiResponse(code = 200,message = "重制密码结果")
@@ -212,20 +224,20 @@ public class UserController extends BaseController {
 
     /**
      * 修改密码
-     * @param userId
+     * @param newPassword
+     * @param oldPassword
      * @return
      */
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @ApiOperation(value="修改密码",notes = "修改密码")
     @ApiResponse(code = 200,message = "修改密码结果")
     public JsonMessage updatePassword(
-            @ApiParam(value = "用户主键",example = "1")
-            @RequestParam(value = "userId") Long userId,
             @ApiParam(value = "旧密码")
             @RequestParam(value = "oldPassword") String oldPassword,
             @ApiParam(value = "新密码")
             @RequestParam(value = "newPassword") String newPassword){
-        boolean flag= userService.updatePassword(userId,oldPassword,newPassword);
+        UserBean userBean= ShiroUtil.getCurrentUser();
+        boolean flag= userService.updatePassword(userBean.getId(),oldPassword,newPassword);
         if(flag){
             return com.bcd.base.define.MessageDefine.SUCCESS_UPDATE.toJsonMessage(true);
         }else{
@@ -238,6 +250,7 @@ public class UserController extends BaseController {
      * @param ids
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_runAs)
     @RequestMapping(value = "/runAs", method = RequestMethod.POST)
     @ApiOperation(value="授予当前登录用户其他身份",notes = "授予当前登录用户其他身份")
     @ApiResponse(code = 200,message = "授权结果")
@@ -250,6 +263,7 @@ public class UserController extends BaseController {
      * 解除当前登录用户的其他身份
      * @return
      */
+    @RequiresNotePermissions(NotePermission.user_runAs)
     @RequestMapping(value = "/releaseRunAs", method = RequestMethod.POST)
     @ApiOperation(value="解除当前登录用户的其他身份",notes = "解除当前登录用户的其他身份")
     @ApiResponse(code = 200,message = "解除授权结果")

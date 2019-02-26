@@ -1,11 +1,15 @@
-package com.bcd.sys.rdb.controller;
+package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
+import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
+import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.rdb.bean.TaskBean;
+import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.bean.UserBean;
+import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.task.TaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +21,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.rdb.service.TaskService;
+import com.bcd.sys.service.TaskService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -33,6 +37,7 @@ public class TaskController extends BaseController {
      * 查询系统任务列表
      * @return
      */
+    @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务列表")
     @ApiResponse(code = 200,message = "任务列表")
@@ -60,6 +65,8 @@ public class TaskController extends BaseController {
             @ApiParam(value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)")
             @RequestParam(value = "filePaths",required = false) String filePaths
         ){
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
@@ -80,6 +87,7 @@ public class TaskController extends BaseController {
      * 查询系统任务分页
      * @return
      */
+    @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务分页")
     @ApiResponse(code = 200,message = "任务分页结果集")
@@ -111,6 +119,8 @@ public class TaskController extends BaseController {
             @ApiParam(value = "分页参数(页大小)",example="20")
             @RequestParam(value = "pageSize",required = false) Integer pageSize
         ){
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
@@ -133,6 +143,7 @@ public class TaskController extends BaseController {
      * @param ids
      * @return
      */
+    @RequiresNotePermissions(NotePermission.sysTask_stop)
     @RequestMapping(value = "/stop",method = RequestMethod.POST)
     @ApiOperation(value = "停止系统任务",notes = "停止系统任务")
     @ApiResponse(code = 200,message = "停止系统任务结果")

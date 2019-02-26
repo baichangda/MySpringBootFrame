@@ -1,7 +1,9 @@
-package com.bcd.sys.rdb.controller;
+package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
+import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
+import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
@@ -9,12 +11,12 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Date;
 import java.util.List;
-import com.bcd.sys.rdb.bean.PermissionBean;
-import com.bcd.sys.rdb.service.PermissionService;
+import org.springframework.validation.annotation.Validated;
+import com.bcd.sys.bean.PermissionBean;
+import com.bcd.sys.service.PermissionService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -30,6 +32,7 @@ public class PermissionController extends BaseController {
      * 查询权限列表
      * @return
      */
+    @RequiresNotePermissions(NotePermission.permission_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限列表")
     @ApiResponse(code = 200,message = "权限列表")
@@ -59,6 +62,7 @@ public class PermissionController extends BaseController {
      * 查询权限分页
      * @return
      */
+    @RequiresNotePermissions(NotePermission.permission_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限分页")
     @ApiResponse(code = 200,message = "权限分页结果集")
@@ -93,10 +97,11 @@ public class PermissionController extends BaseController {
      * @param permission
      * @return
      */
+    @RequiresNotePermissions(NotePermission.permission_edit)
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存权限",notes = "保存权限")
     @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "权限实体") @RequestBody @Validated PermissionBean permission){
+    public JsonMessage save(@ApiParam(value = "权限实体") @Validated @RequestBody PermissionBean permission){
         permissionService.save(permission);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -107,6 +112,7 @@ public class PermissionController extends BaseController {
      * @param ids
      * @return
      */
+    @RequiresNotePermissions(NotePermission.permission_edit)
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @ApiOperation(value = "删除权限",notes = "删除权限")
     @ApiResponse(code = 200,message = "删除结果")

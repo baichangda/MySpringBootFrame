@@ -1,7 +1,6 @@
-package com.bcd.sys.rdb.bean;
+package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
-import com.bcd.sys.UserData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,8 +18,12 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "t_sys_user")
-public class UserBean extends BaseBean<Long> implements UserData<Long> {
+public class UserBean extends BaseBean<Long>{
     //field
+    @NotNull(message = "[用户类型]不能为空")
+    @ApiModelProperty(value = "用户类型(1:管理用户,2:企业用户)(不能为空)")
+    private Integer type;
+
     @Size(max = 100,message = "[关联机构编码]长度不能超过100")
     @ApiModelProperty(value = "关联机构编码(长度不能超过100)")
     private String orgCode;
@@ -157,5 +160,13 @@ public class UserBean extends BaseBean<Long> implements UserData<Long> {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }

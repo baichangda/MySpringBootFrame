@@ -1,6 +1,7 @@
 create table IF NOT EXISTS t_sys_user
 (
    id                   bigint unsigned not null auto_increment comment '主键',
+   type                 int not null comment '类型(1:管理用户,2:企业用户)',
    org_code             varchar(100) comment '关联机构编码',
    username             varchar(50) not null comment '用户名',
    password             varchar(100) not null comment '密码',
