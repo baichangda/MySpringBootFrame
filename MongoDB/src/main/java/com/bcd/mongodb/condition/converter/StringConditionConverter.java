@@ -3,10 +3,10 @@ package com.bcd.mongodb.condition.converter;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
-import org.assertj.core.util.Arrays;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +50,7 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.in(notEmptyList);
-                    }else if(Arrays.isArray(val)){
+                    }else if(val.getClass().isArray()){
                         List notEmptyList=Arrays.asList(val).stream().filter(e->e!=null).collect(Collectors.toList());
                         criteria.in(notEmptyList);
                     }else{

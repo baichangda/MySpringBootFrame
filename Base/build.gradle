@@ -32,6 +32,9 @@ dependencies {
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
 
+    //hibernate validation
+    compile("org.hibernate:hibernate-validator:${hibernateValidation}")
+
 
 
 }
@@ -44,5 +47,6 @@ buildscript {
         swaggerVersion='+'
         commonsPool2='+'
         jedisVersion='+'
+        hibernateValidation='+'
     }
 }

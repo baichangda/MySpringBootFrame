@@ -1,11 +1,13 @@
 package com.bcd.rdb.code.mysql;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Administrator on 2017/7/31.
  */
 public class DBColumn {
+    Logger logger= LoggerFactory.getLogger(DBColumn.class);
     private String name;
     private String type;
     private String comment;
@@ -53,7 +55,11 @@ public class DBColumn {
     }
 
     public JavaColumn toJavaColumn(){
-        JavaColumn javaColumn=new JavaColumn();
+        String javaType=CodeConst.DB_TYPE_TO_JAVA_TYPE.get(type);
+        if(javaType==null){
+            logger.info("不支持[name:"+name+"] [type:"+type+"]类型数据库字段,忽略此字段!");
+            return null;
+        }
         String jName=name;
         int curIndex;
         while((curIndex=jName.indexOf('_'))!=-1){
@@ -61,11 +67,8 @@ public class DBColumn {
                     jName.substring(curIndex+1,curIndex+2).toUpperCase()+
                     jName.substring(curIndex+2);
         }
+        JavaColumn javaColumn=new JavaColumn();
         javaColumn.setName(jName);
-        String javaType=CodeConst.DB_TYPE_TO_JAVA_TYPE.get(type);
-        if(javaType==null){
-            throw BaseRuntimeException.getException("不支持[name:"+name+"] [type:"+type+"]类型数据库字段,忽略此字段!");
-        }
         javaColumn.setType(javaType);
         javaColumn.setComment(comment);
         javaColumn.setNull(!isNull.equals("NO"));

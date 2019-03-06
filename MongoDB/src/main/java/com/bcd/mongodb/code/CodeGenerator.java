@@ -3,6 +3,8 @@ package com.bcd.mongodb.code;
 import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
+import com.bcd.mongodb.bean.BaseBean;
+import com.bcd.mongodb.bean.SuperBaseBean;
 import com.bcd.mongodb.test.bean.TestBean;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -13,6 +15,7 @@ import org.springframework.data.annotation.Transient;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -168,13 +171,30 @@ public class CodeGenerator {
         }
     }
 
+    private static Class getPKType(Class beanClass){
+        Type parentType=beanClass.getGenericSuperclass();
+        while(true){
+            if(parentType instanceof ParameterizedType){
+                Type rawType= ((ParameterizedType) parentType).getRawType();
+                if(rawType.equals(SuperBaseBean.class)||rawType.equals(BaseBean.class)){
+                    break;
+                }else{
+                    parentType=((Class)parentType).getGenericSuperclass();
+                }
+            }else{
+                parentType=((Class)parentType).getGenericSuperclass();
+            }
+        }
+        return (Class) ((ParameterizedType) parentType).getActualTypeArguments()[0];
+    }
+
     /**
      * 初始化主键类型
      * @param config
      * @throws Exception
      */
     private static void initPkType(CollectionConfig config){
-        String pkType=((ParameterizedType) config.getClazz().getGenericSuperclass()).getActualTypeArguments()[0].getTypeName();
+        String pkType=getPKType(config.getClazz()).getTypeName();
         config.getValueMap().put("pkType",pkType.substring(pkType.lastIndexOf('.')+1));
     }
 
@@ -207,7 +227,7 @@ public class CodeGenerator {
             String fieldName = f.getName();
             Class fieldType;
             if ("id".equals(fieldName)) {
-                fieldType = (Class) ((ParameterizedType) beanClass.getGenericSuperclass()).getActualTypeArguments()[0];
+                fieldType = getPKType(beanClass);
             } else {
                 fieldType = f.getType();
             }

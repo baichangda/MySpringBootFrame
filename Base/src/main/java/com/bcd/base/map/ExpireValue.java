@@ -4,37 +4,23 @@ package com.bcd.base.map;
 import java.util.function.BiConsumer;
 
 public class ExpireValue<T> {
-    private Long time;
-    private Long aliveTime;
+    private Long expireTime;
     private T val;
     private BiConsumer callback;
+    private boolean removed;
 
-    public ExpireValue(Long time, Long aliveTime, T val) {
-        this(time,aliveTime,val,null);
+    public ExpireValue(Long expireTime, T val) {
+        this(expireTime,val,null);
     }
 
-    public ExpireValue(Long time, Long aliveTime, T val,BiConsumer callback) {
-        this.time = time;
-        this.aliveTime = aliveTime;
+    public ExpireValue(Long expireTime, T val,BiConsumer callback) {
+        this.expireTime=expireTime;
         this.val = val;
         this.callback=callback;
+        this.removed=false;
     }
 
-    public Long getTime() {
-        return time;
-    }
 
-    public void setTime(Long time) {
-        this.time = time;
-    }
-
-    public Long getAliveTime() {
-        return aliveTime;
-    }
-
-    public void setAliveTime(Long aliveTime) {
-        this.aliveTime = aliveTime;
-    }
 
     public T getVal() {
         return val;
@@ -52,11 +38,23 @@ public class ExpireValue<T> {
         this.callback = callback;
     }
 
+    public Long getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(Long expireTime) {
+        this.expireTime = expireTime;
+    }
+
     public boolean isExpired(){
-        if(aliveTime<0){
-            return false;
-        }else {
-            return System.currentTimeMillis() - time > aliveTime;
-        }
+        return expireTime<System.currentTimeMillis();
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
     }
 }
