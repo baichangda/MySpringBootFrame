@@ -5,6 +5,7 @@ import com.bcd.base.config.redis.mq.RedisMQ;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
@@ -93,11 +94,16 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
                 long timeout=((LettuceConnectionFactory)redisQueueMQ.redisTemplate.getConnectionFactory()).getTimeout();
                 while(!redisQueueMQ.stop){
                     try {
-                        Object data = listOperations.rightPop(redisQueueMQ.name, timeout / 2, TimeUnit.MILLISECONDS);
-                        if (data != null) {
+                        Object[] data=new Object[1];
+                        try {
+                            data[0] = listOperations.rightPop(redisQueueMQ.name, timeout / 2, TimeUnit.MILLISECONDS);
+                        }catch (QueryTimeoutException ex) {
+                            redisQueueMQ.logger.error("RedisQueueMQ["+redisQueueMQ.getClass().getName()+"] Schedule Task QueryTimeoutException", ex);
+                        }
+                        if (data[0] != null) {
                             WORK_POOL.execute(() -> {
                                 try {
-                                    redisQueueMQ.onMessage(data);
+                                    redisQueueMQ.onMessage(data[0]);
                                 } catch (Exception e) {
                                     redisQueueMQ.logger.error(e.getMessage(), e);
                                 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,13 +50,18 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
      */
     private void fetchAndExecute() throws InterruptedException {
         lock.acquire();
-        Object data = boundListOperations.rightPop(popIntervalMills, TimeUnit.MILLISECONDS);
-        if (data == null) {
+        Object[] data=new Object[1];
+        try {
+            data[0]= boundListOperations.rightPop(popIntervalMills, TimeUnit.MILLISECONDS);
+        }catch (QueryTimeoutException ex){
+            logger.error("SysTaskRedisQueue fetchAndExecute QueryTimeoutException",ex);
+        }
+        if (data[0] == null) {
             lock.release();
         }else{
             Worker.WORK_POOL.execute(() -> {
                 try {
-                    onTask(data);
+                    onTask(data[0]);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     lock.release();

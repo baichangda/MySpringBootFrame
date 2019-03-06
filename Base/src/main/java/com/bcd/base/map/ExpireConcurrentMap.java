@@ -238,7 +238,7 @@ class ExpireKeyLinkedList<K,V> {
         if (first == null) {
             return resList;
         } else {
-            Node<ExpireKey> cur = first;
+            Node<ExpireKey<K,V>> cur = first;
             int sum=0;
             while (cur != null) {
                 boolean expired = cur.item.getExpireValue().getExpireTime()<=ts;
