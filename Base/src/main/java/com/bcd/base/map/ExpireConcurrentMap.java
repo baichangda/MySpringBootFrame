@@ -180,16 +180,13 @@ public class ExpireConcurrentMap<K, V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        AtomicInteger num=new AtomicInteger(0);
-        long t1=System.currentTimeMillis();
-        ExpireConcurrentMap map = new ExpireConcurrentMap();
-        for (int i = 1; i <= 10000; i++) {
-            map.put(i, i, i,(k,v)->{
-                num.incrementAndGet();
-            });
-        }
-        long t2=System.currentTimeMillis();
-        System.out.println(t2-t1);
+        ExpireConcurrentMap<String,String> map=new ExpireConcurrentMap<>();
+        map.put("test1","test1",2000L,(k,v)->{
+            System.out.println(v+"已经过期了");
+        });
+        map.put("test2","test2",5000L,(k,v)->{
+            System.out.println(v+"已经过期了");
+        });
     }
 
 }
