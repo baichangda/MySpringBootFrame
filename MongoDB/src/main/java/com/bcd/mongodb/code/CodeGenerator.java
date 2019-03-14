@@ -18,6 +18,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -233,21 +234,16 @@ public class CodeGenerator {
             }
 
             JavaColumn javaColumn= new JavaColumn(fieldName, fieldType.getSimpleName());
-
             ApiModelProperty apiModelProperty= f.getAnnotation(ApiModelProperty.class);
             if(apiModelProperty!=null){
-                String comment=apiModelProperty.value();
-                int index=comment.indexOf("(");
-                if(index>0){
-                    comment=comment.substring(0,index);
-                }
-                javaColumn.setComment(comment);
+                javaColumn.setComment(apiModelProperty.value());
             }
             return javaColumn;
         }).collect(Collectors.toMap(
                 e->e.getName(),
                 e->e,
-                (e1,e2)->e1
+                (e1,e2)->e1,
+                ()->new LinkedHashMap<>()
         ));
 
         collectionConfig.getDataMap().put("fieldList",columnMap.values().stream().collect(Collectors.toList()));
