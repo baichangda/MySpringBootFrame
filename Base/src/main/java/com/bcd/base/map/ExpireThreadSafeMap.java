@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -29,7 +30,7 @@ public class ExpireConcurrentMap<K, V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireConcurrentMap.class);
     private final Map<K, ExpireValue<V>> dataMap = new ConcurrentHashMap<>();
     private final ExpireKeyLinkedList expireKeyList = new ExpireKeyLinkedList();
-    private final ReentrantLock lock=new ReentrantLock();
+    private final ReentrantReadWriteLock lock=new ReentrantReadWriteLock();
 
     /**
      * 用于从map中检索出过期key并移除 定时任务线程池
@@ -47,7 +48,7 @@ public class ExpireConcurrentMap<K, V> {
 
     private void startExpireSchedule(){
         expireScanPool.scheduleWithFixedDelay(() -> {
-            lock.lock();
+            lock.writeLock().lock();
             try {
                 List<ExpireKey<K,V>> keyList = expireKeyList.removeExpired(System.currentTimeMillis());
                 keyList.forEach(key -> {
@@ -55,7 +56,7 @@ public class ExpireConcurrentMap<K, V> {
                     callback(key.getKey(), expireValue);
                 });
             } finally {
-                lock.unlock();
+                lock.writeLock().unlock();
             }
         }, initDelay, delay, TimeUnit.MILLISECONDS);
     }
@@ -88,7 +89,13 @@ public class ExpireConcurrentMap<K, V> {
 
 
     public V get(K k) {
-        ExpireValue<V> expireValue = dataMap.get(k);
+        ExpireValue<V> expireValue;
+        lock.readLock().lock();
+        try {
+            expireValue = dataMap.get(k);
+        }finally {
+            lock.readLock().unlock();
+        }
         if (expireValue == null) {
             return null;
         } else {
@@ -107,7 +114,7 @@ public class ExpireConcurrentMap<K, V> {
     }
 
     public V put(K k, V v, long aliveTime, BiConsumer<K, V> callback) {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             ExpireValue<V> expireValue = new ExpireValue<>(System.currentTimeMillis() + aliveTime, v, callback);
             ExpireValue<V> val = dataMap.put(k, expireValue);
@@ -115,7 +122,7 @@ public class ExpireConcurrentMap<K, V> {
             expireKeyList.add(expireKey);
             return val == null ? null : val.getVal();
         }finally {
-            lock.unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -124,7 +131,7 @@ public class ExpireConcurrentMap<K, V> {
     }
 
     public V putIfAbsent(K k, V v, long aliveTime, BiConsumer<K, V> callback) {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             ExpireValue<V> expireValue = new ExpireValue<>(System.currentTimeMillis() + aliveTime, v, callback);
             ExpireValue<V> val = dataMap.putIfAbsent(k, expireValue);
@@ -132,7 +139,7 @@ public class ExpireConcurrentMap<K, V> {
             expireKeyList.add(expireKey);
             return val == null ? null : val.getVal();
         }finally {
-            lock.unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -143,21 +150,21 @@ public class ExpireConcurrentMap<K, V> {
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime, BiConsumer<K, V> callback) {
         ExpireValue<V> val = dataMap.computeIfAbsent(k, e -> {
-            lock.lock();
+            lock.writeLock().lock();
             try {
                 ExpireValue<V> expireValue = new ExpireValue<>(System.currentTimeMillis() + aliveTime, mappingFunction.apply(e), callback);
                 ExpireKey<K, V> expireKey = new ExpireKey<>(k, expireValue);
                 expireKeyList.add(expireKey);
                 return expireValue;
             }finally {
-                lock.unlock();
+                lock.writeLock().unlock();
             }
         });
         return val == null ? null : val.getVal();
     }
 
     public V remove(K k) {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             ExpireValue<V> val = dataMap.remove(k);
             if (val != null) {
@@ -165,17 +172,17 @@ public class ExpireConcurrentMap<K, V> {
             }
             return val == null ? null : val.getVal();
         }finally {
-            lock.unlock();
+            lock.writeLock().unlock();
         }
     }
 
     public void clear() {
-        lock.lock();
+        lock.writeLock().lock();
         try {
             this.dataMap.clear();
             this.expireKeyList.clear();
         }finally {
-            lock.unlock();
+            lock.writeLock().unlock();
         }
     }
 
