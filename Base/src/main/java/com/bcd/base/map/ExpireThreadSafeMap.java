@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -26,8 +25,8 @@ import java.util.function.Function;
  * @param <V>
  */
 @SuppressWarnings("unchecked")
-public class ExpireConcurrentMap<K, V> {
-    private final static Logger logger = LoggerFactory.getLogger(ExpireConcurrentMap.class);
+public class ExpireThreadSafeMap<K, V> {
+    private final static Logger logger = LoggerFactory.getLogger(ExpireThreadSafeMap.class);
     private final Map<K, ExpireValue<V>> dataMap = new ConcurrentHashMap<>();
     private final ExpireKeyLinkedList expireKeyList = new ExpireKeyLinkedList();
     private final ReentrantReadWriteLock lock=new ReentrantReadWriteLock();
@@ -61,11 +60,11 @@ public class ExpireConcurrentMap<K, V> {
         }, initDelay, delay, TimeUnit.MILLISECONDS);
     }
 
-    public ExpireConcurrentMap() {
-        this(Executors.newScheduledThreadPool(1),1000L,2000L,DEFAULT_EXPIRE_WORK_POOL);
+    public ExpireThreadSafeMap() {
+        this(Executors.newScheduledThreadPool(1),1000L,1000L,DEFAULT_EXPIRE_WORK_POOL);
     }
 
-    public ExpireConcurrentMap(ScheduledExecutorService expireScanPool,long initDelay,long delay,ExecutorService expireWorkPool){
+    public ExpireThreadSafeMap(ScheduledExecutorService expireScanPool, long initDelay, long delay, ExecutorService expireWorkPool){
         this.expireScanPool=expireScanPool;
         this.initDelay=initDelay;
         this.delay=delay;
@@ -187,7 +186,7 @@ public class ExpireConcurrentMap<K, V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireConcurrentMap<String,String> map=new ExpireConcurrentMap<>();
+        ExpireThreadSafeMap<String,String> map=new ExpireThreadSafeMap<>();
         map.put("test1","test1",2000L,(k,v)->{
             System.out.println(v+"已经过期了");
         });
