@@ -27,8 +27,6 @@ allprojects{
         }
     }
     dependencies{
-        //springboot websocket支持
-        compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
         //springboot rabbitmq支持
         compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持

@@ -1,10 +1,14 @@
 dependencies {
     //springboot支持
     compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+    //springboot aop支持
+    compile("org.springframework.boot:spring-boot-starter-aop:${springBootVersion}")
     //springboot web支持
     compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
     //springboot test支持
     compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    //springboot websocket支持
+    compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
     compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")

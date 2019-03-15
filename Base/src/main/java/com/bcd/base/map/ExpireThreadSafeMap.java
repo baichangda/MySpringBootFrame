@@ -197,6 +197,7 @@ public class ExpireThreadSafeMap<K, V> {
 
 }
 
+@SuppressWarnings("unchecked")
 class ExpireKeyLinkedList<K,V> {
     transient Node first;
 

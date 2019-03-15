@@ -1,4 +1,4 @@
-package com.bcd.config.websocket.example;
+package com.bcd.config.websocket.server.example;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +12,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Created by Administrator on 2017/6/22.
  */
-@ServerEndpoint(value = "/carRealTimeWebSocket")
-@Component
+//@ServerEndpoint(value = "/carRealTimeWebSocket")
+//@Component
 public class CarRealTimeWebSocket {
 
     private final static Logger logger= LoggerFactory.getLogger(CarRealTimeWebSocket.class);
