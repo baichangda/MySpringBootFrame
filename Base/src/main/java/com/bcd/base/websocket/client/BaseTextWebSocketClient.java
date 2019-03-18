@@ -81,7 +81,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         initStatus.set(0);
-        logger.warn("webSocket connection closed,will restart it");
+        logger.warn("WebSocket Connection Closed,Will Restart It");
         this.session=null;
         this.manager.stop();
         this.manager.start();
@@ -93,7 +93,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
             switch (val){
                 case 0:{
                     blockingMessageQueue.add(message);
-                    logger.warn("RegisterWebSocketHandler session is null or closed,add message to queue");
+                    logger.warn("RegisterWebSocketHandler Session Is Null Or Closed,Add Message To Queue");
                     break;
                 }
                 case 1:{
@@ -113,7 +113,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
                     break;
                 }
                 default:{
-                    throw BaseRuntimeException.getException("Class["+this.getClass()+"] initStatus not support");
+                    throw BaseRuntimeException.getException("Class["+this.getClass().getName()+"] initStatus["+val+"] Not Support");
                 }
             }
         }
