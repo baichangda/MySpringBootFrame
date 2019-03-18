@@ -13,9 +13,16 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
+
+    /**
+     * 0:session不可用
+     * 1:正在初始化,session不可用
+     * 2:初始化完成,session可用
+     */
+    AtomicInteger initStatus =new AtomicInteger(0);
 
     LinkedBlockingQueue<String> blockingMessageQueue=new LinkedBlockingQueue<>();
 
@@ -36,13 +43,18 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        //1、更改状态为初始化中
+        initStatus.set(1);
+        //2、赋值session
         this.session=session;
-        //进行阻塞数据发送
+        //3、更改状态为初始化完成
+        initStatus.set(2);
+        //4、进行阻塞数据发送
         String data;
-        while((data=blockingMessageQueue.poll(500L, TimeUnit.MILLISECONDS))!=null){
+        while ((data = blockingMessageQueue.poll()) != null) {
             sendMessage(data);
         }
-        super.afterConnectionEstablished(session);
+
     }
 
     public BaseTextWebSocketClient(String url) {
@@ -68,17 +80,42 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        initStatus.set(0);
         logger.warn("webSocket connection closed,will restart it");
         this.session=null;
         this.manager.stop();
         this.manager.start();
-        super.afterConnectionClosed(session, status);
     }
 
     public void sendMessage(String message){
         while(session==null||!session.isOpen()){
-            blockingMessageQueue.add(message);
-            logger.warn("RegisterWebSocketHandler session is null or closed,add message to queue");
+            int val= initStatus.get();
+            switch (val){
+                case 0:{
+                    blockingMessageQueue.add(message);
+                    logger.warn("RegisterWebSocketHandler session is null or closed,add message to queue");
+                    break;
+                }
+                case 1:{
+                    try {
+                        Thread.sleep(100L);
+                    } catch (InterruptedException e) {
+                        throw BaseRuntimeException.getException(e);
+                    }
+                    break;
+                }
+                case 2:{
+                    try {
+                        Thread.sleep(100L);
+                    } catch (InterruptedException e) {
+                        throw BaseRuntimeException.getException(e);
+                    }
+                    break;
+                }
+                default:{
+                    throw BaseRuntimeException.getException("Class["+this.getClass()+"] initStatus not support");
+                }
+            }
         }
         TextMessage textMessage=new TextMessage(message);
         try {
