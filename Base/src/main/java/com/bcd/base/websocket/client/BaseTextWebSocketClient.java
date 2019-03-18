@@ -1,4 +1,4 @@
-package com.bcd.base.websocket;
+package com.bcd.base.websocket.client;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExceptionUtil;

@@ -1,10 +1,9 @@
 package com.bcd.base.websocket.client.impl;
 
-import com.bcd.base.websocket.BaseTextWebSocketClient;
+import com.bcd.base.websocket.client.BaseTextWebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
