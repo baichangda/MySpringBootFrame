@@ -152,3 +152,5 @@ spring:
       default-encoding: UTF-8
    flyway:
       out-of-order: true
+
+register.host: 127.0.0.1:8888
