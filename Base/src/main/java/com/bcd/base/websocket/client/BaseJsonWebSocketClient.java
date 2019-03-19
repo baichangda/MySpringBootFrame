@@ -5,6 +5,7 @@ import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.client.data.WebSocketData;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 
 public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
 
-    public final static Map<String,Consumer<WebSocketData>> SN_TO_CALLBACK_MAP=new ConcurrentHashMap<>();
+    public final Map<String,Consumer<WebSocketData<T>>> SN_TO_CALLBACK_MAP=new ConcurrentHashMap<>();
 
     /**
      * 0:session不可用
@@ -73,7 +74,8 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
 
     public BaseJsonWebSocketClient(String url) {
         this.url=url;
-        this.javaType=JsonUtil.getJavaType(((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+        this.javaType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,
+                JsonUtil.getJavaType(((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0]));
         StandardWebSocketClient client=new StandardWebSocketClient();
         manager=new WebSocketConnectionManager(client,this,url);
         manager.start();
@@ -83,7 +85,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
             //1、转换结果集
-            WebSocketData result= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(message.getPayload(),javaType);
+            WebSocketData<T> result= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(message.getPayload(),javaType);
             //2、触发onMessage方法
             onMessage(result);
         }catch (Exception ex){
@@ -145,7 +147,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
 
     public void onMessage(WebSocketData<T> result){
         //1、取出流水号
-        Consumer<WebSocketData> consumer= SN_TO_CALLBACK_MAP.get(result.getSn());
+        Consumer<WebSocketData<T>> consumer= SN_TO_CALLBACK_MAP.get(result.getSn());
         //2、触发回调
         if(consumer!=null) {
             consumer.accept(result);
