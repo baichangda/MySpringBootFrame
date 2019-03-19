@@ -59,7 +59,7 @@ allprojects{
         //ics
         compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
         //ics
-        compile ("com.incarcloud.vco:VCOService:2.3-SNAPSHOT")
+        compile ("com.incarcloud.vco:VCOService:2.4-SNAPSHOT")
     }
 
     compileJava{
