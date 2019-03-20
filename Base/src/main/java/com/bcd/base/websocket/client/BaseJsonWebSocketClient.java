@@ -52,10 +52,6 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         return url;
     }
 
-    public BaseJsonWebSocketClient() {
-
-    }
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         //1、更改状态为初始化中
@@ -77,7 +73,16 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         this.javaType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,
                 JsonUtil.getJavaType(((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0]));
         StandardWebSocketClient client=new StandardWebSocketClient();
-        manager=new WebSocketConnectionManager(client,this,url);
+        manager=new MyWebSocketConnectionManager(client,this,url,(throwable)->{
+            logger.error("OpenConnection Failed,Will Open After 10 Seconds",throwable);
+            try {
+                Thread.sleep(10*1000L);
+            } catch (InterruptedException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+            manager.stop();
+            manager.start();
+        });
         manager.start();
     }
 
