@@ -153,4 +153,4 @@ spring:
    flyway:
       out-of-order: true
 
-register.host: 127.0.0.1:8888
+register.host: 119.3.31.183:5555
