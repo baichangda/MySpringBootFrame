@@ -58,8 +58,8 @@ allprojects{
         compile("org.flywaydb:flyway-core:${flywayVersion}")
         //ics
         compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
-        //ics
-        compile ("com.incarcloud.vco:VCOService:2.4-SNAPSHOT")
+        //vco
+        compile ("com.incarcloud.vco:VCOService:2.5-SNAPSHOT")
     }
 
     compileJava{

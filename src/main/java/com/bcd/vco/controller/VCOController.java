@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -27,6 +28,14 @@ public class VCOController {
     public JsonMessage<List<HostData>> list(){
         HostVisitor hostVisitor=new HostVisitor();
         return JsonMessage.success(hostVisitor.list());
+    }
+
+    @RequestMapping(value = "/host/vin/packet/list",method = RequestMethod.GET)
+    @ApiOperation(value = "查询host下vin的报文数量列表",notes = "查询host下vin的报文数量列表")
+    @ApiResponse(code = 200,message = "查询host下vin的报文数量列表")
+    public JsonMessage<List<Map<String,Object>>> getHostVinPacketList(){
+        HostVisitor hostVisitor=new HostVisitor();
+        return JsonMessage.success(hostVisitor.getHostVinPacketList());
     }
 
 
