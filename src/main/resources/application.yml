@@ -152,5 +152,3 @@ spring:
       default-encoding: UTF-8
    flyway:
       out-of-order: true
-
-register.host: 119.3.31.183:5555

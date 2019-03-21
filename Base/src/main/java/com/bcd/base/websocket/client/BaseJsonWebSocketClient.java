@@ -1,6 +1,7 @@
 package com.bcd.base.websocket.client;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.map.ExpireThreadSafeMap;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.client.data.WebSocketData;
@@ -19,13 +20,15 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
+public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
 
-    public final Map<String,Consumer<WebSocketData<T>>> SN_TO_CALLBACK_MAP=new ConcurrentHashMap<>();
+    public final ExpireThreadSafeMap<String,Consumer<WebSocketData<R>>> sn_to_callBack_map =new ExpireThreadSafeMap<>();
 
     /**
      * 0:session不可用
@@ -34,7 +37,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
      */
     AtomicInteger initStatus =new AtomicInteger(0);
 
-    LinkedBlockingQueue<String> blockingMessageQueue=new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<WebSocketData<T>> blockingMessageQueue=new LinkedBlockingQueue<>();
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
     protected String url;
@@ -61,8 +64,11 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         //3、更改状态为初始化完成
         initStatus.set(2);
         //4、进行阻塞数据发送
-        String data;
+        WebSocketData<T> data;
         while ((data = blockingMessageQueue.poll()) != null) {
+            if(sn_to_callBack_map.get(data.getSn())==null){
+                return;
+            }
             sendMessage(data);
         }
 
@@ -90,7 +96,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
             //1、转换结果集
-            WebSocketData<T> result= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(message.getPayload(),javaType);
+            WebSocketData<R> result= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(message.getPayload(),javaType);
             //2、触发onMessage方法
             onMessage(result);
         }catch (Exception ex){
@@ -112,12 +118,19 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         this.manager.start();
     }
 
-    public void sendMessage(String message){
+    public void sendMessage(WebSocketData<T> param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack){
+        //1、绑定回调
+        sn_to_callBack_map.put(param.getSn(),consumer,timeOutMills,timeOutCallBack);
+        //2、发送信息
+        sendMessage(param);
+    }
+
+    public void sendMessage(WebSocketData<T> param){
         while(session==null||!session.isOpen()){
             int val= initStatus.get();
             switch (val){
                 case 0:{
-                    blockingMessageQueue.add(message);
+                    blockingMessageQueue.add(param);
                     logger.warn("RegisterWebSocketHandler Session Is Null Or Closed,Add Message To Queue");
                     break;
                 }
@@ -142,6 +155,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
                 }
             }
         }
+        String message=JsonUtil.toJson(param);
         TextMessage textMessage=new TextMessage(message);
         try {
             session.sendMessage(textMessage);
@@ -150,9 +164,9 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         }
     }
 
-    public void onMessage(WebSocketData<T> result){
+    public void onMessage(WebSocketData<R> result){
         //1、取出流水号
-        Consumer<WebSocketData<T>> consumer= SN_TO_CALLBACK_MAP.get(result.getSn());
+        Consumer<WebSocketData<R>> consumer= sn_to_callBack_map.get(result.getSn());
         //2、触发回调
         if(consumer!=null) {
             consumer.accept(result);
