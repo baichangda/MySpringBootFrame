@@ -77,7 +77,7 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
     public BaseJsonWebSocketClient(String url) {
         this.url=url;
         this.javaType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,
-                JsonUtil.getJavaType(((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0]));
+                JsonUtil.getJavaType(((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[1]));
         StandardWebSocketClient client=new StandardWebSocketClient();
         manager=new MyWebSocketConnectionManager(client,this,url,(throwable)->{
             logger.error("Connect to ["+this.url+"] Failed,Will ReOpen After 10 Seconds",throwable);
