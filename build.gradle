@@ -4,7 +4,7 @@ allprojects{
     version '1.0-SNAPSHOT'
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'org.springframework.boot'
+
     //加入maven发布依赖
     apply plugin: 'maven-publish'
     sourceCompatibility = 1.8
@@ -80,15 +80,6 @@ allprojects{
         enabled = true
     }
 
-    /**
-     * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
-     */
-    bootJar {
-        manifest {
-            attributes 'Start-Class': 'com.bcd.Application'
-        }
-    }
-
     //生成jar时打包源码
     task sourceJar(type: Jar) {
         from sourceSets.main.java.srcDirs
@@ -115,8 +106,17 @@ allprojects{
         }
     }
 }
-
+apply plugin: 'org.springframework.boot'
 apply plugin: 'org.flywaydb.flyway'
+
+/**
+ * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
+ */
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.bcd.Application'
+    }
+}
 
 flyway {
     url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
