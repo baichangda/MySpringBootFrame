@@ -37,7 +37,7 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
      */
     AtomicInteger initStatus =new AtomicInteger(0);
 
-    LinkedBlockingQueue<WebSocketData<T>> blockingMessageQueue=new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<WebSocketData<T>> blockingMessageQueue=new LinkedBlockingQueue<>(10000);
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
     protected String url;
@@ -130,6 +130,9 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
             int val= initStatus.get();
             switch (val){
                 case 0:{
+                    if(blockingMessageQueue.remainingCapacity()==0){
+                        blockingMessageQueue.poll();
+                    }
                     blockingMessageQueue.add(param);
                     logger.warn("RegisterWebSocketHandler Session Is Null Or Closed,Add Message To Queue");
                     break;
