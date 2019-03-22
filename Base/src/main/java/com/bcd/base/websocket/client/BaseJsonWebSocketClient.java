@@ -166,8 +166,10 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
         String message=JsonUtil.toJson(param);
         TextMessage textMessage=new TextMessage(message);
         try {
-            logger.info("Receive WebSocket SN["+param.getSn()+"]");
-            session.sendMessage(textMessage);
+            synchronized (session) {
+                logger.info("Receive WebSocket SN["+param.getSn()+"]");
+                session.sendMessage(textMessage);
+            }
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
