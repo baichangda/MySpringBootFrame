@@ -119,8 +119,10 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
     }
 
     public void sendMessage(WebSocketData<T> param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack){
+        logger.info("Start WebSocket SN["+param.getSn()+"]");
         //1、绑定回调
         sn_to_callBack_map.put(param.getSn(),consumer,timeOutMills,(k,v)->{
+            logger.info("TimeOut WebSocket SN["+param.getSn()+"]");
             blockingMessageQueue.remove(v);
             timeOutCallBack.accept(k,v);
         });
@@ -164,6 +166,7 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
         String message=JsonUtil.toJson(param);
         TextMessage textMessage=new TextMessage(message);
         try {
+            logger.info("Receive WebSocket SN["+param.getSn()+"]");
             session.sendMessage(textMessage);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
@@ -171,8 +174,9 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
     }
 
     public void onMessage(WebSocketData<R> result){
+        logger.info("Receive WebSocket SN["+result.getSn()+"]");
         //1、取出流水号
-        Consumer<WebSocketData<R>> consumer= sn_to_callBack_map.get(result.getSn());
+        Consumer<WebSocketData<R>> consumer= sn_to_callBack_map.remove(result.getSn());
         //2、触发回调
         if(consumer!=null) {
             consumer.accept(result);

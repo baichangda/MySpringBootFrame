@@ -191,12 +191,14 @@ public class ExpireThreadSafeMap<K, V> {
 
     public static void main(String[] args) throws InterruptedException {
         ExpireThreadSafeMap<String,String> map=new ExpireThreadSafeMap<>();
-        map.put("test1","test1",2000L,(k,v)->{
-            System.out.println(v+"已经过期了");
-        });
-        map.put("test2","test2",5000L,(k,v)->{
-            System.out.println(v+"已经过期了");
-        });
+        for(int i=1;i<=100000;i++) {
+            map.put("test"+i, "test1", 2000L, (k, v) -> {
+                System.out.println(k + "已经过期了");
+            });
+//            map.put("test2", "test2", 5000L, (k, v) -> {
+//                System.out.println(v + "已经过期了");
+//            });
+        }
     }
 
 }
