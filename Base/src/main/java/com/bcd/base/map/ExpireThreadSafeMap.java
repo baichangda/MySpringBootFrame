@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * 可以插入过期key-value的 ConcurrentHashMap
+ * 可以插入过期key-value的 Map
  * 插入的key-value会在aliveTime后被移除,如果aliveTime为-1则表明不过期
  * 过期策略:
  * 1、懒汉模式: 在调用get时候检查,如果过期则移除
@@ -27,7 +27,7 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 public class ExpireThreadSafeMap<K, V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireThreadSafeMap.class);
-    private final Map<K, ExpireValue<V>> dataMap = new ConcurrentHashMap<>();
+    private final Map<K, ExpireValue<V>> dataMap = new HashMap<>();
     private final ExpireKeyLinkedList expireKeyList = new ExpireKeyLinkedList();
     private final ReentrantReadWriteLock lock=new ReentrantReadWriteLock();
 
@@ -52,7 +52,9 @@ public class ExpireThreadSafeMap<K, V> {
                 List<ExpireKey<K,V>> keyList = expireKeyList.removeExpired(System.currentTimeMillis());
                 keyList.forEach(key -> {
                     ExpireValue expireValue = dataMap.remove(key.getKey());
-                    callback(key.getKey(), expireValue);
+                    if(expireValue!=null) {
+                        callback(key.getKey(), expireValue);
+                    }
                 });
             } finally {
                 lock.writeLock().unlock();
@@ -99,8 +101,10 @@ public class ExpireThreadSafeMap<K, V> {
             return null;
         } else {
             if (expireValue.isExpired()) {
-                remove(k);
-                callback(k,expireValue);
+                V v=remove(k);
+                if(v!=null) {
+                    callback(k, expireValue);
+                }
                 return null;
             } else {
                 return expireValue.getVal();

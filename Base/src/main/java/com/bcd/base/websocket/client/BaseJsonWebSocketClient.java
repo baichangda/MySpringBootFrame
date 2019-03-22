@@ -120,7 +120,10 @@ public abstract class BaseJsonWebSocketClient<T,R> extends TextWebSocketHandler{
 
     public void sendMessage(WebSocketData<T> param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack){
         //1、绑定回调
-        sn_to_callBack_map.put(param.getSn(),consumer,timeOutMills,timeOutCallBack);
+        sn_to_callBack_map.put(param.getSn(),consumer,timeOutMills,(k,v)->{
+            blockingMessageQueue.remove(v);
+            timeOutCallBack.accept(k,v);
+        });
         //2、发送信息
         sendMessage(param);
     }
