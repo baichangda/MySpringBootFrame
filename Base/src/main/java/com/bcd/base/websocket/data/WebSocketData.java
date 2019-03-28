@@ -1,4 +1,4 @@
-package com.bcd.base.websocket.client.data;
+package com.bcd.base.websocket.data;
 
 public class WebSocketData<T> {
     private String sn;
