@@ -24,7 +24,9 @@ public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
     public void trigger(T data) {
         sn_to_notify_message_map.forEach((k,v)->{
             BaseWebSocket webSocket= v.getWebSocket();
-            webSocket.sendMessage(JsonUtil.toJson(packData(k,data)));
+            WebSocketData<NotifyData> sendData=packData(k,data);
+            logger.info("Notify WebSocket SN["+k+"] Event["+event+"]");
+            webSocket.sendMessage(JsonUtil.toJson(sendData));
         });
     }
 

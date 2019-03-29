@@ -148,7 +148,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
                         logger.error("Session Is Null Or Closed");
                         return false;
                     }else{
-                        logger.info("Receive WebSocket SN[" + param.getSn() + "]");
+                        logger.info("Send WebSocket SN[" + param.getSn() + "]");
                         session.sendMessage(textMessage);
                         return true;
                     }

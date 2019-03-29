@@ -26,7 +26,7 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
     protected JavaType paramJavaType;
 
     public BaseJsonWebSocket() {
-        Type parentType=ClassUtil.getParentUntil(getClass(),BaseJsonWebSocket.class);
+        Type parentType= ClassUtil.getParentUntil(getClass(),BaseJsonWebSocket.class);
         this.paramJavaType=TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, JsonUtil.getJavaType(((ParameterizedType)parentType).getActualTypeArguments()[0]));
     }
 
@@ -37,6 +37,7 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
             JsonMessage<String> jsonMessage;
             try {
                 WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(jsonData, paramJavaType);
+                logger.info("Receive WebSocket SN["+paramWebSocketData.getSn()+"]");
                 returnWebSocketData.setSn(paramWebSocketData.getSn());
                 jsonMessage=handle(paramWebSocketData.getData());
             } catch (Exception e) {
@@ -44,6 +45,7 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
                 jsonMessage= ExceptionUtil.toJsonMessage(e);
             }
             returnWebSocketData.setData(jsonMessage);
+            logger.info("Send WebSocket SN["+returnWebSocketData.getSn()+"]");
             sendMessage(JsonUtil.toJson(returnWebSocketData));
         });
 
