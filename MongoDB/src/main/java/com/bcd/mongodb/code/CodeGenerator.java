@@ -2,6 +2,7 @@ package com.bcd.mongodb.code;
 
 import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.FileUtil;
 import com.bcd.mongodb.bean.BaseBean;
 import com.bcd.mongodb.bean.SuperBaseBean;
@@ -173,19 +174,7 @@ public class CodeGenerator {
     }
 
     private static Class getPKType(Class beanClass){
-        Type parentType=beanClass.getGenericSuperclass();
-        while(true){
-            if(parentType instanceof ParameterizedType){
-                Type rawType= ((ParameterizedType) parentType).getRawType();
-                if(rawType.equals(SuperBaseBean.class)||rawType.equals(BaseBean.class)){
-                    break;
-                }else{
-                    parentType=((Class)parentType).getGenericSuperclass();
-                }
-            }else{
-                parentType=((Class)parentType).getGenericSuperclass();
-            }
-        }
+        Type parentType= ClassUtil.getParentUntil(beanClass,SuperBaseBean.class,BaseBean.class);
         return (Class) ((ParameterizedType) parentType).getActualTypeArguments()[0];
     }
 

@@ -56,7 +56,7 @@ public class ExceptionUtil {
      * @param throwable
      * @return
      */
-    public static JsonMessage toJsonMessage(Throwable throwable){
+    public static JsonMessage<String> toJsonMessage(Throwable throwable){
         Throwable realException=parseRealException(throwable);
         if(realException==null){
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
