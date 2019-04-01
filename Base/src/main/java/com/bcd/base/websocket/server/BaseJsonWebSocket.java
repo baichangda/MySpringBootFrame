@@ -33,8 +33,8 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
     @OnMessage
     public void onMessage(String jsonData, Session session){
         WORK_POOL.execute(()->{
-            WebSocketData<JsonMessage<String>> returnWebSocketData=new WebSocketData<>();
-            JsonMessage<String> jsonMessage;
+            WebSocketData<JsonMessage> returnWebSocketData=new WebSocketData<>();
+            JsonMessage jsonMessage;
             try {
                 WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(jsonData, paramJavaType);
                 logger.info("Receive WebSocket SN["+paramWebSocketData.getSn()+"]");

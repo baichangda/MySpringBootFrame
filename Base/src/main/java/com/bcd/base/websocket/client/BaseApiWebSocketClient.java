@@ -1,6 +1,7 @@
 package com.bcd.base.websocket.client;
 
 
+import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.WebSocketData;
 import com.bcd.base.websocket.data.api.ApiCommand;
@@ -19,7 +20,7 @@ public abstract class BaseApiWebSocketClient extends BaseJsonWebSocketClient<Api
      *               JsonMessage<<WebData<VehicleBean>>> 传参数 JsonMessage.class,WebData.class,VehicleBean.class
      * @return 返回null表示超时;其他则表示正常
      */
-    public <R>WebSocketData<R> call(String apiName, Object[] params, long timeOut, Class ... clazzs){
+    public <R>JsonMessage<R> call(String apiName, Object[] params, long timeOut, Class ... clazzs){
         ApiCommand apiCommand=new ApiCommand();
         apiCommand.setApiName(apiName);
         apiCommand.setParamJson(JsonUtil.toJson(params));

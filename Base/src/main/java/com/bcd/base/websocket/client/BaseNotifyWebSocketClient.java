@@ -12,9 +12,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +20,8 @@ import java.util.function.Consumer;
 
 public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<NotifyCommand> {
     public final Map<String,NotifyConsumer> sn_to_consumer =new ConcurrentHashMap<>();
+
+    public final static Map<String,NotifyInfo> SN_TO_NOTIFY_INFO_MAP = new ConcurrentHashMap<>();
 
     public final static ExecutorService RECONNECT_REGISTER_POOL= Executors.newSingleThreadExecutor();
 
@@ -36,13 +36,13 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
      */
     public String register(NotifyEvent event, String paramJson, Consumer<String> consumer){
         String sn= RandomStringUtils.randomAlphanumeric(32);
-        WebSocketData<JsonMessage<String>> webSocketData= blockingRequest(new NotifyCommand(sn, NotifyCommandType.REGISTER,event,paramJson),30*1000, JsonMessage.class,String.class);
-        if(webSocketData==null){
+        JsonMessage<String> jsonMessage= blockingRequest(new NotifyCommand(sn, NotifyCommandType.REGISTER,event,paramJson),30*1000, JsonMessage.class,String.class);
+        if(jsonMessage==null){
             throw BaseRuntimeException.getException("Register Listener Timeout");
         }else{
-            JsonMessage<String> jsonMessage= webSocketData.getData();
             if(jsonMessage.isResult()){
                 sn_to_consumer.put(sn,new NotifyConsumer(event,paramJson, consumer));
+                SN_TO_NOTIFY_INFO_MAP.putIfAbsent(sn,new NotifyInfo(sn,event));
                 return sn;
             }else {
                 throw BaseRuntimeException.getException(jsonMessage.getMessage(), jsonMessage.getCode());
@@ -56,13 +56,13 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
      * @param event
      */
     public void cancel(String sn,NotifyEvent event){
-        WebSocketData<JsonMessage<String>> webSocketData= blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL,event,null),30*1000, JsonMessage.class,String.class);
-        if(webSocketData==null){
+        JsonMessage<String> jsonMessage= blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL,event,null),30*1000, JsonMessage.class,String.class);
+        if(jsonMessage==null){
             throw BaseRuntimeException.getException("Cancel Listener Timeout");
         }else{
-            JsonMessage<String> jsonMessage= webSocketData.getData();
             if(jsonMessage.isResult()){
                 sn_to_consumer.remove(sn);
+                SN_TO_NOTIFY_INFO_MAP.remove(sn);
             }else{
                 throw BaseRuntimeException.getException(jsonMessage.getMessage(),jsonMessage.getCode());
             }
@@ -82,6 +82,7 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
             }else{
                 //2.2、如果是通知数据
                 WebSocketData<NotifyData> webSocketData= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(jsonData,TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, NotifyData.class));
+                logger.info("Receive Notify SN["+webSocketData.getData().getSn()+"] ");
                 NotifyConsumer notifyConsumer= sn_to_consumer.get(webSocketData.getData().getSn());
                 notifyConsumer.getConsumer().accept(webSocketData.getData().getDataJson());
             }
@@ -95,7 +96,9 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
         super.afterConnectionEstablished(session);
         //断线重连之后,检测之前是否存在监听,有则重新注册所有监听
         List<NotifyConsumer> notifyConsumerList= new ArrayList<>(sn_to_consumer.values());
+        Set<String> snSet=new HashSet<>(sn_to_consumer.keySet());
         sn_to_consumer.clear();
+        snSet.forEach(sn-> SN_TO_NOTIFY_INFO_MAP.remove(sn));
         if(!notifyConsumerList.isEmpty()) {
             RECONNECT_REGISTER_POOL.execute(() -> {
                 notifyConsumerList.forEach(e -> register(e.getEvent(), e.getParamJson(), e.getConsumer()));
