@@ -106,28 +106,33 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
     public <R>boolean sendMessage(WebSocketData<T> param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs){
         logger.info("Start WebSocket SN["+param.getSn()+"]");
         //1、绑定回调
-        sn_to_callBack_map.put(param.getSn(),(v)->{
+        sn_to_callBack_map.put(param.getSn(), (v) -> {
             try {
-                JavaType tempType=null;
-                for(int i=clazzs.length-2;i>=0;i--){
-                    if(tempType==null){
-                        tempType=TypeFactory.defaultInstance().constructParametricType(clazzs[i],clazzs[i+1]);
-                    }else{
-                        tempType=TypeFactory.defaultInstance().constructParametricType(clazzs[i],tempType);
+                JavaType tempType = null;
+                for (int i = clazzs.length - 2; i >= 0; i--) {
+                    if (tempType == null) {
+                        tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], clazzs[i + 1]);
+                    } else {
+                        tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], tempType);
                     }
                 }
-                JavaType resType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,tempType);
-                WebSocketData<R> webSocketData= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(v,resType);
+                JavaType resType = TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, tempType);
+                WebSocketData<R> webSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(v, resType);
                 consumer.accept(webSocketData);
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
-        },timeOutMills,(k,v)->{
-            logger.info("TimeOut WebSocket SN["+param.getSn()+"]");
-            timeOutCallBack.accept(k,consumer);
+        }, timeOutMills, (k, v) -> {
+            logger.info("TimeOut WebSocket SN[" + param.getSn() + "]");
+            timeOutCallBack.accept(k, consumer);
         });
         //2、发送信息
-        return sendMessage(param);
+        boolean sendRes= sendMessage(param);
+        //3、如果发送失败,则移除回调
+        if(!sendRes){
+            sn_to_callBack_map.remove(param.getSn());
+        }
+        return sendRes;
     }
 
     /**
@@ -169,7 +174,9 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         //1、取出流水号
         Consumer<String> consumer= sn_to_callBack_map.remove(sn);
         //2、触发回调
-        if(consumer!=null) {
+        if(consumer==null) {
+            logger.warn("Receive No Consumer Message SN["+sn+"]");
+        }else {
             consumer.accept(data);
         }
     }
