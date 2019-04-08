@@ -2,7 +2,6 @@ package com.bcd.base.websocket.client;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.map.ExpireThreadSafeMap;
-import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.WebSocketData;
@@ -105,23 +104,28 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
      * @param <R>
      * @return 返回null表示发送失败;正常情况下返回发送过去的数据
      */
-    public <R>WebSocketData<T> sendMessage(T param, Consumer<JsonMessage<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<JsonMessage<R>>> timeOutCallBack, Class... clazzs){
+    public <R>WebSocketData<T> sendMessage(T param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs){
         WebSocketData<T> paramWebSocketData=new WebSocketData<>(RandomStringUtils.randomAlphabetic(32),param);
         logger.info("Start WebSocket SN["+paramWebSocketData.getSn()+"]");
         //1、绑定回调
         sn_to_callBack_map.put(paramWebSocketData.getSn(), (v) -> {
             try {
-                JavaType tempType = null;
-                for (int i = clazzs.length - 2; i >= 0; i--) {
-                    if (tempType == null) {
-                        tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], clazzs[i + 1]);
-                    } else {
-                        tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], tempType);
+                JavaType resType;
+                if(clazzs.length==1){
+                    resType=TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,clazzs);
+                }else {
+                    JavaType tempType=null;
+                    for (int i = clazzs.length - 2; i >= 0; i--) {
+                        if (tempType == null) {
+                            tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], clazzs[i + 1]);
+                        } else {
+                            tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], tempType);
+                        }
                     }
+                    resType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,tempType);
                 }
-                JavaType resType = TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,TypeFactory.defaultInstance().constructParametricType(JsonMessage.class,tempType));
-                WebSocketData<JsonMessage<R>> webSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(v, resType);
-                consumer.accept(webSocketData.getData());
+                WebSocketData<R> webSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(v, resType);
+                consumer.accept(webSocketData);
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
@@ -194,10 +198,10 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
      *               <WebData<VehicleBean>> 传参数 WebData.class,VehicleBean.class
      * @return 返回null表示超时
      */
-    public <R>JsonMessage<R> blockingRequest(T paramData, long timeOut, Class ... clazzs){
+    public <R>WebSocketData<R> blockingRequest(T paramData, long timeOut, Class ... clazzs){
         CountDownLatch countDownLatch=new CountDownLatch(1);
-        JsonMessage<R>[] resData=new JsonMessage[1];
-        WebSocketData<T> sendWebSocketData=sendMessage(paramData,(JsonMessage<R> res)->{
+        WebSocketData<R>[] resData=new WebSocketData[1];
+        WebSocketData<T> sendWebSocketData=sendMessage(paramData,(WebSocketData<R> res)->{
                 resData[0]=res;
                 countDownLatch.countDown();
         }, timeOut,(k, v)->{

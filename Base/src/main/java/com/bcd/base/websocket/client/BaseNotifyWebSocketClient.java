@@ -36,10 +36,11 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
      */
     public String register(NotifyEvent event, String paramJson, Consumer<String> consumer){
         String sn= RandomStringUtils.randomAlphanumeric(32);
-        JsonMessage<String> jsonMessage= blockingRequest(new NotifyCommand(sn, NotifyCommandType.REGISTER,event,paramJson),30*1000, JsonMessage.class,String.class);
-        if(jsonMessage==null){
+        WebSocketData<JsonMessage<String>> webSocketData= blockingRequest(new NotifyCommand(sn, NotifyCommandType.REGISTER,event,paramJson),30*1000, JsonMessage.class,String.class);
+        if(webSocketData==null){
             throw BaseRuntimeException.getException("Register Listener Timeout");
         }else{
+            JsonMessage<String> jsonMessage= webSocketData.getData();
             if(jsonMessage.isResult()){
                 sn_to_consumer.put(sn,new NotifyConsumer(event,paramJson, consumer));
                 SN_TO_NOTIFY_INFO_MAP.putIfAbsent(sn,new NotifyInfo(sn,event));
@@ -56,10 +57,11 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
      * @param event
      */
     public void cancel(String sn,NotifyEvent event){
-        JsonMessage<String> jsonMessage= blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL,event,null),30*1000, JsonMessage.class,String.class);
-        if(jsonMessage==null){
+        WebSocketData<JsonMessage<String>> webSocketData= blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL,event,null),30*1000, JsonMessage.class,String.class);
+        if(webSocketData==null){
             throw BaseRuntimeException.getException("Cancel Listener Timeout");
         }else{
+            JsonMessage<String> jsonMessage= webSocketData.getData();
             if(jsonMessage.isResult()){
                 sn_to_consumer.remove(sn);
                 SN_TO_NOTIFY_INFO_MAP.remove(sn);

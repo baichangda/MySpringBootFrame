@@ -24,6 +24,10 @@ public abstract class BaseApiWebSocketClient extends BaseJsonWebSocketClient<Api
         ApiCommand apiCommand=new ApiCommand();
         apiCommand.setApiName(apiName);
         apiCommand.setParamJson(JsonUtil.toJson(params));
-        return blockingRequest(apiCommand,timeOut,clazzs);
+        Class[] resClazzs=new Class[clazzs.length+1];
+        resClazzs[0]=JsonMessage.class;
+        System.arraycopy(clazzs,0,resClazzs,1,clazzs.length);
+        WebSocketData<JsonMessage> webSocketData= blockingRequest(apiCommand,timeOut,resClazzs);
+        return webSocketData.getData();
     }
 }
