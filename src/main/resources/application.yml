@@ -23,7 +23,7 @@ spring:
          useServerPrepStmts: true
        minimumIdle: 5
        maximumPoolSize: 15
-     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC
+     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC&generateSimpleParameterMetadata=true
      username: root
      password: 123456
 #  mongodb配置

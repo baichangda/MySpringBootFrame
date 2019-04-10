@@ -18,14 +18,17 @@ public class MyWebSocketConnectionManager extends WebSocketConnectionManager {
 
     private final Consumer<Throwable> onOpenFailureCallBack;
 
+    private final Consumer<WebSocketSession> onOpenSuccessCallBack;
+
     @Nullable
     private WebSocketSession webSocketSession;
 
     private WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
 
-    public MyWebSocketConnectionManager(WebSocketClient client, WebSocketHandler webSocketHandler, String uriTemplate, Consumer<Throwable> onOpenFailureCallBack, Object... uriVariables) {
+    public MyWebSocketConnectionManager(WebSocketClient client, WebSocketHandler webSocketHandler, String uriTemplate, Consumer<WebSocketSession> onOpenSuccessCallBack, Consumer<Throwable> onOpenFailureCallBack, Object... uriVariables) {
         super(client, webSocketHandler, uriTemplate, uriVariables);
         this.client = client;
+        this.onOpenSuccessCallBack=onOpenSuccessCallBack;
         this.onOpenFailureCallBack=onOpenFailureCallBack;
         this.webSocketHandler = decorateWebSocketHandler(webSocketHandler);
     }
@@ -43,7 +46,7 @@ public class MyWebSocketConnectionManager extends WebSocketConnectionManager {
             @Override
             public void onSuccess(@Nullable WebSocketSession result) {
                 webSocketSession = result;
-                logger.info("Successfully connected");
+                onOpenSuccessCallBack.accept(result);
             }
             @Override
             public void onFailure(Throwable ex) {

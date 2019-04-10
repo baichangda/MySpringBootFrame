@@ -1,48 +1,122 @@
 package com.bcd.base.websocket.server;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.*;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public abstract class BaseWebSocket {
+public abstract class BaseWebSocket extends TextWebSocketHandler {
+
+    protected String url;
 
     protected Logger logger= LoggerFactory.getLogger(getClass());
 
-    //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private final static CopyOnWriteArraySet<BaseWebSocket> WEB_SOCKET_SET = new CopyOnWriteArraySet<>();
+    protected WebSocketSession session;
 
-    protected Session session;
+    protected volatile long lastMessageTs=0L;
+
+    protected Long pingIntervalMills;
+
+    protected Long maxDisConnectMills;
+
+    protected ScheduledExecutorService heartBeatWorker;
+
+    protected void updateLastMessageTs(){
+        if(maxDisConnectMills!=null){
+            lastMessageTs=System.currentTimeMillis();
+        }
+    }
+
+    public void startHeartBeat(long pingIntervalMills,long maxDisConnectMills){
+        this.pingIntervalMills=pingIntervalMills;
+        this.maxDisConnectMills=maxDisConnectMills;
+    }
+
+    public abstract CopyOnWriteArraySet<BaseWebSocket> getAll();
+
+
+    public BaseWebSocket(String url) {
+        this.url = url;
+        startHeartBeat(10*1000,30*1000);
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public WebSocketSession getSession() {
+        return session;
+    }
+
+
 
     /**
      * 连接打开时候触发
      * @param session
      */
-    @OnOpen
-    public void onOpen(Session session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
         this.session = session;
-        WEB_SOCKET_SET.add(this);
+        getAll().add(this);
+        updateLastMessageTs();
+        //开始心跳定时任务
+        if(this.maxDisConnectMills!=null) {
+            this.heartBeatWorker =Executors.newSingleThreadScheduledExecutor();
+            //开启定时发送ping
+            this.heartBeatWorker.scheduleWithFixedDelay(()->{
+                try {
+                    session.sendMessage(new PingMessage());
+                } catch (IOException e) {
+                    ExceptionUtil.printException(e);
+                }
+            },1000L,pingIntervalMills,TimeUnit.MILLISECONDS);
+            //开启定时检查pong
+            this.heartBeatWorker.scheduleWithFixedDelay(() -> {
+                if (System.currentTimeMillis() - lastMessageTs > maxDisConnectMills) {
+                    try {
+                        session.close();
+                    } catch (IOException e) {
+                        ExceptionUtil.printException(e);
+                    }
+                }
+            }, 1000L, maxDisConnectMills / 2, TimeUnit.MILLISECONDS);
+        }
     }
+
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception{
+        updateLastMessageTs();
+        super.handleMessage(session,message);
+    }
+
 
     /**
      * 连接关闭时候触发
      */
-    @OnClose
-    public void onClose(Session session, CloseReason closeReason) {
-        WEB_SOCKET_SET.remove(this);
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
+        getAll().remove(this);
+        //终止心跳定时任务
+        if(this.maxDisConnectMills!=null) {
+            if(this.heartBeatWorker !=null){
+                this.heartBeatWorker.shutdown();
+                this.heartBeatWorker =null;
+            }
+        }
     }
 
     /**
      * 发生错误时候触发
      * @param session
-     * @param error
+     * @param exception
      */
-    @OnError
-    public void onError(Session session, Throwable error) {
-        logger.error("Error",error);
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception{
+        ExceptionUtil.printException(exception);
     }
 
 
@@ -62,7 +136,7 @@ public abstract class BaseWebSocket {
                         logger.error("Session Is Null Or Closed");
                         return false;
                     }else {
-                        this.session.getBasicRemote().sendText(message);
+                        this.session.sendMessage(new TextMessage(message));
                         return true;
                     }
                 }

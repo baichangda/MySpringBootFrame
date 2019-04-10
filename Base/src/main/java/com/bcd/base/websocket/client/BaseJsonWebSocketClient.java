@@ -23,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unchecked")
 public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
 
     public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>();
@@ -51,7 +52,9 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
     public BaseJsonWebSocketClient(String url) {
         this.url=url;
         StandardWebSocketClient client=new StandardWebSocketClient();
-        manager=new MyWebSocketConnectionManager(client,this,url,(throwable)->{
+        manager=new MyWebSocketConnectionManager(client,this,url,(s)->{
+            logger.info("Connect to [" + this.url + "] Succeed");
+        },(throwable)->{
             synchronized (this) {
                 logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
                 try {

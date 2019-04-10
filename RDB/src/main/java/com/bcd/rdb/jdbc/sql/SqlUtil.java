@@ -121,12 +121,13 @@ public class SqlUtil {
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
      * @param sql
-     * @param paramList 不会改变
+     * @param params 不会改变
      * @return
      * @see SqlListResult#sql 格式化后的sql
      * @see SqlListResult#paramList 去除Null后的paramList,总是生成新的ArrayList
      */
-    public static SqlListResult replaceNull(String sql, List<Object> paramList){
+    public static SqlListResult replaceNull(String sql, Object ... params){
+        List<Object> paramList=new ArrayList(Arrays.asList(params));
         if(sql==null){
             throw BaseRuntimeException.getException("Param[sql] Can Not Be Null");
         }

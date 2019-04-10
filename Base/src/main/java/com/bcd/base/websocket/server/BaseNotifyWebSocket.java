@@ -5,18 +5,19 @@ import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.nofity.NotifyCommand;
 import com.bcd.base.websocket.data.nofity.NotifyHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketSession;
 
-import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
-import javax.websocket.Session;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyCommand>{
+@SuppressWarnings("unchecked")
+public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyCommand> {
 
-    protected Logger logger= LoggerFactory.getLogger(this.getClass());
+    public BaseNotifyWebSocket(String url) {
+        super(url);
+    }
 
     @Override
     public JsonMessage handle(NotifyCommand data) throws Exception{
@@ -42,8 +43,8 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
     }
 
     @OnClose
-    public void onClose(Session session, CloseReason closeReason){
-        super.onClose(session,closeReason);
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
+        super.afterConnectionClosed(session,closeStatus);
         //断开连接后,清空掉此无效连接的监听
         NotifyHandler.EVENT_TO_SN_NOTIFY_MESSAGE_MAP.forEach((k1, v1)->{
             Set<String> removeSnSet=new HashSet<>();

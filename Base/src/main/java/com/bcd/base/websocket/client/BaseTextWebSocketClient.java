@@ -5,6 +5,7 @@ import com.bcd.base.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
@@ -39,7 +40,9 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     public BaseTextWebSocketClient(String url) {
         this.url=url;
         StandardWebSocketClient client=new StandardWebSocketClient();
-        manager=new MyWebSocketConnectionManager(client,this,url,(throwable)->{
+        manager=new MyWebSocketConnectionManager(client,this,url,(s)->{
+            logger.info("Connect to [" + this.url + "] Succeed");
+        },(throwable)->{
             synchronized (this) {
                 logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
                 try {
@@ -61,6 +64,12 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
         }catch (Exception ex){
             ExceptionUtil.printException(ex);
         }
+    }
+
+    @Override
+    protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+        logger.info("Pong Message: "+new String(message.getPayload().array()));
+        super.handlePongMessage(session, message);
     }
 
     @Override

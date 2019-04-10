@@ -4,6 +4,7 @@ import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.WebSocketData;
 import com.bcd.base.websocket.server.BaseWebSocket;
 
+@SuppressWarnings("unchecked")
 public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
 
     public CommonNotifyHandler(NotifyEvent event) {

@@ -32,6 +32,9 @@ dependencies {
     //apache commons lang3
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
 
+    //apache commons codec
+    compile("commons-codec:commons-codec:${commonsCodecVersion}")
+
     //swagger集成
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
@@ -48,6 +51,7 @@ buildscript {
         poiVersion = '+'
         commonsBeanutilsVersion ='+'
         commonsLangVersion='+'
+        commonsCodecVersion='+'
         swaggerVersion='+'
         commonsPool2='+'
         jedisVersion='+'

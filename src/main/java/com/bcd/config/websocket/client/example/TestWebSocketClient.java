@@ -9,11 +9,9 @@ import org.springframework.web.socket.WebSocketSession;
 
 
 //@Component
-public class RegisterWebSocketHandler extends BaseTextWebSocketClient {
+public class TestWebSocketClient extends BaseTextWebSocketClient {
 
-    Logger logger= LoggerFactory.getLogger(RegisterWebSocketHandler.class);
-
-    public RegisterWebSocketHandler(@Value("${register.webSocket.url}") String url) {
+    public TestWebSocketClient(@Value("${register.webSocket.url}") String url) {
         super(url);
     }
 

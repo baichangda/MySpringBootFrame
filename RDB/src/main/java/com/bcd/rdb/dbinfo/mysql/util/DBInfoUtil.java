@@ -34,7 +34,7 @@ public class DBInfoUtil {
             LinkedHashMap springMap = (LinkedHashMap) dataMap.get("spring");
             LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
             //1.1、取出配置文件后缀
-            String suffix = springMap.get("profiles.active").toString();
+            String suffix = (String)springMap.get("profiles.active");
             if (!StringUtils.isEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
                 String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);

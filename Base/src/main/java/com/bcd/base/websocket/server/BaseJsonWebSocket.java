@@ -7,11 +7,9 @@ import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.WebSocketData;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.concurrent.ExecutorService;
@@ -21,22 +19,21 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
 
     public final static ExecutorService WORK_POOL= Executors.newFixedThreadPool(16);
 
-    protected Logger logger= LoggerFactory.getLogger(this.getClass());
-
     protected JavaType paramJavaType;
 
-    public BaseJsonWebSocket() {
+    public BaseJsonWebSocket(String url) {
+        super(url);
         Type parentType= ClassUtil.getParentUntil(getClass(),BaseJsonWebSocket.class);
         this.paramJavaType=TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, JsonUtil.getJavaType(((ParameterizedType)parentType).getActualTypeArguments()[0]));
     }
 
-    @OnMessage
-    public void onMessage(String jsonData, Session session){
+    public void handleTextMessage(WebSocketSession session, TextMessage message){
         WORK_POOL.execute(()->{
+            String data=message.getPayload();
             WebSocketData<JsonMessage> returnWebSocketData=new WebSocketData<>();
             JsonMessage jsonMessage;
             try {
-                WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(jsonData, paramJavaType);
+                WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, paramJavaType);
                 logger.info("Receive WebSocket SN["+paramWebSocketData.getSn()+"]");
                 returnWebSocketData.setSn(paramWebSocketData.getSn());
                 jsonMessage=handle(paramWebSocketData.getData());

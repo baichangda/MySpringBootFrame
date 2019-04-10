@@ -5,6 +5,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Type;
 
+@SuppressWarnings("unchecked")
 public class ClassUtil {
     public static Type getParentUntil(Class startClass,Class ... endClasses){
         Type parentType=startClass.getGenericSuperclass();
