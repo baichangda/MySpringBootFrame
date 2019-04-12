@@ -8,90 +8,149 @@ import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BaseWebSocket extends TextWebSocketHandler {
+public abstract class BaseWebSocket extends TextWebSocketHandler{
+
+    protected ConcurrentHashMap<WebSocketSession,ServiceInstance> session_to_service_map=new ConcurrentHashMap<>();
+
+
+    public static class ServiceInstance {
+        public WebSocketSession session;
+
+        public volatile long lastMessageTs=0L;
+
+        public Long pingIntervalMills;
+
+        public Long maxDisConnectMills;
+
+        public ScheduledExecutorService heartBeatWorker;
+
+        public ServiceInstance(WebSocketSession session) {
+            this.session = session;
+            startHeartBeat(10 * 1000, 30 * 1000);
+        }
+
+        public void startHeartBeat(long pingIntervalMills,long maxDisConnectMills){
+            this.pingIntervalMills=pingIntervalMills;
+            this.maxDisConnectMills=maxDisConnectMills;
+        }
+
+        public void updateLastMessageTs(){
+            if(maxDisConnectMills!=null){
+                lastMessageTs=System.currentTimeMillis();
+            }
+        }
+
+        public void doOnConnect(){
+            //开始心跳定时任务
+            if(maxDisConnectMills!=null) {
+                heartBeatWorker =Executors.newSingleThreadScheduledExecutor();
+                //开启定时发送ping
+                heartBeatWorker.scheduleWithFixedDelay(()->{
+                    try {
+                        session.sendMessage(new PingMessage());
+                    } catch (IOException e) {
+                        ExceptionUtil.printException(e);
+                    }
+                },1000L,pingIntervalMills,TimeUnit.MILLISECONDS);
+                //开启定时检查pong
+                heartBeatWorker.scheduleWithFixedDelay(() -> {
+                    if (System.currentTimeMillis() - lastMessageTs > maxDisConnectMills) {
+                        try {
+                            session.close();
+                        } catch (IOException e) {
+                            ExceptionUtil.printException(e);
+                        }
+                    }
+                }, 1000L, maxDisConnectMills / 2, TimeUnit.MILLISECONDS);
+            }
+        }
+
+        public void doOnDisConnect(){
+            //终止心跳定时任务
+            if(this.maxDisConnectMills!=null) {
+                if(this.heartBeatWorker !=null){
+                    this.heartBeatWorker.shutdown();
+                    this.heartBeatWorker =null;
+                }
+            }
+        }
+
+        /**
+         * 发送消息
+         * @param message
+         * @throws IOException
+         */
+        public boolean sendMessage(String message){
+            try {
+                if(session==null||!session.isOpen()){
+                    return false;
+                }else {
+                    List<String> subList=new LinkedList<>();
+                    int len=message.length();
+                    int index=0;
+                    while(true){
+                        int start=index;
+                        int end=index+1024;
+                        if(end>=len){
+                            break;
+                        }
+                        String sub= message.substring(start,end);
+                        subList.add(sub);
+                        index=end;
+                    }
+                    subList.add(message.substring(index,len));
+                    synchronized (this) {
+                        if(session==null||!session.isOpen()){
+                            return false;
+                        }else {
+                            int subSize=subList.size();
+                            for(int i=0;i<=subSize-2;i++){
+                                this.session.sendMessage(new TextMessage(subList.get(i),false));
+                            }
+                            this.session.sendMessage(new TextMessage(subList.get(subSize-1),true));
+                            return true;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        }
+    }
 
     protected String url;
 
     protected Logger logger= LoggerFactory.getLogger(getClass());
 
-    protected WebSocketSession session;
-
-    protected volatile long lastMessageTs=0L;
-
-    protected Long pingIntervalMills;
-
-    protected Long maxDisConnectMills;
-
-    protected ScheduledExecutorService heartBeatWorker;
-
-    protected void updateLastMessageTs(){
-        if(maxDisConnectMills!=null){
-            lastMessageTs=System.currentTimeMillis();
-        }
-    }
-
-    public void startHeartBeat(long pingIntervalMills,long maxDisConnectMills){
-        this.pingIntervalMills=pingIntervalMills;
-        this.maxDisConnectMills=maxDisConnectMills;
-    }
-
-    public abstract CopyOnWriteArraySet<BaseWebSocket> getAll();
-
-
     public BaseWebSocket(String url) {
         this.url = url;
-        startHeartBeat(10*1000,30*1000);
+
     }
 
     public String getUrl() {
         return url;
     }
 
-    public WebSocketSession getSession() {
-        return session;
-    }
-
-
-
     /**
      * 连接打开时候触发
      * @param session
      */
     public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        this.session = session;
-        getAll().add(this);
-        updateLastMessageTs();
-        //开始心跳定时任务
-        if(this.maxDisConnectMills!=null) {
-            this.heartBeatWorker =Executors.newSingleThreadScheduledExecutor();
-            //开启定时发送ping
-            this.heartBeatWorker.scheduleWithFixedDelay(()->{
-                try {
-                    session.sendMessage(new PingMessage());
-                } catch (IOException e) {
-                    ExceptionUtil.printException(e);
-                }
-            },1000L,pingIntervalMills,TimeUnit.MILLISECONDS);
-            //开启定时检查pong
-            this.heartBeatWorker.scheduleWithFixedDelay(() -> {
-                if (System.currentTimeMillis() - lastMessageTs > maxDisConnectMills) {
-                    try {
-                        session.close();
-                    } catch (IOException e) {
-                        ExceptionUtil.printException(e);
-                    }
-                }
-            }, 1000L, maxDisConnectMills / 2, TimeUnit.MILLISECONDS);
-        }
+        ServiceInstance serviceInstance= new ServiceInstance(session);
+        session_to_service_map.put(session,serviceInstance);
+        serviceInstance.updateLastMessageTs();
+
     }
 
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception{
-        updateLastMessageTs();
+        session_to_service_map.get(session).updateLastMessageTs();
         super.handleMessage(session,message);
     }
 
@@ -100,14 +159,8 @@ public abstract class BaseWebSocket extends TextWebSocketHandler {
      * 连接关闭时候触发
      */
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
-        getAll().remove(this);
-        //终止心跳定时任务
-        if(this.maxDisConnectMills!=null) {
-            if(this.heartBeatWorker !=null){
-                this.heartBeatWorker.shutdown();
-                this.heartBeatWorker =null;
-            }
-        }
+        ServiceInstance serviceInstance=session_to_service_map.remove(session);
+        serviceInstance.doOnDisConnect();
     }
 
     /**
@@ -120,29 +173,10 @@ public abstract class BaseWebSocket extends TextWebSocketHandler {
     }
 
 
-    /**
-     * 发送消息
-     * @param message
-     * @throws IOException
-     */
-    public boolean sendMessage(String message){
-        try {
-            if(session==null||!session.isOpen()){
-                logger.error("Session Is Null Or Closed");
-                return false;
-            }else {
-                synchronized (this) {
-                    if(session==null||!session.isOpen()){
-                        logger.error("Session Is Null Or Closed");
-                        return false;
-                    }else {
-                        this.session.sendMessage(new TextMessage(message));
-                        return true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+
+
+    @Override
+    public boolean supportsPartialMessages() {
+        return true;
     }
 }

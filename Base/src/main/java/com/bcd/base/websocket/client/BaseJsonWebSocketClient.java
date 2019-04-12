@@ -12,6 +12,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
@@ -23,8 +24,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
-public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
+public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
+
+    public final StringBuilder cache=new StringBuilder();
 
     public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>();
 
@@ -55,28 +57,42 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
         manager=new MyWebSocketConnectionManager(client,this,url,(s)->{
             logger.info("Connect to [" + this.url + "] Succeed");
         },(throwable)->{
-            synchronized (this) {
-                logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
-                try {
-                    Thread.sleep(10 * 1000L);
-                } catch (InterruptedException e) {
-                    throw BaseRuntimeException.getException(e);
-                }
-                manager.stop();
-                manager.start();
-            }
+            onConnectFailed(throwable);
         });
         manager.start();
+    }
+
+    protected void onConnectFailed(Throwable throwable){
+        synchronized (this) {
+            logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
+            try {
+                Thread.sleep(10 * 1000L);
+            } catch (InterruptedException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+            manager.stop();
+            manager.start();
+        }
+    }
+
+    @Override
+    protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+        logger.info("Receive PongMessage");
+        super.handlePongMessage(session, message);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
-            //1、转换结果集
-            String jsonData=message.getPayload();
-            JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
-            //2、触发onMessage方法
-            onMessage(jsonNode.get("sn").asText(),jsonData);
+            cache.append(message.getPayload());
+            if(message.isLast()){
+                //1、转换结果集
+                String jsonData=cache.toString();
+                cache.delete(0,cache.length());
+                JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
+                //2、触发onMessage方法
+                onMessage(jsonNode.get("sn").asText(),jsonData);
+            }
         }catch (Exception ex){
             ExceptionUtil.printException(ex);
         }
@@ -93,6 +109,7 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
             logger.warn("WebSocket Connection Closed,Will Restart It");
             this.session = null;
             this.manager.stop();
+            cache.delete(0,cache.length());
             this.manager.start();
         }
     }
@@ -220,5 +237,10 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler{
                 throw BaseRuntimeException.getException(e);
             }
         }
+    }
+
+    @Override
+    public boolean supportsPartialMessages() {
+        return true;
     }
 }

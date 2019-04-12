@@ -6,12 +6,12 @@ import com.bcd.base.websocket.server.BaseWebSocket;
 public class NotifyMessage {
     private String sn;
     private NotifyEvent event;
-    private BaseWebSocket webSocket;
+    private BaseWebSocket.ServiceInstance serviceInstance;
 
-    public NotifyMessage(String sn, NotifyEvent event, BaseWebSocket webSocket) {
+    public NotifyMessage(String sn, NotifyEvent event, BaseWebSocket.ServiceInstance serviceInstance) {
         this.sn = sn;
         this.event=event;
-        this.webSocket = webSocket;
+        this.serviceInstance = serviceInstance;
     }
 
     public String getSn() {
@@ -30,11 +30,11 @@ public class NotifyMessage {
         this.event = event;
     }
 
-    public BaseWebSocket getWebSocket() {
-        return webSocket;
+    public BaseWebSocket.ServiceInstance getServiceInstance() {
+        return serviceInstance;
     }
 
-    public void setWebSocket(BaseWebSocket webSocket) {
-        this.webSocket = webSocket;
+    public void setServiceInstance(BaseWebSocket.ServiceInstance serviceInstance) {
+        this.serviceInstance = serviceInstance;
     }
 }

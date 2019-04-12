@@ -12,8 +12,8 @@ public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
     }
 
     @Override
-    public void register(String sn, BaseWebSocket webSocket, String param) {
-        sn_to_notify_message_map.put(sn,new NotifyMessage(sn,event,webSocket));
+    public void register(String sn, BaseWebSocket.ServiceInstance serviceInstance, String param) {
+        sn_to_notify_message_map.put(sn,new NotifyMessage(sn,event,serviceInstance));
     }
 
     @Override
@@ -24,10 +24,10 @@ public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
     @Override
     public void trigger(T data) {
         sn_to_notify_message_map.forEach((k,v)->{
-            BaseWebSocket webSocket= v.getWebSocket();
+            BaseWebSocket.ServiceInstance serviceInstance= v.getServiceInstance();
             WebSocketData<NotifyData> sendData=packData(k,data);
-            logger.info("Notify WebSocket SN["+k+"] Event["+event+"]");
-            webSocket.sendMessage(JsonUtil.toJson(sendData));
+            logger.info("Send Notify SN["+k+"] Event["+event+"]");
+            serviceInstance.sendMessage(JsonUtil.toJson(sendData));
         });
     }
 

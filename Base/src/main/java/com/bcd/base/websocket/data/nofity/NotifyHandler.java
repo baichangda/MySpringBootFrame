@@ -49,7 +49,7 @@ public abstract class NotifyHandler<T,R> {
         EVENT_TO_HANDLER_MAP.put(event,this);
     }
 
-    public abstract void register(String sn, BaseWebSocket webSocket, R param);
+    public abstract void register(String sn, BaseWebSocket.ServiceInstance serviceInstance, R param);
 
     public abstract void cancel(String sn);
 

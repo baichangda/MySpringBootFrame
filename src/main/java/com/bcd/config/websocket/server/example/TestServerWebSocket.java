@@ -15,14 +15,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class TestServerWebSocket extends BaseWebSocket{
 
-    public final static CopyOnWriteArraySet<BaseWebSocket> WEB_SOCKETS=new CopyOnWriteArraySet<>();
-
     public TestServerWebSocket() {
         super("/ws/test");
     }
 
-    @Override
-    public CopyOnWriteArraySet<BaseWebSocket> getAll() {
-        return WEB_SOCKETS;
-    }
 }

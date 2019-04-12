@@ -16,9 +16,8 @@ public class TestWebSocketClient extends BaseTextWebSocketClient {
     }
 
     @Override
-    public void onMessage(WebSocketSession session, TextMessage message) throws Exception {
-        logger.info("WebSocket Receive: "+message.getPayload());
-        super.handleTextMessage(session, message);
+    public void onMessage(WebSocketSession session, String data) throws Exception {
+        logger.info("WebSocket Receive: "+data);
     }
 
 

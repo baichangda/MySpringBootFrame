@@ -2,6 +2,8 @@ package com.bcd.base.websocket.client;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExceptionUtil;
+import com.bcd.base.util.JsonUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -15,6 +17,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 
 public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
+
+    public final StringBuilder cache=new StringBuilder();
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
     protected String url;
@@ -60,7 +64,12 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
-            onMessage(session, message);
+            cache.append(message.getPayload());
+            if(message.isLast()){
+                String data=cache.toString();
+                cache.delete(0,cache.length());
+                onMessage(session, data);
+            }
         }catch (Exception ex){
             ExceptionUtil.printException(ex);
         }
@@ -83,6 +92,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
             logger.error("WebSocket Connection Closed,Will Restart It");
             this.session = null;
             this.manager.stop();
+            cache.delete(0,cache.length());
             this.manager.start();
         }
     }
@@ -114,5 +124,10 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
         }
     }
 
-    public abstract void onMessage(WebSocketSession session, TextMessage message) throws Exception;
+    public abstract void onMessage(WebSocketSession session, String data) throws Exception;
+
+    @Override
+    public boolean supportsPartialMessages() {
+        return true;
+    }
 }

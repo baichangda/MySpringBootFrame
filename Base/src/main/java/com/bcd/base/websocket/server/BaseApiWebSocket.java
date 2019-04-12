@@ -10,7 +10,7 @@ public abstract class BaseApiWebSocket extends BaseJsonWebSocket<ApiCommand> {
     }
 
     @Override
-    public JsonMessage handle(ApiCommand data) throws Exception{
+    public JsonMessage handle(ServiceInstance serviceInstance, ApiCommand data) throws Exception{
         ApiHandler apiHandler= ApiHandler.NAME_TO_HANDLER_MAP.get(data.getApiName());
         return apiHandler.execute(data.getParamJson());
     }

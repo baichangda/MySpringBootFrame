@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -222,7 +223,7 @@ public class ExcelUtil {
      * @param cellFunction 读取单元格数据 方法
      * @return
      */
-    public static List<List> readExcel(final Sheet sheet, final int beginRowIndex, final int beginColIndex, final int endColIndex,
+    public static List<List> readSheet(final Sheet sheet, final int beginRowIndex, final int beginColIndex, final int endColIndex,
                                        final Function<Row,Boolean> rowFunction,final Function<Cell,Object> cellFunction){
         List<List> returnList=new ArrayList<>();
         int startRow=beginRowIndex-1;
@@ -249,6 +250,62 @@ public class ExcelUtil {
         return returnList;
     }
 
+    /**
+     * 读取sheet,在积累到一定的数据量之后,暂停读取,先执行任务
+     * @param sheet 操作的sheet
+     * @param beginRowIndex sheet开始的行号,从1开始
+     * @param beginColIndex sheet开始的列号,从1开始
+     * @param endColIndex sheet结束的列号,从1开始
+     * @param rowFunction 判断结束行 方法
+     * @param cellFunction 读取单元格数据 方法
+     * @param pauseNum 暂停的数量
+     * @param workConsumer 执行任务 方法
+     */
+    public static void readSheetAndPauseWork(final Sheet sheet, final int beginRowIndex, final int beginColIndex, final int endColIndex,
+                                             final Function<Row,Boolean> rowFunction, final Function<Cell,Object> cellFunction,int pauseNum,Consumer<List<List>> workConsumer){
+        List<List> tempList=new ArrayList<>();
+        int startRow=beginRowIndex-1;
+        int endRow=sheet.getLastRowNum();
+        for(int i=startRow;i<=endRow;i++){
+            Row row= sheet.getRow(i);
+            boolean isContinue=rowFunction.apply(row);
+            if(!isContinue){
+                break;
+            }
+            List<Object> objList=new ArrayList<>();
+            for(int j=beginColIndex-1;j<=endColIndex-1;j++){
+                Cell cell= row.getCell(j);
+                Object val;
+                if(cellFunction==null){
+                    val=readCell(cell);
+                }else{
+                    val=cellFunction.apply(cell);
+                }
+                objList.add(val);
+            }
+            tempList.add(objList);
+            if(tempList.size()%pauseNum==0){
+                workConsumer.accept(tempList);
+                tempList=new ArrayList<>();
+            }
+        }
+        workConsumer.accept(tempList);
+    }
+
+    public static void readExcelAndPauseWork(final InputStream is, final int sheetIndex, final int beginRowIndex, final int beginColIndex, final int endColIndex,
+                                             final Function<Row,Boolean> rowFunction, final Function<Cell,Object> cellFunction,int pauseNum,Consumer<List<List>> workConsumer){
+        try (Workbook workbook=WorkbookFactory.create(is)){
+            if(sheetIndex>workbook.getNumberOfSheets()){
+                return;
+            }
+            Sheet sheet= workbook.getSheetAt(sheetIndex-1);
+            readSheetAndPauseWork(sheet,beginRowIndex,beginColIndex,endColIndex,rowFunction,cellFunction,pauseNum,workConsumer);
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+
+    }
+
     public static List<List> readExcel(final InputStream is,final int sheetIndex,final int beginRowIndex,final int beginColIndex,final int endColIndex,
                                        final Function<Row,Boolean> rowFunction,final Function<Cell,Object> cellFunction){
         try (Workbook workbook=WorkbookFactory.create(is)){
@@ -256,15 +313,15 @@ public class ExcelUtil {
                 return new ArrayList<>();
             }
             Sheet sheet= workbook.getSheetAt(sheetIndex-1);
-            return readExcel(sheet,beginRowIndex,beginColIndex,endColIndex,rowFunction,cellFunction);
+            return readSheet(sheet,beginRowIndex,beginColIndex,endColIndex,rowFunction,cellFunction);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
-    public static List<Map<String,Object>> readExcel(final Sheet sheet, final int beginRowIndex, final int beginColIndex, final int endColIndex,
+    public static List<Map<String,Object>> readSheet(final Sheet sheet, final int beginRowIndex, final int beginColIndex, final int endColIndex,
                                       final String[] fieldNameArr, final Function<Row,Boolean> rowFunction,final Function<Cell,Object> cellFunction){
-        List<List> dataList=readExcel(sheet, beginRowIndex, beginColIndex, endColIndex, rowFunction,cellFunction);
+        List<List> dataList=readSheet(sheet, beginRowIndex, beginColIndex, endColIndex, rowFunction,cellFunction);
         return parseToJsonArrayData(dataList,fieldNameArr);
     }
 
@@ -273,6 +330,8 @@ public class ExcelUtil {
         List<List> dataList=readExcel(is,sheetIndex, beginRowIndex, beginColIndex, endColIndex, rowFunction,cellFunction);
         return parseToJsonArrayData(dataList,fieldNameArr);
     }
+
+
 
     private static List<Map<String,Object>> parseToJsonArrayData(List<List> dataList,final String[] fieldNameArr){
         return dataList.stream().map(data->{
@@ -283,6 +342,8 @@ public class ExcelUtil {
             return jsonObject;
         }).collect(Collectors.toList());
     }
+
+
 
 
 

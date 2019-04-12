@@ -20,7 +20,7 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
     }
 
     @Override
-    public JsonMessage handle(NotifyCommand data) throws Exception{
+    public JsonMessage handle(ServiceInstance serviceInstance, NotifyCommand data) throws Exception{
         NotifyHandler notifyHandler= NotifyHandler.EVENT_TO_HANDLER_MAP.get(data.getEvent());
         if(notifyHandler==null){
             throw BaseRuntimeException.getException("Event["+data.getEvent()+"] Has No Handler");
@@ -28,7 +28,7 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
         switch (data.getType()){
             case REGISTER:{
                 Object param= data.getParamJson()==null?null: JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data.getParamJson(), notifyHandler.getRegisterParamJavaType());
-                notifyHandler.register(data.getSn(),this,param);
+                notifyHandler.register(data.getSn(),serviceInstance,param);
                 break;
             }
             case CANCEL:{
@@ -49,7 +49,7 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
         NotifyHandler.EVENT_TO_SN_NOTIFY_MESSAGE_MAP.forEach((k1, v1)->{
             Set<String> removeSnSet=new HashSet<>();
             v1.forEach((k2,v2)->{
-                if(v2.getWebSocket()==this)removeSnSet.add(k2);
+                if(v2.getServiceInstance().session==session)removeSnSet.add(k2);
             });
             removeSnSet.forEach(sn-> v1.remove(sn));
         });

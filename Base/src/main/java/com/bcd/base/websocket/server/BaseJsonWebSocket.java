@@ -36,17 +36,21 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
                 WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, paramJavaType);
                 logger.info("Receive WebSocket SN["+paramWebSocketData.getSn()+"]");
                 returnWebSocketData.setSn(paramWebSocketData.getSn());
-                jsonMessage=handle(paramWebSocketData.getData());
+                jsonMessage=handle(session_to_service_map.get(session),paramWebSocketData.getData());
             } catch (Exception e) {
                 logger.error("Error",e);
                 jsonMessage= ExceptionUtil.toJsonMessage(e);
             }
             returnWebSocketData.setData(jsonMessage);
-            logger.info("Send WebSocket SN["+returnWebSocketData.getSn()+"]");
-            sendMessage(JsonUtil.toJson(returnWebSocketData));
+            boolean sendRes= session_to_service_map.get(session).sendMessage(JsonUtil.toJson(returnWebSocketData));
+            if(sendRes){
+                logger.info("Send WebSocket SN["+returnWebSocketData.getSn()+"]");
+            }else{
+                logger.error("Send WebSocket SN["+returnWebSocketData.getSn()+"] Failed");
+            }
         });
 
     }
 
-    public abstract JsonMessage handle(T data) throws Exception;
+    public abstract JsonMessage handle(ServiceInstance serviceInstance, T data) throws Exception;
 }
