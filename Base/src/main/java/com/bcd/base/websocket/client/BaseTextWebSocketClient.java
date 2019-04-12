@@ -64,11 +64,15 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
-            cache.append(message.getPayload());
-            if(message.isLast()){
-                String data=cache.toString();
-                cache.delete(0,cache.length());
-                onMessage(session, data);
+            if(supportsPartialMessages()){
+                cache.append(message.getPayload());
+                if(message.isLast()){
+                    String data=cache.toString();
+                    cache.delete(0,cache.length());
+                    onMessage(session, data);
+                }
+            }else{
+                onMessage(session, message.getPayload());
             }
         }catch (Exception ex){
             ExceptionUtil.printException(ex);

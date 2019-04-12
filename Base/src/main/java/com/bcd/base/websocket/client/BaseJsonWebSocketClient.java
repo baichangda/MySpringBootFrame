@@ -84,13 +84,17 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
-            cache.append(message.getPayload());
-            if(message.isLast()){
-                //1、转换结果集
-                String jsonData=cache.toString();
-                cache.delete(0,cache.length());
+            if(supportsPartialMessages()){
+                cache.append(message.getPayload());
+                if(message.isLast()){
+                    String jsonData=cache.toString();
+                    cache.delete(0,cache.length());
+                    JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
+                    onMessage(jsonNode.get("sn").asText(),jsonData);
+                }
+            }else{
+                String jsonData=message.getPayload();
                 JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
-                //2、触发onMessage方法
                 onMessage(jsonNode.get("sn").asText(),jsonData);
             }
         }catch (Exception ex){

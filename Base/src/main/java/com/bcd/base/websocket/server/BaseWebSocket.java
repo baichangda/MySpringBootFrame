@@ -8,6 +8,7 @@ import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,10 +30,13 @@ public abstract class BaseWebSocket extends TextWebSocketHandler{
 
         public Long maxDisConnectMills;
 
+        public boolean supportsPartialMessages;
+
         public ScheduledExecutorService heartBeatWorker;
 
-        public ServiceInstance(WebSocketSession session) {
+        public ServiceInstance(WebSocketSession session,boolean supportsPartialMessages) {
             this.session = session;
+            this.supportsPartialMessages=supportsPartialMessages;
             startHeartBeat(10 * 1000, 30 * 1000);
         }
 
@@ -92,20 +96,25 @@ public abstract class BaseWebSocket extends TextWebSocketHandler{
                 if(session==null||!session.isOpen()){
                     return false;
                 }else {
-                    List<String> subList=new LinkedList<>();
-                    int len=message.length();
-                    int index=0;
-                    while(true){
-                        int start=index;
-                        int end=index+1024;
-                        if(end>=len){
-                            break;
+                    List<String> subList;
+                    if(supportsPartialMessages) {
+                        subList = new LinkedList<>();
+                        int len = message.length();
+                        int index = 0;
+                        while (true) {
+                            int start = index;
+                            int end = index + 1024;
+                            if (end >= len) {
+                                break;
+                            }
+                            String sub = message.substring(start, end);
+                            subList.add(sub);
+                            index = end;
                         }
-                        String sub= message.substring(start,end);
-                        subList.add(sub);
-                        index=end;
+                        subList.add(message.substring(index, len));
+                    }else{
+                        subList= Arrays.asList(message);
                     }
-                    subList.add(message.substring(index,len));
                     synchronized (this) {
                         if(session==null||!session.isOpen()){
                             return false;
@@ -143,7 +152,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler{
      * @param session
      */
     public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        ServiceInstance serviceInstance= new ServiceInstance(session);
+        ServiceInstance serviceInstance= new ServiceInstance(session,supportsPartialMessages());
         session_to_service_map.put(session,serviceInstance);
         serviceInstance.updateLastMessageTs();
 
