@@ -1,9 +1,13 @@
 package com.bcd.rdb.jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.StringUtil;
 import net.sf.jsqlparser.JSQLParserException;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -148,6 +152,86 @@ public class SqlUtil {
         String newSql=visitor.parseSql();
         //3、返回新sql和移除掉Null参数的新集合
         return new SqlListResult(newSql,paramList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+    }
+
+    private static Map<String,Object> toColumnValueMap(Object obj,boolean includeNullValue,String ... ignoreFields){
+        Map<String,Object> returnMap=new HashMap<>();
+        List<Field> fieldList= FieldUtils.getAllFieldsList(obj.getClass());
+        Set<String> ignoreSet= Arrays.stream(ignoreFields).collect(Collectors.toSet());
+        fieldList.forEach(field->{
+            if(Modifier.isStatic(field.getModifiers())){
+                return;
+            }
+            String fieldName=field.getName();
+            String columnName= StringUtil.toFirstSplitWithUpperCase(fieldName,'_');
+            if(ignoreSet.contains(fieldName)||ignoreSet.contains(columnName)){
+                return;
+            }
+            field.setAccessible(true);
+            try {
+                Object val=field.get(obj);
+                if(!includeNullValue&&val==null){
+                    return;
+                }
+                returnMap.put(columnName,val);
+            } catch (IllegalAccessException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        });
+        return returnMap;
+    }
+
+    /**
+     *
+     * @param obj 对象
+     * @param table 表名
+     * @param includeNullValue 是否包含空值的列
+     * @param ignoreFields 忽视的字段和者列名
+     * @return
+     */
+    public static CreateSqlResult generateCreateSql(Object obj,String table,boolean includeNullValue,String ... ignoreFields){
+        Map<String,Object> filterColumnValueMap=toColumnValueMap(obj,includeNullValue,ignoreFields);
+        if(filterColumnValueMap.size()==0){
+            throw BaseRuntimeException.getException("No Column");
+        }
+        Set<String> columnSet= filterColumnValueMap.keySet();
+        StringBuilder sql=new StringBuilder("insert into ");
+        sql.append(table);
+        sql.append("(");
+        sql.append(columnSet.stream().reduce((e1,e2)->e1+","+e2).get());
+        sql.append(") values(");
+        sql.append(columnSet.stream().map(e->"?").reduce((e1,e2)->e1+","+e2).get());
+        sql.append(")");
+        return new CreateSqlResult(sql.toString(),new ArrayList(filterColumnValueMap.values()));
+    }
+
+    /**
+     *
+     * @param obj 对象
+     * @param table 表名
+     * @param includeNullValue 是否包含空值的列
+     * @param ignoreFields 忽视的字段和者列名
+     * @return
+     */
+    public static UpdateSqlResult generateUpdateSql(Object obj,String table,boolean includeNullValue,String ... ignoreFields){
+        Map<String,Object> filterColumnValueMap=toColumnValueMap(obj,includeNullValue,ignoreFields);
+        if(filterColumnValueMap.size()==0){
+            throw BaseRuntimeException.getException("No Column");
+        }
+        StringBuilder sql=new StringBuilder("update ");
+        sql.append(table);
+        sql.append(" set ");
+        boolean[] isFirst=new boolean[]{true};
+        filterColumnValueMap.forEach((k,v)->{
+            if(isFirst[0]){
+                isFirst[0]=false;
+            }else{
+                sql.append(",");
+            }
+            sql.append(k);
+            sql.append("=?");
+        });
+        return new UpdateSqlResult(sql.toString(),new ArrayList(filterColumnValueMap.values()));
     }
 
 

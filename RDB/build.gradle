@@ -1,6 +1,8 @@
 dependencies {
     //springboot jpa支持
     compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+    //springboot jdbc支持
+    compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
     //mysql驱动包
     runtime "mysql:mysql-connector-java:${mysqlVersion}"
 

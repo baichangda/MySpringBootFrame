@@ -41,6 +41,22 @@ public class StringUtil {
         return result.toString();
     }
 
+    public static String toFirstSplitWithUpperCase(String str,char splitStr){
+        if(str==null||str.length()==0){
+            return str;
+        }
+        StringBuilder result = new StringBuilder();
+        result.append(Character.toLowerCase(str.charAt(0)));
+        for (int i = 1; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if(Character.isUpperCase(c)){
+                result.append(splitStr);
+            }
+            result.append(Character.toLowerCase(c));
+        }
+        return result.toString();
+    }
+
     /**
      * 替换字符串中的${*}格式的变量
      * @param str
