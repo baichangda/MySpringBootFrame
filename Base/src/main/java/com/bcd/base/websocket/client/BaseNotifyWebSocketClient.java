@@ -25,8 +25,15 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
 
     public final static ExecutorService RECONNECT_REGISTER_POOL= Executors.newSingleThreadExecutor();
 
+    protected boolean autoRegisterOnConnected;
+
     public BaseNotifyWebSocketClient(String url) {
+        this(url,true);
+    }
+
+    public BaseNotifyWebSocketClient(String url,boolean autoRegisterOnConnected) {
         super(url);
+        this.autoRegisterOnConnected=autoRegisterOnConnected;
     }
 
     /**
@@ -72,39 +79,52 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    public void onMessage(String data) {
         try {
             //1、转换结果集
-            String jsonData=message.getPayload();
-            JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
+            JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(data);
             //2、判断是命令或者通知数据
             if(jsonNode.hasNonNull("sn")){
-                //2.1、如果是命令,触发onMessage方法
-                onMessage(jsonNode.get("sn").asText(),jsonData);
+                //2.1、如果是命令
+                String sn=jsonNode.get("sn").asText();
+                logger.info("Receive WebSocket SN[" + sn + "]");
+                //2.1.1、取出流水号
+                Consumer<String> consumer = sn_to_callBack_map.remove(sn);
+                //2.1.2、触发回调
+                if (consumer == null) {
+                    logger.warn("Receive No Consumer Message SN[" + sn + "]");
+                } else {
+                    consumer.accept(data);
+                }
             }else{
                 //2.2、如果是通知数据
-                WebSocketData<NotifyData> webSocketData= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(jsonData,TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, NotifyData.class));
-                logger.info("Receive Notify SN["+webSocketData.getData().getSn()+"] ");
-                NotifyConsumer notifyConsumer= sn_to_consumer.get(webSocketData.getData().getSn());
-                notifyConsumer.getConsumer().accept(webSocketData.getData().getDataJson());
+                NotifyData notifyData= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data,NotifyData.class);
+                logger.info("Receive Notify SN["+notifyData.getSn()+"] ");
+                NotifyConsumer notifyConsumer= sn_to_consumer.get(notifyData.getSn());
+                notifyConsumer.getConsumer().accept(notifyData.getDataJson());
             }
-        }catch (Exception ex){
-            ExceptionUtil.printException(ex);
+        }catch (Exception e){
+            ExceptionUtil.printException(e);
         }
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        //断线重连之后,检测之前是否存在监听,有则重新注册所有监听
-        List<NotifyConsumer> notifyConsumerList= new ArrayList<>(sn_to_consumer.values());
+        //1、断线重连之后,检测之前是否存在监听,有则重新注册所有监听
+        List<NotifyConsumer> notifyConsumerList=new ArrayList<>(sn_to_consumer.values());
+        //2、获取所有的监听流水号并清空监听信息
         Set<String> snSet=new HashSet<>(sn_to_consumer.keySet());
         sn_to_consumer.clear();
         snSet.forEach(sn-> SN_TO_NOTIFY_INFO_MAP.remove(sn));
-        if(!notifyConsumerList.isEmpty()) {
-            RECONNECT_REGISTER_POOL.execute(() -> {
-                notifyConsumerList.forEach(e -> register(e.getEvent(), e.getParamJson(), e.getConsumer()));
-            });
+        //3、如果启动了自动注册,则注册
+        if(autoRegisterOnConnected){
+            if(!notifyConsumerList.isEmpty()) {
+                RECONNECT_REGISTER_POOL.execute(() -> {
+                    notifyConsumerList.forEach(e -> register(e.getEvent(), e.getParamJson(), e.getConsumer()));
+                });
+            }
         }
+
     }
 }

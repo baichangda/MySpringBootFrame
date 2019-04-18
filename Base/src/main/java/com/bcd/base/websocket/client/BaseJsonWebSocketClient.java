@@ -55,11 +55,15 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
         this.url=url;
         StandardWebSocketClient client=new StandardWebSocketClient();
         manager=new MyWebSocketConnectionManager(client,this,url,(s)->{
-            logger.info("Connect to [" + this.url + "] Succeed");
+            onConnectSucceed(s);
         },(throwable)->{
             onConnectFailed(throwable);
         });
         manager.start();
+    }
+
+    protected void onConnectSucceed(WebSocketSession session){
+        logger.info("Connect to [" + this.url + "] Succeed");
     }
 
     protected void onConnectFailed(Throwable throwable){
@@ -83,22 +87,16 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        try {
-            if(supportsPartialMessages()){
-                cache.append(message.getPayload());
-                if(message.isLast()){
-                    String jsonData=cache.toString();
-                    cache.delete(0,cache.length());
-                    JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
-                    onMessage(jsonNode.get("sn").asText(),jsonData);
-                }
-            }else{
-                String jsonData=message.getPayload();
-                JsonNode jsonNode= JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(jsonData);
-                onMessage(jsonNode.get("sn").asText(),jsonData);
+        if(supportsPartialMessages()){
+            cache.append(message.getPayload());
+            if(message.isLast()){
+                String jsonData=cache.toString();
+                cache.delete(0,cache.length());
+                onMessage(jsonData);
             }
-        }catch (Exception ex){
-            ExceptionUtil.printException(ex);
+        }else{
+            String jsonData=message.getPayload();
+            onMessage(jsonData);
         }
     }
 
@@ -113,9 +111,13 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
             logger.warn("WebSocket Connection Closed,Will Restart It");
             this.session = null;
             this.manager.stop();
-            cache.delete(0,cache.length());
+            afterConnectionClosed();
             this.manager.start();
         }
+    }
+
+    public void afterConnectionClosed(){
+        cache.delete(0,cache.length());
     }
 
 
@@ -199,18 +201,23 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
 
     /**
      * 当收到数据时候触发
-     * @param sn
      * @param data
      */
-    public void onMessage(String sn,String data){
-        logger.info("Receive WebSocket SN["+sn+"]");
-        //1、取出流水号
-        Consumer<String> consumer= sn_to_callBack_map.remove(sn);
-        //2、触发回调
-        if(consumer==null) {
-            logger.warn("Receive No Consumer Message SN["+sn+"]");
-        }else {
-            consumer.accept(data);
+    public void onMessage(String data){
+        try {
+            JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(data);
+            String sn=jsonNode.get("sn").asText();
+            logger.info("Receive WebSocket SN[" + sn + "]");
+            //1、取出流水号
+            Consumer<String> consumer = sn_to_callBack_map.remove(sn);
+            //2、触发回调
+            if (consumer == null) {
+                logger.warn("Receive No Consumer Message SN[" + sn + "]");
+            } else {
+                consumer.accept(data);
+            }
+        }catch (Exception e){
+            ExceptionUtil.printException(e);
         }
     }
 

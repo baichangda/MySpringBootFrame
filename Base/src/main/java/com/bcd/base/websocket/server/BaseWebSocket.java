@@ -132,6 +132,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler{
                 throw BaseRuntimeException.getException(e);
             }
         }
+
     }
 
     protected String url;

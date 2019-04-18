@@ -26,7 +26,7 @@ public abstract class NotifyHandler<T,R> {
 
     public final static Map<NotifyEvent,NotifyHandler> EVENT_TO_HANDLER_MAP=new HashMap<>();
 
-    protected ConcurrentHashMap<String,NotifyMessage> sn_to_notify_message_map=new ConcurrentHashMap<>();
+
 
 
     protected NotifyEvent event;
@@ -45,7 +45,7 @@ public abstract class NotifyHandler<T,R> {
         this.event = event;
         Type parentType= ClassUtil.getParentUntil(getClass(),NotifyHandler.class);
         this.registerParamJavaType= JsonUtil.getJavaType(((ParameterizedType)parentType).getActualTypeArguments()[1]);
-        this.sn_to_notify_message_map=EVENT_TO_SN_NOTIFY_MESSAGE_MAP.computeIfAbsent(event,(k)->new ConcurrentHashMap<>());
+
         EVENT_TO_HANDLER_MAP.put(event,this);
     }
 

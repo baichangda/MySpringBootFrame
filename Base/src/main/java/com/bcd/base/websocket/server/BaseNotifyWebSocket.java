@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.nofity.NotifyCommand;
+import com.bcd.base.websocket.data.nofity.NotifyData;
 import com.bcd.base.websocket.data.nofity.NotifyHandler;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -27,8 +28,12 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
         }
         switch (data.getType()){
             case REGISTER:{
-                Object param= data.getParamJson()==null?null: JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data.getParamJson(), notifyHandler.getRegisterParamJavaType());
-                notifyHandler.register(data.getSn(),serviceInstance,param);
+                if(notifyHandler.getRegisterParamJavaType().isTypeOrSubTypeOf(String.class)){
+                    notifyHandler.register(data.getSn(),serviceInstance,data.getParamJson());
+                }else{
+                    Object param= data.getParamJson()==null?null: JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data.getParamJson(), notifyHandler.getRegisterParamJavaType());
+                    notifyHandler.register(data.getSn(),serviceInstance,param);
+                }
                 break;
             }
             case CANCEL:{
@@ -54,4 +59,6 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
             removeSnSet.forEach(sn-> v1.remove(sn));
         });
     }
+
+
 }
