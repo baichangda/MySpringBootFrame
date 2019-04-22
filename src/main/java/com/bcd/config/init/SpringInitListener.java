@@ -1,6 +1,6 @@
 package com.bcd.config.init;
 
-import com.bcd.base.config.init.anno.SpringInitializable;
+import com.bcd.base.config.init.SpringInitializable;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;

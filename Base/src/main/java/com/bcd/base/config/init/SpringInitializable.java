@@ -1,4 +1,4 @@
-package com.bcd.base.config.init.anno;
+package com.bcd.base.config.init;
 
 import org.springframework.context.event.ContextRefreshedEvent;
 

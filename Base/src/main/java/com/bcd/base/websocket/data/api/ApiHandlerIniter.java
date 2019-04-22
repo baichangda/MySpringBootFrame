@@ -1,6 +1,6 @@
 package com.bcd.base.websocket.data.api;
 
-import com.bcd.base.config.init.anno.SpringInitializable;
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.util.ProxyUtil;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.context.event.ContextRefreshedEvent;

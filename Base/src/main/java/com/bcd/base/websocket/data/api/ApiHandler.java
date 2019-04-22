@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
+@SuppressWarnings("unchecked")
 public class ApiHandler {
 
     public static Map<String,ApiHandler> NAME_TO_HANDLER_MAP=new HashMap<>();

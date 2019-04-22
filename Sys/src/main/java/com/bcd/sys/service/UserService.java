@@ -2,7 +2,7 @@ package com.bcd.sys.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.config.init.anno.SpringInitializable;
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;

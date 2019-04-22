@@ -1,12 +1,21 @@
 package com.bcd.base.websocket.data.nofity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.function.Consumer;
+
 public class NotifyInfo {
     private String sn;
     private NotifyEvent event;
+    private String paramJson;
+    @JsonIgnore
+    private Consumer<String> consumer;
 
-    public NotifyInfo(String sn, NotifyEvent event) {
+    public NotifyInfo(String sn, NotifyEvent event, String paramJson, Consumer<String> consumer) {
         this.sn = sn;
         this.event = event;
+        this.paramJson=paramJson;
+        this.consumer=consumer;
     }
 
     public NotifyInfo() {
@@ -26,5 +35,21 @@ public class NotifyInfo {
 
     public void setEvent(NotifyEvent event) {
         this.event = event;
+    }
+
+    public String getParamJson() {
+        return paramJson;
+    }
+
+    public void setParamJson(String paramJson) {
+        this.paramJson = paramJson;
+    }
+
+    public Consumer<String> getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(Consumer<String> consumer) {
+        this.consumer = consumer;
     }
 }

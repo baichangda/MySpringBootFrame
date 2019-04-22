@@ -1,6 +1,6 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.config.init.anno.SpringInitializable;
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.util.ProxyUtil;

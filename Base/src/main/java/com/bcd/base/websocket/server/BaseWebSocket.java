@@ -5,6 +5,8 @@ import com.bcd.base.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.*;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
@@ -16,7 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BaseWebSocket extends TextWebSocketHandler{
+public abstract class BaseWebSocket extends TextWebSocketHandler implements WebSocketConfigurer{
 
     protected ConcurrentHashMap<WebSocketSession,ServiceInstance> session_to_service_map=new ConcurrentHashMap<>();
 
@@ -146,6 +148,11 @@ public abstract class BaseWebSocket extends TextWebSocketHandler{
 
     public String getUrl() {
         return url;
+    }
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(this,url).setAllowedOrigins("*");
     }
 
     /**
