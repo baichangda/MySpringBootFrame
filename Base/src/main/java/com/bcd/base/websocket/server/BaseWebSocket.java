@@ -36,6 +36,8 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
 
         public ScheduledExecutorService heartBeatWorker;
 
+        public ScheduledExecutorService checkHeartBeatWorker;
+
         public ServiceInstance(WebSocketSession session,boolean supportsPartialMessages) {
             this.session = session;
             this.supportsPartialMessages=supportsPartialMessages;
@@ -57,6 +59,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
             //开始心跳定时任务
             if(maxDisConnectMills!=null) {
                 heartBeatWorker =Executors.newSingleThreadScheduledExecutor();
+                checkHeartBeatWorker =Executors.newSingleThreadScheduledExecutor();
                 //开启定时发送ping
                 heartBeatWorker.scheduleWithFixedDelay(()->{
                     try {
@@ -66,7 +69,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
                     }
                 },1000L,pingIntervalMills,TimeUnit.MILLISECONDS);
                 //开启定时检查pong
-                heartBeatWorker.scheduleWithFixedDelay(() -> {
+                checkHeartBeatWorker.scheduleWithFixedDelay(() -> {
                     if (System.currentTimeMillis() - lastMessageTs > maxDisConnectMills) {
                         try {
                             session.close();
@@ -162,6 +165,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
     public void afterConnectionEstablished(WebSocketSession session) throws Exception{
         ServiceInstance serviceInstance= new ServiceInstance(session,supportsPartialMessages());
         session_to_service_map.put(session,serviceInstance);
+        serviceInstance.doOnConnect();
         serviceInstance.updateLastMessageTs();
 
     }

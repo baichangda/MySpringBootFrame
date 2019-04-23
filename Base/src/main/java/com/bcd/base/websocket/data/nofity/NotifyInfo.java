@@ -11,11 +11,14 @@ public class NotifyInfo {
     @JsonIgnore
     private Consumer<String> consumer;
 
-    public NotifyInfo(String sn, NotifyEvent event, String paramJson, Consumer<String> consumer) {
+    private String url;
+
+    public NotifyInfo(String sn, NotifyEvent event, String paramJson, Consumer<String> consumer,String url) {
         this.sn = sn;
         this.event = event;
         this.paramJson=paramJson;
         this.consumer=consumer;
+        this.url=url;
     }
 
     public NotifyInfo() {
@@ -51,5 +54,13 @@ public class NotifyInfo {
 
     public void setConsumer(Consumer<String> consumer) {
         this.consumer = consumer;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
