@@ -3,12 +3,12 @@ package com.bcd.base.websocket.data.nofity;
 
 import com.bcd.base.websocket.server.BaseWebSocket;
 
-public class NotifyMessage {
+public class SubscribeInfo {
     private String sn;
     private NotifyEvent event;
     private BaseWebSocket.ServiceInstance serviceInstance;
 
-    public NotifyMessage(String sn, NotifyEvent event, BaseWebSocket.ServiceInstance serviceInstance) {
+    public SubscribeInfo(String sn, NotifyEvent event, BaseWebSocket.ServiceInstance serviceInstance) {
         this.sn = sn;
         this.event=event;
         this.serviceInstance = serviceInstance;
