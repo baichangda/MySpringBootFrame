@@ -22,6 +22,9 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
 
     protected ConcurrentHashMap<WebSocketSession,ServiceInstance> session_to_service_map=new ConcurrentHashMap<>();
 
+    public ConcurrentHashMap<WebSocketSession, ServiceInstance> getSession_to_service_map() {
+        return session_to_service_map;
+    }
 
     public static class ServiceInstance {
         public WebSocketSession session;
@@ -182,6 +185,11 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
         ServiceInstance serviceInstance=session_to_service_map.remove(session);
         serviceInstance.doOnDisConnect();
+        afterConnectionClosed(serviceInstance);
+    }
+
+    public void afterConnectionClosed(ServiceInstance serviceInstance){
+
     }
 
     /**
