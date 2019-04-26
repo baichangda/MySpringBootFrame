@@ -147,23 +147,21 @@ public class ExpireThreadSafeMap<K, V> {
     }
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime) {
-        ExpireValue<V> val = dataMap.computeIfAbsent(k, e -> new ExpireValue<>(System.currentTimeMillis() + aliveTime, mappingFunction.apply(e)));
-        return val == null ? null : val.getVal();
+        return computeIfAbsent(k,mappingFunction,aliveTime,null);
     }
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime, BiConsumer<K, V> callback) {
-        ExpireValue<V> val = dataMap.computeIfAbsent(k, e -> {
-            lock.writeLock().lock();
-            try {
-                ExpireValue<V> expireValue = new ExpireValue<>(System.currentTimeMillis() + aliveTime, mappingFunction.apply(e), callback);
-                ExpireKey<K, V> expireKey = new ExpireKey<>(k, expireValue);
-                expireKeyList.add(expireKey);
-                return expireValue;
-            }finally {
-                lock.writeLock().unlock();
+        lock.writeLock();
+        try {
+            V v=get(k);
+            if (v == null) {
+                v=mappingFunction.apply(k);
+                put(k,v,aliveTime,callback);
             }
-        });
-        return val == null ? null : val.getVal();
+            return v;
+        }finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public V remove(K k) {
