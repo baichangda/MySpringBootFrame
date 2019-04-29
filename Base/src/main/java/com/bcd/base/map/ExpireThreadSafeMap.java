@@ -35,38 +35,58 @@ public class ExpireThreadSafeMap<K, V> {
      * 用于从map中检索出过期key并移除 定时任务线程池
      */
     private ScheduledExecutorService expireScanPool;
-    private long initDelay;
-    private long delay;
+    private Long initDelay;
+    private Long delay;
 
     /**
      * 用于执行过期的回调方法线程池
      */
     private ExecutorService expireWorkPool;
 
-    private final static ExecutorService DEFAULT_EXPIRE_WORK_POOL=Executors.newCachedThreadPool();
+    public final static ExecutorService DEFAULT_EXPIRE_WORK_POOL=Executors.newCachedThreadPool();
 
     private void startExpireSchedule(){
-        expireScanPool.scheduleWithFixedDelay(() -> {
-            lock.writeLock().lock();
-            try {
-                List<ExpireKey<K,V>> keyList = expireKeyList.removeExpired(System.currentTimeMillis());
-                keyList.forEach(key -> {
-                    ExpireValue expireValue = dataMap.remove(key.getKey());
-                    if(expireValue!=null) {
-                        callback(key.getKey(), expireValue);
-                    }
-                });
-            } finally {
-                lock.writeLock().unlock();
-            }
-        }, initDelay, delay, TimeUnit.MILLISECONDS);
+        if(expireScanPool!=null) {
+            expireScanPool.scheduleWithFixedDelay(() -> {
+                lock.writeLock().lock();
+                try {
+                    List<ExpireKey<K, V>> keyList = expireKeyList.removeExpired(System.currentTimeMillis());
+                    keyList.forEach(key -> {
+                        ExpireValue expireValue = dataMap.remove(key.getKey());
+                        if (expireValue != null) {
+                            callback(key.getKey(), expireValue);
+                        }
+                    });
+                } finally {
+                    lock.writeLock().unlock();
+                }
+            }, initDelay, delay, TimeUnit.MILLISECONDS);
+        }
     }
 
     public ExpireThreadSafeMap() {
-        this(Executors.newScheduledThreadPool(1),1000L,1000L,DEFAULT_EXPIRE_WORK_POOL);
+        this(DEFAULT_EXPIRE_WORK_POOL);
     }
 
-    public ExpireThreadSafeMap(ScheduledExecutorService expireScanPool, long initDelay, long delay, ExecutorService expireWorkPool){
+    /**
+     * 此构造方法不会启动 定时扫描过期key
+     * @param expireWorkPool
+     */
+    public ExpireThreadSafeMap(ExecutorService expireWorkPool) {
+        this(expireWorkPool,null,null,null);
+    }
+
+    public ExpireThreadSafeMap(Long delay) {
+        this(DEFAULT_EXPIRE_WORK_POOL,new ScheduledThreadPoolExecutor(1),1000L,delay);
+    }
+
+    /**
+     * @param expireWorkPool 过期回调执行线程池
+     * @param expireScanPool 过期扫描线程池 传入null代表不启动定时扫描任务
+     * @param initDelay 扫描计划初始化延迟
+     * @param delay 扫描计划执行间隔
+     */
+    public ExpireThreadSafeMap(ExecutorService expireWorkPool,ScheduledExecutorService expireScanPool, Long initDelay, Long delay){
         this.expireScanPool=expireScanPool;
         this.initDelay=initDelay;
         this.delay=delay;
@@ -151,7 +171,7 @@ public class ExpireThreadSafeMap<K, V> {
     }
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime, BiConsumer<K, V> callback) {
-        lock.writeLock();
+        lock.writeLock().lock();
         try {
             V v=get(k);
             if (v == null) {
@@ -188,7 +208,7 @@ public class ExpireThreadSafeMap<K, V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireThreadSafeMap<String,String> map=new ExpireThreadSafeMap<>();
+        ExpireThreadSafeMap<String,String> map=new ExpireThreadSafeMap<>(1000L);
         for(int i=1;i<=100000;i++) {
             map.put("test"+i, "test1", 2000L, (k, v) -> {
                 System.out.println(k + "已经过期了");

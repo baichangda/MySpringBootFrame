@@ -6,13 +6,14 @@ import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.lang.Nullable;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @SuppressWarnings("unchecked")
 public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
 
     private String name;
     private Long aliveTime;
-    private ExpireThreadSafeMap<Object,Object> dataMap=new ExpireThreadSafeMap<>();
+    private ExpireThreadSafeMap<Object,Object> dataMap=new ExpireThreadSafeMap<>(2000L);
 
 
     public ExpireConcurrentMapCache(String name, Long aliveTime) {

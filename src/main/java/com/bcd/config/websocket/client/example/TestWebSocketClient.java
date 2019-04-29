@@ -1,4 +1,8 @@
-package com.bcd.base.websocket.client.impl;
+package com.bcd.config.websocket.client.example;
+
+import com.bcd.base.websocket.client.BaseTextWebSocketClient;
+
+import com.bcd.base.websocket.client.BaseTextWebSocketClient;
 
 import com.bcd.base.websocket.client.BaseTextWebSocketClient;
 import org.slf4j.Logger;

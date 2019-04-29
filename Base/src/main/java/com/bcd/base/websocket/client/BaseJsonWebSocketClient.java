@@ -34,7 +34,10 @@ public abstract class BaseJsonWebSocketClient<T> extends TextWebSocketHandler {
 
     public final StringBuilder cache=new StringBuilder();
 
-    public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>();
+    /**
+     * 每3秒扫描一次过期的回调
+     */
+    public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>(3000L);
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
     protected String url;

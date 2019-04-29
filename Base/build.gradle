@@ -16,6 +16,12 @@ dependencies {
     //jedis同步客户端,可以不进行引用(此jar默认引入了apache commons-pool2)
 //    compile("redis.clients:jedis:${jedisVersion}")
 
+
+    //springboot validation支持
+    compile("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
+
+
+
     //poi 集成
     compile("org.apache.poi:poi:${poiVersion}")
     compile("org.apache.poi:poi-ooxml:${poiVersion}")
@@ -39,8 +45,7 @@ dependencies {
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
 
-    //hibernate validation
-    compile("org.hibernate:hibernate-validator:${hibernateValidation}")
+
 
 
 
