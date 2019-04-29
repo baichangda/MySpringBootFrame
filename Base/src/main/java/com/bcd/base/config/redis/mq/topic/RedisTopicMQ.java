@@ -92,4 +92,9 @@ public abstract class RedisTopicMQ<V> implements RedisMQ<V> {
     public void unWatch() {
         this.redisMessageListenerContainer.removeMessageListener(this.messageListener);
     }
+
+    @Override
+    public void onMessage(V data) {
+        logger.info(data.toString());
+    }
 }

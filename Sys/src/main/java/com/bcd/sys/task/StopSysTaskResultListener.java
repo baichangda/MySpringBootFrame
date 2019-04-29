@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class StopSysTaskResultListener extends RedisTopicMQ<Map>{
     public StopSysTaskResultListener(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.SERIALIZABLE);
+        super(CommonConst.STOP_SYS_TASK_RESULT_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.JACKSON);
         watch();
     }
 

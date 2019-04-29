@@ -74,6 +74,11 @@ public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
         this.stop=true;
     }
 
+    @Override
+    public void onMessage(V data) {
+        logger.info(data.toString());
+    }
+
     static class Worker{
         private Worker() {
         }

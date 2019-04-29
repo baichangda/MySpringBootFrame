@@ -18,7 +18,7 @@ public class StopSysTaskListener extends RedisTopicMQ<Map>{
     StopSysTaskResultListener stopSysTaskResultListener;
 
     public StopSysTaskListener(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super(CommonConst.STOP_SYS_TASK_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.SERIALIZABLE);
+        super(CommonConst.STOP_SYS_TASK_CHANNEL, redisMessageListenerContainer, Map.class,ValueSerializer.JACKSON);
         watch();
     }
 
