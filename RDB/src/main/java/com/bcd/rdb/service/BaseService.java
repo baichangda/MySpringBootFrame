@@ -11,6 +11,7 @@ import com.bcd.rdb.repository.BaseRepository;
 import com.bcd.rdb.util.RDBUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -345,6 +347,43 @@ public class BaseService<T,K extends Serializable> {
             limitParams[limitParams.length-1]=pageable.getPageSize();
             List<T> dataList= jdbcTemplate.query(limitSql,new BeanPropertyRowMapper<>(clazz),limitParams);
             return new PageImpl<>(dataList,pageable,count);
+        }
+    }
+
+    /**
+     * 采用jdbc查询方式,将condition转换为where条件
+     * condition中的字段名称将会由驼峰格式转换为下划线拼接格式
+     * @param sqlPre sql语句前缀,where之前
+     *               example
+     *               select * from t
+     *               select a.name,b.* from a inner join b on a.id=b.relation_id
+     * @param sqlSuffix sql语句结尾,where之后
+     *               example:
+     *               limit 1,10
+     *               order by id desc
+     * @param condition 条件
+     * @param clazz 返回结果集
+     * @param <R> 结果集类型
+     * @return
+     */
+    public <R>List<R> queryByCondition(String sqlPre,String sqlSuffix,Condition condition,Class<R> clazz){
+        Map<String,Object> paramMap=new HashMap<>();
+        String where=ConditionUtil.convertCondition(condition,paramMap);
+        StringBuilder sql=new StringBuilder(sqlPre);
+        if(where!=null){
+            sql.append(" where");
+            sql.append("\n");
+            sql.append(where);
+        }
+        if(sqlSuffix!=null){
+            sql.append("\n");
+            sql.append(sqlSuffix);
+        }
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate=new NamedParameterJdbcTemplate(jdbcTemplate);
+        if(ClassUtils.isPrimitiveOrWrapper(clazz)||clazz==String.class){
+            return namedParameterJdbcTemplate.queryForList(sql.toString(),paramMap,clazz);
+        }else{
+            return namedParameterJdbcTemplate.query(sql.toString(),paramMap,new BeanPropertyRowMapper<>(clazz));
         }
     }
 

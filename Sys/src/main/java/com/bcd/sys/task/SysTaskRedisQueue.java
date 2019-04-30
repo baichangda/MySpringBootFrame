@@ -89,10 +89,13 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
         }
         //3、使用线程池执行任务
         Future future= CommonConst.SYS_TASK_POOL.submit(()->{
-            //3.1、执行任务
-            new SysTaskRunnable(task,taskFunction,taskDAO).run();
-            //3.2、执行完毕后释放锁
-            lock.release();
+            try {
+                //3.1、执行任务
+                new SysTaskRunnable(task, taskFunction, taskDAO).run();
+            }finally {
+                //3.2、执行完毕后释放锁
+                lock.release();
+            }
         });
         CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(id,future);
     }

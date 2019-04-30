@@ -16,15 +16,28 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 public class ConditionUtil {
-    private final static Map<Class,Converter> CONDITION_CONVERTER_MAP=new HashMap<>();
+    private final static Map<Class,Converter> JPA_CONDITION_CONVERTER_MAP=new HashMap<>();
     static{
-        CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new ConditionImplConverter());
-        CONDITION_CONVERTER_MAP.put(DateCondition.class,new DateConditionConverter());
-        CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
-        CONDITION_CONVERTER_MAP.put(NumberCondition.class,new NumberConditionConverter());
-        CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
-        CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new BooleanConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new ConditionImplConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(DateCondition.class,new DateConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new NumberConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new BooleanConditionConverter());
     }
+
+    private final static Map<Class,Converter> JDBC_CONDITION_CONVERTER_MAP=new HashMap<>();
+    static{
+        JDBC_CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new com.bcd.rdb.condition.converter.jdbc.ConditionImplConverter());
+        JDBC_CONDITION_CONVERTER_MAP.put(DateCondition.class,new com.bcd.rdb.condition.converter.jdbc.DateConditionConverter());
+        JDBC_CONDITION_CONVERTER_MAP.put(NullCondition.class,new com.bcd.rdb.condition.converter.jdbc.NullConditionConverter());
+        JDBC_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new com.bcd.rdb.condition.converter.jdbc.NumberConditionConverter());
+        JDBC_CONDITION_CONVERTER_MAP.put(StringCondition.class,new com.bcd.rdb.condition.converter.jdbc.StringConditionConverter());
+        JDBC_CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new com.bcd.rdb.condition.converter.jdbc.BooleanConditionConverter());
+    }
+
+
+
     public static <T>Path parseRootPath(Root<T> root, String attrName){
         Path path=null;
         if(attrName.indexOf('.')!=-1){
@@ -42,7 +55,6 @@ public class ConditionUtil {
         return path;
     }
 
-
     public static <T>Specification<T> toSpecification(Condition condition){
         Specification<T> specification=(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb)->{
             Predicate predicate=convertCondition(condition,root,query,cb);
@@ -59,11 +71,34 @@ public class ConditionUtil {
         if(condition==null){
             return null;
         }
-        Converter converter=CONDITION_CONVERTER_MAP.get(condition.getClass());
+        Converter converter=JPA_CONDITION_CONVERTER_MAP.get(condition.getClass());
         if(converter==null){
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition["+condition.getClass()+"] Have Not Converter!");
         }else{
             return (Predicate)converter.convert(condition,root,query,cb);
         }
+    }
+
+    /**
+     * 转换condition为 jdbc where条件
+     * @param condition
+     * @param paramMap
+     * @param deep 层深(用于格式化where sql),最外层调用传1
+     * @return
+     */
+    public static String convertCondition(Condition condition,Map<String,Object> paramMap,int deep){
+        if(condition==null){
+            return null;
+        }
+        Converter converter=JDBC_CONDITION_CONVERTER_MAP.get(condition.getClass());
+        if(converter==null){
+            throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition["+condition.getClass()+"] Have Not Converter!");
+        }else{
+            return (String)converter.convert(condition,paramMap,deep);
+        }
+    }
+
+    public static String convertCondition(Condition condition,Map<String,Object> paramMap){
+        return convertCondition(condition,paramMap,1);
     }
 }

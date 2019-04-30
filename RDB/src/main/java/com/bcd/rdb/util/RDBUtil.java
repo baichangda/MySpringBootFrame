@@ -3,17 +3,38 @@ package com.bcd.rdb.util;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import javax.persistence.*;
 import java.lang.reflect.*;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/9/12.
  */
 @SuppressWarnings("unckecked")
 public class RDBUtil {
+
+    /**
+     * 根据字段名称生成参数名称
+     * @param fieldName
+     * @param paramMap
+     * @return
+     */
+    public static String generateRandomParamName(String fieldName,Map<String,Object> paramMap){
+        String paramName;
+        if(fieldName.contains(".")){
+            paramName=fieldName.substring(fieldName.indexOf('.')+1);
+        }else{
+            paramName=fieldName;
+        }
+        while (paramMap.containsKey(paramName)){
+            paramName= fieldName+"_"+ RandomStringUtils.randomNumeric(4);
+        }
+        return paramName;
+    }
 
 
     /**
