@@ -14,7 +14,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public abstract class RedisTopicMQ<V> implements RedisMQ<V> {
+public class RedisTopicMQ<V> implements RedisMQ<V> {
 
     protected Logger logger= LoggerFactory.getLogger(RedisTopicMQ.class);
 

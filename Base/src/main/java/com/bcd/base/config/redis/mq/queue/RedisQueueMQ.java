@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public abstract class RedisQueueMQ<V> implements RedisMQ<V>{
+public class RedisQueueMQ<V> implements RedisMQ<V>{
     protected Logger logger=LoggerFactory.getLogger(this.getClass());
 
     protected String name;

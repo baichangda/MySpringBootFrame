@@ -363,6 +363,10 @@ public class BaseService<T,K extends Serializable> {
      *               order by id desc
      * @param condition 条件
      * @param clazz 返回结果集
+     *              三种情况
+     *              1、java 8大基础类型和包装类型,String
+     *              2、Map类型和其子类
+     *              3、自定义对象类型
      * @param <R> 结果集类型
      * @return
      */
@@ -382,6 +386,8 @@ public class BaseService<T,K extends Serializable> {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate=new NamedParameterJdbcTemplate(jdbcTemplate);
         if(ClassUtils.isPrimitiveOrWrapper(clazz)||clazz==String.class){
             return namedParameterJdbcTemplate.queryForList(sql.toString(),paramMap,clazz);
+        }else if(Map.class.isAssignableFrom(clazz)){
+            return (List<R>)namedParameterJdbcTemplate.query(sql.toString(),paramMap,new MyColumnMapRowMapper());
         }else{
             return namedParameterJdbcTemplate.query(sql.toString(),paramMap,new BeanPropertyRowMapper<>(clazz));
         }
