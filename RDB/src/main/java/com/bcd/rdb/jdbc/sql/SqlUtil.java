@@ -37,7 +37,7 @@ public class SqlUtil {
         //phone
         paramList1.add(null);
         paramList1.add(null);
-        SqlListResult sqlListResult=replaceNull(sql1,paramList1);
+        SqlListResult sqlListResult=replaceNull(sql1,paramList1.toArray());
         System.out.println(sqlListResult.getSql());
         sqlListResult.getParamList().forEach(e->System.out.print(e+"    "));
 
