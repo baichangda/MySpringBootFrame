@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 /**
  * Created by Administrator on 2017/6/22.
  */
-//@Component
+@Component
 public class TestServerWebSocket extends BaseWebSocket{
 
     public TestServerWebSocket() {

@@ -13,7 +13,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * 通知处理器
@@ -32,7 +31,7 @@ public abstract class NotifyHandler<T,R> {
     /**
      * 记录流水号和注册信息对应关系
      */
-    protected final Map<String,RegisterInfo> sn_to_register_info_map=new ConcurrentHashMap<>();
+    protected final Map<String,NotifyChannel> snToNotifyChannel =new ConcurrentHashMap<>();
 
     protected NotifyEvent event;
 
@@ -46,8 +45,8 @@ public abstract class NotifyHandler<T,R> {
         return registerParamJavaType;
     }
 
-    public Map<String, RegisterInfo> getSn_to_register_info_map() {
-        return sn_to_register_info_map;
+    public Map<String, NotifyChannel> getSnToNotifyChannel() {
+        return snToNotifyChannel;
     }
 
     public NotifyHandler(NotifyEvent event) {
@@ -60,19 +59,21 @@ public abstract class NotifyHandler<T,R> {
     /**
      * 注册一个监听
      * @param sn 监听流水号
-     * @param serviceInstance 监听的客户端连接实体
+     * @param session 监听的客户端连接实体
      * @param param 注册参数
      */
-    public void register(String sn, BaseWebSocket.ServiceInstance serviceInstance, R param){
-        sn_to_register_info_map.put(sn,new RegisterInfo(sn,event,serviceInstance));
+    public NotifyChannel register(String sn, BaseWebSocket webSocket, WebSocketSession session, R param){
+        NotifyChannel notifyChannel=new NotifyChannel(sn,event,webSocket,session);
+        snToNotifyChannel.put(sn,notifyChannel);
+        return notifyChannel;
     }
 
     /**
      * 取消一个监听
      * @param sn 监听流水号
      */
-    public void cancel(String sn){
-        sn_to_register_info_map.remove(sn);
+    public NotifyChannel cancel(String sn){
+        return snToNotifyChannel.remove(sn);
     }
 
     /**
@@ -83,11 +84,12 @@ public abstract class NotifyHandler<T,R> {
 
     /**
      * 处理命令请求
-     * @param serviceInstance
+     * @param webSocket
+     * @param session
      * @param notifyCommand
      * @throws Exception
      */
-    public static void handle(BaseWebSocket.ServiceInstance serviceInstance,NotifyCommand notifyCommand) throws Exception{
+    public static void handle(BaseWebSocket webSocket,WebSocketSession session,NotifyCommand notifyCommand) throws Exception{
         NotifyHandler notifyHandler= NotifyHandler.EVENT_TO_HANDLER_MAP.get(notifyCommand.getEvent());
         if(notifyHandler==null){
             throw BaseRuntimeException.getException("Event["+notifyCommand.getEvent()+"] Has No Handler");
@@ -95,10 +97,10 @@ public abstract class NotifyHandler<T,R> {
         switch (notifyCommand.getType()){
             case REGISTER:{
                 if(notifyHandler.getRegisterParamJavaType().isTypeOrSubTypeOf(String.class)){
-                    notifyHandler.register(notifyCommand.getSn(),serviceInstance,notifyCommand.getParamJson());
+                    notifyHandler.register(notifyCommand.getSn(),webSocket,session,notifyCommand.getParamJson());
                 }else{
                     Object param= notifyCommand.getParamJson()==null?null: JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(notifyCommand.getParamJson(), notifyHandler.getRegisterParamJavaType());
-                    notifyHandler.register(notifyCommand.getSn(),serviceInstance,param);
+                    notifyHandler.register(notifyCommand.getSn(),webSocket,session,param);
                 }
                 break;
             }
@@ -114,12 +116,12 @@ public abstract class NotifyHandler<T,R> {
 
     /**
      * 取消某个连接上的所有监听信息
-     * @param serviceInstance
+     * @param session
      */
-    public static void cancel(BaseWebSocket.ServiceInstance serviceInstance){
+    public static void cancel(WebSocketSession session){
         EVENT_TO_HANDLER_MAP.values().forEach(e1->{
-            e1.sn_to_register_info_map.values().stream().filter(e2->((RegisterInfo)e2).getServiceInstance()==serviceInstance).forEach(e2->{
-                e1.cancel(((RegisterInfo)e2).getSn());
+            e1.snToNotifyChannel.values().stream().filter(e2->((NotifyChannel)e2).getSession()==session).forEach(e2->{
+                e1.cancel(((NotifyChannel)e2).getSn());
             });
         });
     }

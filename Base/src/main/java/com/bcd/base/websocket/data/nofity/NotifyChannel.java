@@ -4,13 +4,13 @@ package com.bcd.base.websocket.data.nofity;
 import com.bcd.base.websocket.server.BaseWebSocket;
 import org.springframework.web.socket.WebSocketSession;
 
-public class RegisterInfo {
+public class NotifyChannel {
     private String sn;
     private NotifyEvent event;
     private WebSocketSession session;
     private BaseWebSocket webSocket;
 
-    public RegisterInfo(String sn, NotifyEvent event,BaseWebSocket webSocket, WebSocketSession session) {
+    public NotifyChannel(String sn, NotifyEvent event, BaseWebSocket webSocket, WebSocketSession session) {
         this.sn = sn;
         this.event=event;
         this.webSocket=webSocket;
@@ -47,5 +47,13 @@ public class RegisterInfo {
 
     public void setWebSocket(BaseWebSocket webSocket) {
         this.webSocket = webSocket;
+    }
+
+    /**
+     * 向通道的客户端发送数据
+     * @param data
+     */
+    public void sendMessage(String data){
+        this.webSocket.sendMessage(this.session,data);
     }
 }

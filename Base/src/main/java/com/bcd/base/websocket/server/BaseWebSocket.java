@@ -13,135 +13,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public abstract class BaseWebSocket extends TextWebSocketHandler implements WebSocketConfigurer{
 
-    protected ConcurrentHashMap<WebSocketSession,ServiceInstance> session_to_service_map=new ConcurrentHashMap<>();
-
-    public ConcurrentHashMap<WebSocketSession, ServiceInstance> getSession_to_service_map() {
-        return session_to_service_map;
-    }
-
-    public static class ServiceInstance {
-        public WebSocketSession session;
-
-        public volatile long lastMessageTs=0L;
-
-        public Long pingIntervalMills;
-
-        public Long maxDisConnectMills;
-
-        public boolean supportsPartialMessages;
-
-        public ScheduledExecutorService heartBeatWorker;
-
-        public ScheduledExecutorService checkHeartBeatWorker;
-
-        public ServiceInstance(WebSocketSession session,boolean supportsPartialMessages) {
-            this.session = session;
-            this.supportsPartialMessages=supportsPartialMessages;
-            startHeartBeat(10 * 1000, 30 * 1000);
-        }
-
-        public void startHeartBeat(long pingIntervalMills,long maxDisConnectMills){
-            this.pingIntervalMills=pingIntervalMills;
-            this.maxDisConnectMills=maxDisConnectMills;
-        }
-
-        public void updateLastMessageTs(){
-            if(maxDisConnectMills!=null){
-                lastMessageTs=System.currentTimeMillis();
-            }
-        }
-
-        public void doOnConnect(){
-            //开始心跳定时任务
-            if(maxDisConnectMills!=null) {
-                heartBeatWorker =Executors.newSingleThreadScheduledExecutor();
-                checkHeartBeatWorker =Executors.newSingleThreadScheduledExecutor();
-                //开启定时发送ping
-                heartBeatWorker.scheduleWithFixedDelay(()->{
-                    try {
-                        session.sendMessage(new PingMessage());
-                    } catch (IOException e) {
-                        ExceptionUtil.printException(e);
-                    }
-                },1000L,pingIntervalMills,TimeUnit.MILLISECONDS);
-                //开启定时检查pong
-                checkHeartBeatWorker.scheduleWithFixedDelay(() -> {
-                    if (System.currentTimeMillis() - lastMessageTs > maxDisConnectMills) {
-                        try {
-                            session.close();
-                        } catch (IOException e) {
-                            ExceptionUtil.printException(e);
-                        }
-                    }
-                }, 1000L, maxDisConnectMills / 2, TimeUnit.MILLISECONDS);
-            }
-        }
-
-        public void doOnDisConnect(){
-            //终止心跳定时任务
-            if(this.maxDisConnectMills!=null) {
-                if(this.heartBeatWorker !=null){
-                    this.heartBeatWorker.shutdown();
-                    this.heartBeatWorker =null;
-                }
-            }
-        }
-
-        /**
-         * 发送消息
-         * @param message
-         * @throws IOException
-         */
-        public boolean sendMessage(String message){
-            try {
-                if(session==null||!session.isOpen()){
-                    return false;
-                }else {
-                    List<String> subList;
-                    if(supportsPartialMessages) {
-                        subList = new LinkedList<>();
-                        int len = message.length();
-                        int index = 0;
-                        while (true) {
-                            int start = index;
-                            int end = index + 1024;
-                            if (end >= len) {
-                                break;
-                            }
-                            String sub = message.substring(start, end);
-                            subList.add(sub);
-                            index = end;
-                        }
-                        subList.add(message.substring(index, len));
-                    }else{
-                        subList= Arrays.asList(message);
-                    }
-                    synchronized (this) {
-                        if(session==null||!session.isOpen()){
-                            return false;
-                        }else {
-                            int subSize=subList.size();
-                            for(int i=0;i<=subSize-2;i++){
-                                this.session.sendMessage(new TextMessage(subList.get(i),false));
-                            }
-                            this.session.sendMessage(new TextMessage(subList.get(subSize-1),true));
-                            return true;
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
-            }
-        }
-
-    }
+    /**
+     * 客户端连接集合
+     */
+    protected final CopyOnWriteArraySet<WebSocketSession> clientSessionSet=new CopyOnWriteArraySet<>();
 
     protected String url;
 
@@ -152,8 +31,59 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
 
     }
 
+    public CopyOnWriteArraySet<WebSocketSession> getClientSessionSet() {
+        return clientSessionSet;
+    }
+
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * 发送信息
+     * @param session
+     * @param message
+     */
+    public boolean sendMessage(WebSocketSession session,String message){
+        try {
+            if(session==null||!session.isOpen()){
+                return false;
+            }else {
+                List<String> subList;
+                if(supportsPartialMessages()) {
+                    subList = new LinkedList<>();
+                    int len = message.length();
+                    int index = 0;
+                    while (true) {
+                        int start = index;
+                        int end = index + 1024;
+                        if (end >= len) {
+                            break;
+                        }
+                        String sub = message.substring(start, end);
+                        subList.add(sub);
+                        index = end;
+                    }
+                    subList.add(message.substring(index, len));
+                }else{
+                    subList= Arrays.asList(message);
+                }
+                synchronized (session) {
+                    if(!session.isOpen()){
+                        return false;
+                    }else {
+                        int subSize=subList.size();
+                        for(int i=0;i<=subSize-2;i++){
+                            session.sendMessage(new TextMessage(subList.get(i),false));
+                        }
+                        session.sendMessage(new TextMessage(subList.get(subSize-1),true));
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     @Override
@@ -166,15 +96,10 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * @param session
      */
     public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        ServiceInstance serviceInstance= new ServiceInstance(session,supportsPartialMessages());
-        session_to_service_map.put(session,serviceInstance);
-        serviceInstance.doOnConnect();
-        serviceInstance.updateLastMessageTs();
-
+        clientSessionSet.add(session);
     }
 
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception{
-        session_to_service_map.get(session).updateLastMessageTs();
         super.handleMessage(session,message);
     }
 
@@ -183,13 +108,7 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * 连接关闭时候触发
      */
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
-        ServiceInstance serviceInstance=session_to_service_map.remove(session);
-        serviceInstance.doOnDisConnect();
-        afterConnectionClosed(serviceInstance);
-    }
-
-    public void afterConnectionClosed(ServiceInstance serviceInstance){
-
+        clientSessionSet.remove(session);
     }
 
     /**

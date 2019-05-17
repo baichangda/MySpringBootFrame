@@ -1,9 +1,7 @@
 package com.bcd.base.websocket.data.nofity;
 
 import com.bcd.base.util.JsonUtil;
-import com.bcd.base.websocket.server.BaseWebSocket;
-
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.web.socket.WebSocketSession;
 
 @SuppressWarnings("unchecked")
 public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
@@ -14,11 +12,10 @@ public class CommonNotifyHandler<T> extends NotifyHandler<T,String> {
 
     @Override
     public void trigger(T data) {
-        sn_to_register_info_map.forEach((k,v)->{
-            BaseWebSocket.ServiceInstance serviceInstance= v.getServiceInstance();
+        snToNotifyChannel.forEach((k, v)->{
             NotifyData sendData=packData(k,data);
             logger.info("Send Notify SN["+k+"] Event["+event+"]");
-            serviceInstance.sendMessage(JsonUtil.toJson(sendData));
+            v.sendMessage(JsonUtil.toJson(sendData));
         });
     }
 
