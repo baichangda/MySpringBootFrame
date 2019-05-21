@@ -1,8 +1,11 @@
 package com.bcd.base.config.redis.mq.queue;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.redis.mq.RedisMQ;
+import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.ClassUtil;
+import com.bcd.base.util.JsonUtil;
+import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
@@ -10,34 +13,51 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public class RedisQueueMQ<V> implements RedisMQ<V>{
+public class RedisQueueMQ<V>{
     protected Logger logger=LoggerFactory.getLogger(this.getClass());
 
     protected String name;
 
     protected RedisTemplate<String,V> redisTemplate;
 
+    protected ThreadPoolExecutor consumePool;
+
+    protected ExecutorService workPool;
+
     private volatile boolean stop;
 
-    public RedisQueueMQ(String name,RedisTemplate<String,V> redisTemplate) {
-        this.name=name;
-        this.stop=false;
-        this.redisTemplate=redisTemplate;
+    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory,ValueSerializerType valueSerializer){
+        this(name,redisConnectionFactory,valueSerializer,(ThreadPoolExecutor)Executors.newFixedThreadPool(1),Executors.newCachedThreadPool());
     }
 
-    public RedisQueueMQ(String name,RedisConnectionFactory redisConnectionFactory,Class<V> clazz,ValueSerializer valueSerializer){
+    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory,ValueSerializerType valueSerializer, ThreadPoolExecutor consumePool, ExecutorService workPool){
         this.name=name;
         this.stop=false;
-        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory,clazz,valueSerializer);
+        this.redisTemplate=getDefaultRedisTemplate(redisConnectionFactory,valueSerializer);
+        this.consumePool=consumePool;
+        this.workPool=workPool;
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory, Class<V> clazz, ValueSerializer valueSerializer){
+    public String getName() {
+        return name;
+    }
+
+    private JavaType parseValueJavaType(){
+        Type parentType= ClassUtil.getParentUntil(getClass(),RedisQueueMQ.class);
+        return JsonUtil.getJavaType(((ParameterizedType) parentType).getActualTypeArguments()[0]);
+    }
+
+    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializer){
         switch (valueSerializer){
             case STRING:{
                 return RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
@@ -46,7 +66,7 @@ public class RedisQueueMQ<V> implements RedisMQ<V>{
                 return RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
             }
             case JACKSON:{
-                return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory,clazz);
+                return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory,parseValueJavaType());
             }
             default:{
                 throw BaseRuntimeException.getException("Not Support");
@@ -54,73 +74,55 @@ public class RedisQueueMQ<V> implements RedisMQ<V>{
         }
     }
 
-    @Override
     public void send(V data) {
         redisTemplate.opsForList().leftPush(name,data);
     }
 
-    @Override
     public void sendBatch(List<V> dataList) {
         redisTemplate.opsForList().leftPushAll(name,dataList);
     }
 
-    @Override
     public void watch() {
-        Worker.init(this);
+        this.stop=false;
+        start();
     }
 
-    @Override
     public void unWatch(){
         this.stop=true;
     }
 
-    @Override
     public void onMessage(V data) {
         logger.info(data.toString());
     }
 
-    static class Worker{
-        private Worker() {
-        }
-
-        /**
-         * 从redis中遍历数据的线程池
-         */
-        private final static ExecutorService POOL= Executors.newCachedThreadPool();
-
-        /**
-         * 执行工作任务的线程池
-         */
-        private final static ExecutorService WORK_POOL=Executors.newCachedThreadPool();
-
-        public static void init(RedisQueueMQ redisQueueMQ){
-            POOL.execute(()->{
-                ListOperations listOperations= redisQueueMQ.redisTemplate.opsForList();
-                long timeout=((LettuceConnectionFactory)redisQueueMQ.redisTemplate.getConnectionFactory()).getTimeout();
-                while(!redisQueueMQ.stop){
+    protected void start(){
+        while(consumePool.getPoolSize()<consumePool.getMaximumPoolSize()){
+            consumePool.execute(()->{
+                ListOperations<String,V> listOperations= redisTemplate.opsForList();
+                long timeout=((LettuceConnectionFactory)redisTemplate.getConnectionFactory()).getTimeout();
+                while(!stop){
                     try {
                         Object[] data=new Object[1];
                         try {
-                            data[0] = listOperations.rightPop(redisQueueMQ.name, timeout / 2, TimeUnit.MILLISECONDS);
+                            data[0] = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
                         }catch (QueryTimeoutException ex) {
-                            redisQueueMQ.logger.error("RedisQueueMQ["+redisQueueMQ.getClass().getName()+"] Schedule Task QueryTimeoutException", ex);
+                            logger.error("RedisQueueMQ["+getClass().getName()+"] Schedule Task QueryTimeoutException", ex);
                         }
                         if (data[0] != null) {
-                            WORK_POOL.execute(() -> {
+                            workPool.execute(() -> {
                                 try {
-                                    redisQueueMQ.onMessage(data[0]);
+                                    onMessage((V)data[0]);
                                 } catch (Exception e) {
-                                    redisQueueMQ.logger.error(e.getMessage(), e);
+                                    logger.error(e.getMessage(), e);
                                 }
                             });
                         }
                     } catch (Exception e) {
-                        redisQueueMQ.logger.error("Redis Queue["+redisQueueMQ.name+"] Cycle Error", e);
+                        logger.error("Redis Queue["+name+"] Cycle Error", e);
                         return;
                     }
                 }
             });
         }
     }
-
 }

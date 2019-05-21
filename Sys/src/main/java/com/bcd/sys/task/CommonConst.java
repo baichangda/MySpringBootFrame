@@ -21,7 +21,7 @@ public class CommonConst {
      * key: 停止任务请求的id
      * value: 当前请求的结果集map
      */
-    public final static ConcurrentHashMap<String,ConcurrentHashMap<Serializable,Boolean>> SYS_TASK_CODE_TO_RESULT_MAP =new ConcurrentHashMap<>();
+    public final static ConcurrentHashMap<String,ConcurrentHashMap<String,Boolean>> SYS_TASK_CODE_TO_RESULT_MAP =new ConcurrentHashMap<>();
 
     /**
      * 用来执行系统任务的线程池

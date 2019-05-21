@@ -99,18 +99,18 @@ public class TaskUtil {
         //1、生成当前停止任务请求随机编码
         String code= RandomStringUtils.randomAlphanumeric(32);
         //2、构造当前请求的空结果集并加入到全局map
-        ConcurrentHashMap<Serializable,Boolean> resultMap=new ConcurrentHashMap<>();
+        ConcurrentHashMap<String,Boolean> resultMap=new ConcurrentHashMap<>();
         CommonConst.SYS_TASK_CODE_TO_RESULT_MAP.put(code,resultMap);
         //3、锁住此次请求的结果map,等待,便于本服务器其他线程收到结果时唤醒
         //3.1、定义退出循环标记
         boolean isFinish=false;
         synchronized (resultMap){
             //3.2、构造请求数据,推送给其他服务器停止任务
-            Map<String,Object> dataMap=new HashMap<>();
-            dataMap.put("code",code);
-            dataMap.put("ids",ids);
-            dataMap.put("mayInterruptIfRunning",mayInterruptIfRunning);
-            stopSysTaskListener.send(dataMap);
+            StopSysTask stopSysTask=new StopSysTask();
+            stopSysTask.setCode(code);
+            stopSysTask.setIds(Arrays.stream(ids).map(e->e.toString()).toArray(len->new String[len]));
+            stopSysTask.setMayInterruptIfRunning(mayInterruptIfRunning);
+            stopSysTaskListener.send(stopSysTask);
             try {
                 //3.3、设置任务等待超时时间,默认为30s,如果在规定时间内还没有收到所有服务器通知,就不进行等待了,主要是为了解决死循环问题
                 long t=30*1000L;

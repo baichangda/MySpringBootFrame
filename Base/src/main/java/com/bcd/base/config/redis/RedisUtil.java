@@ -1,6 +1,8 @@
 package com.bcd.base.config.redis;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
+import com.fasterxml.jackson.databind.JavaType;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -8,6 +10,7 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 
 public class RedisUtil {
 
@@ -17,14 +20,21 @@ public class RedisUtil {
     /**
      * 获取对应实体类型的String_Jackson的redisTemplate
      * @param redisConnectionFactory
-     * @param clazz
+     * @param type 必须为Class或者JavaType类型
      * @param <V>
      * @return
      */
-    public static <V>RedisTemplate<String,V> newString_JacksonBeanRedisTemplate(RedisConnectionFactory redisConnectionFactory,Class<V> clazz){
+    public static <V>RedisTemplate<String,V> newString_JacksonBeanRedisTemplate(RedisConnectionFactory redisConnectionFactory, Type type){
         RedisTemplate<String,V> redisTemplate=new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        Jackson2JsonRedisSerializer<V> redisSerializer=new Jackson2JsonRedisSerializer<>(clazz);
+        Jackson2JsonRedisSerializer<V> redisSerializer;
+        if(type instanceof Class){
+            redisSerializer=new Jackson2JsonRedisSerializer<>((Class)type);
+        }else if(type instanceof JavaType){
+            redisSerializer=new Jackson2JsonRedisSerializer<>((JavaType)type);
+        }else{
+            throw BaseRuntimeException.getException("Param Type["+type.getTypeName()+"] Not Support");
+        }
         redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
         redisTemplate.setKeySerializer(STRING_SERIALIZER);
         redisTemplate.setHashKeySerializer(STRING_SERIALIZER);

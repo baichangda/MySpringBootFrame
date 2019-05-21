@@ -37,14 +37,14 @@ public class JsonUtil {
         //1、判断是否带有泛型
         if (type instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
-            //1.1获取泛型类型
-            Class rowClass = (Class) ((ParameterizedType) type).getRawType();
+            //1.1、获取泛型类型
+            Class rawClass = (Class) ((ParameterizedType) type).getRawType();
             JavaType[] javaTypes = new JavaType[actualTypeArguments.length];
             for (int i = 0; i < actualTypeArguments.length; i++) {
-            //1.2泛型也可能带有泛型，递归获取
+                //1.2、泛型也可能带有泛型，递归获取
                 javaTypes[i] = getJavaType(actualTypeArguments[i]);
             }
-            return TypeFactory.defaultInstance().constructParametricType(rowClass, javaTypes);
+            return TypeFactory.defaultInstance().constructParametricType(rawClass, javaTypes);
         } else {
             //2、简单类型直接用该类构建JavaType
             Class cla = (Class) type;
