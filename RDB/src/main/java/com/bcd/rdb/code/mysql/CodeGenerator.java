@@ -259,14 +259,19 @@ public class CodeGenerator {
      */
     private static void initControllerConfig(TableConfig config) {
         //缩进
-        final String blank = "            ";
+        final String blank = "        ";
         List<JavaColumn> javaColumnList = (List<JavaColumn>) config.getDataMap().get("fieldList");
+        StringBuilder swaggerParamSb=new StringBuilder();
         StringBuilder paramsSb = new StringBuilder();
         StringBuilder conditionsSb = new StringBuilder();
         for (int i = 0; i <= javaColumnList.size() - 1; i++) {
             JavaColumn column = javaColumnList.get(i);
             if(CodeConst.IGNORE_FIELD_NAME.contains(column.getName())){
                 continue;
+            }
+            if(swaggerParamSb.length()>0){
+                swaggerParamSb.append(",");
+                swaggerParamSb.append("\n");
             }
             if (paramsSb.length()>0) {
                 paramsSb.append(",");
@@ -278,54 +283,48 @@ public class CodeGenerator {
             }
             //取到原始类型对应的包装类型
             String type = CodeConst.BASE_TYPE_TO_PACKAGE_TYPE.getOrDefault(column.getType(),column.getType());
-            String swaggerExample= CodeConst.PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.get(type);
             String param = column.getName();
+            String swaggerType=CodeConst.JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.get(type);
             String paramBegin = column.getName() + "Begin";
             String paramEnd = column.getName() + "End";
             //1、controllerListSwaggerParams和controllerListParams
+            swaggerParamSb.append(blank);
             paramsSb.append(blank);
             if (type.equals("Date")) {
-                paramsSb.append("@ApiParam(value = \""+column.getComment()+"开始\")");
-                paramsSb.append("\n");
-                paramsSb.append(blank);
-                paramsSb.append("@RequestParam(value = \"" + paramBegin + "\",required = false) " + type + " " + paramBegin);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramBegin+"\", value = \""+column.getComment()+"开始\", dataType = \""+swaggerType+"\")");
+                swaggerParamSb.append(",");
+                swaggerParamSb.append("\n");
+                swaggerParamSb.append(blank);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramEnd+"\", value = \""+column.getComment()+"结束\", dataType = \""+swaggerType+"\")");
+
+                paramsSb.append("@RequestParam(value = \"" + paramBegin + "\", required = false) " + type + " " + paramBegin);
                 paramsSb.append(",");
-                paramsSb.append("\n");
-                paramsSb.append(blank);
-                paramsSb.append("@ApiParam(value = \""+column.getComment()+"截止\")");
                 paramsSb.append("\n");
                 paramsSb.append(blank);
                 paramsSb.append("@RequestParam(value = \"" + paramEnd + "\",required = false) " + type + " " + paramEnd);
             } else {
-                if(swaggerExample==null){
-                    paramsSb.append("@ApiParam(value = \""+column.getComment()+"\")");
-                    paramsSb.append("\n");
-                    paramsSb.append(blank);
-                }else{
-                    paramsSb.append("@ApiParam(value = \""+column.getComment()+"\",example=\""+swaggerExample+"\")");
-                    paramsSb.append("\n");
-                    paramsSb.append(blank);
-                }
-                paramsSb.append("@RequestParam(value = \"" + param + "\",required = false) " + type + " " + param);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+column.getName()+"\", value = \""+column.getComment()+"\", dataType = \""+swaggerType+"\")");
+                paramsSb.append("@RequestParam(value = \"" + param + "\", required = false) " + type + " " + param);
             }
             //2、controllerListConditions
             String condition = CodeConst.TYPE_TO_CONDITION.get(column.getType());
             conditionsSb.append(blank);
             if (type.equals("Date")) {
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramBegin + ", " + condition + ".Handler.GE)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + paramBegin + ", " + condition + ".Handler.GE)");
                 conditionsSb.append(",");
                 conditionsSb.append("\n");
                 conditionsSb.append(blank);
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramEnd + ", " + condition + ".Handler.LE)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + paramEnd + ", " + condition + ".Handler.LE)");
             }else if(type.equals("Boolean")||type.equals("boolean")) {
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ")");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ")");
             }else if(type.equals("String")){
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.ALL_LIKE)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.ALL_LIKE)");
             }else{
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.EQUAL)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.EQUAL)");
             }
 
         }
+        config.getValueMap().put("controllerListSwaggerParams", swaggerParamSb.toString());
         config.getValueMap().put("controllerListParams", paramsSb.toString());
         config.getValueMap().put("controllerListConditions", conditionsSb.toString());
     }
@@ -473,32 +472,32 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/Sys/src/main/java/com/bcd/sys";
+        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
         List<Config> list = Arrays.asList(
                 new Config(path,
                         new TableConfig("Role", "角色", "t_sys_role")
                                 .setNeedCreateControllerFile(true)
                                 .setNeedCreateServiceFile(false)
                                 .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(true)
+                                .setNeedCreateBeanFile(false)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
-                        new TableConfig("Permission", "权限", "t_sys_permission")
+                        new TableConfig("User", "用户", "t_sys_user")
                                 .setNeedCreateControllerFile(true)
                                 .setNeedCreateServiceFile(false)
                                 .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(true)
+                                .setNeedCreateBeanFile(false)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
-                        new TableConfig("Org", "机构", "t_sys_org")
+                        new TableConfig("Permission", "角色", "t_sys_permission")
                                 .setNeedCreateControllerFile(true)
                                 .setNeedCreateServiceFile(false)
                                 .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(true)
+                                .setNeedCreateBeanFile(false)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
@@ -507,7 +506,25 @@ public class CodeGenerator {
                                 .setNeedCreateControllerFile(true)
                                 .setNeedCreateServiceFile(false)
                                 .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(true)
+                                .setNeedCreateBeanFile(false)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
+                ),
+                new Config(path,
+                        new TableConfig("Org", "组织机构", "t_sys_org")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(false)
+                                .setNeedBeanValidate(true)
+                                .setNeedParamValidate(true)
+                ),
+                new Config(path,
+                        new TableConfig("Task", "系统任务", "t_sys_task")
+                                .setNeedCreateControllerFile(true)
+                                .setNeedCreateServiceFile(false)
+                                .setNeedCreateRepositoryFile(false)
+                                .setNeedCreateBeanFile(false)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 )

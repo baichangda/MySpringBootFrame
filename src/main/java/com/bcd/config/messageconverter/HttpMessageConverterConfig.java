@@ -37,16 +37,7 @@ public class HttpMessageConverterConfig implements ApplicationListener<ContextRe
          * mappingJackson2HttpMessageConverter JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration
          * 覆盖这两个类的方式就是通过设置 setSupportedMediaTypes 来替换
          */
-        MappingJackson2HttpMessageConverter httpMessageConverter=new MappingJackson2HttpMessageConverter();
-        List<MediaType> supportedMediaTypes = new ArrayList<>();
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
-        supportedMediaTypes.add(MediaType.APPLICATION_PROBLEM_JSON);
-        supportedMediaTypes.add(MediaType.APPLICATION_PROBLEM_JSON_UTF8);
-        supportedMediaTypes.add(MediaType.APPLICATION_STREAM_JSON);
-        httpMessageConverter.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
-        httpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-
+        MappingJackson2HttpMessageConverter httpMessageConverter=new MappingJackson2HttpMessageConverter(JsonUtil.GLOBAL_OBJECT_MAPPER);
         return httpMessageConverter;
     }
 
@@ -62,17 +53,7 @@ public class HttpMessageConverterConfig implements ApplicationListener<ContextRe
          * mappingJackson2HttpMessageConverter JacksonHttpMessageConvertersConfiguration$MappingJackson2HttpMessageConverterConfiguration
          * 覆盖这两个类的方式就是通过设置 setSupportedMediaTypes 来替换
          */
-        MappingJackson2XmlHttpMessageConverter xmlHttpMessageConverter=new MappingJackson2XmlHttpMessageConverter();
-        List<MediaType> supportedMediaTypes = new ArrayList<>();
-        supportedMediaTypes.add(MediaType.APPLICATION_XHTML_XML);
-        supportedMediaTypes.add(MediaType.TEXT_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_ATOM_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_PROBLEM_XML);
-        supportedMediaTypes.add(MediaType.APPLICATION_RSS_XML);
-        xmlHttpMessageConverter.setObjectMapper(XmlUtil.GLOBAL_XML_MAPPER);
-        xmlHttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-
+        MappingJackson2XmlHttpMessageConverter xmlHttpMessageConverter=new MappingJackson2XmlHttpMessageConverter(XmlUtil.GLOBAL_XML_MAPPER);
         return xmlHttpMessageConverter;
     }
 }

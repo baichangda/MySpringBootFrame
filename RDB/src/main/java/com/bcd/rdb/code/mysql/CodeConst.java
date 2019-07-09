@@ -28,6 +28,20 @@ public class CodeConst {
 
     }
 
+    public final static Map<String,String> JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE =new HashMap<>();
+
+    static {
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("BigDecimal","java.math.BigDecimal");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Byte","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Short","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Long","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("String","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Integer","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Float","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Double","String");
+        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Date","String");
+    }
+
     public final static Map<String,String> TYPE_TO_CONDITION =new HashMap<>();
     static{
         TYPE_TO_CONDITION.put("BigDecimal","NumberCondition");
@@ -59,22 +73,6 @@ public class CodeConst {
         BASE_TYPE_TO_PACKAGE_TYPE.put("byte","Byte");
         BASE_TYPE_TO_PACKAGE_TYPE.put("char","Character");
         BASE_TYPE_TO_PACKAGE_TYPE.put("short","Short");
-    }
-
-    public final static Map<String,String> PACKAGE_TYPE_TO_SWAGGER_EXAMPLE =new HashMap<>();
-    static{
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Integer","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("int","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Long","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("long","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Float","1.1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("float","1.1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Double","1.1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("double","1.1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Byte","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("byte","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("Short","1");
-        PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.put("short","1");
     }
 
     public final static Set<String> SUPPORT_PK_TYPE=new HashSet<>();

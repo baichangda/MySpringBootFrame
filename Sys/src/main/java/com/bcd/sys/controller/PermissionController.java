@@ -35,19 +35,21 @@ public class PermissionController extends BaseController {
     @RequiresNotePermissions(NotePermission.permission_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "id", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "角色名称", dataType = "String"),
+        @ApiImplicitParam(name = "code", value = "编码", dataType = "String"),
+        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String"),
+        @ApiImplicitParam(name = "roleId", value = "关联角色id", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "权限列表")
     public JsonMessage<List<PermissionBean>> list(
-            @ApiParam(value = "id",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "角色名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "编码")
-            @RequestParam(value = "code",required = false) String code,
-            @ApiParam(value = "备注")
-            @RequestParam(value = "remark",required = false) String remark,
-            @ApiParam(value = "关联角色id",example="1")
-            @RequestParam(value = "roleId",required = false) Long roleId
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "name",required = false) String name,
+        @RequestParam(value = "code",required = false) String code,
+        @RequestParam(value = "remark",required = false) String remark,
+        @RequestParam(value = "roleId",required = false) Long roleId
+    ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
@@ -65,23 +67,25 @@ public class PermissionController extends BaseController {
     @RequiresNotePermissions(NotePermission.permission_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询权限列表",notes = "查询权限分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "id", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "角色名称", dataType = "String"),
+        @ApiImplicitParam(name = "code", value = "编码", dataType = "String"),
+        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String"),
+        @ApiImplicitParam(name = "roleId", value = "关联角色id", dataType = "String"),
+        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "权限分页结果集")
     public JsonMessage<Page<PermissionBean>> page(
-            @ApiParam(value = "id",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "角色名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "编码")
-            @RequestParam(value = "code",required = false) String code,
-            @ApiParam(value = "备注")
-            @RequestParam(value = "remark",required = false) String remark,
-            @ApiParam(value = "关联角色id",example="1")
-            @RequestParam(value = "roleId",required = false) Long roleId,
-            @ApiParam(value = "分页参数(页数)",example="1")
-            @RequestParam(value = "pageNum",required = false)Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)",example="20")
-            @RequestParam(value = "pageSize",required = false) Integer pageSize
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "name",required = false) String name,
+        @RequestParam(value = "code",required = false) String code,
+        @RequestParam(value = "remark",required = false) String remark,
+        @RequestParam(value = "roleId",required = false) Long roleId,
+        @RequestParam(value = "pageNum",required = false)Integer pageNum,
+        @RequestParam(value = "pageSize",required = false) Integer pageSize
+    ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),

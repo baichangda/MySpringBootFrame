@@ -37,23 +37,25 @@ public class OrgController extends BaseController {
     @RequiresNotePermissions(NotePermission.org_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询机构列表",notes = "查询机构列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "parentId", value = "父组织id", dataType = "String"),
+        @ApiImplicitParam(name = "code", value = "组织层级编码(格式为1_2_3_,必须以_结尾)", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "组织名称", dataType = "String"),
+        @ApiImplicitParam(name = "address", value = "地址", dataType = "String"),
+        @ApiImplicitParam(name = "phone", value = "电话", dataType = "String"),
+        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "机构列表")
     public JsonMessage<List<OrgBean>> list(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "父组织id",example="1")
-            @RequestParam(value = "parentId",required = false) Long parentId,
-            @ApiParam(value = "组织层级编码(格式为1_2_3_,必须以_结尾)")
-            @RequestParam(value = "code",required = false) String code,
-            @ApiParam(value = "组织名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "地址")
-            @RequestParam(value = "address",required = false) String address,
-            @ApiParam(value = "电话")
-            @RequestParam(value = "phone",required = false) String phone,
-            @ApiParam(value = "备注")
-            @RequestParam(value = "remark",required = false) String remark
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "parentId",required = false) Long parentId,
+        @RequestParam(value = "code",required = false) String code,
+        @RequestParam(value = "name",required = false) String name,
+        @RequestParam(value = "address",required = false) String address,
+        @RequestParam(value = "phone",required = false) String phone,
+        @RequestParam(value = "remark",required = false) String remark
+    ){
         UserBean curUser= ShiroUtil.getCurrentUser();
         code=curUser.getType()==1?code:curUser.getOrgCode();
         Condition condition= Condition.and(
@@ -75,27 +77,29 @@ public class OrgController extends BaseController {
     @RequiresNotePermissions(NotePermission.org_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询机构列表",notes = "查询机构分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "parentId", value = "父组织id", dataType = "String"),
+        @ApiImplicitParam(name = "code", value = "组织层级编码(格式为1_2_3_,必须以_结尾)", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "组织名称", dataType = "String"),
+        @ApiImplicitParam(name = "address", value = "地址", dataType = "String"),
+        @ApiImplicitParam(name = "phone", value = "电话", dataType = "String"),
+        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String"),
+        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "机构分页结果集")
     public JsonMessage<Page<OrgBean>> page(
-            @ApiParam(value = "主键",example="1")
             @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "父组织id",example="1")
             @RequestParam(value = "parentId",required = false) Long parentId,
-            @ApiParam(value = "组织层级编码(格式为1_2_3_,必须以_结尾)")
             @RequestParam(value = "code",required = false) String code,
-            @ApiParam(value = "组织名称")
             @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "地址")
             @RequestParam(value = "address",required = false) String address,
-            @ApiParam(value = "电话")
             @RequestParam(value = "phone",required = false) String phone,
-            @ApiParam(value = "备注")
             @RequestParam(value = "remark",required = false) String remark,
-            @ApiParam(value = "分页参数(页数)",example="1")
             @RequestParam(value = "pageNum",required = false)Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)",example="20")
             @RequestParam(value = "pageSize",required = false) Integer pageSize
-        ){
+    ){
         UserBean curUser= ShiroUtil.getCurrentUser();
         code=curUser.getType()==1?code:curUser.getOrgCode();
         Condition condition= Condition.and(

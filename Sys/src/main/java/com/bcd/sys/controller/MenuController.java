@@ -37,21 +37,23 @@ public class MenuController extends BaseController {
     @RequiresNotePermissions(NotePermission.menu_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询菜单列表",notes = "查询菜单列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "parentId", value = "父菜单id", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "菜单名称", dataType = "String"),
+        @ApiImplicitParam(name = "url", value = "url地址", dataType = "String"),
+        @ApiImplicitParam(name = "icon", value = "图标", dataType = "String"),
+        @ApiImplicitParam(name = "orderNum", value = "排序", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "菜单列表")
     public JsonMessage<List<MenuBean>> list(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "父菜单id",example="1")
-            @RequestParam(value = "parentId",required = false) Long parentId,
-            @ApiParam(value = "菜单名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "url地址")
-            @RequestParam(value = "url",required = false) String url,
-            @ApiParam(value = "图标")
-            @RequestParam(value = "icon",required = false) String icon,
-            @ApiParam(value = "排序",example="1")
-            @RequestParam(value = "orderNum",required = false) Integer orderNum
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "parentId",required = false) Long parentId,
+        @RequestParam(value = "name",required = false) String name,
+        @RequestParam(value = "url",required = false) String url,
+        @RequestParam(value = "icon",required = false) String icon,
+        @RequestParam(value = "orderNum",required = false) Integer orderNum
+    ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new NumberCondition("parentId",parentId, NumberCondition.Handler.EQUAL),
@@ -70,25 +72,27 @@ public class MenuController extends BaseController {
     @RequiresNotePermissions(NotePermission.menu_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询菜单列表",notes = "查询菜单分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "parentId", value = "父菜单id", dataType = "String"),
+        @ApiImplicitParam(name = "name", value = "菜单名称", dataType = "String"),
+        @ApiImplicitParam(name = "url", value = "url地址", dataType = "String"),
+        @ApiImplicitParam(name = "icon", value = "图标", dataType = "String"),
+        @ApiImplicitParam(name = "orderNum", value = "排序", dataType = "String"),
+        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "菜单分页结果集")
     public JsonMessage<Page<MenuBean>> page(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "父菜单id",example="1")
-            @RequestParam(value = "parentId",required = false) Long parentId,
-            @ApiParam(value = "菜单名称")
-            @RequestParam(value = "name",required = false) String name,
-            @ApiParam(value = "url地址")
-            @RequestParam(value = "url",required = false) String url,
-            @ApiParam(value = "图标")
-            @RequestParam(value = "icon",required = false) String icon,
-            @ApiParam(value = "排序",example="1")
-            @RequestParam(value = "orderNum",required = false) Integer orderNum,
-            @ApiParam(value = "分页参数(页数)",example="1")
-            @RequestParam(value = "pageNum",required = false)Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)",example="20")
-            @RequestParam(value = "pageSize",required = false) Integer pageSize
-        ){
+        @RequestParam(value = "id", required = false) Long id,
+        @RequestParam(value = "parentId", required = false) Long parentId,
+        @RequestParam(value = "name", required = false) String name,
+        @RequestParam(value = "url", required = false) String url,
+        @RequestParam(value = "icon", required = false) String icon,
+        @RequestParam(value = "orderNum", required = false) Integer orderNum,
+        @RequestParam(value = "pageNum",required = false)Integer pageNum,
+        @RequestParam(value = "pageSize",required = false) Integer pageSize
+    ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
             new NumberCondition("parentId",parentId, NumberCondition.Handler.EQUAL),

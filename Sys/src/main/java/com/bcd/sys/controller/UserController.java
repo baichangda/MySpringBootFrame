@@ -36,33 +36,36 @@ public class UserController extends BaseController {
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "type", value = "类型(1:管理用户,2:企业用户)", dataType = "String"),
+        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
+        @ApiImplicitParam(name = "username", value = "用户名", dataType = "String"),
+        @ApiImplicitParam(name = "password", value = "密码", dataType = "String"),
+        @ApiImplicitParam(name = "email", value = "邮箱", dataType = "String"),
+        @ApiImplicitParam(name = "phone", value = "手机号", dataType = "String"),
+        @ApiImplicitParam(name = "realName", value = "真实姓名", dataType = "String"),
+        @ApiImplicitParam(name = "sex", value = "性别", dataType = "String"),
+        @ApiImplicitParam(name = "birthdayBegin", value = "生日开始", dataType = "String"),
+        @ApiImplicitParam(name = "birthdayEnd", value = "生日结束", dataType = "String"),
+        @ApiImplicitParam(name = "cardNumber", value = "身份证号", dataType = "String"),
+        @ApiImplicitParam(name = "status", value = "是否可用(0:禁用,1:可用)", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "用户列表")
     public JsonMessage<List<UserBean>> list(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "关联机构编码")
-            @RequestParam(value = "orgCode",required = false) String orgCode,
-            @ApiParam(value = "用户名")
-            @RequestParam(value = "username",required = false) String username,
-            @ApiParam(value = "用户名")
-            @RequestParam(value = "password",required = false) String password,
-            @ApiParam(value = "邮箱")
-            @RequestParam(value = "email",required = false) String email,
-            @ApiParam(value = "手机号")
-            @RequestParam(value = "phone",required = false) String phone,
-            @ApiParam(value = "真实姓名")
-            @RequestParam(value = "realName",required = false) String realName,
-            @ApiParam(value = "性别")
-            @RequestParam(value = "sex",required = false) String sex,
-            @ApiParam(value = "生日开始")
-            @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
-            @ApiParam(value = "生日截止")
-            @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
-            @ApiParam(value = "身份证号")
-            @RequestParam(value = "cardNumber",required = false) String cardNumber,
-            @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
-            @RequestParam(value = "status",required = false) Integer status
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "orgCode",required = false) String orgCode,
+        @RequestParam(value = "username",required = false) String username,
+        @RequestParam(value = "password",required = false) String password,
+        @RequestParam(value = "email",required = false) String email,
+        @RequestParam(value = "phone",required = false) String phone,
+        @RequestParam(value = "realName",required = false) String realName,
+        @RequestParam(value = "sex",required = false) String sex,
+        @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
+        @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
+        @RequestParam(value = "cardNumber",required = false) String cardNumber,
+        @RequestParam(value = "status",required = false) Integer status
+    ){
         UserBean curUser= ShiroUtil.getCurrentUser();
         orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
@@ -89,37 +92,40 @@ public class UserController extends BaseController {
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
+        @ApiImplicitParam(name = "type", value = "类型(1:管理用户,2:企业用户)", dataType = "String"),
+        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
+        @ApiImplicitParam(name = "username", value = "用户名", dataType = "String"),
+        @ApiImplicitParam(name = "password", value = "密码", dataType = "String"),
+        @ApiImplicitParam(name = "email", value = "邮箱", dataType = "String"),
+        @ApiImplicitParam(name = "phone", value = "手机号", dataType = "String"),
+        @ApiImplicitParam(name = "realName", value = "真实姓名", dataType = "String"),
+        @ApiImplicitParam(name = "sex", value = "性别", dataType = "String"),
+        @ApiImplicitParam(name = "birthdayBegin", value = "生日开始", dataType = "String"),
+        @ApiImplicitParam(name = "birthdayEnd", value = "生日结束", dataType = "String"),
+        @ApiImplicitParam(name = "cardNumber", value = "身份证号", dataType = "String"),
+        @ApiImplicitParam(name = "status", value = "是否可用(0:禁用,1:可用)", dataType = "String"),
+        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
+    })
     @ApiResponse(code = 200,message = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
-            @ApiParam(value = "主键",example="1")
-            @RequestParam(value = "id",required = false) Long id,
-            @ApiParam(value = "关联机构编码")
-            @RequestParam(value = "orgCode",required = false) String orgCode,
-            @ApiParam(value = "用户名")
-            @RequestParam(value = "username",required = false) String username,
-            @ApiParam(value = "用户名")
-            @RequestParam(value = "password",required = false) String password,
-            @ApiParam(value = "邮箱")
-            @RequestParam(value = "email",required = false) String email,
-            @ApiParam(value = "手机号")
-            @RequestParam(value = "phone",required = false) String phone,
-            @ApiParam(value = "真实姓名")
-            @RequestParam(value = "realName",required = false) String realName,
-            @ApiParam(value = "性别")
-            @RequestParam(value = "sex",required = false) String sex,
-            @ApiParam(value = "生日开始")
-            @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
-            @ApiParam(value = "生日截止")
-            @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
-            @ApiParam(value = "身份证号")
-            @RequestParam(value = "cardNumber",required = false) String cardNumber,
-            @ApiParam(value = "是否可用（0:禁用,1:可用）",example="1")
-            @RequestParam(value = "status",required = false) Integer status,
-            @ApiParam(value = "分页参数(页数)",example="1")
-            @RequestParam(value = "pageNum",required = false)Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)",example="20")
-            @RequestParam(value = "pageSize",required = false) Integer pageSize
-        ){
+        @RequestParam(value = "id",required = false) Long id,
+        @RequestParam(value = "orgCode",required = false) String orgCode,
+        @RequestParam(value = "username",required = false) String username,
+        @RequestParam(value = "password",required = false) String password,
+        @RequestParam(value = "email",required = false) String email,
+        @RequestParam(value = "phone",required = false) String phone,
+        @RequestParam(value = "realName",required = false) String realName,
+        @RequestParam(value = "sex",required = false) String sex,
+        @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
+        @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
+        @RequestParam(value = "cardNumber",required = false) String cardNumber,
+        @RequestParam(value = "status",required = false) Integer status,
+        @RequestParam(value = "pageNum",required = false)Integer pageNum,
+        @RequestParam(value = "pageSize",required = false) Integer pageSize
+    ){
         UserBean curUser= ShiroUtil.getCurrentUser();
         orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(

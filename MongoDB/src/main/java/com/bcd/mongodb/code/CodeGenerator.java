@@ -59,14 +59,19 @@ public class CodeGenerator {
             valueMap.put("paramValidateAnno","");
         }
         //缩进
-        final String blank = "            ";
+        final String blank = "        ";
         List<JavaColumn> javaColumnList = (List<JavaColumn>) collectionConfig.getDataMap().get("fieldList");
+        StringBuilder swaggerParamSb=new StringBuilder();
         StringBuilder paramsSb = new StringBuilder();
         StringBuilder conditionsSb = new StringBuilder();
         for (int i = 0; i <= javaColumnList.size() - 1; i++) {
             JavaColumn column = javaColumnList.get(i);
             if(CodeConst.IGNORE_PARAM_NAME.contains(column.getName())){
                 continue;
+            }
+            if(swaggerParamSb.length()>0){
+                swaggerParamSb.append(",");
+                swaggerParamSb.append("\n");
             }
             if (paramsSb.length()>0) {
                 paramsSb.append(",");
@@ -78,57 +83,51 @@ public class CodeGenerator {
             }
             //取到原始类型对应的包装类型
             String type = CodeConst.BASE_TYPE_TO_PACKAGE_TYPE.getOrDefault(column.getType(),column.getType());
-            String swaggerExample= CodeConst.PACKAGE_TYPE_TO_SWAGGER_EXAMPLE.get(type);
+            String swaggerType=CodeConst.JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.get(type);
             String param = column.getName();
             String paramBegin = column.getName() + "Begin";
             String paramEnd = column.getName() + "End";
             //1、controllerListSwaggerParams和controllerListParams
+            swaggerParamSb.append(blank);
             paramsSb.append(blank);
             if (type.equals("Date")) {
-                paramsSb.append("@ApiParam(value = \""+column.getComment()+"开始\")");
-                paramsSb.append("\n");
-                paramsSb.append(blank);
-                paramsSb.append("@RequestParam(value = \"" + paramBegin + "\",required = false) " + type + " " + paramBegin);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramBegin+"\", value = \""+column.getComment()+"开始\", dataType = \""+swaggerType+"\")");
+                swaggerParamSb.append(",");
+                swaggerParamSb.append("\n");
+                swaggerParamSb.append(blank);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramEnd+"\", value = \""+column.getComment()+"结束\", dataType = \""+swaggerType+"\")");
+
+                paramsSb.append("@RequestParam(value = \"" + paramBegin + "\", required = false) " + type + " " + paramBegin);
                 paramsSb.append(",");
-                paramsSb.append("\n");
-                paramsSb.append(blank);
-                paramsSb.append("@ApiParam(value = \""+column.getComment()+"截止\")");
                 paramsSb.append("\n");
                 paramsSb.append(blank);
                 paramsSb.append("@RequestParam(value = \"" + paramEnd + "\",required = false) " + type + " " + paramEnd);
             } else {
-                if(swaggerExample==null){
-                    paramsSb.append("@ApiParam(value = \""+column.getComment()+"\")");
-                    paramsSb.append("\n");
-                    paramsSb.append(blank);
-                }else{
-                    paramsSb.append("@ApiParam(value = \""+column.getComment()+"\",example=\""+swaggerExample+"\")");
-                    paramsSb.append("\n");
-                    paramsSb.append(blank);
-                }
-                paramsSb.append("@RequestParam(value = \"" + param + "\",required = false) " + type + " " + param);
+                swaggerParamSb.append("@ApiImplicitParam(name = \""+column.getName()+"\", value = \""+column.getComment()+"\", dataType = \""+swaggerType+"\")");
+                paramsSb.append("@RequestParam(value = \"" + param + "\", required = false) " + type + " " + param);
             }
             //2、controllerListConditions
             String condition = CodeConst.TYPE_TO_CONDITION.get(column.getType());
             conditionsSb.append(blank);
             if (type.equals("Date")) {
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramBegin + ", " + condition + ".Handler.GE)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + paramBegin + ", " + condition + ".Handler.GE)");
                 conditionsSb.append(",");
                 conditionsSb.append("\n");
                 conditionsSb.append(blank);
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + paramEnd + ", " + condition + ".Handler.LE)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + paramEnd + ", " + condition + ".Handler.LE)");
             }else if(type.equals("Boolean")||type.equals("boolean")) {
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ")");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ")");
             }else if(type.equals("String")){
                 String handler="Handler.ALL_LIKE";
                 if(CodeConst.ID_FIELD_SET.contains(param)){
                     handler="Handler.EQUAL";
                 }
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ", " + condition + "."+handler+")");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ", " + condition + "."+handler+")");
             }else{
-                conditionsSb.append("new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.EQUAL)");
+                conditionsSb.append("    new " + condition + "(\"" + param + "\"," + param + ", " + condition + ".Handler.EQUAL)");
             }
         }
+        collectionConfig.getValueMap().put("controllerListSwaggerParams", swaggerParamSb.toString());
         collectionConfig.getValueMap().put("controllerListParams", paramsSb.toString());
         collectionConfig.getValueMap().put("controllerListConditions", conditionsSb.toString());
     }

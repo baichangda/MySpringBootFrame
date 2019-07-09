@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.incarcloud.skeleton.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.File;
@@ -54,7 +54,7 @@ public class ClassUtil {
         try {
             Map<String,List<Class>> annoNameToClassListMap=new HashMap<>();
             //1、找出所有带 ICSComponent 注解的类
-            List<Class> classList= com.incarcloud.skeleton.util.ClassUtil.getClassesWithAnno(annoClass,packages);
+            List<Class> classList= ClassUtil.getClassesWithAnno(annoClass,packages);
             //2、找出其中的 注解,并从集合中移除
             List<Class> subAnnoList=new ArrayList<>();
             for (int i=0;i<=classList.size()-1;i++) {
