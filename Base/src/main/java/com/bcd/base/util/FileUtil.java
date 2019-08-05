@@ -38,7 +38,6 @@ public class FileUtil {
             if (path.toFile().exists()) {
                 return;
             }
-            Files.createDirectories(path.getParent());
             Files.createFile(path);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);

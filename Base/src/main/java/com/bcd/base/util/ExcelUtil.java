@@ -88,31 +88,25 @@ public class ExcelUtil {
     /**
      * 导出excel(.xlsx)
      * @param dataList 数据集合
-     * @return
+     * @return XSSFWorkbook(注意需要关闭)
      */
     public static XSSFWorkbook exportExcel_2007(List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        try(XSSFWorkbook workBook = new XSSFWorkbook()) {
-            Sheet sheet = workBook.createSheet();
-            writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
-            return workBook;
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        XSSFWorkbook workBook = new XSSFWorkbook();
+        Sheet sheet = workBook.createSheet();
+        writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
+        return workBook;
     }
 
     /**
      * 导出excel(.xls)
      * @param dataList 数据集合
-     * @return
+     * @return HSSFWorkbook(注意需要关闭)
      */
     public static HSSFWorkbook exportExcel_2003(List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        try(HSSFWorkbook workBook = new HSSFWorkbook()) {
-            Sheet sheet = workBook.createSheet();
-            writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
-            return workBook;
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        HSSFWorkbook workBook = new HSSFWorkbook();
+        Sheet sheet = workBook.createSheet();
+        writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
+        return workBook;
     }
 
     /**
@@ -147,9 +141,9 @@ public class ExcelUtil {
      * @param cellBiConsumer 单元格插入方法
      */
     public static void writeExcel_2007(Path path,List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        XSSFWorkbook workbook= exportExcel_2007(dataList, cellBiConsumer);
         FileUtil.createFileIfNotExists(path);
-        try(OutputStream os=Files.newOutputStream(path)){
+        try(OutputStream os=Files.newOutputStream(path);
+            XSSFWorkbook workbook= exportExcel_2007(dataList, cellBiConsumer)){
             workbook.write(os);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
@@ -163,9 +157,9 @@ public class ExcelUtil {
      * @param cellBiConsumer 单元格插入方法
      */
     public static void writeExcel_2003(Path path,List<List> dataList,BiConsumer<Cell,Object> cellBiConsumer){
-        HSSFWorkbook workbook= exportExcel_2003(dataList, cellBiConsumer);
         FileUtil.createFileIfNotExists(path);
-        try(OutputStream os=Files.newOutputStream(path)){
+        try(OutputStream os=Files.newOutputStream(path);
+            HSSFWorkbook workbook= exportExcel_2003(dataList, cellBiConsumer)){
             workbook.write(os);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);

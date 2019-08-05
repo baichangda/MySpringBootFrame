@@ -3,6 +3,7 @@ package com.bcd.rdb.jdbc.sql;
 import com.bcd.base.exception.BaseRuntimeException;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
@@ -85,7 +86,16 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                 //获取条件对象
                 Expression where= plainSelect.getWhere();
                 //自定义反解析器解析sql,在解析条件中按照自己的逻辑重新组装where
+                Set<Expression> orRightExpressionSet=new HashSet<>();
                 ExpressionDeParser parser= new ExpressionDeParser(){
+                    @Override
+                    public void visit(OrExpression orExpression) {
+                        orExpression.getLeftExpression().accept(this);
+                        buffer.append(" OR ");
+                        orRightExpressionSet.add(orExpression.getRightExpression());
+                        orExpression.getRightExpression().accept(this);
+                    }
+
                     @Override
                     public void visit(EqualsTo equalsTo) {
                         //重写 =
@@ -171,7 +181,11 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                     getBuffer().append(inParamList.stream().reduce((e1,e2)->e1+","+e2).get());
                                     getBuffer().append(")");
                                 }else{
-                                    getBuffer().append("1=1");
+                                    if(orRightExpressionSet.remove(inExpression)){
+                                        getBuffer().append("1=0");
+                                    }else{
+                                        getBuffer().append("1=1");
+                                    }
                                 }
 
                             }else{
@@ -243,7 +257,11 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                             });
                             if(isJdbcNamedParam[0]){
                                 if(isParamEmpty[0]){
-                                    getBuffer().append("1=1");
+                                    if(orRightExpressionSet.remove(inExpression)){
+                                        getBuffer().append("1=0");
+                                    }else{
+                                        getBuffer().append("1=1");
+                                    }
                                 }else{
                                     super.visit(inExpression);
                                 }
@@ -274,7 +292,11 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                             if(isLeftParam ||isRightParam){
                                 Object param=paramList.get(paramListIndex[0]++);
                                 if(param==null){
-                                    getBuffer().append("1=1");
+                                    if(orRightExpressionSet.remove(binaryExpression)){
+                                        getBuffer().append("1=0");
+                                    }else{
+                                        getBuffer().append("1=1");
+                                    }
                                     return;
                                 }
                             }
@@ -285,7 +307,11 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                 String paramName=isLeftParam?((JdbcNamedParameter)leftExpression).getName():((JdbcNamedParameter)rightExpression).getName();
                                 Object param=paramMap.get(paramName);
                                 if(param==null){
-                                    getBuffer().append("1=1");
+                                    if(orRightExpressionSet.remove(binaryExpression)){
+                                        getBuffer().append("1=0");
+                                    }else{
+                                        getBuffer().append("1=1");
+                                    }
                                     return;
                                 }
                             }
@@ -294,15 +320,8 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                     }
                 };
                 where.accept(parser);
-
-                String allSql=plainSelect.toString();
-                String whereSql=where.toString();
-                int index=allSql.indexOf(whereSql);
-                StringBuilder newSb=new StringBuilder();
-                newSb.append(allSql.substring(0,index));
-                newSb.append(parser.getBuffer());
-                newSb.append(allSql.substring(index+whereSql.length()));
-                newSql=newSb.toString();
+                plainSelect.setWhere(new HexValue(parser.getBuffer().toString()));
+                newSql=plainSelect.toString();
             }
         });
     }

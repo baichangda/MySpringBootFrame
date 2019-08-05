@@ -56,6 +56,12 @@ public class BaseController {
             }
         }catch (IOException e){
             throw BaseRuntimeException.getException(e);
+        }finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
+            }
         }
     }
 
@@ -96,6 +102,12 @@ public class BaseController {
             }
         }catch (IOException e){
             throw BaseRuntimeException.getException(e);
+        }finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
+            }
         }
     }
 
@@ -103,13 +115,13 @@ public class BaseController {
      * 文件名字带上 '-时间数字'
      * 例如:
      * name.xlsx
-     * name-2018111111235959.xlsx
+     * name-20181111112359.xlsx
      * @param fileName
      * @return
      */
     protected String toDateFileName(String fileName){
         int index=fileName.lastIndexOf('.');
-        long dateNum= DateZoneUtil.getDateNum(new Date(), ChronoUnit.MILLIS);
+        long dateNum= DateZoneUtil.getDateNum(new Date(), ChronoUnit.SECONDS);
         if(index==-1){
             return fileName +"-"+ dateNum;
         }else {

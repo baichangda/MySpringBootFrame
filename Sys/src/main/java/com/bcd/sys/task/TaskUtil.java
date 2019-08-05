@@ -156,7 +156,7 @@ public class TaskUtil {
     public static Boolean[] stopClusterTask(boolean mayInterruptIfRunning, Serializable ...ids){
         //1、先移除队列中正在等待的任务
         LinkedHashMap<Serializable,Boolean> resMap=sysTaskRedisQueue.remove(ids);
-        //2、如果参数为不打断正在运行的任务,则返回;否则打断每个集群实例正在执行的任务
+        //2、如果参数为不打断正在运行的任务,则更新状态并直接返回;否则打断每个集群实例正在执行的任务
         if(mayInterruptIfRunning){
             //3、更新终止成功任务的状态,同时记录终止失败任务id并准备进行运行任务打断
             List<Serializable> failedIdList=new ArrayList<>();
@@ -167,7 +167,7 @@ public class TaskUtil {
                         task.onStop();
                         taskDAO.doUpdate(task);
                     }catch (Exception e){
-                        logger.error("Task["+k+"] Stop Error",e);
+                        logger.error("Task["+k+"] Execute onStop Error",e);
                     }
                 }else{
                     failedIdList.add(k);
@@ -195,7 +195,7 @@ public class TaskUtil {
                         task.onStop();
                         taskDAO.doUpdate(task);
                     }catch (Exception e){
-                        logger.error("Task["+k+"] Stop Error",e);
+                        logger.error("Task["+k+"] Execute onStop Error",e);
                     }
                 }
             });

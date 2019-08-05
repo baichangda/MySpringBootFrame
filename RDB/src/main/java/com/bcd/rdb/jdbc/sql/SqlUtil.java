@@ -22,7 +22,7 @@ public class SqlUtil {
                 "        INNER JOIN\n" +
                 "    t_sys_user_role b ON a.id = b.user_id\n" +
                 "WHERE\n" +
-                "    username LIKE ? AND sex = ? AND status=? AND type in (?,?,?) AND phone in (?,?)";
+                "    username LIKE ? AND (sex = ? OR status=?) AND type in (?,?,?) AND phone in (?,?)";
         List<Object> paramList1=new ArrayList<>();
         //username
         paramList1.add("%z%");
@@ -43,30 +43,30 @@ public class SqlUtil {
 
 
         System.out.println();
-        String sql2="SELECT \n" +
-                "    *\n" +
-                "FROM\n" +
-                "    t_sys_user a\n" +
-                "        INNER JOIN\n" +
-                "    t_sys_user_role b ON a.id = b.user_id\n" +
-                "WHERE\n" +
-                "    username LIKE :username AND sex = :sex AND status=:status And type in (:type) And phone in (:phone)";
-        Map<String,Object> paramMap2=new LinkedHashMap<>();
-        paramMap2.put("username","%z%");
-        paramMap2.put("sex",1);
-        paramMap2.put("status",null);
-        paramMap2.put("type",Arrays.asList(1,null,3));
-        paramMap2.put("phone",new Object[]{1,null});
-        SqlMapResult sqlMapResult=replaceNull(sql2,paramMap2);
-        System.out.println(sqlMapResult.getSql());
-        sqlMapResult.getParamMap().forEach((k,v)->{
-            if(v.getClass().isArray()){
-                Object[] arr=(Object[])v;
-                System.out.print(k+":"+Arrays.asList(arr)+"    ");
-            }else {
-                System.out.print(k + ":" + v + "    ");
-            }
-        });
+//        String sql2="SELECT \n" +
+//                "    *\n" +
+//                "FROM\n" +
+//                "    t_sys_user a\n" +
+//                "        INNER JOIN\n" +
+//                "    t_sys_user_role b ON a.id = b.user_id\n" +
+//                "WHERE\n" +
+//                "    username LIKE :username AND sex = :sex AND status=:status And type in (:type) And phone in (:phone)";
+//        Map<String,Object> paramMap2=new LinkedHashMap<>();
+//        paramMap2.put("username","%z%");
+//        paramMap2.put("sex",1);
+//        paramMap2.put("status",null);
+//        paramMap2.put("type",Arrays.asList(1,null,3));
+//        paramMap2.put("phone",new Object[]{1,null});
+//        SqlMapResult sqlMapResult=replaceNull(sql2,paramMap2);
+//        System.out.println(sqlMapResult.getSql());
+//        sqlMapResult.getParamMap().forEach((k,v)->{
+//            if(v.getClass().isArray()){
+//                Object[] arr=(Object[])v;
+//                System.out.print(k+":"+Arrays.asList(arr)+"    ");
+//            }else {
+//                System.out.print(k + ":" + v + "    ");
+//            }
+//        });
     }
 
 

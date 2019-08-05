@@ -2,6 +2,7 @@ package com.bcd.sys.task;
 
 
 import com.bcd.sys.task.dao.TaskDAO;
+import com.bcd.sys.task.entity.Processing;
 import com.bcd.sys.task.entity.Task;
 import com.bcd.sys.task.function.TaskFunction;
 import org.slf4j.Logger;
@@ -59,6 +60,9 @@ public class SysTaskRunnable<T extends Task> implements Runnable{
             task=function.apply(task);
             try {
                 task.onSucceed();
+                if(task instanceof Processing){
+                    ((Processing) task).setProcessing(100f);
+                }
                 taskDAO.doUpdate(task);
             }catch (Exception e){
                 logger.error("Task["+id+"] Execute onSucceed Error",e);

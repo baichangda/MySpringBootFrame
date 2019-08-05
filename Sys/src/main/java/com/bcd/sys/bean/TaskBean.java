@@ -6,6 +6,7 @@ import com.bcd.rdb.bean.SuperBaseBean;
 import com.bcd.sys.task.TaskStatus;
 import com.bcd.sys.task.entity.ClusterTask;
 import com.bcd.sys.shiro.ShiroUtil;
+import com.bcd.sys.task.entity.Processing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -25,7 +26,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
+public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Processing{
 
 
     //field
@@ -48,6 +49,10 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     @Size(max = 255,message = "[任务信息]长度不能超过255")
     @ApiModelProperty(value = "任务信息(失败时记录失败原因)(长度不能超过255)")
     private String message;
+
+    @NotNull(message = "[任务处理进度]不能为空")
+    @ApiModelProperty(value = "任务处理进度")
+    private Float percent;
 
     @Size(max = 65535,message = "[失败堆栈信息]长度不能超过65535")
     @ApiModelProperty(hidden = true,readOnly = true,value = "失败堆栈信息(失败时后台异常堆栈信息)(长度不能超过65535)")
@@ -88,9 +93,11 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
 
     public TaskBean(String name) {
         this.name=name;
+        setProcessing(0f);
     }
 
     private TaskBean() {
+
     }
 
     //method
@@ -198,6 +205,14 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
         this.stackMessage = stackMessage;
     }
 
+    public Float getPercent() {
+        return percent;
+    }
+
+    public void setPercent(Float percent) {
+        this.percent = percent;
+    }
+
     @Override
     public void onCreate() {
         createTime=new Date();
@@ -253,5 +268,10 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     @Override
     public Object[] getParams() {
         return params;
+    }
+
+    @Override
+    public void setProcessing(Float percent) {
+        this.percent=percent;
     }
 }

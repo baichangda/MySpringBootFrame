@@ -39,7 +39,7 @@ public class BooleanConditionConverter implements Converter<BooleanCondition,Str
                 Condition.and(
                     new NumberCondition("m.i",1, NumberCondition.Handler.EQUAL),
                     new NumberCondition("h.j",12, NumberCondition.Handler.GE),
-                    new DateCondition("h.fdfdsf",12, DateCondition.Handler.GE),
+                    new DateCondition("h.fdfDsf",12, DateCondition.Handler.GE),
                     new BooleanCondition("kn.l",true),
                     new NullCondition("daf")
                 ),
