@@ -167,7 +167,7 @@ public class TaskUtil {
                         task.onStop();
                         taskDAO.doUpdate(task);
                     }catch (Exception e){
-                        logger.error("Task["+k+"] Execute onStop Error",e);
+                        logger.error("Task["+k+"] Stop Error",e);
                     }
                 }else{
                     failedIdList.add(k);
@@ -195,7 +195,7 @@ public class TaskUtil {
                         task.onStop();
                         taskDAO.doUpdate(task);
                     }catch (Exception e){
-                        logger.error("Task["+k+"] Execute onStop Error",e);
+                        logger.error("Task["+k+"] Stop Error",e);
                     }
                 }
             });
