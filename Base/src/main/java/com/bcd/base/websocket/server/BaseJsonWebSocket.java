@@ -42,12 +42,7 @@ public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
                 jsonMessage= ExceptionUtil.toJsonMessage(e);
             }
             returnWebSocketData.setData(jsonMessage);
-            boolean sendRes= sendMessage(session,JsonUtil.toJson(returnWebSocketData));
-            if(sendRes){
-                logger.info("Send WebSocket SN["+returnWebSocketData.getSn()+"]");
-            }else{
-                logger.error("Send WebSocket SN["+returnWebSocketData.getSn()+"] Failed");
-            }
+            sendMessage(session,JsonUtil.toJson(returnWebSocketData));
         });
 
     }

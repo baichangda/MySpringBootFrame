@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public abstract class BaseWebSocket extends TextWebSocketHandler implements WebSocketConfigurer{
@@ -21,6 +22,8 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * 客户端连接集合
      */
     protected final CopyOnWriteArraySet<WebSocketSession> clientSessionSet=new CopyOnWriteArraySet<>();
+
+    protected final Map<WebSocketSession,ExecutorService> clientSessionToPool=new ConcurrentHashMap<>();
 
     protected String url;
 
@@ -44,46 +47,47 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * @param session
      * @param message
      */
-    public boolean sendMessage(WebSocketSession session,String message){
-        try {
-            if(session==null||!session.isOpen()){
-                return false;
-            }else {
-                List<String> subList;
-                if(supportsPartialMessages()) {
-                    subList = new LinkedList<>();
-                    int len = message.length();
-                    int index = 0;
-                    while (true) {
-                        int start = index;
-                        int end = index + 1024;
-                        if (end >= len) {
-                            break;
+    public void sendMessage(WebSocketSession session,String message){
+        clientSessionToPool.computeIfAbsent(session,k-> Executors.newSingleThreadExecutor()).execute(()->{
+            try {
+                if(session!=null&&session.isOpen()){
+                    List<String> subList;
+                    if(supportsPartialMessages()) {
+                        subList = new LinkedList<>();
+                        int len = message.length();
+                        int index = 0;
+                        while (true) {
+                            int start = index;
+                            int end = index + 1024;
+                            if (end >= len) {
+                                break;
+                            }
+                            String sub = message.substring(start, end);
+                            subList.add(sub);
+                            index = end;
                         }
-                        String sub = message.substring(start, end);
-                        subList.add(sub);
-                        index = end;
+                        subList.add(message.substring(index, len));
+                    }else{
+                        subList= Arrays.asList(message);
                     }
-                    subList.add(message.substring(index, len));
+                    synchronized (session) {
+                        if(session.isOpen()){
+                            int subSize=subList.size();
+                            for(int i=0;i<=subSize-2;i++){
+                                session.sendMessage(new TextMessage(subList.get(i),false));
+                            }
+                            session.sendMessage(new TextMessage(subList.get(subSize-1),true));
+                        }else{
+                            logger.error("Session Has Been Closed");
+                        }
+                    }
                 }else{
-                    subList= Arrays.asList(message);
+                    logger.error("Session Has Been Closed");
                 }
-                synchronized (session) {
-                    if(!session.isOpen()){
-                        return false;
-                    }else {
-                        int subSize=subList.size();
-                        for(int i=0;i<=subSize-2;i++){
-                            session.sendMessage(new TextMessage(subList.get(i),false));
-                        }
-                        session.sendMessage(new TextMessage(subList.get(subSize-1),true));
-                        return true;
-                    }
-                }
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
             }
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        });
     }
 
     @Override
@@ -108,6 +112,10 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * 连接关闭时候触发
      */
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
+        ExecutorService pool= clientSessionToPool.get(session);
+        if(pool!=null){
+            pool.shutdown();
+        }
         clientSessionSet.remove(session);
     }
 

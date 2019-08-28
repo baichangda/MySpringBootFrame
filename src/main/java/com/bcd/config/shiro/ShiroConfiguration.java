@@ -22,6 +22,10 @@ import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -145,7 +149,7 @@ public class ShiroConfiguration{
         filterChainMap.put("/api/sys/user/login", "anon");
 //        filterChainMap.put("/api/**/list", "user");
 //        filterChainMap.put("/api/**/page", "user");
-        filterChainMap.put("/api/**","authc");
+//        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 

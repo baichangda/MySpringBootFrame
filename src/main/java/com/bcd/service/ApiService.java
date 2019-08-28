@@ -4,6 +4,7 @@ import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
+import io.swagger.models.Swagger;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -14,23 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @SuppressWarnings("unchecked")
 public class ApiService {
     /**
      * 获取方法下面所有方法名称和注释的map
-     * RequestParam 参数名称取值顺序:
-     * 1、
-     * @see RequestParam#value()
-     * 2、
-     * @see Parameter#getName()
      *
-     * RequestBody 参数取值:
-     * @see Parameter#getName()
-     *
-     * 参数注释取值:
-     * @see ApiParam#value()
+     * 规则:
+     * 1、先获取所有 RequestParam和RequestBody 注解的参数名称
+     * 2、根据参数名称从 ApiImplicitParams、ApiParam 获取参数对应注释
      *
      * @param method
      * @return
@@ -40,6 +35,14 @@ public class ApiService {
         //1、使用spring工具类获取所有参数真实名称
         LocalVariableTableParameterNameDiscoverer discoverer=new LocalVariableTableParameterNameDiscoverer();
         String [] paramNames=discoverer.getParameterNames(method);
+        //2、获取所有swagger注解参数对应注释
+        Map<String,String> swaggerMap=new HashMap<>();
+        ApiImplicitParams apiImplicitParams= method.getAnnotation(ApiImplicitParams.class);
+        if(apiImplicitParams!=null&&apiImplicitParams.value().length>0){
+            for (ApiImplicitParam apiImplicitParam : apiImplicitParams.value()) {
+                swaggerMap.put(apiImplicitParam.name(),apiImplicitParam.value());
+            }
+        }
         //2、获取所有参数
         Parameter[] parameters= method.getParameters();
         for (int i=0;i<=parameters.length-1;i++) {
@@ -54,7 +57,7 @@ public class ApiService {
                     //2.2.1、如果 RequestBody 也为空,跳过此参数
                     continue;
                 }else{
-                    //2.2.2、如果是 RequestBody 参数,直接过去 参数名
+                    //2.2.2、如果是 RequestBody 参数,直接取 参数名
                     name=paramNames[i];
                 }
             }else{
@@ -65,8 +68,11 @@ public class ApiService {
                 }
             }
             //2.4、获取参数的swagger注解来获取其注释
-            ApiParam apiParam=parameter.getAnnotation(ApiParam.class);
-            String comment=apiParam==null?"":apiParam.value();
+            String comment=swaggerMap.get(name);
+            if(comment==null) {
+                ApiParam apiParam = parameter.getAnnotation(ApiParam.class);
+                comment = apiParam == null ? "" : apiParam.value();
+            }
             resultMap.put(name,comment);
         }
         return resultMap;
@@ -99,6 +105,7 @@ public class ApiService {
      * @return
      */
     public String getApiResponse(Method method){
+        //1、获取ApiResponse注解值
         ApiResponse apiResponse= method.getAnnotation(ApiResponse.class);
         return apiResponse==null?"":apiResponse.message();
     }
