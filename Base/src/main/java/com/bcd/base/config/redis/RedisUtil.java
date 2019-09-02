@@ -12,6 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 
+@SuppressWarnings("unchecked")
 public class RedisUtil {
 
     private final static JdkSerializationRedisSerializer JDK_SERIALIZATION_SERIALIZER =new JdkSerializationRedisSerializer();

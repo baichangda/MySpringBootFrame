@@ -48,46 +48,46 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
      * @param message
      */
     public void sendMessage(WebSocketSession session,String message){
-        clientSessionToPool.computeIfAbsent(session,k-> Executors.newSingleThreadExecutor()).execute(()->{
-            try {
-                if(session!=null&&session.isOpen()){
-                    List<String> subList;
-                    if(supportsPartialMessages()) {
-                        subList = new LinkedList<>();
-                        int len = message.length();
-                        int index = 0;
-                        while (true) {
-                            int start = index;
-                            int end = index + 1024;
-                            if (end >= len) {
-                                break;
-                            }
-                            String sub = message.substring(start, end);
-                            subList.add(sub);
-                            index = end;
-                        }
-                        subList.add(message.substring(index, len));
-                    }else{
-                        subList= Arrays.asList(message);
+        if(session!=null&&session.isOpen()){
+            List<String> subList;
+            if(supportsPartialMessages()) {
+                subList = new LinkedList<>();
+                int len = message.length();
+                int index = 0;
+                while (true) {
+                    int start = index;
+                    int end = index + 1024;
+                    if (end >= len) {
+                        break;
                     }
-                    synchronized (session) {
-                        if(session.isOpen()){
+                    String sub = message.substring(start, end);
+                    subList.add(sub);
+                    index = end;
+                }
+                subList.add(message.substring(index, len));
+            }else{
+                subList= Arrays.asList(message);
+            }
+            synchronized (session) {
+                if(session.isOpen()){
+                    clientSessionToPool.computeIfAbsent(session,k-> Executors.newSingleThreadExecutor()).execute(()->{
+                        try {
                             int subSize=subList.size();
                             for(int i=0;i<=subSize-2;i++){
                                 session.sendMessage(new TextMessage(subList.get(i),false));
                             }
                             session.sendMessage(new TextMessage(subList.get(subSize-1),true));
-                        }else{
-                            logger.error("Session Has Been Closed");
+                        } catch (IOException e) {
+                            throw BaseRuntimeException.getException(e);
                         }
-                    }
+                    });
                 }else{
                     logger.error("Session Has Been Closed");
                 }
-            } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
             }
-        });
+        }else{
+            logger.error("Session Has Been Closed");
+        }
     }
 
     @Override
