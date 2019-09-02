@@ -8,87 +8,87 @@ import java.util.List;
 /**
  * 此类为日期帮助类(专属于某个时区)
  * 方法都参见
+ *
  * @see DateUtil
- *
+ * <p>
  * 所有的操作方法都基于某个时区
- *
  */
 public class DateZoneUtil {
-    public final static ZoneId ZONE_ID =ZoneId.of("Asia/Shanghai");
+    public final static ZoneId ZONE_ID = ZoneId.of("Asia/Shanghai");
 
     /**
-     * @see DateUtil#stringToDate(String, String, ZoneId)
      * @param dateStr
      * @param format
      * @return
+     * @see DateUtil#stringToDate(String, String, ZoneId)
      */
-    public static Date stringToDate(String dateStr, String format){
-        if(dateStr==null||format==null){
+    public static Date stringToDate(String dateStr, String format) {
+        if (dateStr == null || format == null) {
             return null;
         }
-        return DateUtil.stringToDate(dateStr,format, ZONE_ID);
+        return DateUtil.stringToDate(dateStr, format, ZONE_ID);
     }
 
     /**
-     * @see DateUtil#dateToString(Date, String, ZoneId)
      * @param date
      * @param format
      * @return
+     * @see DateUtil#dateToString(Date, String, ZoneId)
      */
-    public static String dateToString(Date date, String format){
-        if(date==null||format==null){
+    public static String dateToString(Date date, String format) {
+        if (date == null || format == null) {
             return null;
         }
-        return DateUtil.dateToString(date,format, ZONE_ID);
+        return DateUtil.dateToString(date, format, ZONE_ID);
     }
 
     /**
+     * @param date
+     * @param unit
+     * @return
      * @see DateUtil#getFloorDate(Date, ChronoUnit, ZoneId)
-     * @param date
-     * @param unit
-     * @return
      */
-    public static Date getFloorDate(Date date,ChronoUnit unit){
-        return DateUtil.getFloorDate(date,unit, ZONE_ID);
+    public static Date getFloorDate(Date date, ChronoUnit unit) {
+        return DateUtil.getFloorDate(date, unit, ZONE_ID);
     }
 
     /**
+     * @param date
+     * @param unit
+     * @return
      * @see DateUtil#getCeilDate(Date, ChronoUnit, ZoneId)
-     * @param date
-     * @param unit
-     * @return
      */
-    public static Date getCeilDate(Date date,ChronoUnit unit){
-        return DateUtil.getCeilDate(date,unit, ZONE_ID);
+    public static Date getCeilDate(Date date, ChronoUnit unit) {
+        return DateUtil.getCeilDate(date, unit, ZONE_ID);
     }
 
     /**
+     * @param startDate
+     * @param endDate
+     * @param unit
+     * @return
      * @see DateUtil#rangeDate(Date, Date, ChronoUnit, ZoneId)
-     * @param startDate
-     * @param endDate
-     * @param unit
-     * @return
      */
-    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit){
-        return DateUtil.rangeDate(startDate,endDate,unit, ZONE_ID);
+    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit) {
+        return DateUtil.rangeDate(startDate, endDate, unit, ZONE_ID);
     }
 
     /**
-     * @see DateUtil#formatDateParam(Date, Date, ZoneId)
      * @param startDate
      * @param endDate
+     * @see DateUtil#formatDateParam(Date, Date, ZoneId)
      */
-    public static void formatDateParam(Date startDate,Date endDate){
+    public static void formatDateParam(Date startDate, Date endDate) {
         DateUtil.formatDateParam(startDate, endDate, ZONE_ID);
     }
 
     /**
-     * @see DateUtil#getDateNum(Date, ChronoUnit, ZoneId)
      * @param date
      * @param unit
      * @return
+     * @see DateUtil#getDateNum(Date, ChronoUnit, ZoneId)
      */
-    public static Long getDateNum(Date date,ChronoUnit unit){
+    public static Long getDateNum(Date date, ChronoUnit unit) {
         return DateUtil.getDateNum(date, unit, ZONE_ID);
     }
 }

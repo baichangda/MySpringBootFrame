@@ -20,19 +20,20 @@ import java.util.Objects;
  */
 public class ExceptionUtil {
 
-    private final static Logger logger= LoggerFactory.getLogger(ExceptionUtil.class);
+    private final static Logger logger = LoggerFactory.getLogger(ExceptionUtil.class);
 
     /**
      * 获取堆栈信息
+     *
      * @param throwable
      * @return
      */
-    public static String getStackTraceMessage(Throwable throwable){
-        if(throwable==null){
+    public static String getStackTraceMessage(Throwable throwable) {
+        if (throwable == null) {
             return "";
         }
-        try(StringWriter sw = new StringWriter();
-            PrintWriter pw=new PrintWriter(sw)) {
+        try (StringWriter sw = new StringWriter();
+             PrintWriter pw = new PrintWriter(sw)) {
             throwable.printStackTrace(pw);
             return sw.toString();
         } catch (IOException e) {
@@ -43,63 +44,65 @@ public class ExceptionUtil {
 
     /**
      * 根据异常打印异常信息
+     *
      * @param throwable
      * @return
      */
-    public static void printException(Throwable throwable){
-        Throwable realException=parseRealException(throwable);
-        logger.error("Error",realException);
+    public static void printException(Throwable throwable) {
+        Throwable realException = parseRealException(throwable);
+        logger.error("Error", realException);
     }
 
     /**
      * 根据异常生成JsonMessage
+     *
      * @param throwable
      * @return
      */
-    public static JsonMessage<String> toJsonMessage(Throwable throwable){
-        Throwable realException=parseRealException(throwable);
-        if(realException==null){
+    public static JsonMessage<String> toJsonMessage(Throwable throwable) {
+        Throwable realException = parseRealException(throwable);
+        if (realException == null) {
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
         }
-        if(realException instanceof BaseRuntimeException){
-            return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode(),getStackTraceMessage(realException));
-        }else if(realException instanceof ConstraintViolationException) {
-            String message=((ConstraintViolationException)realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2)->e1+","+e2).orElse("");
+        if (realException instanceof BaseRuntimeException) {
+            return JsonMessage.fail(realException.getMessage(), ((BaseRuntimeException) realException).getCode(), getStackTraceMessage(realException));
+        } else if (realException instanceof ConstraintViolationException) {
+            String message = ((ConstraintViolationException) realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             return JsonMessage.fail(message);
-        }else if(realException instanceof MethodArgumentNotValidException) {
-            String message=((MethodArgumentNotValidException)realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2)->e1+","+e2).orElse("");
+        } else if (realException instanceof MethodArgumentNotValidException) {
+            String message = ((MethodArgumentNotValidException) realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             return JsonMessage.fail(message);
-        }else {
+        } else {
             return JsonMessage.fail(realException.getMessage());
         }
     }
-
 
 
     /**
      * 遇到如下两种情况继续深入取出异常信息:
      * 1、getCause()==null
      * 2、InvocationTargetException
+     *
      * @param throwable
      * @return
      */
-    public static Throwable parseRealException(Throwable throwable){
+    public static Throwable parseRealException(Throwable throwable) {
         //1、如果异常为空,返回null
-        if(throwable==null){
+        if (throwable == null) {
             return null;
         }
         //2、获取其真实异常
-        Throwable realException= throwable.getCause();
+        Throwable realException = throwable.getCause();
         //3、如果真实异常为当前异常
-        if(realException==null){
+        if (realException == null) {
             //4、如果真实异常为InvocationTargetException,则获取其目标异常
-            if(throwable instanceof InvocationTargetException){
-                return parseRealException(((InvocationTargetException)throwable).getTargetException());
-            }else{
+            if (throwable instanceof InvocationTargetException) {
+                return parseRealException(((InvocationTargetException) throwable).getTargetException());
+            } else {
                 //5、否则直接返回
                 return throwable;
             }
-        }else{
+        } else {
             //6、如果真实异常不为当前异常,则继续解析其真实异常
             return parseRealException(realException);
         }

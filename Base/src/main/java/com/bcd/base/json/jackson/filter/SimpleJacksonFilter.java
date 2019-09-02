@@ -13,21 +13,21 @@ import java.util.Collection;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
-public class SimpleJacksonFilter implements PropertyFilter{
+public class SimpleJacksonFilter implements PropertyFilter {
     private SimpleFilterBean[] filterBeans;
 
-    public SimpleJacksonFilter(SimpleFilterBean ... beans) {
-        this.filterBeans=beans;
+    public SimpleJacksonFilter(SimpleFilterBean... beans) {
+        this.filterBeans = beans;
     }
 
-    public SimpleJacksonFilter(Collection<SimpleFilterBean> beans){
-        if(beans!=null&&!beans.isEmpty()){
-            this.filterBeans=beans.stream().toArray(len->new SimpleFilterBean[len]);
+    public SimpleJacksonFilter(Collection<SimpleFilterBean> beans) {
+        if (beans != null && !beans.isEmpty()) {
+            this.filterBeans = beans.stream().toArray(len -> new SimpleFilterBean[len]);
         }
     }
 
     public boolean isSerializeAsField(Object pojo, JsonGenerator gen, SerializerProvider prov, PropertyWriter writer) {
-        if(pojo!=null&&filterBeans!=null&&filterBeans.length>0){
+        if (pojo != null && filterBeans != null && filterBeans.length > 0) {
             for (SimpleFilterBean filterBean : filterBeans) {
                 Class clazz = filterBean.getClazz();
                 Set<String> includes = filterBean.getIncludes();
@@ -38,7 +38,7 @@ public class SimpleJacksonFilter implements PropertyFilter{
                             return false;
                         }
                     } else {
-                        if (!excludes.isEmpty()&&excludes.contains(writer.getName())) {
+                        if (!excludes.isEmpty() && excludes.contains(writer.getName())) {
                             return false;
                         }
                     }
@@ -50,10 +50,10 @@ public class SimpleJacksonFilter implements PropertyFilter{
 
     @Override
     public void serializeAsField(Object pojo, JsonGenerator gen, SerializerProvider prov, PropertyWriter writer) throws Exception {
-        boolean isSerialize=isSerializeAsField(pojo, gen, prov, writer);
-        if(isSerialize){
+        boolean isSerialize = isSerializeAsField(pojo, gen, prov, writer);
+        if (isSerialize) {
             writer.serializeAsField(pojo, gen, prov);
-        }else if(!gen.canOmitFields()){
+        } else if (!gen.canOmitFields()) {
             writer.serializeAsOmittedField(pojo, gen, prov);
         }
     }
@@ -63,7 +63,9 @@ public class SimpleJacksonFilter implements PropertyFilter{
         writer.serializeAsElement(elementValue, gen, prov);
     }
 
-    /** @deprecated */
+    /**
+     * @deprecated
+     */
     @Override
     @Deprecated
     public void depositSchemaProperty(PropertyWriter writer, ObjectNode propertiesNode, SerializerProvider provider) throws JsonMappingException {

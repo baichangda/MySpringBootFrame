@@ -29,7 +29,7 @@ public class ExpireThreadSafeMap<K, V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireThreadSafeMap.class);
     private final Map<K, ExpireValue<V>> dataMap = new HashMap<>();
     private final ExpireKeyLinkedList expireKeyList = new ExpireKeyLinkedList();
-    private final ReentrantReadWriteLock lock=new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * 用于从map中检索出过期key并移除 定时任务线程池
@@ -43,10 +43,10 @@ public class ExpireThreadSafeMap<K, V> {
      */
     private ExecutorService expireWorkPool;
 
-    public final static ExecutorService DEFAULT_EXPIRE_WORK_POOL=Executors.newCachedThreadPool();
+    public final static ExecutorService DEFAULT_EXPIRE_WORK_POOL = Executors.newCachedThreadPool();
 
-    private void startExpireSchedule(){
-        if(expireScanPool!=null) {
+    private void startExpireSchedule() {
+        if (expireScanPool != null) {
             expireScanPool.scheduleWithFixedDelay(() -> {
                 lock.writeLock().lock();
                 try {
@@ -70,34 +70,34 @@ public class ExpireThreadSafeMap<K, V> {
 
     /**
      * 此构造方法不会启动 定时扫描过期key
+     *
      * @param expireWorkPool
      */
     public ExpireThreadSafeMap(ExecutorService expireWorkPool) {
-        this(expireWorkPool,null,null,null);
+        this(expireWorkPool, null, null, null);
     }
 
     public ExpireThreadSafeMap(Long delay) {
-        this(DEFAULT_EXPIRE_WORK_POOL,new ScheduledThreadPoolExecutor(1),1000L,delay);
+        this(DEFAULT_EXPIRE_WORK_POOL, new ScheduledThreadPoolExecutor(1), 1000L, delay);
     }
 
     /**
      * @param expireWorkPool 过期回调执行线程池
      * @param expireScanPool 过期扫描线程池 传入null代表不启动定时扫描任务
-     * @param initDelay 扫描计划初始化延迟
-     * @param delay 扫描计划执行间隔
+     * @param initDelay      扫描计划初始化延迟
+     * @param delay          扫描计划执行间隔
      */
-    public ExpireThreadSafeMap(ExecutorService expireWorkPool,ScheduledExecutorService expireScanPool, Long initDelay, Long delay){
-        this.expireScanPool=expireScanPool;
-        this.initDelay=initDelay;
-        this.delay=delay;
-        this.expireWorkPool=expireWorkPool;
+    public ExpireThreadSafeMap(ExecutorService expireWorkPool, ScheduledExecutorService expireScanPool, Long initDelay, Long delay) {
+        this.expireScanPool = expireScanPool;
+        this.initDelay = initDelay;
+        this.delay = delay;
+        this.expireWorkPool = expireWorkPool;
         startExpireSchedule();
     }
 
 
-
     private void callback(K k, ExpireValue<V> expireValue) {
-        if (expireValue.getCallback()!= null) {
+        if (expireValue.getCallback() != null) {
             expireWorkPool.execute(() -> {
                 try {
                     expireValue.getCallback().accept(k, expireValue.getVal());
@@ -114,15 +114,15 @@ public class ExpireThreadSafeMap<K, V> {
         lock.readLock().lock();
         try {
             expireValue = dataMap.get(k);
-        }finally {
+        } finally {
             lock.readLock().unlock();
         }
         if (expireValue == null) {
             return null;
         } else {
             if (expireValue.isExpired()) {
-                V v=remove(k);
-                if(v!=null) {
+                V v = remove(k);
+                if (v != null) {
                     callback(k, expireValue);
                 }
                 return null;
@@ -144,7 +144,7 @@ public class ExpireThreadSafeMap<K, V> {
             ExpireKey<K, V> expireKey = new ExpireKey<>(k, expireValue);
             expireKeyList.add(expireKey);
             return val == null ? null : val.getVal();
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
@@ -161,25 +161,25 @@ public class ExpireThreadSafeMap<K, V> {
             ExpireKey<K, V> expireKey = new ExpireKey<>(k, expireValue);
             expireKeyList.add(expireKey);
             return val == null ? null : val.getVal();
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime) {
-        return computeIfAbsent(k,mappingFunction,aliveTime,null);
+        return computeIfAbsent(k, mappingFunction, aliveTime, null);
     }
 
     public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime, BiConsumer<K, V> callback) {
         lock.writeLock().lock();
         try {
-            V v=get(k);
+            V v = get(k);
             if (v == null) {
-                v=mappingFunction.apply(k);
-                put(k,v,aliveTime,callback);
+                v = mappingFunction.apply(k);
+                put(k, v, aliveTime, callback);
             }
             return v;
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
@@ -192,7 +192,7 @@ public class ExpireThreadSafeMap<K, V> {
                 val.setRemoved(true);
             }
             return val == null ? null : val.getVal();
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
@@ -202,15 +202,15 @@ public class ExpireThreadSafeMap<K, V> {
         try {
             this.dataMap.clear();
             this.expireKeyList.clear();
-        }finally {
+        } finally {
             lock.writeLock().unlock();
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireThreadSafeMap<String,String> map=new ExpireThreadSafeMap<>(1000L);
-        for(int i=1;i<=100000;i++) {
-            map.put("test"+i, "test1", 2000L, (k, v) -> {
+        ExpireThreadSafeMap<String, String> map = new ExpireThreadSafeMap<>(1000L);
+        for (int i = 1; i <= 100000; i++) {
+            map.put("test" + i, "test1", 2000L, (k, v) -> {
                 System.out.println(k + "已经过期了");
             });
 //            map.put("test2", "test2", 5000L, (k, v) -> {
@@ -222,35 +222,35 @@ public class ExpireThreadSafeMap<K, V> {
 }
 
 @SuppressWarnings("unchecked")
-class ExpireKeyLinkedList<K,V> {
+class ExpireKeyLinkedList<K, V> {
     transient Node first;
 
-    AtomicInteger size=new AtomicInteger(0);
+    AtomicInteger size = new AtomicInteger(0);
 
     public ExpireKeyLinkedList() {
     }
 
-    public void add(ExpireKey<K,V> e) {
-        if(first==null){
-            first=new Node<>(null,e,null);
-        }else{
-            Node<ExpireKey> prev=null;
-            Node<ExpireKey> next=first;
-            while(true){
-                Long t1=e.getExpireValue().getExpireTime();
-                Long t2=next.item.getExpireValue().getExpireTime();
-                if(t1>t2){
-                    prev=next;
-                    next=prev.next;
-                    if(next==null){
-                        prev.next=new Node<>(prev,e,null);
+    public void add(ExpireKey<K, V> e) {
+        if (first == null) {
+            first = new Node<>(null, e, null);
+        } else {
+            Node<ExpireKey> prev = null;
+            Node<ExpireKey> next = first;
+            while (true) {
+                Long t1 = e.getExpireValue().getExpireTime();
+                Long t2 = next.item.getExpireValue().getExpireTime();
+                if (t1 > t2) {
+                    prev = next;
+                    next = prev.next;
+                    if (next == null) {
+                        prev.next = new Node<>(prev, e, null);
                         break;
                     }
-                }else{
-                    Node<ExpireKey> cur=new Node<>(prev,e,next);
-                    if(prev==null){
-                        first=cur;
-                    }else{
+                } else {
+                    Node<ExpireKey> cur = new Node<>(prev, e, next);
+                    if (prev == null) {
+                        first = cur;
+                    } else {
                         prev.next = cur;
                     }
                     next.prev = cur;
@@ -261,15 +261,15 @@ class ExpireKeyLinkedList<K,V> {
         size.incrementAndGet();
     }
 
-    public List<ExpireKey<K,V>> removeExpired(long ts) {
-        List<ExpireKey<K,V>> resList = new ArrayList<>();
+    public List<ExpireKey<K, V>> removeExpired(long ts) {
+        List<ExpireKey<K, V>> resList = new ArrayList<>();
         if (first == null) {
             return resList;
         } else {
-            Node<ExpireKey<K,V>> cur = first;
-            int sum=0;
+            Node<ExpireKey<K, V>> cur = first;
+            int sum = 0;
             while (cur != null) {
-                boolean expired = cur.item.getExpireValue().getExpireTime()<=ts;
+                boolean expired = cur.item.getExpireValue().getExpireTime() <= ts;
                 if (expired) {
                     sum++;
                     if (!cur.item.getExpireValue().isRemoved()) {
@@ -280,17 +280,17 @@ class ExpireKeyLinkedList<K,V> {
                     break;
                 }
             }
-            if(cur!=null){
-                cur.prev=null;
+            if (cur != null) {
+                cur.prev = null;
             }
-            first=cur;
+            first = cur;
             size.getAndAdd(-sum);
             return resList;
         }
     }
 
-    public void clear(){
-        first=null;
+    public void clear() {
+        first = null;
         size.set(0);
     }
 

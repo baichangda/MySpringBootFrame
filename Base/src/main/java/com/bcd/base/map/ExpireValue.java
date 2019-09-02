@@ -10,16 +10,15 @@ public class ExpireValue<T> {
     private boolean removed;
 
     public ExpireValue(Long expireTime, T val) {
-        this(expireTime,val,null);
+        this(expireTime, val, null);
     }
 
-    public ExpireValue(Long expireTime, T val,BiConsumer callback) {
-        this.expireTime=expireTime;
+    public ExpireValue(Long expireTime, T val, BiConsumer callback) {
+        this.expireTime = expireTime;
         this.val = val;
-        this.callback=callback;
-        this.removed=false;
+        this.callback = callback;
+        this.removed = false;
     }
-
 
 
     public T getVal() {
@@ -46,8 +45,8 @@ public class ExpireValue<T> {
         this.expireTime = expireTime;
     }
 
-    public boolean isExpired(){
-        return expireTime<System.currentTimeMillis();
+    public boolean isExpired() {
+        return expireTime < System.currentTimeMillis();
     }
 
     public boolean isRemoved() {

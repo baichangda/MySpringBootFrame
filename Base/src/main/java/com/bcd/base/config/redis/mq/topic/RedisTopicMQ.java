@@ -20,74 +20,74 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class RedisTopicMQ<V>{
+public class RedisTopicMQ<V> {
 
-    protected Logger logger= LoggerFactory.getLogger(RedisTopicMQ.class);
+    protected Logger logger = LoggerFactory.getLogger(RedisTopicMQ.class);
 
-    protected String [] names;
+    protected String[] names;
 
-    protected RedisTemplate<String,V> redisTemplate;
+    protected RedisTemplate<String, V> redisTemplate;
 
     protected RedisMessageListenerContainer redisMessageListenerContainer;
 
     protected MessageListener messageListener;
 
-    public RedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType, String ... names) {
+    public RedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType, String... names) {
         this.names = names;
-        this.redisMessageListenerContainer=redisMessageListenerContainer;
-        this.redisTemplate=getDefaultRedisTemplate(redisMessageListenerContainer,valueSerializerType);
-        this.messageListener=getMessageListener();
+        this.redisMessageListenerContainer = redisMessageListenerContainer;
+        this.redisTemplate = getDefaultRedisTemplate(redisMessageListenerContainer, valueSerializerType);
+        this.messageListener = getMessageListener();
     }
 
     public String[] getNames() {
         return names;
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType){
-        switch (valueSerializerType){
-            case STRING:{
+    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType) {
+        switch (valueSerializerType) {
+            case STRING: {
                 return RedisUtil.newString_StringRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
             }
-            case SERIALIZABLE:{
+            case SERIALIZABLE: {
                 return RedisUtil.newString_SerializableRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
             }
-            case JACKSON:{
-                return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(),parseValueJavaType());
+            case JACKSON: {
+                return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(), parseValueJavaType());
             }
-            default:{
+            default: {
                 throw BaseRuntimeException.getException("Not Support");
             }
         }
     }
 
-    private JavaType parseValueJavaType(){
-        Type parentType= ClassUtil.getParentUntil(getClass(),RedisTopicMQ.class);
+    private JavaType parseValueJavaType() {
+        Type parentType = ClassUtil.getParentUntil(getClass(), RedisTopicMQ.class);
         return JsonUtil.getJavaType(((ParameterizedType) parentType).getActualTypeArguments()[0]);
     }
 
-    protected void onMessage(Message message, byte[] pattern){
-        V v=(V)redisTemplate.getValueSerializer().deserialize(message.getBody());
+    protected void onMessage(Message message, byte[] pattern) {
+        V v = (V) redisTemplate.getValueSerializer().deserialize(message.getBody());
         onMessage(v);
     }
 
-    private MessageListener getMessageListener(){
-        return (message,pattern)->{
+    private MessageListener getMessageListener() {
+        return (message, pattern) -> {
             try {
-                onMessage(message,pattern);
-            }catch (Exception e){
-                logger.error(e.getMessage(),e);
+                onMessage(message, pattern);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         };
     }
 
-    public void send(V data,String ... names) {
-        if(names==null||names.length==0){
-            if(this.names.length==1){
+    public void send(V data, String... names) {
+        if (names == null || names.length == 0) {
+            if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], data);
-            }else{
+            } else {
                 throw BaseRuntimeException.getException("MQ Has More Than One Topic,Param[names] Can't Be Empty");
             }
-        }else {
+        } else {
             for (String name : names) {
                 redisTemplate.convertAndSend(name, data);
             }

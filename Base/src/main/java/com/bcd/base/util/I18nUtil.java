@@ -21,42 +21,38 @@ public class I18nUtil {
     }
 
     /**
-     *
      * @param key
      * @return
      */
-    public static String getMessage(String key){
-       return getMessage(key,null,LocaleContextHolder.getLocale());
+    public static String getMessage(String key) {
+        return getMessage(key, null, LocaleContextHolder.getLocale());
     }
 
     /**
-     *
      * @param key
      * @param locale
      * @return
      */
-    public static String getMessage(String key, Locale locale){
-       return getMessage(key,null,locale);
+    public static String getMessage(String key, Locale locale) {
+        return getMessage(key, null, locale);
     }
 
     /**
-     *
      * @param key
      * @param params
      * @param locale
      * @return
      */
-    public static String getMessage(String key,Object[] params, Locale locale){
-        return messageSource.getMessage(key,params, locale);
+    public static String getMessage(String key, Object[] params, Locale locale) {
+        return messageSource.getMessage(key, params, locale);
     }
 
     /**
-     *
      * @param key
      * @param params
      * @return
      */
-    public static String getMessage(String key,Object[] params){
-        return getMessage(key,params, LocaleContextHolder.getLocale());
+    public static String getMessage(String key, Object[] params) {
+        return getMessage(key, params, LocaleContextHolder.getLocale());
     }
 }

@@ -8,12 +8,13 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2017/7/26.
  */
-public class Message implements Serializable{
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     protected String code;
     protected String msg;
     //对应的是message的I18NData
     protected I18NData i18NData;
+
     protected Message(String msg) {
         this.msg = msg;
     }
@@ -32,32 +33,35 @@ public class Message implements Serializable{
         this.i18NData = i18NData;
     }
 
-    public JsonMessage toJsonMessage(boolean result,Object ... params) {
-        return new JsonMessage(result,getValue(params),code);
+    public JsonMessage toJsonMessage(boolean result, Object... params) {
+        return new JsonMessage(result, getValue(params), code);
     }
 
-    public String getValue(Object ... params){
-        if(msg==null){
-            if(i18NData==null){
+    public String getValue(Object... params) {
+        if (msg == null) {
+            if (i18NData == null) {
                 return null;
-            }else{
+            } else {
                 return i18NData.getValue(params);
             }
-        }else{
-            return StringUtil.replaceLikeI18N(msg,params);
+        } else {
+            return StringUtil.replaceLikeI18N(msg, params);
         }
     }
 
-    public static Message getMessage(String msg){
+    public static Message getMessage(String msg) {
         return new Message(msg);
     }
-    public static Message getMessage(String msg, String code){
-        return new Message(msg,code);
+
+    public static Message getMessage(String msg, String code) {
+        return new Message(msg, code);
     }
-    public static Message getMessage(I18NData i18NData){
+
+    public static Message getMessage(I18NData i18NData) {
         return new Message(i18NData);
     }
-    public static Message getMessage(I18NData i18NData, String code){
-        return new Message(i18NData,code);
+
+    public static Message getMessage(I18NData i18NData, String code) {
+        return new Message(i18NData, code);
     }
 }

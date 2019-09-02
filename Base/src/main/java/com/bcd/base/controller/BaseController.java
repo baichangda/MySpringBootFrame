@@ -21,42 +21,44 @@ import java.util.Date;
 @MyCacheClass
 public class BaseController {
 
-    public final static String DEFAULT_RESPONSE_ENCODING="UTF-8";
+    public final static String DEFAULT_RESPONSE_ENCODING = "UTF-8";
 
     /**
      * 下载文件
-     * @param content 文件字节数组
+     *
+     * @param content  文件字节数组
      * @param fileName 导出的文件名
      * @param response 响应response
      */
-    protected void response(byte[] content, String fileName, HttpServletResponse response){
+    protected void response(byte[] content, String fileName, HttpServletResponse response) {
         try {
             response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
             response.setContentType("application/octet-stream");
             response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
             response.getOutputStream().write(content);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     /**
      * 下载文件流
-     * @param is 文件流
+     *
+     * @param is       文件流
      * @param fileName 导出的文件名
      * @param response 响应response
      */
-    protected void response(InputStream is, String fileName, HttpServletResponse response){
+    protected void response(InputStream is, String fileName, HttpServletResponse response) {
         try {
             response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
             response.setContentType("application/octet-stream");
             response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            try(OutputStream os=response.getOutputStream()){
-                FileUtil.write(is,os);
+            try (OutputStream os = response.getOutputStream()) {
+                FileUtil.write(is, os);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
-        }finally {
+        } finally {
             try {
                 is.close();
             } catch (IOException e) {
@@ -68,31 +70,33 @@ public class BaseController {
 
     /**
      * 下载文件
-     * @param path 文件
+     *
+     * @param path     文件
      * @param fileName 导出的文件名
      * @param response 响应response
      */
-    protected void response(Path path, String fileName, HttpServletResponse response){
+    protected void response(Path path, String fileName, HttpServletResponse response) {
         try {
             response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
             response.setContentType("application/octet-stream");
             response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            try(InputStream is= Files.newInputStream(path);
-                OutputStream os=response.getOutputStream()){
-                FileUtil.write(is,os);
+            try (InputStream is = Files.newInputStream(path);
+                 OutputStream os = response.getOutputStream()) {
+                FileUtil.write(is, os);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     /**
      * 导出excel
+     *
      * @param workbook excel
      * @param fileName 导出的文件名
      * @param response 响应response
      */
-    protected void response(Workbook workbook, String fileName, HttpServletResponse response){
+    protected void response(Workbook workbook, String fileName, HttpServletResponse response) {
         try {
             response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
             response.setContentType("application/octet-stream");
@@ -100,9 +104,9 @@ public class BaseController {
             try (OutputStream os = response.getOutputStream()) {
                 workbook.write(os);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
-        }finally {
+        } finally {
             try {
                 workbook.close();
             } catch (IOException e) {
@@ -116,16 +120,17 @@ public class BaseController {
      * 例如:
      * name.xlsx
      * name-20181111112359.xlsx
+     *
      * @param fileName
      * @return
      */
-    protected String toDateFileName(String fileName){
-        int index=fileName.lastIndexOf('.');
-        long dateNum= DateZoneUtil.getDateNum(new Date(), ChronoUnit.SECONDS);
-        if(index==-1){
-            return fileName +"-"+ dateNum;
-        }else {
-            return fileName.substring(0,index)+"-"+dateNum+fileName.substring(index);
+    protected String toDateFileName(String fileName) {
+        int index = fileName.lastIndexOf('.');
+        long dateNum = DateZoneUtil.getDateNum(new Date(), ChronoUnit.SECONDS);
+        if (index == -1) {
+            return fileName + "-" + dateNum;
+        } else {
+            return fileName.substring(0, index) + "-" + dateNum + fileName.substring(index);
         }
     }
 }

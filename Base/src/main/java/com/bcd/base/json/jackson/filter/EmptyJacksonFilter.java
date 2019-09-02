@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 
-public class EmptyJacksonFilter implements PropertyFilter{
+public class EmptyJacksonFilter implements PropertyFilter {
     @Override
     public void serializeAsField(Object pojo, JsonGenerator gen, SerializerProvider prov, PropertyWriter writer) throws Exception {
         writer.serializeAsField(pojo, gen, prov);
@@ -19,7 +19,9 @@ public class EmptyJacksonFilter implements PropertyFilter{
         writer.serializeAsElement(elementValue, gen, prov);
     }
 
-    /** @deprecated */
+    /**
+     * @deprecated
+     */
     @Deprecated
     @Override
     public void depositSchemaProperty(PropertyWriter writer, ObjectNode propertiesNode, SerializerProvider provider) throws JsonMappingException {

@@ -13,32 +13,33 @@ import java.lang.reflect.Field;
 public class ProxyUtil {
     /**
      * 获取 目标对象
+     *
      * @param proxy 代理对象
      * @return
      * @throws Exception
      */
-    public static Object getSource(Object proxy){
-        if(!AopUtils.isAopProxy(proxy)) {
+    public static Object getSource(Object proxy) {
+        if (!AopUtils.isAopProxy(proxy)) {
             return proxy;//不是代理对象
         }
 
-        if(AopUtils.isJdkDynamicProxy(proxy)) {
+        if (AopUtils.isJdkDynamicProxy(proxy)) {
             return getJdkDynamicProxyTargetObject(proxy);
         } else { //cglib
             return getCglibProxyTargetObject(proxy);
         }
 
 
-
     }
 
     /**
      * 获取cglib代理对象的原始对象
+     *
      * @param proxy
      * @return
      * @throws Exception
      */
-    private static Object getCglibProxyTargetObject(Object proxy){
+    private static Object getCglibProxyTargetObject(Object proxy) {
         try {
             Field h = proxy.getClass().getDeclaredField("CGLIB$CALLBACK_0");
             h.setAccessible(true);
@@ -50,19 +51,19 @@ public class ProxyUtil {
             Object target = ((AdvisedSupport) advised.get(dynamicAdvisedInterceptor)).getTargetSource().getTarget();
 
             return target;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     /**
-     *
      * 获取jdk代理对象的原始对象
+     *
      * @param proxy
      * @return
      * @throws Exception
      */
-    private static Object getJdkDynamicProxyTargetObject(Object proxy){
+    private static Object getJdkDynamicProxyTargetObject(Object proxy) {
         try {
             Field h = proxy.getClass().getSuperclass().getDeclaredField("h");
             h.setAccessible(true);
@@ -73,7 +74,7 @@ public class ProxyUtil {
             Object target = ((AdvisedSupport) advised.get(aopProxy)).getTargetSource().getTarget();
 
             return target;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw BaseRuntimeException.getException(e);
         }
     }
