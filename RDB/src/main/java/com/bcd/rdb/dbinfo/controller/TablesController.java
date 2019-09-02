@@ -16,24 +16,24 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/tables")
-public class TablesController extends BaseController{
+public class TablesController extends BaseController {
 
     @Autowired
     private TablesService tablesService;
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/exportDBDesigner",method = RequestMethod.GET)
-    @ApiOperation(value = "导出数据库设计",notes = "导出数据库设计")
+    @RequestMapping(value = "/exportDBDesigner", method = RequestMethod.GET)
+    @ApiOperation(value = "导出数据库设计", notes = "导出数据库设计")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "dbName",value = "数据库名称",dataType = "String")
+            @ApiImplicitParam(name = "dbName", value = "数据库名称", dataType = "String")
     })
-    @ApiResponse(code = 200,message = "导出结果")
+    @ApiResponse(code = 200, message = "导出结果")
     public JsonMessage<Object> exportDBDesigner(
-            @RequestParam(value="dbName",required = false) String dbName,
-            HttpServletResponse response){
-        Workbook workbook= tablesService.exportDBDesigner(dbName);
-        String fileName=I18nUtil.getMessage("TablesController.exportDBDesigner.fileName",new Object[]{dbName})+".xlsx";
-        response(workbook,toDateFileName(fileName),response);
+            @RequestParam(value = "dbName", required = false) String dbName,
+            HttpServletResponse response) {
+        Workbook workbook = tablesService.exportDBDesigner(dbName);
+        String fileName = I18nUtil.getMessage("TablesController.exportDBDesigner.fileName", new Object[]{dbName}) + ".xlsx";
+        response(workbook, toDateFileName(fileName), response);
         return JsonMessage.success();
     }
 }
