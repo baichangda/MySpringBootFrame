@@ -16,13 +16,13 @@ public abstract class BaseNotifyWebSocket extends BaseJsonWebSocket<NotifyComman
     }
 
     @Override
-    public JsonMessage handle(WebSocketSession session, NotifyCommand data) throws Exception{
-        NotifyHandler.handle(this,session,data);
+    public JsonMessage handle(WebSocketSession session, NotifyCommand data) throws Exception {
+        NotifyHandler.handle(this, session, data);
         return JsonMessage.success();
     }
 
     @OnClose
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         super.afterConnectionClosed(session, closeStatus);
         //断开连接后,清空掉此无效连接的监听
         NotifyHandler.cancel(session);

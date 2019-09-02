@@ -16,11 +16,11 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 
-public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
+public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
 
-    public final StringBuilder cache=new StringBuilder();
+    public final StringBuilder cache = new StringBuilder();
 
-    protected Logger logger= LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
     protected String url;
 
     protected WebSocketSession session;
@@ -38,15 +38,15 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         //1、赋值session
-        this.session=session;
+        this.session = session;
     }
 
     public BaseTextWebSocketClient(String url) {
-        this.url=url;
-        StandardWebSocketClient client=new StandardWebSocketClient();
-        manager=new MyWebSocketConnectionManager(client,this,url,(s)->{
+        this.url = url;
+        StandardWebSocketClient client = new StandardWebSocketClient();
+        manager = new MyWebSocketConnectionManager(client, this, url, (s) -> {
             logger.info("Connect to [" + this.url + "] Succeed");
-        },(throwable)->{
+        }, (throwable) -> {
             synchronized (this) {
                 logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
                 try {
@@ -64,24 +64,24 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         try {
-            if(supportsPartialMessages()){
+            if (supportsPartialMessages()) {
                 cache.append(message.getPayload());
-                if(message.isLast()){
-                    String data=cache.toString();
-                    cache.delete(0,cache.length());
+                if (message.isLast()) {
+                    String data = cache.toString();
+                    cache.delete(0, cache.length());
                     onMessage(session, data);
                 }
-            }else{
+            } else {
                 onMessage(session, message.getPayload());
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ExceptionUtil.printException(ex);
         }
     }
 
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
-        logger.info("Pong Message: "+new String(message.getPayload().array()));
+        logger.info("Pong Message: " + new String(message.getPayload().array()));
         super.handlePongMessage(session, message);
     }
 
@@ -96,28 +96,29 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler{
             logger.error("WebSocket Connection Closed,Will Restart It");
             this.session = null;
             this.manager.stop();
-            cache.delete(0,cache.length());
+            cache.delete(0, cache.length());
             this.manager.start();
         }
     }
 
     /**
      * 发送文本
+     *
      * @param message
      * @return
      */
-    public boolean sendMessage(String message){
-        if(session==null||!session.isOpen()){
+    public boolean sendMessage(String message) {
+        if (session == null || !session.isOpen()) {
             logger.error("Session Is Null Or Closed");
             return false;
-        }else {
+        } else {
             TextMessage textMessage = new TextMessage(message);
             try {
                 synchronized (this) {
-                    if(session==null||!session.isOpen()) {
+                    if (session == null || !session.isOpen()) {
                         logger.error("Session Is Null Or Closed");
                         return false;
-                    }else{
+                    } else {
                         session.sendMessage(textMessage);
                         return true;
                     }

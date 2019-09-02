@@ -17,32 +17,32 @@ import java.util.concurrent.Executors;
 
 public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
 
-    public final static ExecutorService WORK_POOL= Executors.newFixedThreadPool(16);
+    public final static ExecutorService WORK_POOL = Executors.newFixedThreadPool(16);
 
     protected JavaType paramJavaType;
 
     public BaseJsonWebSocket(String url) {
         super(url);
-        Type parentType= ClassUtil.getParentUntil(getClass(),BaseJsonWebSocket.class);
-        this.paramJavaType=TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, JsonUtil.getJavaType(((ParameterizedType)parentType).getActualTypeArguments()[0]));
+        Type parentType = ClassUtil.getParentUntil(getClass(), BaseJsonWebSocket.class);
+        this.paramJavaType = TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, JsonUtil.getJavaType(((ParameterizedType) parentType).getActualTypeArguments()[0]));
     }
 
-    public void handleTextMessage(WebSocketSession session, TextMessage message){
-        WORK_POOL.execute(()->{
-            String data=message.getPayload();
-            WebSocketData<JsonMessage> returnWebSocketData=new WebSocketData<>();
+    public void handleTextMessage(WebSocketSession session, TextMessage message) {
+        WORK_POOL.execute(() -> {
+            String data = message.getPayload();
+            WebSocketData<JsonMessage> returnWebSocketData = new WebSocketData<>();
             JsonMessage jsonMessage;
             try {
                 WebSocketData<T> paramWebSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, paramJavaType);
-                logger.info("Receive WebSocket SN["+paramWebSocketData.getSn()+"]");
+                logger.info("Receive WebSocket SN[" + paramWebSocketData.getSn() + "]");
                 returnWebSocketData.setSn(paramWebSocketData.getSn());
-                jsonMessage=handle(session,paramWebSocketData.getData());
+                jsonMessage = handle(session, paramWebSocketData.getData());
             } catch (Exception e) {
-                logger.error("Error",e);
-                jsonMessage= ExceptionUtil.toJsonMessage(e);
+                logger.error("Error", e);
+                jsonMessage = ExceptionUtil.toJsonMessage(e);
             }
             returnWebSocketData.setData(jsonMessage);
-            sendMessage(session,JsonUtil.toJson(returnWebSocketData));
+            sendMessage(session, JsonUtil.toJson(returnWebSocketData));
         });
 
     }
