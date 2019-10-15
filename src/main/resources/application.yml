@@ -153,3 +153,7 @@ spring:
       default-encoding: UTF-8
    flyway:
       out-of-order: true
+
+my:
+  #是否启用集群定时任务失败注解
+  enableScheduleFailedAnnotation: true

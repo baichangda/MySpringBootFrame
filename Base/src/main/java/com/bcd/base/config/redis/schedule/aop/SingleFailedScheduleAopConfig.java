@@ -1,4 +1,4 @@
-package com.bcd.config.redis.schedule.aop;
+package com.bcd.base.config.redis.schedule.aop;
 
 import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.impl.SingleFailedScheduleHandler;
@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -16,11 +17,18 @@ import java.lang.reflect.Method;
 /**
  * Created by bcd on 2018/2/12.
  */
+@ConditionalOnProperty("my.enableScheduleFailedAnnotation")
 @Aspect
 @Component
 public class SingleFailedScheduleAopConfig {
 
     private final static Logger logger= LoggerFactory.getLogger(SingleFailedScheduleAopConfig.class);
+
+    private ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier;
+
+    public SingleFailedScheduleAopConfig(ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier) {
+        this.scheduleAopRedisConnectionFactorySupplier=scheduleAopRedisConnectionFactorySupplier;
+    }
 
     /**
      * 定时任务
@@ -39,7 +47,7 @@ public class SingleFailedScheduleAopConfig {
         try {
             Method method=getAopMethod(joinPoint);
             SingleFailedSchedule anno= method.getAnnotation(SingleFailedSchedule.class);
-            handler= new SingleFailedScheduleHandler(anno);
+            handler= new SingleFailedScheduleHandler(anno,scheduleAopRedisConnectionFactorySupplier.getRedisConnectionFactory());
             boolean flag=handler.doBeforeStart();
             if(flag){
                 Object[] args = joinPoint.getArgs();

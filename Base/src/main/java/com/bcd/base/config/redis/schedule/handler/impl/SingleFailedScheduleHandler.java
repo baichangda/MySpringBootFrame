@@ -5,6 +5,7 @@ import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
@@ -29,17 +30,17 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
      */
     private long aliveTime;
 
-    public SingleFailedScheduleHandler(String lockId, long aliveTime) {
-        super(lockId);
+    public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long aliveTime) {
+        super(lockId,redisConnectionFactory);
         this.aliveTime = aliveTime;
     }
 
-    public SingleFailedScheduleHandler(String lockId) {
-        this(lockId, DEFAULT_ALIVE_TIME);
+    public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory) {
+        this(lockId,redisConnectionFactory, DEFAULT_ALIVE_TIME);
     }
 
-    public SingleFailedScheduleHandler(SingleFailedSchedule anno) {
-        this(anno.lockId(), anno.aliveTime() == 0L ? DEFAULT_ALIVE_TIME : anno.aliveTime());
+    public SingleFailedScheduleHandler(SingleFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
+        this(anno.lockId(),redisConnectionFactory, anno.aliveTime() == 0L ? DEFAULT_ALIVE_TIME : anno.aliveTime());
     }
 
     /**

@@ -6,6 +6,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
@@ -59,8 +60,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     protected String successVal;
 
 
-    public ClusterFailedScheduleHandler(String lockId, long timeOut, long aliveTime, long cycleInterval) {
-        super(lockId);
+    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut, long aliveTime, long cycleInterval) {
+        super(lockId,redisConnectionFactory);
         this.timeOut = timeOut;
         this.aliveTime = aliveTime;
         this.cycleInterval = cycleInterval;
@@ -69,12 +70,12 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
         this.successVal = "1-" + randomVal;
     }
 
-    public ClusterFailedScheduleHandler(String lockId, long timeOut) {
-        this(lockId, timeOut, timeOut / 2, timeOut / 10);
+    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut) {
+        this(lockId,redisConnectionFactory, timeOut, timeOut / 2, timeOut / 10);
     }
 
-    public ClusterFailedScheduleHandler(ClusterFailedSchedule anno) {
-        this(anno.lockId(), anno.timeOut(), anno.aliveTime() == 0L ? anno.timeOut() / 2 : anno.aliveTime(), anno.cycleInterval() == 0L ? anno.timeOut() / 10 : anno.cycleInterval());
+    public ClusterFailedScheduleHandler(ClusterFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
+        this(anno.lockId(),redisConnectionFactory, anno.timeOut(), anno.aliveTime() == 0L ? anno.timeOut() / 2 : anno.aliveTime(), anno.cycleInterval() == 0L ? anno.timeOut() / 10 : anno.cycleInterval());
     }
 
     /**

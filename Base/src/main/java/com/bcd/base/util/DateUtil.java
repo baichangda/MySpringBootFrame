@@ -234,9 +234,10 @@ public class DateUtil {
      * @param d1   开始时间
      * @param d2   结束时间
      * @param unit 支持ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS
+     * @param up 如果存在小数位,是向上取整还是向下取整;true代表向上;false代表向下
      * @return 相差日期单位数
      */
-    public static long getDiff(Date d1, Date d2, ChronoUnit unit) {
+    public static long getDiff(Date d1, Date d2, ChronoUnit unit,boolean up) {
         ChronoUnit[] units = new ChronoUnit[]{ChronoUnit.MILLIS, ChronoUnit.SECONDS, ChronoUnit.MINUTES, ChronoUnit.HOURS, ChronoUnit.DAYS};
         if (Arrays.stream(units).noneMatch(e -> e == unit)) {
             throw BaseRuntimeException.getException("[DateUtil.getDiff],ChronoUnit[" + unit.toString() + "] Not Support!");
@@ -270,7 +271,11 @@ public class DateUtil {
         long begin = d1.getTime();
         long end = d2.getTime();
         double res = (end - begin) / ((double) diff);
-        return (int) Math.ceil(res);
+        if(up){
+            return (int) Math.ceil(res);
+        }else{
+            return (int) Math.floor(res);
+        }
     }
 
 

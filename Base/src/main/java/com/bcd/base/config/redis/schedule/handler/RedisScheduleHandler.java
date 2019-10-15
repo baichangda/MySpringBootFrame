@@ -1,6 +1,8 @@
 package com.bcd.base.config.redis.schedule.handler;
 
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.util.SpringUtil;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 
@@ -24,9 +26,9 @@ public abstract class RedisScheduleHandler {
      */
     protected String lockId;
 
-    public RedisScheduleHandler(String lockId) {
+    public RedisScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory) {
         this.lockId = lockId;
-        this.redisTemplate = SpringUtil.applicationContext.getBean(RedisTemplate.class);
+        this.redisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
     }
 
 
