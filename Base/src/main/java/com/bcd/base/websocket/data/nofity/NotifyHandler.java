@@ -11,7 +11,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,7 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <T> 服务器通知客户端的数据类型
  * @param <R> 客户端注册请求参数类型
  */
+@SuppressWarnings("unchecked")
 public abstract class NotifyHandler<T,R> {
+
+    static Logger staticLogger= LoggerFactory.getLogger(NotifyHandler.class);
 
     protected Logger logger= LoggerFactory.getLogger(getClass());
 
@@ -89,11 +93,12 @@ public abstract class NotifyHandler<T,R> {
      * @param notifyCommand
      * @throws Exception
      */
-    public static void handle(BaseWebSocket webSocket,WebSocketSession session,NotifyCommand notifyCommand) throws Exception{
+    public static void handle(BaseWebSocket webSocket, WebSocketSession session, NotifyCommand notifyCommand) throws Exception{
         NotifyHandler notifyHandler= NotifyHandler.EVENT_TO_HANDLER_MAP.get(notifyCommand.getEvent());
         if(notifyHandler==null){
             throw BaseRuntimeException.getException("Event["+notifyCommand.getEvent()+"] Has No Handler");
         }
+        staticLogger.debug("Receive Command["+notifyCommand.getEvent()+"] Type["+notifyCommand.getType()+"] From["+session.getRemoteAddress().toString()+"] On ["+webSocket.getUrl()+"]:\n"+JsonUtil.toJson(notifyCommand));
         switch (notifyCommand.getType()){
             case REGISTER:{
                 if(notifyHandler.getRegisterParamJavaType().isTypeOrSubTypeOf(String.class)){
@@ -109,7 +114,7 @@ public abstract class NotifyHandler<T,R> {
                 break;
             }
             default:{
-                throw BaseRuntimeException.getException("Command Type["+notifyCommand.getType()+"] Not Support");
+                throw BaseRuntimeException.getException("Command Event["+notifyCommand.getEvent()+"] Type["+notifyCommand.getType()+"] Not Support");
             }
         }
     }
@@ -121,6 +126,7 @@ public abstract class NotifyHandler<T,R> {
     public static void cancel(WebSocketSession session){
         EVENT_TO_HANDLER_MAP.values().forEach(e1->{
             e1.snToNotifyChannel.values().stream().filter(e2->((NotifyChannel)e2).getSession()==session).forEach(e2->{
+                staticLogger.warn("Cancel Notify Listener SN["+((NotifyChannel)e2).getSn()+"] On "+session.getRemoteAddress()+" AfterConnectionClosed");
                 e1.cancel(((NotifyChannel)e2).getSn());
             });
         });

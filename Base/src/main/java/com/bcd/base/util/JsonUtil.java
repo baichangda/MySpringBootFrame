@@ -6,8 +6,15 @@ import com.bcd.base.json.jackson.filter.EmptyJacksonFilter;
 import com.bcd.base.json.SimpleFilterBean;
 import com.bcd.base.json.jackson.filter.SimpleJacksonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.deser.BeanDeserializer;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
+import com.fasterxml.jackson.databind.introspect.BasicBeanDescription;
+import com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
@@ -16,6 +23,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -291,4 +299,65 @@ public class JsonUtil {
         return filterMap.values().stream().toArray(SimpleFilterBean[]::new);
     }
 
+
+    public static void main(String[] args) throws JsonProcessingException {
+        int i=1;
+        System.out.println((++i)+(++i));
+        TestBean t1=new TestBean();
+        t1.setId(1);
+        t1.setName("t1");
+        TestBean t2=new TestBean();
+        t2.setId(2);
+        t2.setName("t2");
+        TestBean t3=new TestBean();
+        t2.setId(3);
+        t2.setName("t3");
+        t1.setDataList(Arrays.asList(t2,t3));
+        ObjectMapper objectMapper=JsonUtil.withConfig(new ObjectMapper());
+        SimpleModule simpleModule=new SimpleModule();
+        simpleModule.addDeserializer(TestBean.class, new JsonDeserializer<TestBean>() {
+            public TestBean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                if (p.isExpectedStartObjectToken()) {
+                    p.nextToken();
+                }
+                if(p.hasTokenId(JsonTokenId.ID_FIELD_NAME)){
+                }
+
+                p.currentToken();
+                return null;
+            }
+        });
+        objectMapper.registerModule(simpleModule);
+        TestBean res= objectMapper.readValue(JsonUtil.toJson(t1),TestBean.class);
+    }
+
+}
+class TestBean{
+    private Integer id;
+    private String name;
+    private List<TestBean> dataList;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<TestBean> getDataList() {
+        return dataList;
+    }
+
+    public void setDataList(List<TestBean> dataList) {
+        this.dataList = dataList;
+    }
 }
