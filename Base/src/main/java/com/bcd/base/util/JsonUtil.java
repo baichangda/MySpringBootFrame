@@ -87,6 +87,8 @@ public class JsonUtil {
             t.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             //4、设置在解析json字符串为实体类时候,忽略多余的属性
             t.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            //5、设置在序列化时候遇到空属性对象时候,不抛出异常
+            t.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             return t;
         } catch (JsonMappingException e) {
             throw BaseRuntimeException.getException(e);
