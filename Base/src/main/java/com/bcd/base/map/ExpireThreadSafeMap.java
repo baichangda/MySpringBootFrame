@@ -207,6 +207,29 @@ public class ExpireThreadSafeMap<K, V> {
         }
     }
 
+    public boolean contains(K k){
+        ExpireValue<V> expireValue;
+        lock.readLock().lock();
+        try {
+            expireValue = dataMap.get(k);
+        }finally {
+            lock.readLock().unlock();
+        }
+        if (expireValue == null) {
+            return false;
+        } else {
+            if (expireValue.isExpired()) {
+                V v=remove(k);
+                if(v!=null) {
+                    callback(k, expireValue);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException {
         ExpireThreadSafeMap<String, String> map = new ExpireThreadSafeMap<>(1000L);
         for (int i = 1; i <= 100000; i++) {

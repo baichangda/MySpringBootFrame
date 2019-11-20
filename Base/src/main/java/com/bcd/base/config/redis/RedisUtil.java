@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.io.Serializable;
@@ -15,8 +16,8 @@ import java.lang.reflect.Type;
 @SuppressWarnings("unchecked")
 public class RedisUtil {
 
-    private final static JdkSerializationRedisSerializer JDK_SERIALIZATION_SERIALIZER = new JdkSerializationRedisSerializer();
-    private final static StringRedisSerializer STRING_SERIALIZER = StringRedisSerializer.UTF_8;
+    public final static JdkSerializationRedisSerializer JDK_SERIALIZATION_SERIALIZER = new JdkSerializationRedisSerializer();
+    public final static StringRedisSerializer STRING_SERIALIZER = StringRedisSerializer.UTF_8;
 
     /**
      * 获取对应实体类型的String_Jackson的redisTemplate
@@ -29,6 +30,36 @@ public class RedisUtil {
     public static <V> RedisTemplate<String, V> newString_JacksonBeanRedisTemplate(RedisConnectionFactory redisConnectionFactory, Type type) {
         RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+        Jackson2JsonRedisSerializer<V> redisSerializer=newJackson2JsonRedisSerializer(type);
+        redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
+        redisTemplate.setKeySerializer(STRING_SERIALIZER);
+        redisTemplate.setHashKeySerializer(STRING_SERIALIZER);
+        redisTemplate.setValueSerializer(redisSerializer);
+        redisTemplate.setHashValueSerializer(redisSerializer);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    /**
+     * 获取string_bytes的redisTemplate
+     * @param redisConnectionFactory
+     * @return
+     */
+    public static RedisTemplate<String,byte[]> newString_BytesRedisTemplate(RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate<String, byte[]> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setValueSerializer(null);
+        redisTemplate.setHashValueSerializer(null);
+        return redisTemplate;
+    }
+
+    /**
+     * 获取对应的jackson序列化
+     * @param type
+     * @param <V>
+     * @return
+     */
+    public static <V>Jackson2JsonRedisSerializer<V> newJackson2JsonRedisSerializer(Type type){
         Jackson2JsonRedisSerializer<V> redisSerializer;
         if (type instanceof Class) {
             redisSerializer = new Jackson2JsonRedisSerializer<>((Class) type);
@@ -37,13 +68,7 @@ public class RedisUtil {
         } else {
             throw BaseRuntimeException.getException("Param Type[" + type.getTypeName() + "] Not Support");
         }
-        redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
-        redisTemplate.setKeySerializer(STRING_SERIALIZER);
-        redisTemplate.setHashKeySerializer(STRING_SERIALIZER);
-        redisTemplate.setValueSerializer(redisSerializer);
-        redisTemplate.setHashValueSerializer(redisSerializer);
-        redisTemplate.afterPropertiesSet();
-        return redisTemplate;
+        return redisSerializer;
     }
 
     /**

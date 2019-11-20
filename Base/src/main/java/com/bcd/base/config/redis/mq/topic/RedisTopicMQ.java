@@ -4,6 +4,7 @@ import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
+import com.bcd.base.util.CompressUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,7 +28,9 @@ public class RedisTopicMQ<V> {
 
     protected String[] names;
 
-    protected RedisTemplate<String, V> redisTemplate;
+    protected RedisSerializer<V> redisSerializer;
+
+    protected RedisTemplate<String, byte[]> redisTemplate;
 
     protected RedisMessageListenerContainer redisMessageListenerContainer;
 
@@ -35,7 +39,8 @@ public class RedisTopicMQ<V> {
     public RedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType, String... names) {
         this.names = names;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
-        this.redisTemplate = getDefaultRedisTemplate(redisMessageListenerContainer, valueSerializerType);
+        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+        this.redisSerializer=getDefaultRedisSerializer(valueSerializerType);
         this.messageListener = getMessageListener();
     }
 
@@ -43,16 +48,17 @@ public class RedisTopicMQ<V> {
         return names;
     }
 
-    private RedisTemplate getDefaultRedisTemplate(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType) {
-        switch (valueSerializerType) {
+
+    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType){
+        switch (valueSerializerType){
             case STRING: {
-                return RedisUtil.newString_StringRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+                return RedisUtil.STRING_SERIALIZER;
             }
             case SERIALIZABLE: {
-                return RedisUtil.newString_SerializableRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
+                return RedisUtil.JDK_SERIALIZATION_SERIALIZER;
             }
             case JACKSON: {
-                return RedisUtil.newString_JacksonBeanRedisTemplate(redisMessageListenerContainer.getConnectionFactory(), parseValueJavaType());
+                return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default: {
                 throw BaseRuntimeException.getException("Not Support");
@@ -66,7 +72,7 @@ public class RedisTopicMQ<V> {
     }
 
     protected void onMessage(Message message, byte[] pattern) {
-        V v = (V) redisTemplate.getValueSerializer().deserialize(message.getBody());
+        V v = (V) redisTemplate.getValueSerializer().deserialize(compress(message.getBody()));
         onMessage(v);
     }
 
@@ -81,17 +87,26 @@ public class RedisTopicMQ<V> {
     }
 
     public void send(V data, String... names) {
+        byte[] bytes=unCompress(redisSerializer.serialize(data));
         if (names == null || names.length == 0) {
             if (this.names.length == 1) {
-                redisTemplate.convertAndSend(this.names[0], data);
+                redisTemplate.convertAndSend(this.names[0], bytes);
             } else {
                 throw BaseRuntimeException.getException("MQ Has More Than One Topic,Param[names] Can't Be Empty");
             }
         } else {
             for (String name : names) {
-                redisTemplate.convertAndSend(name, data);
+                redisTemplate.convertAndSend(name, bytes);
             }
         }
+    }
+
+    protected byte[] compress(byte[] data){
+        return data;
+    }
+
+    protected byte[] unCompress(byte[] data){
+        return data;
     }
 
     public void watch() {
