@@ -7,6 +7,7 @@ import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.CompressUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
@@ -14,7 +15,10 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.SerializationException;
+import org.springframework.lang.Nullable;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -72,7 +76,7 @@ public class RedisTopicMQ<V> {
     }
 
     protected void onMessage(Message message, byte[] pattern) {
-        V v = (V) redisTemplate.getValueSerializer().deserialize(compress(message.getBody()));
+        V v = redisSerializer.deserialize(unCompress(message.getBody()));
         onMessage(v);
     }
 
@@ -87,7 +91,7 @@ public class RedisTopicMQ<V> {
     }
 
     public void send(V data, String... names) {
-        byte[] bytes=unCompress(redisSerializer.serialize(data));
+        byte[] bytes=compress(redisSerializer.serialize(data));
         if (names == null || names.length == 0) {
             if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], bytes);

@@ -20,7 +20,7 @@ public class TestWebSocketClient extends BaseTextWebSocketClient {
     }
 
     @Override
-    public void onMessage(WebSocketSession session, String data) throws Exception {
+    public void onMessage(String data) {
         logger.info("WebSocket Receive: "+data);
     }
 

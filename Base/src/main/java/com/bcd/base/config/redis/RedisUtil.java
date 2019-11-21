@@ -48,8 +48,9 @@ public class RedisUtil {
     public static RedisTemplate<String,byte[]> newString_BytesRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<String, byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setValueSerializer(null);
-        redisTemplate.setHashValueSerializer(null);
+        redisTemplate.setValueSerializer(RedisSerializer.byteArray());
+        redisTemplate.setHashValueSerializer(RedisSerializer.byteArray());
+        redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
