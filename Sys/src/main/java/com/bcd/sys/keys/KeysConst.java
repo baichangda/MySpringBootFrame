@@ -57,7 +57,7 @@ public class KeysConst {
     static{
         if(!IS_CLUSTER) {
             if (IS_GENERATE_KEY_ON_STARTUP) {
-                Object[] keys = RSASecurity.generateKey();
+                Object[] keys = RSASecurity.generateKey(1024);
                 KeysConst.PUBLIC_KEY = (RSAPublicKey) keys[0];
                 KeysConst.PRIVATE_KEY = (RSAPrivateKey) keys[1];
                 KeysConst.PUBLIC_KEY_BASE64 = Base64.encodeBase64String(KeysConst.PUBLIC_KEY.getEncoded());

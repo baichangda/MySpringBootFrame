@@ -31,7 +31,6 @@ public class RedisUtil {
         RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         Jackson2JsonRedisSerializer<V> redisSerializer=newJackson2JsonRedisSerializer(type);
-        redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
         redisTemplate.setKeySerializer(STRING_SERIALIZER);
         redisTemplate.setHashKeySerializer(STRING_SERIALIZER);
         redisTemplate.setValueSerializer(redisSerializer);
@@ -69,6 +68,7 @@ public class RedisUtil {
         } else {
             throw BaseRuntimeException.getException("Param Type[" + type.getTypeName() + "] Not Support");
         }
+        redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
         return redisSerializer;
     }
 

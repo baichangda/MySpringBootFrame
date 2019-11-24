@@ -1,6 +1,7 @@
 package com.bcd.base.security;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import org.apache.commons.codec.binary.Base64;
 
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -22,51 +23,41 @@ import javax.crypto.NoSuchPaddingException;
 
 public class RSASecurity {
 
-    public static final String KEY_ALGORITHM = "RSA";
-    /** 貌似默认是RSA/NONE/PKCS1Padding，未验证 */
-    public static final String CIPHER_ALGORITHM = "RSA/ECB/PKCS1Padding";
-
-    /** RSA密钥长度必须是64的倍数，在512~65536之间。默认是1024 */
-    public static final int KEY_SIZE = 1024;
+    /**
+     * 算法/模式/补码方式
+     */
+    public final static String PADDING_TYPE="RSA/ECB/PKCS1Padding";
 
     /**
      * 生成密钥对。注意这里是生成密钥对KeyPair，再由密钥对获取公私钥
      * @return 数组,第一个元素为公钥,第二个元素为私钥
      */
-    public static Object[] generateKey() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator
-                    .getInstance(KEY_ALGORITHM);
-            keyPairGenerator.initialize(KEY_SIZE);
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-            return new Object[]{publicKey,privateKey};
-        } catch (NoSuchAlgorithmException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+    public static Object[] generateKey(int size) {
+        Singleton.INSTANCE.keyPairGenerator.initialize(size);
+        KeyPair keyPair = Singleton.INSTANCE.keyPairGenerator.generateKeyPair();
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        return new Object[]{publicKey,privateKey};
     }
 
     /**
      * 还原公钥，X509EncodedKeySpec 用于构建公钥的规范
-     * 
+     *
      * @param keyBytes
      * @return
      */
     public static PublicKey restorePublicKey(byte[] keyBytes) {
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
         try {
-            KeyFactory factory = KeyFactory.getInstance(KEY_ALGORITHM);
-            PublicKey publicKey = factory.generatePublic(x509EncodedKeySpec);
-            return publicKey;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            return Singleton.INSTANCE.keyFactory.generatePublic(x509EncodedKeySpec);
+        } catch (InvalidKeySpecException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     /**
      * 还原私钥，PKCS8EncodedKeySpec 用于构建私钥的规范
-     * 
+     *
      * @param keyBytes
      * @return
      */
@@ -74,11 +65,10 @@ public class RSASecurity {
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
                 keyBytes);
         try {
-            KeyFactory factory = KeyFactory.getInstance(KEY_ALGORITHM);
-            PrivateKey privateKey = factory
+            PrivateKey privateKey = Singleton.INSTANCE.keyFactory
                     .generatePrivate(pkcs8EncodedKeySpec);
             return privateKey;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -92,7 +82,7 @@ public class RSASecurity {
      */
     public static byte[] encode(PublicKey key, byte[] plainText) {
         try {
-            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            Cipher cipher = Cipher.getInstance(PADDING_TYPE);
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(plainText);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
@@ -112,7 +102,7 @@ public class RSASecurity {
      */
     public static String decode(PrivateKey key, byte[] encodedText) {
         try {
-            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            Cipher cipher = Cipher.getInstance(PADDING_TYPE);
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(encodedText));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
@@ -120,5 +110,37 @@ public class RSASecurity {
                 | BadPaddingException e) {
             throw BaseRuntimeException.getException(e);
         }
+    }
+
+    enum Singleton{
+        INSTANCE;
+        KeyPairGenerator keyPairGenerator;
+        KeyFactory keyFactory;
+        Singleton(){
+            try {
+                keyPairGenerator=KeyPairGenerator.getInstance("RSA");
+                keyFactory=KeyFactory.getInstance("RSA");
+            } catch (NoSuchAlgorithmException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Object[] res1= generateKey(1024);
+        PublicKey publicKey1=(PublicKey)res1[0];
+        PrivateKey privateKey1=(PrivateKey)res1[1];
+        System.out.println(Base64.encodeBase64String(publicKey1.getEncoded()));
+        System.out.println(Base64.encodeBase64String(privateKey1.getEncoded()));
+        Object[] res2= generateKey(1024);
+        PublicKey publicKey2=(PublicKey)res2[0];
+        PrivateKey privateKey2=(PrivateKey)res2[1];
+        System.out.println(Base64.encodeBase64String(publicKey2.getEncoded()));
+        System.out.println(Base64.encodeBase64String(privateKey2.getEncoded()));
+
+        byte []b1=encode(publicKey1,"abc".getBytes());
+        byte []b2=encode(publicKey2,"def".getBytes());
+        System.out.println(new String(decode(privateKey1,b1)));
+        System.out.println(new String(decode(privateKey2,b2)));
     }
 }

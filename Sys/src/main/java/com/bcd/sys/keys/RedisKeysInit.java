@@ -29,7 +29,7 @@ public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>
             String[] keys=redisTemplate.opsForValue().get(KeysConst.REDIS_KEY_NAME);
             //3、如果redis中公钥私钥为空,则生成一份,插入进去
             if(keys==null){
-                Object[] objects= RSASecurity.generateKey();
+                Object[] objects= RSASecurity.generateKey(1024);
                 keys=new String[2];
                 keys[0]=Base64.encodeBase64String(((PublicKey)objects[0]).getEncoded());
                 keys[1]=Base64.encodeBase64String(((PrivateKey)objects[1]).getEncoded());
