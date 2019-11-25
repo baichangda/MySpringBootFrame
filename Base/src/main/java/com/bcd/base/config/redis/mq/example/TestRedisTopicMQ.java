@@ -30,9 +30,9 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean> implements Applicat
         TestBean testBean=new TestBean();
         testBean.setId(1);
         testBean.setName("呵呵");
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(()->{
-            send(testBean,"test");
-        },1,3, TimeUnit.SECONDS);
+//        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(()->{
+//            send(testBean,"test");
+//        },1,3, TimeUnit.SECONDS);
     }
 
 

@@ -20,6 +20,7 @@ import java.util.function.Consumer;
  * 1、断线重连机制(当连接断开以后会过10s后自动连接 (如果检测到发送时间距离当前时间1分钟之内) )
  * @param <T>
  */
+@SuppressWarnings("unchecked")
 public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient {
 
     public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>();

@@ -37,7 +37,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
     public void handle(HttpServletResponse response, Object result) throws IOException {
         ServletServerHttpResponse servletServerHttpResponse=new ServletServerHttpResponse(response);
         converter.write(result,
-                MediaType.APPLICATION_JSON_UTF8,
+                MediaType.APPLICATION_JSON,
                 servletServerHttpResponse);
     }
 }

@@ -5,6 +5,8 @@ import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.mgt.NativeSessionManager;
+import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.DispatcherType;
@@ -22,10 +25,6 @@ import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
@@ -61,7 +60,6 @@ public class ShiroConfiguration{
         return ehcacheManager;
     }
 
-
     /**
      * 安全管理器
      * @param realm
@@ -85,14 +83,14 @@ public class ShiroConfiguration{
 
     /**
      * 会话管理器
-     * @param redisTemplate
+     * @param redisConnectionFactory
      * @return
      */
     @Bean
-    public SessionManager sessionManager(@Qualifier(value = "string_serializable_redisTemplate") RedisTemplate redisTemplate){
+    public SessionManager sessionManager(RedisConnectionFactory redisConnectionFactory){
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
         DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
-        sessionManager.setSessionDAO(new MySessionRedisDAO(redisTemplate));
+        sessionManager.setSessionDAO(new RedisSessionDAO(redisConnectionFactory));
         sessionManager.setGlobalSessionTimeout(-1000L);
         return sessionManager;
     }
@@ -149,7 +147,7 @@ public class ShiroConfiguration{
         filterChainMap.put("/api/sys/user/login", "anon");
 //        filterChainMap.put("/api/**/list", "user");
 //        filterChainMap.put("/api/**/page", "user");
-//        filterChainMap.put("/api/**","authc");
+        filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }
 
