@@ -61,7 +61,7 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
             loggedIn = executeLogin(request, response);
         }
         if (!loggedIn) {
-                handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+            handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
         }
         return loggedIn;
     }
