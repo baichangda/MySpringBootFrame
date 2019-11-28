@@ -193,9 +193,6 @@ public class BaseService<T, K extends Serializable> {
         return returnVal;
     }
 
-    /**
-     * 此操作不会触发检查
-     */
     @Transactional
     public void deleteAll() {
         repository.deleteAll();
@@ -218,9 +215,6 @@ public class BaseService<T, K extends Serializable> {
         repository.deleteAll(iterable);
     }
 
-    /**
-     * 此操作不会触发检查
-     */
     @Transactional
     public void deleteAllInBatch() {
         repository.deleteAllInBatch();

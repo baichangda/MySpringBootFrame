@@ -56,8 +56,6 @@ allprojects{
         compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
         //flyway支持
         compile("org.flywaydb:flyway-core:${flywayVersion}")
-        //ics
-        compile ("com.incarcloud.ics:ics-map-tracking:5.3-SNAPSHOT")
     }
 
     compileJava{

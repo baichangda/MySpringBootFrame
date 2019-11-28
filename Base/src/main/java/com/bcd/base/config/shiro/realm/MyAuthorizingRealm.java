@@ -1,4 +1,4 @@
-package com.bcd.sys;
+package com.bcd.base.config.shiro.realm;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationInfo;

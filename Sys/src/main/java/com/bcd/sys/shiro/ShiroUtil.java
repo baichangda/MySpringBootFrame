@@ -1,6 +1,6 @@
 package com.bcd.sys.shiro;
 
-import com.bcd.sys.MyAuthorizingRealm;
+import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
