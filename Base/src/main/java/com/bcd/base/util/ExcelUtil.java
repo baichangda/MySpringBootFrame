@@ -9,11 +9,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ExcelUtil {
     /**
@@ -346,12 +348,62 @@ public class ExcelUtil {
 
 
     public static void main(String[] args) throws IOException {
-//        List<List> dataList= Arrays.asList(
-//                Arrays.asList("a","b","c","d","a","b","c","d"),
-//                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
-//                Arrays.asList("a","b","c","d","a","b","c","d","1","3"),
-//                Arrays.asList("a","b","c","d","a","b","c","d","1","3")
-//        );
-//        overWriteExcel(Paths.get("/Users/baichangda/test.xlsx"),1,1,1,null,dataList);
+        Path dir=Paths.get("/Users/baichangda/bcd/workspace/vcp-32960-gateway/NettyServer/src/main/java/com/incarcloud/nettyserver/tcp/data");
+        Set<String> set=new HashSet<>();
+        set.add("Packet.java");
+        set.add("PacketData.java");
+        Path output=Paths.get("/Users/baichangda/output.xlsx");
+        Files.deleteIfExists(output);
+        Workbook workbook=new XSSFWorkbook();
+        Sheet sheet=workbook.createSheet();
+        List<List> dataList=new ArrayList<>();
+        Files.list(dir).filter(e->!set.contains(e.getFileName().toString())).forEach(p->{
+            String fileName=p.getFileName().toString().split("\\.")[0];
+            dataList.add(Arrays.asList("类型名称",fileName));
+            dataList.add(Arrays.asList("字段","类型","描述"));
+            try(BufferedReader br=Files.newBufferedReader(p)){
+                String line;
+                String comment="";
+                while((line=br.readLine())!=null){
+                    List data=new ArrayList();
+                    line=line.trim();
+                    if(!line.isEmpty()&&!line.contains("return ")&&!line.contains("this.")&&!line.contains("(")
+                            &&!line.contains(")")&&!line.contains("@")&&!line.contains("import ")
+                            &&!line.contains("package ")&&!line.contains("*")&&!line.contains("}")) {
+                        if (line.contains(" class ")) {
+                            int begin = line.indexOf(" class ") + " class ".length();
+                            int end = line.indexOf(" ", begin);
+                            String className = line.substring(begin, end);
+                            data.add(className);
+                        } else if (line.contains("//")) {
+                            int begin = line.indexOf("//") + "//".length();
+                            comment = line.substring(begin);
+                        } else{
+                            String[] fieldArr=line.split(" ");
+                            String type=fieldArr[0].trim();
+                            fieldArr[1]=fieldArr[1].trim();
+                            String fieldName=fieldArr[1].substring(0,fieldArr[1].length()-1);
+                            data.add(fieldName);
+                            data.add(type);
+                            if(fieldName.contains("Hex")){
+                                data.add(comment+"16进制");
+                            }else{
+                                data.add(comment);
+                            }
+                            dataList.add(data);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+            dataList.add(Arrays.asList());
+            dataList.add(Arrays.asList());
+        });
+        ExcelUtil.writeSheet(sheet,1,1,(cell,val)->ExcelUtil.inputValue(cell,val),dataList);
+        try(OutputStream os=Files.newOutputStream(output)){
+            workbook.write(os);
+        }
+
     }
 }

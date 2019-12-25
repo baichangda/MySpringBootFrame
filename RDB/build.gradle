@@ -5,6 +5,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
     //mysql驱动包
     runtime "mysql:mysql-connector-java:${mysqlVersion}"
+    //yaml包支持
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.25'
 
     compile("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
     compile project(':Base')

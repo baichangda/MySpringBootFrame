@@ -14,6 +14,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
+@SuppressWarnings("unchecked")
 public class ScheduleUtil {
     private final static Map<String,ScheduledFuture> ID_TO_FUTURE=new ConcurrentHashMap<>();
 

@@ -4,6 +4,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
 import net.sf.jsqlparser.JSQLParserException;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class SqlUtil {
+
+    static Logger logger= LoggerFactory.getLogger(SqlUtil.class);
 
     public static void main(String[] args) throws JSQLParserException {
         String sql1 = "SELECT \n" +
@@ -180,7 +184,7 @@ public class SqlUtil {
      * @param table
      * @return
      */
-    private static String generateUpdateSql(Set<String> columnSet,String table){
+    private static String generateUpdateSql(Set<String> columnSet,Set<String> whereColumnSet,String table){
         StringBuilder sql = new StringBuilder("update ");
         sql.append(table);
         sql.append(" set ");
@@ -194,46 +198,23 @@ public class SqlUtil {
             sql.append(e);
             sql.append("=?");
         });
+        if(whereColumnSet!=null&&!whereColumnSet.isEmpty()) {
+            isFirst[0]=true;
+            sql.append(" where ");
+            whereColumnSet.forEach(e -> {
+                if (isFirst[0]) {
+                    isFirst[0] = false;
+                } else {
+                    sql.append(" and ");
+                }
+                sql.append(e);
+                sql.append("=?");
+            });
+        }
         return sql.toString();
     }
 
-    /**
-     * 生成字段和值对应map
-     * @param obj
-     * @param includeNullValue
-     * @param fieldHandler
-     * @param ignoreFields
-     * @return
-     */
-    private static Map<String, Object> toColumnValueMap(Object obj, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
-        Map<String, Object> returnMap = new LinkedHashMap<>();
-        List<Field> fieldList = FieldUtils.getAllFieldsList(obj.getClass());
-        Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
-        fieldList.forEach(field -> {
-            if (Modifier.isStatic(field.getModifiers())) {
-                return;
-            }
-            String fieldName = field.getName();
-            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
-            if (ignoreSet.contains(fieldName) || ignoreSet.contains(columnName)) {
-                return;
-            }
-            field.setAccessible(true);
-            try {
-                Object val = field.get(obj);
-                if (!includeNullValue && val == null) {
-                    return;
-                }
-                if(fieldHandler!=null){
-                    val=fieldHandler.apply(fieldName,val);
-                }
-                returnMap.put(columnName, val);
-            } catch (IllegalAccessException e) {
-                throw BaseRuntimeException.getException(e);
-            }
-        });
-        return returnMap;
-    }
+
 
     /**
      * 生成批量中间结果
@@ -284,10 +265,10 @@ public class SqlUtil {
 
     /**
      * 生成批量新增结果
-     * @param dataList
-     * @param table
-     * @param fieldHandler
-     * @param ignoreFields
+     * @param dataList 数据集合
+     * @param table 表名
+     * @param fieldHandler 字段值二次处理器
+     * @param ignoreFields 忽略的新增字段
      * @return
      */
     public static BatchCreateSqlResult generateBatchCreateResult(List dataList, String table, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
@@ -303,23 +284,134 @@ public class SqlUtil {
     }
 
     /**
-     * 生成批量更新结果
+     * 生成批量中间结果
+     * [0]:更新列名和字段对应map Map<String,Field>
+     * [1]:where条件列名和字段对应map Map<String,Field>(如果存在字段的值为null,会抛出异常)
+     * [2]:批量参数集合 List<Object[]>(包括更新字段值和where字段值)
      * @param dataList
-     * @param table
      * @param fieldHandler
      * @param ignoreFields
      * @return
      */
-    public static BatchUpdateSqlResult generateBatchUpdateResult(List dataList, String table, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
+    private static Object[] toBatchResultWithWhere(List dataList, BiFunction<String,Object,Object> fieldHandler,String[] whereFields, String... ignoreFields){
+        Object first= dataList.get(0);
+        Class clazz=first.getClass();
+        Map<String,Field> columnToFieldMap=new LinkedHashMap<>();
+        Map<String,Field> whereColumnToFieldMap=new LinkedHashMap<>();
+        List<Field> fieldList = FieldUtils.getAllFieldsList(clazz);
+        Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
+        Set<String> whereSet = Arrays.stream(whereFields).collect(Collectors.toSet());
+        fieldList.forEach(field -> {
+            if (Modifier.isStatic(field.getModifiers())) {
+                return;
+            }
+            String fieldName = field.getName();
+            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
+            if (whereSet.contains(fieldName) || whereSet.contains(columnName)) {
+                field.setAccessible(true);
+                whereColumnToFieldMap.put(columnName,field);
+            }
+            if (!(ignoreSet.contains(fieldName) || ignoreSet.contains(columnName))) {
+                field.setAccessible(true);
+                columnToFieldMap.put(columnName,field);
+            }
+
+        });
+
+        List<Object[]> paramList= (List<Object[]>)dataList.stream().map(data->{
+            List param=new ArrayList();
+            columnToFieldMap.forEach((k,v)->{
+                //如果where条件中存在此字段,则不作为更新字段
+                if(whereColumnToFieldMap.keySet().contains(k)){
+                    return;
+                }
+                try {
+                    Object val= v.get(data);
+                    if(fieldHandler!=null){
+                        val=fieldHandler.apply(k,val);
+                    }
+                    param.add(val);
+                } catch (IllegalAccessException ex) {
+                    throw BaseRuntimeException.getException(ex);
+                }
+            });
+            whereColumnToFieldMap.forEach((k,v)->{
+                try {
+                    Object val= v.get(data);
+                    if(fieldHandler!=null){
+                        val=fieldHandler.apply(k,val);
+                    }
+                    if(val==null){
+                        throw BaseRuntimeException.getException("where field["+k+"] can't be null");
+                    }
+                    param.add(val);
+                } catch (IllegalAccessException ex) {
+                    throw BaseRuntimeException.getException(ex);
+                }
+            });
+            return param.toArray();
+        }).collect(Collectors.toList());
+        return new Object[]{columnToFieldMap,whereColumnToFieldMap,paramList};
+    }
+
+    /**
+     * 生成批量更新结果
+     * @param dataList 数据集合
+     * @param table 表名
+     * @param fieldHandler 字段值二次处理器
+     * @param whereFields 作为where条件的字段(若字段值为null,则忽略条件;如果所有的字段值都为null,则异常)
+     * @param ignoreFields 忽略的更新字段
+     * @return
+     */
+    public static BatchUpdateSqlResult generateBatchUpdateResult(List dataList, String table, BiFunction<String,Object,Object> fieldHandler,String[] whereFields, String... ignoreFields) {
         if(dataList.isEmpty()){
             return null;
         }else{
-            Object[] res= toBatchResult(dataList, fieldHandler, ignoreFields);
+            Object[] res= toBatchResultWithWhere(dataList, fieldHandler,whereFields, ignoreFields);
             Map<String,Field> columnToFieldMap=(Map<String,Field>)res[0];
-            List<Object[]> paramList=(List<Object[]>)res[1];
-            String sql= generateUpdateSql(columnToFieldMap.keySet(),table);
+            Map<String,Field> whereColumnToFieldMap=(Map<String,Field>)res[1];
+            List<Object[]> paramList=(List<Object[]>)res[2];
+            String sql= generateUpdateSql(columnToFieldMap.keySet(),whereColumnToFieldMap.keySet(),table);
             return new BatchUpdateSqlResult(sql,paramList);
         }
+    }
+
+    /**
+     * 生成字段和值对应map
+     * @param obj
+     * @param includeNullValue
+     * @param fieldHandler
+     * @param ignoreFields
+     * @return
+     */
+    private static Map<String, Object> toColumnValueMap(Object obj, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
+        Map<String, Object> returnMap = new LinkedHashMap<>();
+        List<Field> fieldList = FieldUtils.getAllFieldsList(obj.getClass());
+        Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
+        fieldList.forEach(field -> {
+            if (Modifier.isStatic(field.getModifiers())) {
+                return;
+            }
+            String fieldName = field.getName();
+            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
+            if (ignoreSet.contains(fieldName) || ignoreSet.contains(columnName)) {
+                return;
+            }
+            field.setAccessible(true);
+            try {
+                Object val = field.get(obj);
+                if (!includeNullValue && val == null) {
+                    return;
+                }
+                if(fieldHandler!=null){
+                    val=fieldHandler.apply(fieldName,val);
+                }
+                returnMap.put(columnName, val);
+            } catch (IllegalAccessException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        });
+        return returnMap;
     }
 
     /**
@@ -333,7 +425,7 @@ public class SqlUtil {
     public static CreateSqlResult generateCreateResult(Object obj, String table, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
         Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue,fieldHandler, ignoreFields);
         if (filterColumnValueMap.size() == 0) {
-            throw BaseRuntimeException.getException("No Column");
+            throw BaseRuntimeException.getException("no column");
         }
         String sql=generateCreateSql(filterColumnValueMap.keySet(),table);
         return new CreateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
@@ -350,9 +442,9 @@ public class SqlUtil {
     public static UpdateSqlResult generateUpdateResult(Object obj, String table, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
         Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue,fieldHandler, ignoreFields);
         if (filterColumnValueMap.size() == 0) {
-            throw BaseRuntimeException.getException("No Column");
+            throw BaseRuntimeException.getException("no column");
         }
-        String sql=generateUpdateSql(filterColumnValueMap.keySet(),table);
+        String sql=generateUpdateSql(filterColumnValueMap.keySet(),null,table);
         return new UpdateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
     }
 
