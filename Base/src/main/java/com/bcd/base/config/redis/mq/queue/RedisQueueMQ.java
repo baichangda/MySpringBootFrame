@@ -1,7 +1,7 @@
-package com.bcd.base.config.redis.mq.queue;
+package com.bcd.base.mq.redis.queue;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.redis.mq.ValueSerializerType;
+import com.bcd.base.mq.redis.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.JsonUtil;
@@ -13,6 +13,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -21,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class RedisQueueMQ<V> {
@@ -28,7 +30,9 @@ public class RedisQueueMQ<V> {
 
     protected String name;
 
-    protected RedisTemplate<String, V> redisTemplate;
+    protected RedisSerializer<V> redisSerializer;
+
+    protected RedisTemplate<String, byte[]> redisTemplate;
 
     protected ThreadPoolExecutor consumePool;
 
@@ -40,16 +44,34 @@ public class RedisQueueMQ<V> {
         this(name, redisConnectionFactory, valueSerializer, (ThreadPoolExecutor) Executors.newFixedThreadPool(1), Executors.newCachedThreadPool());
     }
 
-    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializer, ThreadPoolExecutor consumePool, ExecutorService workPool) {
+    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializerType, ThreadPoolExecutor consumePool, ExecutorService workPool) {
         this.name = name;
         this.stop = false;
-        this.redisTemplate = getDefaultRedisTemplate(redisConnectionFactory, valueSerializer);
+        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
+        this.redisSerializer=getDefaultRedisSerializer(valueSerializerType);
         this.consumePool = consumePool;
         this.workPool = workPool;
     }
 
     public String getName() {
         return name;
+    }
+
+    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType){
+        switch (valueSerializerType){
+            case STRING: {
+                return RedisUtil.STRING_SERIALIZER;
+            }
+            case SERIALIZABLE: {
+                return RedisUtil.JDK_SERIALIZATION_SERIALIZER;
+            }
+            case JACKSON: {
+                return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
+            }
+            default: {
+                throw BaseRuntimeException.getException("Not Support");
+            }
+        }
     }
 
     private JavaType parseValueJavaType() {
@@ -74,12 +96,21 @@ public class RedisQueueMQ<V> {
         }
     }
 
+    protected byte[] compress(byte[] data){
+        return data;
+    }
+
+    protected byte[] unCompress(byte[] data){
+        return data;
+    }
+
     public void send(V data) {
-        redisTemplate.opsForList().leftPush(name, data);
+        redisTemplate.opsForList().leftPush(name, compress(redisSerializer.serialize(data)));
     }
 
     public void sendBatch(List<V> dataList) {
-        redisTemplate.opsForList().leftPushAll(name, dataList);
+        List<byte[]> byteList= dataList.stream().map(e->compress(redisSerializer.serialize(e))).collect(Collectors.toList());
+        redisTemplate.opsForList().leftPushAll(name, byteList);
     }
 
     public void watch() {
@@ -95,27 +126,30 @@ public class RedisQueueMQ<V> {
         logger.info(data.toString());
     }
 
+    protected void onMessageFromRedis(byte[] data) {
+        onMessage(redisSerializer.deserialize(unCompress(data)));
+    }
+
     protected void start() {
         while (consumePool.getPoolSize() < consumePool.getMaximumPoolSize()) {
             consumePool.execute(() -> {
-                ListOperations<String, V> listOperations = redisTemplate.opsForList();
+                ListOperations<String, byte[]> listOperations = redisTemplate.opsForList();
                 long timeout = ((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout();
                 while (!stop) {
                     try {
-                        Object[] data = new Object[1];
                         try {
-                            data[0] = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
+                            byte[] data = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
+                            if (data != null) {
+                                workPool.execute(() -> {
+                                    try {
+                                        onMessageFromRedis(data);
+                                    } catch (Exception e) {
+                                        logger.error(e.getMessage(), e);
+                                    }
+                                });
+                            }
                         } catch (QueryTimeoutException ex) {
                             logger.error("RedisQueueMQ[" + getClass().getName() + "] Schedule Task QueryTimeoutException", ex);
-                        }
-                        if (data[0] != null) {
-                            workPool.execute(() -> {
-                                try {
-                                    onMessage((V) data[0]);
-                                } catch (Exception e) {
-                                    logger.error(e.getMessage(), e);
-                                }
-                            });
                         }
                     } catch (Exception e) {
                         logger.error("Redis Queue[" + name + "] Cycle Error", e);

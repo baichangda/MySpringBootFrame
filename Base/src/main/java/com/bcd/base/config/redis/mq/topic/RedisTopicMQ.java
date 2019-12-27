@@ -1,13 +1,11 @@
-package com.bcd.base.config.redis.mq.topic;
+package com.bcd.base.mq.redis.topic;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.redis.mq.ValueSerializerType;
+import com.bcd.base.mq.redis.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
-import com.bcd.base.util.CompressUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
@@ -15,10 +13,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.lang.Nullable;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -96,7 +91,7 @@ public class RedisTopicMQ<V> {
             if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], bytes);
             } else {
-                throw BaseRuntimeException.getException("MQ Has More Than One Topic,Param[names] Can't Be Empty");
+                throw BaseRuntimeException.getException("Param[names] Can't Be Empty");
             }
         } else {
             for (String name : names) {
