@@ -1,7 +1,7 @@
-package com.bcd.base.mq.redis.queue;
+package com.bcd.base.config.redis.mq.queue;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.mq.redis.ValueSerializerType;
+import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.JsonUtil;
