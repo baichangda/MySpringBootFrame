@@ -1,11 +1,17 @@
 package com.bcd.rdb.dbinfo.mysql.service;
 
 import com.bcd.base.util.ExcelUtil;
+import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,5 +63,17 @@ public class MysqlTableServiceImpl extends TablesService {
             dataList.add(emptyList);
         }
         return ExcelUtil.exportExcel_2007(dataList, null);
+    }
+
+    public static void main(String[] args) {
+        MysqlTableServiceImpl mysqlTableService=new MysqlTableServiceImpl();
+        Workbook workbook= mysqlTableService.exportDBDesigner("register");
+        Path p= Paths.get("/Users/baichangda/register.xlsx");
+        FileUtil.createFileIfNotExists(p);
+        try(OutputStream os=Files.newOutputStream(p)){
+            workbook.write(os);
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
     }
 }
