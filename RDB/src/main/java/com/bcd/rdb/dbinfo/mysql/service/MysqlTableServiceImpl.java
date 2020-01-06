@@ -79,7 +79,7 @@ public class MysqlTableServiceImpl extends TablesService {
     }
 
     /**
-     * 导出数据库配置到本地
+     * 导出数据库设计到本地
      * @param url
      * @param username
      * @param password

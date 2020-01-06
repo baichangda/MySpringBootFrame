@@ -22,18 +22,17 @@ public class TablesController extends BaseController {
     private TablesService tablesService;
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/exportDBDesigner", method = RequestMethod.GET)
+    @RequestMapping(value = "/exportDBDesignerExcel", method = RequestMethod.GET)
     @ApiOperation(value = "导出数据库设计", notes = "导出数据库设计")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "dbName", value = "数据库名称", dataType = "String")
     })
     @ApiResponse(code = 200, message = "导出结果")
-    public JsonMessage<Object> exportDBDesigner(
+    public void exportDBDesignerExcel(
             @RequestParam(value = "dbName", required = false) String dbName,
             HttpServletResponse response) {
         Workbook workbook = tablesService.exportDBDesignerExcel(dbName);
         String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
         response(workbook, toDateFileName(fileName), response);
-        return JsonMessage.success();
     }
 }
