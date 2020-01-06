@@ -67,13 +67,29 @@ public class DBInfoUtil {
      *
      * @return
      */
-    public static Connection getConn() {
+    public static Connection getSpringConn() {
         Map<String, Object> dbProps = getDBProps();
         String url = dbProps.get("url").toString();
         String username = dbProps.get("username").toString();
         String password = dbProps.get("password").toString();
         try {
             return DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    /**
+     * 获取对应ip:port的information_schema的数据库连接
+     * jdbc:mysql://127.0.0.1:3306/information_schema
+     * @param url 127.0.0.1:3306
+     * @param username root
+     * @param password root
+     * @return
+     */
+    public static Connection getConn(String url,String username,String password) {
+        try {
+            return DriverManager.getConnection("jdbc:mysql://"+url+"/"+DB_INFO_SCHEMA, username, password);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -129,14 +145,14 @@ public class DBInfoUtil {
     /**
      * 获取指定数据库名称下面的所有表
      *
+     * @param conn
      * @param dbName
      * @return
      */
-    public static List<Map<String, Object>> findTables(String dbName) {
+    public static List<Map<String, Object>> findTables(Connection conn,String dbName) {
         List<Map<String, Object>> res;
         String sql = "select * from tables where table_schema=?";
-        try (Connection conn = getConn();
-             PreparedStatement pstsm = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             try (ResultSet rs = pstsm.executeQuery()) {
                 res = parseResult(rs);
@@ -153,11 +169,10 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static Map<String, Object> findTable(String dbName, String tableName) {
+    public static Map<String, Object> findTable(Connection conn,String dbName, String tableName) {
         Map<String, Object> res;
         String sql = "select * from tables where table_schema=? and table_name=?";
-        try (Connection conn = getConn();
-             PreparedStatement pstsm = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
@@ -180,11 +195,10 @@ public class DBInfoUtil {
      * @param tableName
      * @return
      */
-    public static List<Map<String, Object>> findColumns(String dbName, String tableName) {
+    public static List<Map<String, Object>> findColumns(Connection conn,String dbName, String tableName) {
         List<Map<String, Object>> res;
         String sql = "select * from columns where table_schema=? and table_name=?";
-        try (Connection conn = getConn();
-             PreparedStatement pstsm = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
@@ -199,12 +213,11 @@ public class DBInfoUtil {
     /**
      * 获取指定数据库表的主键
      */
-    public static Map<String, Object> findPKColumn(String dbName, String tableName) {
+    public static Map<String, Object> findPKColumn(Connection conn,String dbName, String tableName) {
         String sql = "select a.* from " +
                 "(select * from columns where table_schema=? and table_name=?) a inner join" +
                 "(select COLUMN_NAME from STATISTICS where table_schema=? and table_name=? and index_name='PRIMARY') b on a.COLUMN_NAME=b.COLUMN_NAME";
-        try (Connection conn = getConn();
-             PreparedStatement pstsm = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             pstsm.setString(3, dbName);

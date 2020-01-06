@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 @SuppressWarnings("unchecked")
 public abstract class TablesService {
-    public abstract Workbook exportDBDesigner(String dbName);
+    public abstract Workbook exportDBDesignerExcel(String dbName);
 }

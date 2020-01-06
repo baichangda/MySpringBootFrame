@@ -1,10 +1,13 @@
 package com.bcd.rdb.dbinfo.mysql.service;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -12,6 +15,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,13 +27,21 @@ import java.util.Map;
 public class MysqlTableServiceImpl extends TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "不能为空", "默认值", "备注"};
 
-    public Workbook exportDBDesigner(String dbName) {
+    public Workbook exportDBDesignerExcel(String dbName) {
+        try(Connection connection=DBInfoUtil.getSpringConn()){
+            return exportDBDesignerExcel(connection,dbName);
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public Workbook exportDBDesignerExcel(Connection connection,String dbName) {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
             emptyList.add("");
         }
-        List<Map<String, Object>> tablesList = DBInfoUtil.findTables(dbName);
+        List<Map<String, Object>> tablesList = DBInfoUtil.findTables(connection,dbName);
         for (Map<String, Object> table : tablesList) {
             String tableName = table.get("TABLE_NAME").toString();
             //如果是flyway的版本信息表,则跳过
@@ -46,7 +59,7 @@ public class MysqlTableServiceImpl extends TablesService {
 
             List<Map<String, Object>> columnsList = null;
             columnsList = DBInfoUtil.findColumns(
-                    dbName, tableName
+                    connection,dbName, tableName
             );
 
             dataList.add(define);
@@ -65,15 +78,32 @@ public class MysqlTableServiceImpl extends TablesService {
         return ExcelUtil.exportExcel_2007(dataList, null);
     }
 
-    public static void main(String[] args) {
-        MysqlTableServiceImpl mysqlTableService=new MysqlTableServiceImpl();
-        Workbook workbook= mysqlTableService.exportDBDesigner("register");
-        Path p= Paths.get("/Users/baichangda/register.xlsx");
+    /**
+     * 导出数据库配置到本地
+     * @param url
+     * @param username
+     * @param password
+     * @param dbName
+     * @param file 如果不存在,则创建
+     */
+    public void exportDBDesignerExcelToDisk(String url,String username,String password,String dbName,String file){
+        Workbook workbook;
+        try(Connection connection=DBInfoUtil.getConn(url, username, password)){
+            workbook= exportDBDesignerExcel(connection,dbName);
+        }catch (SQLException e){
+            throw BaseRuntimeException.getException(e);
+        }
+        Path p= Paths.get(file);
         FileUtil.createFileIfNotExists(p);
         try(OutputStream os=Files.newOutputStream(p)){
             workbook.write(os);
-        }catch (IOException ex){
-            ex.printStackTrace();
+        }catch (IOException e){
+            throw BaseRuntimeException.getException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        MysqlTableServiceImpl mysqlTableService=new MysqlTableServiceImpl();
+        mysqlTableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
     }
 }

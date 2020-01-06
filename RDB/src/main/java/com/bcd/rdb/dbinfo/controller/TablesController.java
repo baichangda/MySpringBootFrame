@@ -31,8 +31,8 @@ public class TablesController extends BaseController {
     public JsonMessage<Object> exportDBDesigner(
             @RequestParam(value = "dbName", required = false) String dbName,
             HttpServletResponse response) {
-        Workbook workbook = tablesService.exportDBDesigner(dbName);
-        String fileName = I18nUtil.getMessage("TablesController.exportDBDesigner.fileName", new Object[]{dbName}) + ".xlsx";
+        Workbook workbook = tablesService.exportDBDesignerExcel(dbName);
+        String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
         response(workbook, toDateFileName(fileName), response);
         return JsonMessage.success();
     }

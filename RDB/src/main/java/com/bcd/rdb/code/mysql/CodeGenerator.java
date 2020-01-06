@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,12 +136,14 @@ public class CodeGenerator {
     private static void initTableConfig(TableConfig config) throws Exception {
         //初始化简单属性
         initSimpleProp(config);
-        //初始化模块注释
-        initModuleDesc(config);
-        //初始化主键类型
-        initPkType(config);
-        //初始化java字段集合
-        initJavaField(config);
+        try(Connection connection=DBInfoUtil.getSpringConn()) {
+            //初始化模块注释
+            initModuleDesc(connection,config);
+            //初始化主键类型
+            initPkType(connection,config);
+            //初始化java字段集合
+            initJavaField(connection,config);
+        }
         //初始化Bean模版需要的属性和方法
         initBeanConfig(config);
         //初始化Controller模版需要的swagger注解和参数
@@ -152,11 +155,12 @@ public class CodeGenerator {
 
     /**
      * 初始化主键类型
+     * @param connection
      * @param config
      * @throws Exception
      */
-    private static void initPkType(TableConfig config)throws Exception {
-        Map<String,Object> pk= DBInfoUtil.findPKColumn(config.getDataMap().get("dbName").toString(),config.getTableName());
+    private static void initPkType(Connection connection,TableConfig config)throws Exception {
+        Map<String,Object> pk= DBInfoUtil.findPKColumn(connection,config.getDataMap().get("dbName").toString(),config.getTableName());
         String pk_db_type=pk.get("DATA_TYPE").toString();
         String pk_java_type=CodeConst.DB_TYPE_TO_JAVA_TYPE.get(pk_db_type);
         config.getValueMap().put("pkType",pk_java_type);
@@ -198,10 +202,10 @@ public class CodeGenerator {
         config.getDataMap().put("ignoreColumnSet", ignoreColumnSet);
     }
 
-    private static void initModuleDesc(TableConfig config) throws Exception{
+    private static void initModuleDesc(Connection connection,TableConfig config) throws Exception{
         String tableName = config.getTableName();
         String dbName=config.getDataMap().get("dbName").toString();
-        Map<String,Object> res= DBInfoUtil.findTable(dbName,tableName);
+        Map<String,Object> res= DBInfoUtil.findTable(connection,dbName,tableName);
         if(res==null){
             throw BaseRuntimeException.getException("数据库["+dbName+"]不存在表["+tableName+"]");
         }
@@ -210,11 +214,12 @@ public class CodeGenerator {
 
     /**
      * 初始化java字段集合
+     * @param connection
      * @param config
      */
-    private static void initJavaField(TableConfig config) throws Exception {
+    private static void initJavaField(Connection connection,TableConfig config) throws Exception {
         String tableName = config.getTableName();
-        List<Map<String,Object>> res = DBInfoUtil.findColumns(config.getDataMap().get("dbName").toString(),tableName);
+        List<Map<String,Object>> res = DBInfoUtil.findColumns(connection,config.getDataMap().get("dbName").toString(),tableName);
         List<JavaColumn> javaColumnList = res.stream().map(e -> {
             DBColumn dbColumn = new DBColumn();
             dbColumn.setName(e.get("COLUMN_NAME").toString());
