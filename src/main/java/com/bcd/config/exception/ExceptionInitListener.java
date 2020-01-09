@@ -14,6 +14,22 @@ import java.util.List;
 /**
  * 在系统加载完毕之后,取出spring的默认异常处理器
  * 把默认的 DefaultHandlerExceptionResolver 替换成 自定义的异常解析器
+ *
+ * 为什么不直接通过Bean方式替换
+ * 因为spring默认的是 HandlerExceptionResolverComposite,其中包含3个 HandlerExceptionResolver,按照优先级选择
+ * 1、{@link org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver},
+ *      负责处理 {@link org.springframework.web.bind.annotation.ExceptionHandler}
+ * 2、{@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver},
+ *      负责处理 {@link org.springframework.web.bind.annotation.ResponseStatus}
+ * 3、{@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver},默认的异常处理器
+ *
+ * 如果替换掉会导致
+ * {@link org.springframework.web.bind.annotation.ExceptionHandler}
+ * {@link org.springframework.web.bind.annotation.ResponseStatus}
+ * 失效
+ * 我们的目的只是替换默认异常处理器,所以需要通过此方式
+ *
+ *
  */
 @Component
 public class ExceptionInitListener implements ApplicationListener<ContextRefreshedEvent> {
