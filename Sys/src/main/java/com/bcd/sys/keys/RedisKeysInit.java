@@ -1,5 +1,6 @@
 package com.bcd.sys.keys;
 
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.security.RSASecurity;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -18,13 +19,13 @@ import java.security.interfaces.RSAPublicKey;
 
 @SuppressWarnings("unchecked")
 @Component
-public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>{
+public class RedisKeysInit implements SpringInitializable {
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void init(ContextRefreshedEvent event) {
         //1、判断是否是集群环境
         if(KeysConst.IS_CLUSTER){
             //2、如果是集群环境则从redis中取出公钥私钥
-            RedisConnectionFactory redisConnectionFactory= contextRefreshedEvent.getApplicationContext().getBean(RedisConnectionFactory.class);
+            RedisConnectionFactory redisConnectionFactory= event.getApplicationContext().getBean(RedisConnectionFactory.class);
             RedisTemplate<String,String[]> redisTemplate= RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory, TypeFactory.defaultInstance().constructArrayType(String.class));
             String[] keys=redisTemplate.opsForValue().get(KeysConst.REDIS_KEY_NAME);
             //3、如果redis中公钥私钥为空,则生成一份,插入进去
@@ -46,6 +47,6 @@ public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>
             KeysConst.PRIVATE_KEY=RSASecurity.restorePrivateKey(Base64.decodeBase64(keys[1]));
 
         }
-
     }
+
 }

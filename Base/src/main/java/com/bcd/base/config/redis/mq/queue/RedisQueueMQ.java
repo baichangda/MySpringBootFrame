@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import javax.annotation.PreDestroy;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -149,14 +150,20 @@ public class RedisQueueMQ<V> {
                                 });
                             }
                         } catch (QueryTimeoutException ex) {
-                            logger.error("RedisQueueMQ[" + getClass().getName() + "] Schedule Task QueryTimeoutException", ex);
+                            logger.error("RedisQueueMQ[" + getClass().getName() + "] schedule task QueryTimeoutException", ex);
                         }
                     } catch (Exception e) {
-                        logger.error("Redis Queue[" + name + "] Cycle Error", e);
+                        logger.error("redis queue[" + name + "] cycle error,exit...", e);
                         return;
                     }
                 }
             });
         }
+    }
+
+    protected void destroy(){
+        unWatch();
+        consumePool.shutdown();
+        workPool.shutdown();
     }
 }

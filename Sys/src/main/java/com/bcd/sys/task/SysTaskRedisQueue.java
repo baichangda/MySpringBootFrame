@@ -1,5 +1,6 @@
 package com.bcd.sys.task;
 
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.dao.TaskDAO;
 import com.bcd.sys.task.entity.ClusterTask;
@@ -17,6 +18,8 @@ import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component
-public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationListener<ContextRefreshedEvent>{
+public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializable {
     private final static Logger logger= LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
     private Map<String,NamedTaskFunction<T>> taskFunctionMap;
@@ -34,6 +37,18 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
     private BoundListOperations boundListOperations;
 
     private long popIntervalMills;
+
+    private volatile boolean stop;
+
+    /**
+     * 从redis中遍历数据的线程池
+     */
+    private ExecutorService fetchPool= Executors.newSingleThreadExecutor();
+
+    /**
+     * 执行工作任务的线程池
+     */
+    private ExecutorService workPool=Executors.newCachedThreadPool();
 
     @Autowired
     private TaskDAO taskDAO;
@@ -59,7 +74,7 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
         if (data[0] == null) {
             lock.release();
         }else{
-            Worker.WORK_POOL.execute(() -> {
+            workPool.execute(() -> {
                 try {
                     onTask(data[0]);
                 } catch (Exception e) {
@@ -130,33 +145,37 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements ApplicationList
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        taskFunctionMap=contextRefreshedEvent.getApplicationContext().getBeansOfType(NamedTaskFunction.class).values().stream().collect(Collectors.toMap(NamedTaskFunction::getName, e->e,(e1, e2)->e1));
-        Worker.init(this);
+    public void init(ContextRefreshedEvent event) {
+        taskFunctionMap=event.getApplicationContext().getBeansOfType(NamedTaskFunction.class).values().stream().collect(Collectors.toMap(NamedTaskFunction::getName, e->e,(e1, e2)->e1));
+        start();
     }
 
-    static class Worker{
-        /**
-         * 从redis中遍历数据的线程池
-         */
-        private final static ExecutorService POOL= Executors.newSingleThreadExecutor();
 
-        /**
-         * 执行工作任务的线程池
-         */
-        private final static ExecutorService WORK_POOL=Executors.newCachedThreadPool();
-
-        public static void init(SysTaskRedisQueue sysTaskRedisQueue){
-            POOL.execute(()->{
-                while(true){
-                    try {
-                        sysTaskRedisQueue.fetchAndExecute();
-                    } catch (Exception e) {
-                        logger.error("SysTaskRedisQueue["+sysTaskRedisQueue.name+"] Stop", e);
-                        break;
-                    }
+    public void start(){
+        stop=false;
+        fetchPool.execute(()->{
+            while(!stop){
+                try {
+                    fetchAndExecute();
+                } catch (Exception e) {
+                    logger.error("SysTaskRedisQueue["+name+"] stop,exit...", e);
+                    break;
                 }
-            });
+            }
+        });
+    }
+
+    public void stop(){
+        stop=true;
+    }
+
+    public void destroy(){
+        stop();
+        if(fetchPool!=null){
+            fetchPool.shutdown();
+        }
+        if(workPool!=null) {
+            workPool.shutdown();
         }
     }
 }

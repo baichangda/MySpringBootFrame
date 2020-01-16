@@ -1,5 +1,6 @@
 package com.bcd.base.config.redis.mq.example;
 
+import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
 import com.bcd.base.util.JsonUtil;
@@ -14,10 +15,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class TestRedisTopicMQ extends RedisTopicMQ<TestBean> implements ApplicationListener<ContextRefreshedEvent>{
+public class TestRedisTopicMQ extends RedisTopicMQ<TestBean> implements SpringInitializable {
     public TestRedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer) {
         super(redisMessageListenerContainer, ValueSerializerType.JACKSON,"test");
-        watch();
     }
 
     @Override
@@ -26,7 +26,8 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean> implements Applicat
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void init(ContextRefreshedEvent event) {
+        watch();
         TestBean testBean=new TestBean();
         testBean.setId(1);
         testBean.setName("呵呵");
@@ -34,6 +35,4 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean> implements Applicat
 //            send(testBean,"test");
 //        },1,3, TimeUnit.SECONDS);
     }
-
-
 }

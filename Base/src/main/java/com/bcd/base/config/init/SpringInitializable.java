@@ -10,4 +10,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public interface SpringInitializable {
     void init(ContextRefreshedEvent event);
+
+    default void destroy(){};
 }
