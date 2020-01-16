@@ -30,13 +30,13 @@ public class CompressUtil {
     /**
      * 解压zip格式数据
      * @param data
-     * @param batchSize 每次长度
+     * @param batchSize 中间缓存临时数组长度
      * @return
      */
     public static byte[] unGzip(byte[] data,int batchSize){
         byte[] res;
         try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(data));
-             ByteArrayOutputStream os = new ByteArrayOutputStream(120*1024)){
+             ByteArrayOutputStream os = new ByteArrayOutputStream()){
             int count;
             byte[] bytes = new byte[batchSize];
             while ((count = gis.read(bytes, 0, bytes.length)) != -1) {

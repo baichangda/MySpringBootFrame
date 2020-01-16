@@ -8,11 +8,13 @@ import com.bcd.base.json.jackson.filter.SimpleJacksonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBase;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerBuilder;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.introspect.BasicBeanDescription;
 import com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -317,15 +320,11 @@ public class JsonUtil {
         t1.setDataList(Arrays.asList(t2,t3));
         ObjectMapper objectMapper=JsonUtil.withConfig(new ObjectMapper());
         SimpleModule simpleModule=new SimpleModule();
-        simpleModule.addDeserializer(TestBean.class, new JsonDeserializer<TestBean>() {
+        simpleModule.addDeserializer(TestBean.class, new StdDeserializer<TestBean>(TestBean.class) {
+            @Override
             public TestBean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-                if (p.isExpectedStartObjectToken()) {
-                    p.nextToken();
-                }
-                if(p.hasTokenId(JsonTokenId.ID_FIELD_NAME)){
-                }
-
-                p.currentToken();
+                String field=p.nextFieldName();
+                JsonToken token= p.nextToken();
                 return null;
             }
         });
@@ -338,6 +337,7 @@ class TestBean{
     private Integer id;
     private String name;
     private List<TestBean> dataList;
+    private String dataJson;
 
     public Integer getId() {
         return id;
@@ -361,5 +361,13 @@ class TestBean{
 
     public void setDataList(List<TestBean> dataList) {
         this.dataList = dataList;
+    }
+
+    public String getDataJson() {
+        return dataJson;
+    }
+
+    public void setDataJson(String dataJson) {
+        this.dataJson = dataJson;
     }
 }

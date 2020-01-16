@@ -2,13 +2,11 @@ package com.bcd.base.util;
 
 
 import com.bcd.base.exception.BaseRuntimeException;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -23,8 +21,8 @@ public class ClassUtil {
     public static Type getParentUntil(Class startClass, Class... endClasses) {
         Type parentType = startClass.getGenericSuperclass();
         while (true) {
-            if (parentType instanceof ParameterizedTypeImpl) {
-                Class rawType = ((ParameterizedTypeImpl) parentType).getRawType();
+            if (parentType instanceof ParameterizedType) {
+                Class rawType = (Class)((ParameterizedType) parentType).getRawType();
                 boolean isMatch = false;
                 for (Class endClass : endClasses) {
                     if (rawType.equals(endClass)) {
