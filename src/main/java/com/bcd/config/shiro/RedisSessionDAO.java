@@ -26,7 +26,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
     Logger logger= LoggerFactory.getLogger(RedisSessionDAO.class);
 
-    private final static long TIME_OUT_SECONDS=60L;
+    private final static long TIME_OUT_SECONDS=60*30L;
 
     private RedisTemplate redisTemplate;
 

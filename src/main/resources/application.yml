@@ -2,7 +2,7 @@ server:
   port: 8888
   compression:
     enabled: true
-    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/result
+    mime-types: application/json,application/xml,application/xhtml+xml,text/html,text/xml,text/plain
     min-response-size: 1024
   servlet:
     session:
@@ -102,13 +102,16 @@ spring:
 #      password: briair
 
 #  kafka配置
-#   kafka:
-#      bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
-#      consumer.group-id: zd
-#      consumer.key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-#      consumer.value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-#      producer.key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-#      producer.value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+   kafka:
+     consumer:
+        bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
+        group-id: zd
+        key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+     producer:
+        bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
+        key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+        value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
 #aliyun:
 #   mns:

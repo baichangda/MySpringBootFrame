@@ -41,6 +41,9 @@ dependencies {
     //apache commons io
     compile("commons-io:commons-io:${commonsIoVersion}")
 
+    //apache commons lang3
+    compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
+
     //swagger集成
     compile "io.springfox:springfox-swagger2:${swaggerVersion}"
     compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
@@ -57,9 +60,9 @@ buildscript {
         commonsBeanutilsVersion ='+'
         commonsCodecVersion='+'
         commonsIoVersion='+'
+        commonsLangVersion='+'
         swaggerVersion='+'
         commonsPool2='+'
         jedisVersion='+'
-        hibernateValidation='+'
     }
 }
