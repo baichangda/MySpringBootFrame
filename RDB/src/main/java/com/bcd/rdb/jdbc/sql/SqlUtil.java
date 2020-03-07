@@ -61,7 +61,7 @@ public class SqlUtil {
         paramMap2.put("sex", 1);
         paramMap2.put("status", null);
         paramMap2.put("type", Arrays.asList(1, null, 3));
-        paramMap2.put("phone", new Object[]{1, null});
+        paramMap2.put("phone", new Object[]{null, null});
         SqlMapResult sqlMapResult = replaceNull(sql2, paramMap2);
         System.out.println(sqlMapResult.getSql());
         sqlMapResult.getParamMap().forEach((k, v) -> {
@@ -72,11 +72,27 @@ public class SqlUtil {
                 System.out.print(k + ":" + v + "    ");
             }
         });
+
+
+        long t1=System.currentTimeMillis();
+        for(int i=1;i<=100000;i++){
+            replaceNull(sql1, paramList1.toArray());
+        }
+        long t2=System.currentTimeMillis();
+        for(int i=1;i<=100000;i++){
+            replaceNull(sql2, paramMap2);
+        }
+        long t3=System.currentTimeMillis();
+        System.out.println(t2-t1);
+        System.out.println(t3-t2);
     }
 
 
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
+     *
+     * 性能测试:
+     * 采用main方法中例子测试10w次，耗时8245ms
      *
      * @param sql
      * @param paramMap 不会改变
@@ -130,6 +146,9 @@ public class SqlUtil {
 
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
+     *
+     * 性能测试:
+     * 采用main方法中例子测试10w次，耗时7263ms
      *
      * @param sql
      * @param params 不会改变

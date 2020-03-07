@@ -3,10 +3,10 @@ package com.bcd.rdb.jdbc.sql;
 import com.bcd.base.exception.BaseRuntimeException;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.StatementVisitorAdapter;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -27,10 +27,6 @@ import java.util.*;
  *
  * 性能方面:
  * 根据sql的复杂程度,sql越复杂,性能越低
- * 1表1条件 10w次 3.5秒
- * 2表3条件 10w次 10s 左右
- * 3表8条件 10w次 13s 左右
- * 8表8条件 10w次 25s 左右
  *
  * 线程安全方面:
  * 非线程安全
@@ -76,8 +72,6 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
     @Override
     public void visit(Select select) {
-        //定义JdbcParameter模式时候 paramList 对应的索引
-        int[] paramListIndex=new int[]{0};
         super.visit(select);
         select.getSelectBody().accept(new SelectVisitorAdapter(){
             @Override
@@ -85,15 +79,21 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                 super.visit(plainSelect);
                 //获取条件对象
                 Expression where= plainSelect.getWhere();
-                //自定义反解析器解析sql,在解析条件中按照自己的逻辑重新组装where
-                Set<Expression> orRightExpressionSet=new HashSet<>();
+                //记录每个条件对应的合并符
+                Map<Expression,BinaryExpression> expressionToConcat=new HashMap<>();
                 ExpressionDeParser parser= new ExpressionDeParser(){
                     @Override
                     public void visit(OrExpression orExpression) {
-                        orExpression.getLeftExpression().accept(this);
-                        buffer.append(" OR ");
-                        orRightExpressionSet.add(orExpression.getRightExpression());
-                        orExpression.getRightExpression().accept(this);
+                        expressionToConcat.put(orExpression.getLeftExpression(),orExpression);
+                        expressionToConcat.put(orExpression.getRightExpression(),orExpression);
+                        super.visit(orExpression);
+                    }
+
+                    @Override
+                    public void visit(AndExpression andExpression) {
+                        expressionToConcat.put(andExpression.getLeftExpression(),andExpression);
+                        expressionToConcat.put(andExpression.getRightExpression(),andExpression);
+                        super.visit(andExpression);
                     }
 
                     @Override
@@ -134,142 +134,108 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
                     @Override
                     public void visit(InExpression inExpression) {
+                        boolean [] needReplace=new boolean[]{false};
                         //重写 in
                         ItemsList itemsList= inExpression.getRightItemsList();
                         if(paramList!=null){
                             //JdbcParameter参数模式的逻辑
                             //定义是否是JdbcParameter模式
-                            boolean[] isJdbcParam=new boolean[]{true};
-                            //定义临时in参数集合
-                            List<String> inParamList=new ArrayList<>();
                             itemsList.accept(new ItemsListVisitorAdapter(){
                                 @Override
                                 public void visit(ExpressionList expressionList) {
-                                    expressionList.getExpressions().forEach(expression->{
-                                        expression.accept(new ExpressionVisitorAdapter(){
-                                            @Override
-                                            public void visit(JdbcParameter parameter) {
-                                                //自己组装in参数集合
-                                                Object param=paramList.get(paramListIndex[0]++);
-                                                if(param!=null){
-                                                    inParamList.add("?");
-                                                    super.visit(parameter);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void visit(JdbcNamedParameter parameter) {
-                                                isJdbcParam[0]=false;
-                                            }
-                                        });
-                                    });
-                                    super.visit(expressionList);
-                                }
-                            });
-                            if(isJdbcParam[0]){
-                                //如果是jdbcParam模式,自己拼装in条件
-                                if(!inParamList.isEmpty()){
-                                    Expression leftExpression= inExpression.getLeftExpression();
-                                    leftExpression.accept(new ExpressionVisitorAdapter(){
-                                        @Override
-                                        public void visit(Column column) {
-                                            super.visit(column);
-                                            getBuffer().append(column.getColumnName());
+                                    List<Expression> list= expressionList.getExpressions();
+                                    for(int i=0;i<=list.size()-1;i++){
+                                        Expression expression= list.get(i);
+                                        if(expression instanceof JdbcParameter){
+                                           Object param=paramList.get (((JdbcParameter) expression).getIndex()-1);
+                                           if(param==null){
+                                               list.remove(i);
+                                               i--;
+                                           }
                                         }
-                                    });
-                                    getBuffer().append(" IN (");
-                                    getBuffer().append(inParamList.stream().reduce((e1,e2)->e1+","+e2).get());
-                                    getBuffer().append(")");
-                                }else{
-                                    if(orRightExpressionSet.remove(inExpression)){
-                                        getBuffer().append("1=0");
+                                    }
+                                    if(list.size()==0){
+                                        needReplace[0]=true;
                                     }else{
-                                        getBuffer().append("1=1");
+                                        super.visit(expressionList);
                                     }
                                 }
-
-                            }else{
-                                //其他模式则不进行任何特殊处理
-                                super.visit(inExpression);
-                            }
+                            });
                         }else if(paramMap!=null){
-                            //JdbcNamedParameter参数模式的逻辑
-                            //定义是否是JdbcNamedParameter模式
-                            boolean[] isJdbcNamedParam=new boolean[]{true};
-                            //定义是否参数为空
-                            boolean[] isParamEmpty=new boolean[]{false};
                             itemsList.accept(new ItemsListVisitorAdapter(){
                                 @Override
                                 public void visit(ExpressionList expressionList) {
                                     expressionList.getExpressions().forEach(expression->{
                                         expression.accept(new ExpressionVisitorAdapter(){
-                                            @Override
-                                            public void visit(JdbcParameter parameter) {
-                                                isJdbcNamedParam[0]=false;
-                                            }
                                             @Override
                                             public void visit(JdbcNamedParameter parameter) {
                                                 //根据参数名称从map中取出参数,如果为null,则标记参数为空
-                                                if(paramMap!=null){
-                                                    String paramName=parameter.getName();
-                                                    Object param=paramMap.get(paramName);
-                                                    if(param==null){
-                                                        isParamEmpty[0]=true;
-                                                    }else{
-                                                        //此模式下遇到集合参数,排除掉集合中所有为Null的参数,再判断是否为空
-                                                        if(param instanceof List){
-                                                            int size=((List) param).size();
-                                                            if(size==0){
-                                                                isParamEmpty[0]=true;
-                                                            }else {
-                                                                long count=((List) param).stream().filter(Objects::nonNull).count();
-                                                                if(count==0){
-                                                                    isParamEmpty[0]=true;
-                                                                }
-
+                                                String paramName=parameter.getName();
+                                                Object param=paramMap.get(paramName);
+                                                if(param==null){
+                                                    needReplace[0]=true;
+                                                }else{
+                                                    //此模式下遇到集合参数,排除掉集合中所有为Null的参数,再判断是否为空
+                                                    if(param instanceof List){
+                                                        int size=((List) param).size();
+                                                        if(size==0){
+                                                            needReplace[0]=true;
+                                                        }else {
+                                                            long count=((List) param).stream().filter(Objects::nonNull).count();
+                                                            if(count==0){
+                                                                needReplace[0]=true;
                                                             }
-                                                        }else if(param.getClass().isArray()){
-                                                            //此模式下遇到数组,排除掉数组中所有为Null的参数,再判断是否为空
-                                                            int len= Array.getLength(param);
-                                                            if(len==0){
-                                                                isParamEmpty[0]=true;
-                                                            }else{
-                                                                List<Object> validList=new ArrayList<>();
-                                                                for(int i=0;i<=len-1;i++){
-                                                                    Object val=Array.get(param,i);
-                                                                    if(val!=null){
-                                                                        validList.add(val);
-                                                                    }
+
+                                                        }
+                                                    }else if(param.getClass().isArray()){
+                                                        //此模式下遇到数组,排除掉数组中所有为Null的参数,再判断是否为空
+                                                        int len= Array.getLength(param);
+                                                        if(len==0){
+                                                            needReplace[0]=true;
+                                                        }else{
+                                                            List<Object> validList=new ArrayList<>();
+                                                            for(int i=0;i<=len-1;i++){
+                                                                Object val=Array.get(param,i);
+                                                                if(val!=null){
+                                                                    validList.add(val);
                                                                 }
-                                                                if(validList.isEmpty()){
-                                                                    isParamEmpty[0]=true;
-                                                                }
+                                                            }
+                                                            if(validList.isEmpty()){
+                                                                needReplace[0]=true;
                                                             }
                                                         }
                                                     }
                                                 }
-                                                super.visit(parameter);
+                                                if(!needReplace[0]){
+                                                    super.visit(parameter);
+                                                }
                                             }
                                         });
                                     });
-                                    super.visit(expressionList);
+                                    if(!needReplace[0]){
+                                        super.visit(expressionList);
+                                    }
                                 }
                             });
-                            if(isJdbcNamedParam[0]){
-                                if(isParamEmpty[0]){
-                                    if(orRightExpressionSet.remove(inExpression)){
-                                        getBuffer().append("1=0");
-                                    }else{
-                                        getBuffer().append("1=1");
-                                    }
-                                }else{
-                                    super.visit(inExpression);
-                                }
-                            }else{
-                                super.visit(inExpression);
-                            }
                         }
-
+                        if(needReplace[0]) {
+                            BinaryExpression concat= expressionToConcat.get(inExpression);
+                            if (concat instanceof AndExpression) {
+                                if (concat.getRightExpression() == inExpression) {
+                                    concat.setRightExpression(getSqlExpressionForTrue());
+                                } else {
+                                    concat.setLeftExpression(getSqlExpressionForTrue());
+                                }
+                            } else {
+                                if (concat.getRightExpression() == inExpression) {
+                                    concat.setRightExpression(getSqlExpressionForFalse());
+                                } else {
+                                    concat.setLeftExpression(getSqlExpressionForFalse());
+                                }
+                            }
+                        }else{
+                            super.visit(inExpression);
+                        }
                     }
 
                     @Override
@@ -279,51 +245,69 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                     }
 
                     /**
-                     * 检查每个操作的左右操作符,如果变量参数为null,则用1=1替代此条件
+                     * 检查每个操作的左右操作符
+                     * 如果变量参数为null
+                     * 如果条件左边是and,则用1=1替代此条件
+                     * 如果条件左边是or,则用1=0替代此条件
                      * @param binaryExpression
-                     * @param runnable
                      */
-                    private void replaceOrElse(BinaryExpression binaryExpression, Runnable runnable){
+                    private void replaceOrElse(BinaryExpression binaryExpression,Runnable runnable){
+
                         Expression leftExpression= binaryExpression.getLeftExpression();
                         Expression rightExpression= binaryExpression.getRightExpression();
+                        Object param;
                         if(paramList!=null){
-                            boolean isLeftParam=leftExpression instanceof JdbcParameter;
-                            boolean isRightParam=rightExpression instanceof JdbcParameter;
-                            if(isLeftParam ||isRightParam){
-                                Object param=paramList.get(paramListIndex[0]++);
-                                if(param==null){
-                                    if(orRightExpressionSet.remove(binaryExpression)){
-                                        getBuffer().append("1=0");
-                                    }else{
-                                        getBuffer().append("1=1");
-                                    }
-                                    return;
-                                }
+                            if(rightExpression instanceof JdbcParameter){
+                                param=paramList.get(((JdbcParameter) rightExpression).getIndex()-1);
+                            }else if(leftExpression instanceof JdbcParameter){
+                                param=paramList.get(((JdbcParameter) leftExpression).getIndex()-1);
+                            }else{
+                                runnable.run();
+                                return;
                             }
                         }else if(paramMap != null){
-                            boolean isLeftParam=leftExpression instanceof JdbcNamedParameter;
-                            boolean isRightParam=rightExpression instanceof JdbcNamedParameter;
-                            if(isLeftParam||isRightParam){
-                                String paramName=isLeftParam?((JdbcNamedParameter)leftExpression).getName():((JdbcNamedParameter)rightExpression).getName();
-                                Object param=paramMap.get(paramName);
-                                if(param==null){
-                                    if(orRightExpressionSet.remove(binaryExpression)){
-                                        getBuffer().append("1=0");
-                                    }else{
-                                        getBuffer().append("1=1");
-                                    }
-                                    return;
+                            if(rightExpression instanceof JdbcNamedParameter){
+                                param=paramMap.get(((JdbcNamedParameter) rightExpression).getName());
+                            }else if(leftExpression instanceof JdbcNamedParameter){
+                                param=paramMap.get(((JdbcNamedParameter) leftExpression).getName());
+                            }else{
+                                runnable.run();
+                                return;
+                            }
+                        }else{
+                            return;
+                        }
+                        if(param==null){
+                            BinaryExpression concat= expressionToConcat.get(binaryExpression);
+                            if (concat instanceof AndExpression) {
+                                if (concat.getRightExpression() == binaryExpression) {
+                                    concat.setRightExpression(getSqlExpressionForTrue());
+                                } else {
+                                    concat.setLeftExpression(getSqlExpressionForTrue());
+                                }
+                            } else {
+                                if (concat.getRightExpression() == binaryExpression) {
+                                    concat.setRightExpression(getSqlExpressionForFalse());
+                                } else {
+                                    concat.setLeftExpression(getSqlExpressionForFalse());
                                 }
                             }
+                        }else{
+                            runnable.run();
                         }
-                        runnable.run();
                     }
                 };
                 where.accept(parser);
-                plainSelect.setWhere(new HexValue(parser.getBuffer().toString()));
                 newSql=plainSelect.toString();
             }
         });
     }
 
+    private static Expression getSqlExpressionForTrue(){
+        return new HexValue("1=1");
+    }
+
+    private static Expression getSqlExpressionForFalse(){
+        return new HexValue("1=0");
+    }
 }
