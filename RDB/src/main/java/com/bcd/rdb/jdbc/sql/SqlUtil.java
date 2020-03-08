@@ -3,6 +3,12 @@ package com.bcd.rdb.jdbc.sql;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +80,9 @@ public class SqlUtil {
         });
 
 
+        Statement statement= CCJSqlParserUtil.parse(sql1);
+
+
         long t1=System.currentTimeMillis();
         for(int i=1;i<=100000;i++){
             replaceNull(sql1, paramList1.toArray());
@@ -92,7 +101,7 @@ public class SqlUtil {
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
      *
      * 性能测试:
-     * 采用main方法中例子测试10w次，耗时8245ms
+     * 采用main方法中例子测试10w次，耗时7638ms
      *
      * @param sql
      * @param paramMap 不会改变
@@ -143,12 +152,11 @@ public class SqlUtil {
         return new SqlMapResult(newSql, newParamMap);
     }
 
-
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
      *
      * 性能测试:
-     * 采用main方法中例子测试10w次，耗时7263ms
+     * 采用main方法中例子测试10w次，耗时7080ms
      *
      * @param sql
      * @param params 不会改变
@@ -466,5 +474,4 @@ public class SqlUtil {
         String sql=generateUpdateSql(filterColumnValueMap.keySet(),null,table);
         return new UpdateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
     }
-
 }
