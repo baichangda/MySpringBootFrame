@@ -79,10 +79,6 @@ public class SqlUtil {
             }
         });
 
-
-        Statement statement= CCJSqlParserUtil.parse(sql1);
-
-
         long t1=System.currentTimeMillis();
         for(int i=1;i<=100000;i++){
             replaceNull(sql1, paramList1.toArray());
@@ -92,8 +88,7 @@ public class SqlUtil {
             replaceNull(sql2, paramMap2);
         }
         long t3=System.currentTimeMillis();
-        System.out.println(t2-t1);
-        System.out.println(t3-t2);
+        System.out.printf("\n%dms,%dms",t2-t1,t3-t2);
     }
 
 
