@@ -24,7 +24,6 @@ public class RestTemplateConfig {
      * @return
      */
     @Bean
-    @ConditionalOnMissingBean(RestTemplate.class)
     public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("httpMessageConverter") HttpMessageConverter httpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         List<HttpMessageConverter<?>> messageConverters=new ArrayList<>();

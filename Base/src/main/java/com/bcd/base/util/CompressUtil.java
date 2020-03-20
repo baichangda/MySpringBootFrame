@@ -1,8 +1,11 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.*;
+import java.util.function.BiConsumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -57,6 +60,27 @@ public class CompressUtil {
             }
         }catch (IOException e){
             throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    /**
+     * 解压 tar.gz包
+     * @param is
+     * @param consumer
+     * @param batchSize
+     */
+    public static void unTar(InputStream is, BiConsumer<Integer,byte[]> consumer, int batchSize){
+        try {
+            TarArchiveInputStream tis= new TarArchiveInputStream(new GzipCompressorInputStream(new BufferedInputStream(is,100*1024),true));
+            while ((tis.getNextTarEntry()) != null) {
+                int count;
+                byte data[] = new byte[batchSize];
+                while ((count = is.read(data)) != -1) {
+                    consumer.accept(count,data);
+                }
+            }
+        }catch (IOException ex){
+            throw BaseRuntimeException.getException(ex);
         }
     }
 }

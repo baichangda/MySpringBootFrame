@@ -22,8 +22,8 @@ import java.time.Duration;
 @SuppressWarnings("unchecked")
 @EnableCaching
 @Configuration
-public class CacheConfig {
-    @Bean("cacheRedisSerializer")
+public class RedisCacheConfig {
+    @Bean("redisCacheSerializer")
     public RedisSerializer<String> redisSerializer(){
         return new Jackson2JsonRedisSerializer(Object.class);
     }
@@ -36,7 +36,7 @@ public class CacheConfig {
      */
     @ConditionalOnClass(RedisConnectionFactory.class)
     @Bean("myCache")
-    public Cache myCache(RedisConnectionFactory factory,@Qualifier("cacheRedisSerializer")RedisSerializer<String> redisSerializer){
+    public Cache myCache(RedisConnectionFactory factory,@Qualifier("redisCacheSerializer")RedisSerializer<String> redisSerializer){
         RedisCacheManager redisCacheManager=new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()

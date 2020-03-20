@@ -80,7 +80,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
         if(key==null){
             return "";
         }
-        return JsonUtil.toJson(key);
+        return key.toString();
     }
 
 }

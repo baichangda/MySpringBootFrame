@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-@Component("mySimpleKeyGenerator")
 public class MySimpleKeyGenerator extends SimpleKeyGenerator{
     @Override
     public Object generate(Object target, Method method, Object... params) {

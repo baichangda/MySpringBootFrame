@@ -140,59 +140,6 @@ public class BaseService<T, K extends Serializable> {
         return repository.saveAll(iterable);
     }
 
-    /**
-     * 逻辑为
-     * 先查询出数据库对应记录
-     * 然后将参数对象非空值注入到数据库对象中
-     * 保存对象
-     * <p>
-     * 对象t主键必须为'id'且必须属于BeanUtil.BASE_DATA_TYPE
-     * <p>
-     * 会改成传入参数的值
-     *
-     * @param t
-     */
-    @Transactional
-    public T saveIgnoreNull(T t) {
-        T returnVal;
-        Object val = RDBUtil.getPKVal(t);
-        if (val == null) {
-            returnVal = save(t);
-        } else {
-            T dbt = findById((K) val);
-            try {
-                BeanUtils.copyProperties(dbt, t);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw BaseRuntimeException.getException(e);
-            }
-            returnVal = save(t);
-        }
-        return returnVal;
-    }
-
-    /**
-     * 逻辑为
-     * 先查询出数据库对应记录
-     * 然后将参数对象非空值注入到数据库对象中
-     * 保存数据库对象
-     * <p>
-     * 对象t主键必须为'id'且必须属于BeanUtil.BASE_DATA_TYPE
-     * <p>
-     * 会改变传入参数的值
-     *
-     * @param iterable
-     */
-    @Transactional
-    public List<T> saveIgnoreNull(Iterable<T> iterable) {
-        List<T> returnVal = new ArrayList<>();
-        Iterator<T> it = iterable.iterator();
-        while (it.hasNext()) {
-            T t = it.next();
-            returnVal.add(saveIgnoreNull(t));
-        }
-        return returnVal;
-    }
-
     @Transactional
     public void deleteAll() {
         repository.deleteAll();
@@ -362,12 +309,11 @@ public class BaseService<T, K extends Serializable> {
      * @param clazz     返回结果集
      *                  三种情况
      *                  1、java 8大基础类型和包装类型,String
-     *                  2、Map类型和其子类
-     *                  3、自定义对象类型
+     *                  2、自定义对象类型
      * @param <R>       结果集类型
      * @return
      */
-    public <R> List<R> queryByCondition(String sqlPre, String sqlSuffix, Condition condition, Class<R> clazz) {
+    public <R> List<R> queryByCondition(String sqlPre, Condition condition, String sqlSuffix, Class<R> clazz) {
         Map<String, Object> paramMap = new HashMap<>();
         String where = ConditionUtil.convertCondition(condition, paramMap);
         StringBuilder sql = new StringBuilder(sqlPre);
@@ -383,11 +329,36 @@ public class BaseService<T, K extends Serializable> {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         if (ClassUtils.isPrimitiveOrWrapper(clazz) || clazz == String.class) {
             return namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap, clazz);
-        } else if (Map.class.isAssignableFrom(clazz)) {
-            return (List<R>) namedParameterJdbcTemplate.query(sql.toString(), paramMap, new MyColumnMapRowMapper());
-        } else {
+        }else{
             return namedParameterJdbcTemplate.query(sql.toString(), paramMap, new BeanPropertyRowMapper<>(clazz));
         }
+    }
+
+    /**
+     * 逻辑和参数定义参考
+     * {@link BaseService#queryByCondition(String, Condition, String, Class)}
+     *
+     * 返回的结果类型为map
+     * @param sqlPre
+     * @param condition
+     * @param sqlSuffix
+     * @return
+     */
+    public List<Map<String,Object>> queryByCondition(String sqlPre, Condition condition, String sqlSuffix){
+        Map<String, Object> paramMap = new HashMap<>();
+        String where = ConditionUtil.convertCondition(condition, paramMap);
+        StringBuilder sql = new StringBuilder(sqlPre);
+        if (where != null) {
+            sql.append(" where");
+            sql.append("\n");
+            sql.append(where);
+        }
+        if (sqlSuffix != null) {
+            sql.append("\n");
+            sql.append(sqlSuffix);
+        }
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        return namedParameterJdbcTemplate.query(sql.toString(),paramMap, MyColumnMapRowMapper.ROW_MAPPER);
     }
 
     /**

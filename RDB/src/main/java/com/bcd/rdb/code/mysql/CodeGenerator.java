@@ -477,59 +477,59 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
+        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code/test";
         List<Config> list = Arrays.asList(
                 new Config(path,
                         new TableConfig("Role", "角色", "t_sys_role")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
                         new TableConfig("User", "用户", "t_sys_user")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
                         new TableConfig("Permission", "角色", "t_sys_permission")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
                         new TableConfig("Menu", "菜单", "t_sys_menu")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
                         new TableConfig("Org", "组织机构", "t_sys_org")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 ),
                 new Config(path,
                         new TableConfig("Task", "系统任务", "t_sys_task")
                                 .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(false)
-                                .setNeedCreateRepositoryFile(false)
-                                .setNeedCreateBeanFile(false)
+                                .setNeedCreateServiceFile(true)
+                                .setNeedCreateRepositoryFile(true)
+                                .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
                 )
