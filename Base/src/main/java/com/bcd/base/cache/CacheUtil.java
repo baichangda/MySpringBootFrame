@@ -3,7 +3,6 @@ package com.bcd.base.cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 public class CacheUtil {
     public static Cache cache;
     public static MySimpleKeyGenerator keyGenerator;
-    public static RedisSerializer keySerializer;
     @Autowired
     @Qualifier("myCache")
     public void setCache(Cache cache) {

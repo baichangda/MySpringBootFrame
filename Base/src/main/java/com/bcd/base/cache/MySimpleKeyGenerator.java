@@ -13,8 +13,7 @@ public class MySimpleKeyGenerator extends SimpleKeyGenerator{
     }
 
     public MySimpleKey generate(Object target, String methodName, Object... params) {
-        String className=target.getClass().getName();
-        return new MySimpleKey(className,methodName,params);
+        return generate(target.getClass(),methodName,params);
     }
 
     public MySimpleKey generate(String className, String methodName, Object... params) {
@@ -22,7 +21,6 @@ public class MySimpleKeyGenerator extends SimpleKeyGenerator{
     }
 
     public MySimpleKey generate(Class clazz, String methodName, Object... params) {
-        String className=clazz.getName();
-        return new MySimpleKey(className,methodName,params);
+        return generate(clazz.getName(),methodName,params);
     }
 }
