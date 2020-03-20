@@ -1,6 +1,11 @@
-package com.bcd.base.cache;
+package com.bcd.config.redis.cache;
 
+import com.bcd.base.cache.ExpireConcurrentMapCache;
+import com.bcd.base.cache.MultiLevelCache;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +34,9 @@ public class CacheConfig {
      * 二级:redis(过期时间15s);  key: myCache_2::${key}
      * @return
      */
+    @ConditionalOnClass(RedisConnectionFactory.class)
     @Bean("myCache")
-    public MultiLevelCache filterCache(RedisConnectionFactory factory,@Qualifier("cacheRedisSerializer")RedisSerializer<String> redisSerializer){
+    public Cache myCache(RedisConnectionFactory factory,@Qualifier("cacheRedisSerializer")RedisSerializer<String> redisSerializer){
         RedisCacheManager redisCacheManager=new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()
@@ -43,6 +49,8 @@ public class CacheConfig {
         );
         return cache;
     }
+
+
 
 
 }
