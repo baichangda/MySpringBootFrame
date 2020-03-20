@@ -7,6 +7,7 @@ import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.util.RDBUtil;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,11 +22,13 @@ public class BooleanConditionConverter implements Converter<BooleanCondition,Str
         Object val=condition.val;
         String columnName= StringUtil.toFirstSplitWithUpperCase(condition.fieldName,'_');
         Map<String,Object> paramMap=(Map<String,Object>)exts[0];
-        String paramName= RDBUtil.generateRandomParamName(columnName,paramMap);
+        Map<String,Integer> paramToCount=(Map<String,Integer>)exts[1];
+        String paramName= RDBUtil.generateRandomParamName(columnName,paramToCount);
         if(val!=null){
             where.append(columnName);
             where.append(" = ");
-            where.append(":"+paramName);
+            where.append(":");
+            where.append(paramName);
             paramMap.put(paramName,val);
         }
         return where.length()==0?null:where.toString();
@@ -54,12 +57,13 @@ public class BooleanConditionConverter implements Converter<BooleanCondition,Str
                                 new NumberCondition("h.j",12, NumberCondition.Handler.GE),
                                 new DateCondition("h.fdfdsf",12, DateCondition.Handler.GE),
                                 new BooleanCondition("kn.l",true),
-                                new NullCondition("daf")
+                                new NullCondition("daf"),
+                                new StringCondition("g.i", Arrays.asList("a","b"), StringCondition.Handler.IN)
                         )
                 )
         );
         Map<String,Object> paramMap=new HashMap<>();
-        String sql=ConditionUtil.convertCondition(condition,paramMap,1);
+        String sql=ConditionUtil.convertCondition(condition,paramMap);
         System.out.println(sql);
     }
 }

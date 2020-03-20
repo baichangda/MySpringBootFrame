@@ -22,48 +22,56 @@ public class StringConditionConverter implements Converter<StringCondition,Strin
         Object val=condition.val;
         String columnName= StringUtil.toFirstSplitWithUpperCase(condition.fieldName,'_');
         Map<String,Object> paramMap=(Map<String,Object>)exts[0];
-        String paramName= RDBUtil.generateRandomParamName(columnName,paramMap);
+        Map<String,Integer> paramToCount=(Map<String,Integer>)exts[1];
+        String paramName= RDBUtil.generateRandomParamName(columnName,paramToCount);
         if(!StringUtils.isEmpty(val)){
             switch (handler){
                 case EQUAL: {
                     where.append(columnName);
                     where.append(" = ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case NOT_EQUAL: {
                     where.append(columnName);
                     where.append(" <> ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case ALL_LIKE: {
                     where.append(columnName);
                     where.append(" LIKE ");
-                    where.append("%:"+paramName+"%");
-                    paramMap.put(paramName,val);
+                    where.append(":");
+                    where.append(paramName);
+                    paramMap.put(paramName,"%"+val+"%");
                     break;
                 }
                 case LEFT_LIKE: {
                     where.append(columnName);
                     where.append(" LIKE ");
-                    where.append("%:"+paramName);
-                    paramMap.put(paramName,val);
+                    where.append(":");
+                    where.append(paramName);
+                    paramMap.put(paramName,"%"+val);
                     break;
                 }
                 case RIGHT_LIKE: {
                     where.append(columnName);
                     where.append(" LIKE ");
-                    where.append(":"+paramName+"%");
-                    paramMap.put(paramName,val);
+                    where.append(":");
+                    where.append(paramName);
+                    paramMap.put(paramName,val+"%");
                     break;
                 }
                 case IN: {
                     where.append(columnName);
                     where.append(" IN ");
-                    where.append("(:"+paramName+")");
+                    where.append("(:");
+                    where.append(paramName);
+                    where.append(")");
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         paramMap.put(paramName,notEmptyList);
@@ -77,8 +85,10 @@ public class StringConditionConverter implements Converter<StringCondition,Strin
                 }
                 case NOT_IN: {
                     where.append(columnName);
-                    where.append(" not in ");
-                    where.append("(:"+paramName+")");
+                    where.append(" NOT IN ");
+                    where.append("(:");
+                    where.append(paramName);
+                    where.append(")");
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         paramMap.put(paramName,notEmptyList);

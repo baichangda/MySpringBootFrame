@@ -20,41 +20,47 @@ public class DateConditionConverter  implements Converter<DateCondition,String> 
         Object val=condition.val;
         String columnName= StringUtil.toFirstSplitWithUpperCase(condition.fieldName,'_');
         Map<String,Object> paramMap=(Map<String,Object>)exts[0];
-        String paramName= RDBUtil.generateRandomParamName(columnName,paramMap);
+        Map<String,Integer> paramToCount=(Map<String,Integer>)exts[1];
+        String paramName= RDBUtil.generateRandomParamName(columnName,paramToCount);
         if(val!=null) {
             switch (handler) {
                 case EQUAL: {
                     where.append(columnName);
                     where.append(" = ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case LE: {
                     where.append(columnName);
                     where.append(" <= ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case LT: {
                     where.append(columnName);
                     where.append(" < ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case GE: {
                     where.append(columnName);
                     where.append(" >= ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case GT: {
                     where.append(columnName);
                     where.append(" > ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }

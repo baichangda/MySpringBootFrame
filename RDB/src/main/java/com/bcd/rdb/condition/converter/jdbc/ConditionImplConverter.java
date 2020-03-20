@@ -21,8 +21,9 @@ public class ConditionImplConverter implements Converter<ConditionImpl,String> {
         List<Condition> childrenList=condition.childrenList;
         ConditionImpl.ConcatWay concatWay=condition.concatWay;
         Map<String,Object> paramMap=(Map<String,Object>)exts[0];
-        int deep=(int)exts[1];
-        List<Object[]> childrenValList=childrenList.stream().map(e-> new Object[]{ConditionUtil.convertCondition(e,paramMap,deep+1),e instanceof ConditionImpl}).filter(e->e[0]!=null).collect(Collectors.toList());
+        Map<String,Integer> paramToCount=(Map<String,Integer>)exts[1];
+        int deep=(int)exts[2];
+        List<Object[]> childrenValList=childrenList.stream().map(e-> new Object[]{ConditionUtil.convertCondition(e,paramMap,paramToCount,deep+1),e instanceof ConditionImpl}).filter(e->e[0]!=null).collect(Collectors.toList());
         String concat;
         if(ConditionImpl.ConcatWay.AND.equals(concatWay)){
             concat="AND";

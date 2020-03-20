@@ -21,55 +21,64 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Stri
         Object val=condition.val;
         String columnName= StringUtil.toFirstSplitWithUpperCase(condition.fieldName,'_');
         Map<String,Object> paramMap=(Map<String,Object>)exts[0];
-        String paramName= RDBUtil.generateRandomParamName(columnName,paramMap);
+        Map<String,Integer> paramToCount=(Map<String,Integer>)exts[1];
+        String paramName= RDBUtil.generateRandomParamName(columnName,paramToCount);
         if(val!=null) {
             switch (handler) {
                 case EQUAL: {
                     where.append(columnName);
                     where.append(" = ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case LT: {
                     where.append(columnName);
                     where.append(" < ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case LE: {
                     where.append(columnName);
                     where.append(" <= ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case GT: {
                     where.append(columnName);
                     where.append(" > ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case GE: {
                     where.append(columnName);
                     where.append(" >= ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case NOT_EQUAL: {
                     where.append(columnName);
                     where.append(" <> ");
-                    where.append(":"+paramName);
+                    where.append(":");
+                    where.append(paramName);
                     paramMap.put(paramName,val);
                     break;
                 }
                 case IN: {
                     where.append(columnName);
                     where.append(" IN ");
-                    where.append("(:"+paramName+")");
+                    where.append("(:");
+                    where.append(paramName);
+                    where.append(")");
                     paramMap.put(paramName,val);
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
@@ -84,8 +93,10 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Stri
                 }
                 case NOT_IN: {
                     where.append(columnName);
-                    where.append(" in ");
-                    where.append("(:"+paramName+")");
+                    where.append(" NOT IN ");
+                    where.append("(:");
+                    where.append(paramName);
+                    where.append(")");
                     paramMap.put(paramName,val);
                     if(val instanceof Collection){
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());

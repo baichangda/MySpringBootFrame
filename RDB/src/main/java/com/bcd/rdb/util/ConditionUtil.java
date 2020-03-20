@@ -86,7 +86,7 @@ public class ConditionUtil {
      * @param deep 层深(用于格式化where sql),最外层调用传1
      * @return
      */
-    public static String convertCondition(Condition condition,Map<String,Object> paramMap,int deep){
+    public static String convertCondition(Condition condition,Map<String,Object> paramMap,Map<String,Integer> paramToCount,int deep){
         if(condition==null){
             return null;
         }
@@ -94,11 +94,11 @@ public class ConditionUtil {
         if(converter==null){
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition["+condition.getClass()+"] Have Not Converter!");
         }else{
-            return (String)converter.convert(condition,paramMap,deep);
+            return (String)converter.convert(condition,paramMap,paramToCount,deep);
         }
     }
 
     public static String convertCondition(Condition condition,Map<String,Object> paramMap){
-        return convertCondition(condition,paramMap,1);
+        return convertCondition(condition,paramMap,new HashMap<>(),1);
     }
 }
