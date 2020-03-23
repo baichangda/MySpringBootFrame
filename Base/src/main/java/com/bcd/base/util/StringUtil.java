@@ -273,7 +273,7 @@ public class StringUtil {
                     }else{
                         Double val=map.get(s);
                         if(val==null){
-                            throw BaseRuntimeException.getException("map val["+s+"] not exists");
+                            throw BaseRuntimeException.getException("map val["+s+"] not exists or null");
                         }
                         stack[++stackIndex]=val;
                     }
