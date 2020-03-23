@@ -26,10 +26,11 @@ public class StringUtil {
             return str;
         }
         StringBuilder result = new StringBuilder();
+        char[] arr= str.toCharArray();
         boolean nextIsUpper = false;
         result.append(Character.toLowerCase(str.charAt(0)));
-        for (int i = 1; i < str.length(); i++) {
-            char c = str.charAt(i);
+        for (int i = 1; i < arr.length-1; i++) {
+            char c = arr[i];
             if (c == splitStr) {
                 nextIsUpper = true;
             } else {
@@ -49,9 +50,10 @@ public class StringUtil {
             return str;
         }
         StringBuilder result = new StringBuilder();
+        char[] arr= str.toCharArray();
         result.append(Character.toLowerCase(str.charAt(0)));
-        for (int i = 1; i < str.length(); i++) {
-            char c = str.charAt(i);
+        for (int i=1;i<=arr.length-1;i++) {
+            char c=arr[i];
             if (Character.isUpperCase(c)) {
                 result.append(splitStr);
             }
