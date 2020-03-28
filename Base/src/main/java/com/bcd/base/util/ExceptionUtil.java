@@ -77,6 +77,22 @@ public class ExceptionUtil {
         }
     }
 
+    public static String getMessage(Throwable throwable){
+        Throwable realException = parseRealException(throwable);
+        if (realException == null) {
+            throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
+        }
+        if (realException instanceof BaseRuntimeException) {
+            return realException.getMessage();
+        } else if (realException instanceof ConstraintViolationException) {
+            return ((ConstraintViolationException) realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2) -> e1 + "," + e2).orElse("");
+        } else if (realException instanceof MethodArgumentNotValidException) {
+            return ((MethodArgumentNotValidException) realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2) -> e1 + "," + e2).orElse("");
+        } else {
+            return realException.getMessage();
+        }
+    }
+
 
     /**
      * 遇到如下两种情况继续深入取出异常信息:

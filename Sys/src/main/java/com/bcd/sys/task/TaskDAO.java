@@ -1,6 +1,6 @@
-package com.bcd.sys.task.dao;
+package com.bcd.sys.task;
 
-import com.bcd.sys.task.entity.Task;
+import com.bcd.sys.task.Task;
 
 import java.io.Serializable;
 

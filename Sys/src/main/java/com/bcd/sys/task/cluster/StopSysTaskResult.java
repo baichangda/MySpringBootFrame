@@ -1,14 +1,11 @@
-package com.bcd.sys.task;
+package com.bcd.sys.task.cluster;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StopSysTaskResult {
     private String code;
     private Map<String,Boolean> result=new ConcurrentHashMap<>();
-    private Set<String> localIds=new HashSet<>();
 
     public String getCode() {
         return code;
@@ -26,11 +23,4 @@ public class StopSysTaskResult {
         this.result = result;
     }
 
-    public Set<String> getLocalIds() {
-        return localIds;
-    }
-
-    public void setLocalIds(Set<String> localIds) {
-        this.localIds = localIds;
-    }
 }

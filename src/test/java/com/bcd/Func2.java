@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.bean.OrgBean;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.OrgService;
-import com.bcd.sys.task.function.NamedTaskFunction;
+import com.bcd.sys.task.NamedTaskFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +20,19 @@ public class Func2 extends NamedTaskFunction<TaskBean>{
     }
 
     @Override
-    @Transactional
-    public TaskBean apply(TaskBean task) {
+    @Transactional(rollbackFor = Exception.class)
+    public TaskBean apply(TaskBean task)  throws InterruptedException{
+        OrgBean orgBean=new OrgBean();
+        orgBean.setName("testFun2");
+        orgBean.setCode("testFun2");
+        orgService.save(orgBean);
         try {
-            OrgBean orgBean=new OrgBean();
-            orgBean.setName("asdfasd");
-            orgService.save(orgBean);
-            Thread.sleep(10*1000L);
-            System.out.println(task.getParams()[0]);
-        } catch (InterruptedException e) {
-            throw BaseRuntimeException.getException(e);
+            Thread.sleep(10 * 1000L);
+        }catch (InterruptedException ex){
+            System.out.println("==============Func2被打断");
+            throw ex;
         }
+        System.out.println(task.getParams()[0]);
         return task;
     }
 }

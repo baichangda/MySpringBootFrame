@@ -2,8 +2,8 @@ package com.bcd.sys.service;
 
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.dao.TaskDAO;
-import com.bcd.sys.task.entity.Task;
+import com.bcd.sys.task.TaskDAO;
+import com.bcd.sys.task.Task;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;

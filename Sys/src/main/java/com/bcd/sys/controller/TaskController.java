@@ -11,6 +11,8 @@ import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.task.TaskUtil;
+import com.bcd.sys.task.cluster.ClusterTask;
+import com.bcd.sys.task.cluster.ClusterTaskUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -153,7 +155,7 @@ public class TaskController extends BaseController {
     @ApiResponse(code = 200,message = "停止系统任务结果")
     public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids){
         if(ids!=null&&ids.length>0){
-            TaskUtil.stopTask(true,Arrays.stream(ids).map(e->(Serializable)e).toArray(len->new Serializable[len]));
+            ClusterTaskUtil.stopTask(true,Arrays.stream(ids).map(e->(Serializable)e).toArray(len->new Serializable[len]));
         }
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }

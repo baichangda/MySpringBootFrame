@@ -2,7 +2,7 @@ package com.bcd;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.function.NamedTaskFunction;
+import com.bcd.sys.task.NamedTaskFunction;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +13,7 @@ public class Func3 extends NamedTaskFunction<TaskBean>{
     }
 
     @Override
-    public TaskBean apply(TaskBean task) {
+    public TaskBean apply(TaskBean task)   throws InterruptedException{
         throw BaseRuntimeException.getException("Func3发生错误");
     }
 }

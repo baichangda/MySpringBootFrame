@@ -1,7 +1,5 @@
-package com.bcd.sys.task.function;
-
-import com.bcd.sys.task.entity.Task;
+package com.bcd.sys.task;
 
 public interface TaskFunction<T extends Task> {
-      T apply(T task);
+      T apply(T task) throws InterruptedException;
 }

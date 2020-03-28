@@ -1,9 +1,16 @@
 package com.bcd.sys.task.cluster;
 
-public class StopSysTask {
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * 停止任务 上下文
+ */
+public class StopSysTaskContext {
     private String code;
     private boolean mayInterruptIfRunning;
     private String[] ids;
+    private Map<String,Boolean> result=new ConcurrentHashMap<>();
 
     public String getCode() {
         return code;
@@ -13,7 +20,7 @@ public class StopSysTask {
         this.code = code;
     }
 
-    public boolean getMayInterruptIfRunning() {
+    public boolean isMayInterruptIfRunning() {
         return mayInterruptIfRunning;
     }
 
@@ -28,4 +35,13 @@ public class StopSysTask {
     public void setIds(String[] ids) {
         this.ids = ids;
     }
+
+    public Map<String, Boolean> getResult() {
+        return result;
+    }
+
+    public void setResult(Map<String, Boolean> result) {
+        this.result = result;
+    }
+
 }

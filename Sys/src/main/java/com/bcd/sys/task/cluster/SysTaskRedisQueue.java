@@ -1,8 +1,13 @@
-package com.bcd.sys.task;
+package com.bcd.sys.task.cluster;
 
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.task.cluster.ClusterTask;
+import com.bcd.sys.task.CommonConst;
+import com.bcd.sys.task.SysTaskRunnable;
+import com.bcd.sys.task.TaskUtil;
+import com.bcd.sys.task.TaskDAO;
+import com.bcd.sys.task.NamedTaskFunction;
+import com.bcd.sys.task.TaskFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +53,8 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
     private TaskDAO taskDAO;
 
     public SysTaskRedisQueue(@Qualifier("string_serializable_redisTemplate")RedisTemplate redisTemplate) {
-        this.name=CommonConst.SYS_TASK_LIST_NAME;
-        this.boundListOperations=redisTemplate.boundListOps(CommonConst.SYS_TASK_LIST_NAME);
+        this.name=ClusterTaskUtil.SYS_TASK_LIST_NAME;
+        this.boundListOperations=redisTemplate.boundListOps(this.name);
         this.popIntervalMills =((LettuceConnectionFactory)redisTemplate.getConnectionFactory()).getTimeout()/2;
     }
 

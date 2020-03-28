@@ -153,6 +153,17 @@ public class StringUtil {
     }
 
     /**
+     * 计算字符串公式
+     * 支持 = - * / ( )
+     * @param str
+     * @param map
+     * @return
+     */
+    public static Double calcArithmetic(String str,Map<String,Number> map){
+        return calcRPN(parseArithmeticToRPN(str),map);
+    }
+
+    /**
      * 将算数字符串转换成逆波兰表达式
      * 算数支持 + - * / ( ) 符号
      * @return
@@ -239,9 +250,9 @@ public class StringUtil {
      * @param map 字段和值对应map
      * @return
      */
-    public static Double calcRPN(List<String> list,Map<String,Double> map){
+    public static double calcRPN(List<String> list,Map<String,Number> map){
         int stackIndex=-1;
-        Double[] stack=new Double[list.size()];
+        double[] stack=new double[list.size()];
         for (String s : list) {
             switch (s){
                 case "+":{
@@ -273,11 +284,11 @@ public class StringUtil {
                     if(NUMBER_PATTERN.matcher(s).matches()){
                         stack[++stackIndex]=Double.parseDouble(s);
                     }else{
-                        Double val=map.get(s);
+                        Number val=map.get(s);
                         if(val==null){
                             throw BaseRuntimeException.getException("map val["+s+"] not exists or null");
                         }
-                        stack[++stackIndex]=val;
+                        stack[++stackIndex]=val.doubleValue();
                     }
                     break;
                 }

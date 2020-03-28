@@ -1,10 +1,6 @@
 package com.bcd.sys.task;
 
 
-import com.bcd.sys.task.dao.TaskDAO;
-import com.bcd.sys.task.entity.Processing;
-import com.bcd.sys.task.entity.Task;
-import com.bcd.sys.task.function.TaskFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +27,7 @@ public class SysTaskRunnable<T extends Task> implements Runnable{
         Serializable id= task.getId();
         //1、先确认结果集map中是否已经添加进去
         while(true) {
-            boolean hasFuture=CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.containsKey(id);
+            boolean hasFuture=CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.containsKey(id.toString());
             if(hasFuture){
                 break;
             }
@@ -45,48 +41,34 @@ public class SysTaskRunnable<T extends Task> implements Runnable{
         }
         //2、如果检测到已经打断,则移除future并直接返回(因为步骤1的打断是忽略的)
         if(Thread.interrupted()){
-            CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.remove(id);
+            CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.remove(id.toString());
             return;
         }
         //3、开始任务
-        try {
-            task.onStart();
-            taskDAO.doUpdate(task);
-        }catch (Exception e){
-            logger.error("Task["+id+"] Execute onStart Error",e);
-        }
+        TaskUtil.onStart(task);
         //4、开始执行任务;并记录执行结果
         try {
             task=function.apply(task);
-            try {
-                task.onSucceed();
-                if(task instanceof Processing){
-                    ((Processing) task).setProcessing(100f);
-                }
-                taskDAO.doUpdate(task);
-            }catch (Exception e){
-                logger.error("Task["+id+"] Execute onSucceed Error",e);
-            }
+            TaskUtil.onSucceed(task);
         }catch (Exception e){
             if(e instanceof InterruptedException){
-                //4.1、如果任务是被打断的,不进行任务处理
+                //4.1、如果任务是被打断的
+                logger.info("task[" + task.getId() + "] has been interrupted");
+                TaskUtil.onStop(task);
             }else {
                 //4.2、否则当作任务失败
-                logger.error("Execute Task[" + task.getId() + "] Failed", e);
-                try {
-                    task.onFailed(e);
-                    taskDAO.doUpdate(task);
-                }catch (Exception ex){
-                    logger.error("Task["+id+"] Execute onSucceed Error",ex);
-                }
+                logger.error("execute task[" + task.getId() + "] failed", e);
+                TaskUtil.onFailed(task,e);
             }
         } finally {
             //5、最后从当前服务器任务id和结果映射结果集中移除
-            CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.remove(task.getId());
+            CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.remove(task.getId().toString());
         }
     }
 
     public T getTask() {
         return task;
     }
+
+
 }

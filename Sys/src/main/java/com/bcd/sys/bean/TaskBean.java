@@ -4,9 +4,8 @@ import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.SuperBaseBean;
 import com.bcd.sys.task.TaskStatus;
-import com.bcd.sys.task.entity.ClusterTask;
+import com.bcd.sys.task.cluster.ClusterTask;
 import com.bcd.sys.shiro.ShiroUtil;
-import com.bcd.sys.task.entity.Processing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -26,7 +25,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Processing{
+public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
 
 
     //field
@@ -93,10 +92,10 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Process
 
     public TaskBean(String name) {
         this.name=name;
-        setProcessing(0f);
+        this.percent=0F;
     }
 
-    private TaskBean() {
+    public TaskBean() {
 
     }
 
@@ -240,6 +239,7 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Process
     @Override
     public void onSucceed() {
         finishTime=new Date();
+        percent=100F;
         status= TaskStatus.SUCCEED.getStatus();
     }
 
@@ -248,7 +248,7 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Process
         finishTime=new Date();
         status= TaskStatus.FAILED.getStatus();
         Throwable realException= ExceptionUtil.parseRealException(ex);
-        message= realException.getMessage();
+        message= ExceptionUtil.getMessage(realException);
         stackMessage=ExceptionUtil.getStackTraceMessage(realException);
     }
 
@@ -268,10 +268,5 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask,Process
     @Override
     public Object[] getParams() {
         return params;
-    }
-
-    @Override
-    public void setProcessing(Float percent) {
-        this.percent=percent;
     }
 }

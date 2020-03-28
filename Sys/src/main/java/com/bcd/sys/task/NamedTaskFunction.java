@@ -1,6 +1,4 @@
-package com.bcd.sys.task.function;
-
-import com.bcd.sys.task.entity.Task;
+package com.bcd.sys.task;
 
 public abstract class NamedTaskFunction<T extends Task> implements TaskFunction<T>{
     protected String name;

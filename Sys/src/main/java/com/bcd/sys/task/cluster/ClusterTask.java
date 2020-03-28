@@ -1,6 +1,8 @@
-package com.bcd.sys.task.entity;
+package com.bcd.sys.task.cluster;
 
-public interface ClusterTask extends Task{
+import com.bcd.sys.task.Task;
+
+public interface ClusterTask extends Task {
     /**
      * 获取方法名称
      * @return
