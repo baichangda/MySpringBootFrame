@@ -2,7 +2,7 @@ package com.bcd.sys.task;
 
 public class StopSysTask {
     private String code;
-    private Boolean mayInterruptIfRunning;
+    private boolean mayInterruptIfRunning;
     private String[] ids;
 
     public String getCode() {
@@ -13,11 +13,11 @@ public class StopSysTask {
         this.code = code;
     }
 
-    public Boolean getMayInterruptIfRunning() {
+    public boolean getMayInterruptIfRunning() {
         return mayInterruptIfRunning;
     }
 
-    public void setMayInterruptIfRunning(Boolean mayInterruptIfRunning) {
+    public void setMayInterruptIfRunning(boolean mayInterruptIfRunning) {
         this.mayInterruptIfRunning = mayInterruptIfRunning;
     }
 

@@ -2,15 +2,11 @@ package com.bcd.sys.task;
 
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.task.dao.TaskDAO;
-import com.bcd.sys.task.entity.ClusterTask;
-import com.bcd.sys.task.function.NamedTaskFunction;
-import com.bcd.sys.task.function.TaskFunction;
+import com.bcd.sys.task.cluster.ClusterTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -18,8 +14,6 @@ import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
@@ -98,8 +92,7 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
         //2、如果找不到对应执行方法实体,则任务执行失败并抛出异常
         if(taskFunction==null){
             BaseRuntimeException exception= BaseRuntimeException.getException("Can't Find ClusterTask["+functionName+"],Please Check It");
-            task.onFailed(exception);
-            taskDAO.doUpdate(task);
+            TaskUtil.onFailed(task,exception);
             throw exception;
         }
         //3、使用线程池执行任务
@@ -112,7 +105,7 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
                 lock.release();
             }
         });
-        CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(id,future);
+        CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(id.toString(),future);
     }
 
     public void send(T task) {
