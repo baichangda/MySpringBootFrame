@@ -1,0 +1,109 @@
+package com.bcd.mongodb.test.controller;
+
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.*;
+import com.bcd.base.controller.BaseController;
+import com.bcd.base.define.MessageDefine;
+import com.bcd.base.message.JsonMessage;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+import java.util.Date;
+import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import com.bcd.mongodb.test.bean.TestBean;
+import com.bcd.mongodb.test.service.TestService;
+
+@SuppressWarnings(value = "unchecked")
+@RestController
+@RequestMapping("/api/test/test")
+public class TestController extends BaseController {
+
+    @Autowired
+    private TestService testService;
+
+
+    /**
+     * 查询测试列表
+     * @return
+     */
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @ApiOperation(value="查询测试列表",notes = "查询测试列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "postlinecode", value = "班线code(长度20)", dataType = "String"),
+        @ApiImplicitParam(name = "postlinename", value = "班线名称(长度30)", dataType = "String"),
+        @ApiImplicitParam(name = "id", value = "主键(唯一标识符,自动生成)(不需要赋值)", dataType = "String")
+    })
+    @ApiResponse(code = 200,message = "测试列表")
+    public JsonMessage<List<TestBean>> list(
+        @RequestParam(value = "postlinecode", required = false) String postlinecode,
+        @RequestParam(value = "postlinename", required = false) String postlinename,
+        @RequestParam(value = "id", required = false) String id
+    ){
+        Condition condition= Condition.and(
+            new StringCondition("postlinecode",postlinecode, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("postlinename",postlinename, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("id",id, StringCondition.Handler.EQUAL)
+        );
+        return JsonMessage.success(testService.findAll(condition));
+    }
+
+
+    /**
+     * 查询测试列表
+     * @return
+     */
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @ApiOperation(value="查询测试分页",notes = "查询测试分页")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "postlinecode", value = "班线code(长度20)", dataType = "String"),
+        @ApiImplicitParam(name = "postlinename", value = "班线名称(长度30)", dataType = "String"),
+        @ApiImplicitParam(name = "id", value = "主键(唯一标识符,自动生成)(不需要赋值)", dataType = "String"),
+        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
+        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
+    })
+    @ApiResponse(code = 200,message = "测试分页结果集")
+    public JsonMessage<Page<TestBean>> page(
+        @RequestParam(value = "postlinecode", required = false) String postlinecode,
+        @RequestParam(value = "postlinename", required = false) String postlinename,
+        @RequestParam(value = "id", required = false) String id,
+        @RequestParam(value = "pageNum",required = false)Integer pageNum,
+        @RequestParam(value = "pageSize",required = false) Integer pageSize
+    ){
+        Condition condition= Condition.and(
+            new StringCondition("postlinecode",postlinecode, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("postlinename",postlinename, StringCondition.Handler.ALL_LIKE),
+            new StringCondition("id",id, StringCondition.Handler.EQUAL)
+        );
+        return JsonMessage.success(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+    }
+
+    /**
+     * 保存测试
+     * @param test
+     * @return
+     */
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @ApiOperation(value = "保存测试",notes = "保存测试")
+    @ApiResponse(code = 200,message = "保存结果")
+    public JsonMessage save(@ApiParam(value = "测试实体")  @RequestBody TestBean test){
+        testService.save(test);
+        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+    }
+
+
+    /**
+     * 删除测试
+     * @param ids
+     * @return
+     */
+    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除测试",notes = "删除测试")
+    @ApiResponse(code = 200,message = "删除结果")
+    public JsonMessage delete(@ApiParam(value = "测试id数组") @RequestParam String[] ids){
+        testService.deleteById(ids);
+        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+    }
+}

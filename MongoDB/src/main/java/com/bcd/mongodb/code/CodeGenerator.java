@@ -22,7 +22,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +29,10 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unchecked")
 public class CodeGenerator {
+
+    private final static String CLASS_OUT_DIR_PATH ="out/production/classes";
+    private final static String CLASS_BUILD_DIR_PATH ="build/classes/java/main";
+    private final static String SOURCE_DIR_PATH="src/main/java";
 
     private final static Logger logger= LoggerFactory.getLogger(CodeGenerator.class);
 
@@ -148,7 +151,17 @@ public class CodeGenerator {
         valueMap.put("upperModuleName",upperModuleName);
         valueMap.put("lowerModuleName",lowerModuleName);
         //2、解析出当前beanClass对应java类的文件夹路径
-        String beanPath=beanClass.getResource("").getFile().replace("out/production/classes","src/main/java");
+        String classFilePath= beanClass.getResource("").getFile();
+        String beanPath;
+        if(classFilePath.contains(CLASS_OUT_DIR_PATH)){
+            //替换out目录下
+            beanPath=beanClass.getResource("").getFile().replace(CLASS_OUT_DIR_PATH,SOURCE_DIR_PATH);
+        }else if(classFilePath.contains(CLASS_BUILD_DIR_PATH)){
+            //替换build目录下
+            beanPath=beanClass.getResource("").getFile().replace(CLASS_BUILD_DIR_PATH,SOURCE_DIR_PATH);
+        }else{
+            throw BaseRuntimeException.getException("initBean failed,class path["+classFilePath+"] not support");
+        }
         String dirPath=Paths.get(beanPath).getParent().toString();
         dataMap.put("dirPath",dirPath);
         //3、解析出所有的字段和实体类的注释
