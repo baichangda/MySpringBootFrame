@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -43,27 +45,22 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
         this.handler=handler;
     }
 
+
     /**
-     * 重写此方法
-     * 此方法主要是用在url认证authc功能
-     * 1、在验证账户失败时候,改变返回结果
-     * 2、executeLogin会从当前request中取出header为 Authorization 的信息,其中包含的是Base64加密的账号密码,格式如下
-     *   (schema Base64(username:password)),以此来进行登录
+     * 重写此方法用于登陆失败时候 定义 返回的结果
      * @param request
      * @param response
      * @return
-     * @throws Exception
      */
     @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        boolean loggedIn = false; //false by default or we wouldn't be in this method
-        if (isLoginAttempt(request, response)) {
-            loggedIn = executeLogin(request, response);
-        }
-        if (!loggedIn) {
+    protected boolean sendChallenge(ServletRequest request, ServletResponse response) {
+        try {
+            super.sendChallenge(request,response);
             handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+            return false;
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
         }
-        return loggedIn;
     }
 
     /**
