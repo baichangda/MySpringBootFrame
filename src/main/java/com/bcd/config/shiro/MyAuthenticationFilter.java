@@ -3,8 +3,9 @@ package com.bcd.config.shiro;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import org.apache.shiro.authz.UnauthenticatedException;
-import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.web.filter.AccessControlFilter;
+import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -37,7 +37,7 @@ import java.io.IOException;
  * 必须走perms过滤器(验证有权限 file:edit)
  */
 @SuppressWarnings("unchecked")
-public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
+public class MyAuthenticationFilter extends AuthenticationFilter {
     private static final Logger log = LoggerFactory.getLogger(MyAuthenticationFilter.class);
     private ExceptionResponseHandler handler;
 
@@ -46,99 +46,9 @@ public class MyAuthenticationFilter extends BasicHttpAuthenticationFilter {
     }
 
 
-    /**
-     * 重写此方法用于登陆失败时候 定义 返回的结果
-     * @param request
-     * @param response
-     * @return
-     */
     @Override
-    protected boolean sendChallenge(ServletRequest request, ServletResponse response) {
-        try {
-            super.sendChallenge(request,response);
-            handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
-            return false;
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-    /**
-     * 重写这个方法
-     * 此方法主要是用在请求中发生异常但是又没有被spring拦截的异常
-     *
-     * 1、拦截所有在请求执行过程中发生的异常(已经被spring拦截下来的会转换成JsonMessage,这里拦截不到)
-     *
-     * remarks:单单重写onAccessDenied不满足需求的原因是因为,父类cleanup只会处理UnauthenticatedException
-     * @param request
-     * @param response
-     * @param existing
-     * @throws ServletException
-     * @throws IOException
-     */
-    @Override
-    protected void cleanup(ServletRequest request, ServletResponse response, Exception existing) throws ServletException, IOException {
-        /**
-         * 此处是 BasicHttpAuthenticationFilter cleanup逻辑,进行重写 onStart
-         */
-        try {
-            /**
-             * 此处是 onAccessDenied方法实现 onStart
-             * */
-            if(existing!=null){
-//                boolean loggedIn = false; //false by default or we wouldn't be in this method
-//                if (isLoginAttempt(request, response)) {
-//                    loggedIn = executeLogin(request, response);
-//                }
-//                if (!loggedIn) {
-                    handler.handle(WebUtils.toHttp(response),existing);
-//                }
-                /**
-                 * 此处是 onAccessDenied方法实现 end
-                 * */
-                existing = null;
-            }
-        } catch (Exception e) {
-            existing = e;
-        }
-        /**
-         * 此处是 BasicHttpAuthenticationFilter cleanup逻辑,进行重写 end
-         */
-
-        /**
-         * 以下是 AdviceFilter cleanup逻辑,直接复制过来 onStart
-         */
-        Exception exception = existing;
-        try {
-            afterCompletion(request, response, exception);
-            if (log.isTraceEnabled()) {
-                log.trace("Successfully invoked afterCompletion method.");
-            }
-        } catch (Exception e) {
-            if (exception == null) {
-                exception = e;
-            } else {
-                log.debug("afterCompletion implementation threw an exception.  This will be ignored to " +
-                        "allow the original source exception to be propagated.", e);
-            }
-        }
-        if (exception != null) {
-            if (exception instanceof ServletException) {
-                throw (ServletException) exception;
-            } else if (exception instanceof IOException) {
-                throw (IOException) exception;
-            } else {
-                if (log.isDebugEnabled()) {
-                    String msg = "Filter execution resulted in an unexpected Exception " +
-                            "(not IOException or ServletException as the Filter API recommends).  " +
-                            "Wrapping in ServletException and propagating.";
-                    log.debug(msg);
-                }
-                throw new ServletException(exception);
-            }
-        }
-        /**
-         * 以下是 AdviceFilter cleanup逻辑,直接复制过来 end
-         */
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+        return false;
     }
 }

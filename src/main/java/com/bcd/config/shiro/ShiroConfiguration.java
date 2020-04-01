@@ -5,8 +5,6 @@ import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.session.mgt.NativeSessionManager;
-import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -18,7 +16,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
