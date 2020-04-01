@@ -27,12 +27,13 @@ public class DateConverter implements Converter<String,Date> {
             try {
                 String timeZone= ShiroUtil.getCurrentUser().getTimeZone();
                 ZoneOffset zoneOffset= ZoneOffset.of(timeZone);
-                if(source.length()==DateUtil.DATE_FORMAT_DAY.length()){
+                int sourceLen=source.length();
+                if(sourceLen==DateUtil.DATE_FORMAT_DAY.length()){
                     return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,zoneOffset);
-                }else if(source.length()==DateUtil.DATE_FORMAT_SECOND.length()){
+                }else if(sourceLen==DateUtil.DATE_FORMAT_SECOND.length()){
                     return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,zoneOffset);
                 }else{
-                    throw MessageDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException();
+                    throw MessageDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException(source);
                 }
             } catch (Exception e1) {
                 throw BaseRuntimeException.getException(e1);
