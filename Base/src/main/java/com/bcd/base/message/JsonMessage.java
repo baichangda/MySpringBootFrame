@@ -21,9 +21,6 @@ public class JsonMessage<T> implements Serializable {
     private boolean result;
     @ApiModelProperty("Api调用失败时提示信息")
     private String message = "";
-    @ApiModelProperty(hidden = true)
-    @JsonIgnore
-    private String error = "";
     @ApiModelProperty("Api调用失败时错误编码")
     private String code = "";
     @ApiModelProperty("Api调用成功时返回的数据(Json字符串)")
@@ -50,20 +47,13 @@ public class JsonMessage<T> implements Serializable {
         this(result, message, code, null);
     }
 
-    public JsonMessage(boolean result, String message, String code, String error) {
-        this(result, message, code, error, null);
-    }
-
-    public JsonMessage(boolean result, String message, String code, String error, T data) {
+    public JsonMessage(boolean result, String message, String code, T data) {
         this.result = result;
         if (message != null) {
             this.message = message;
         }
         if (code != null) {
             this.code = code;
-        }
-        if (error != null) {
-            this.error = error;
         }
         this.data = data;
     }
@@ -81,7 +71,7 @@ public class JsonMessage<T> implements Serializable {
     }
 
     public static <T> JsonMessage<T> success(T data, String message, String code) {
-        return new JsonMessage<>(true, message, code, "", data);
+        return new JsonMessage<>(true, message, code,  data);
     }
 
     public static <T> JsonMessage<T> fail() {
@@ -96,8 +86,9 @@ public class JsonMessage<T> implements Serializable {
         return JsonMessage.fail(message, code, null);
     }
 
-    public static <T> JsonMessage<T> fail(String message, String code, String error) {
-        return new JsonMessage<>(false, message, code, error);
+
+    public static <T> JsonMessage<T> fail(String message, String code,T data) {
+        return new JsonMessage<>(false, message, code, data);
     }
 
     public boolean isResult() {
@@ -114,14 +105,6 @@ public class JsonMessage<T> implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
     }
 
     public String getCode() {

@@ -12,7 +12,6 @@ import com.bcd.sys.shiro.ShiroUtil;
 import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -184,7 +183,7 @@ public class UserController extends BaseController {
      * 登录
      * @param username
      * @param password
-     * @param timeZone
+     * @param offsetId
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -195,9 +194,9 @@ public class UserController extends BaseController {
             @RequestParam(value = "username",required = true) String username,
             @ApiParam(value = "密码")
             @RequestParam(value = "password",required = true) String password,
-            @ApiParam(value = "时区")
-            @RequestParam(value="timeZone",required = true)String timeZone){
-        UserBean user= userService.login(username,password,timeZone);
+            @ApiParam(value = "时区偏移量")
+            @RequestParam(value="offsetId",required = false,defaultValue = "+8")String offsetId){
+        UserBean user= userService.login(username,password,offsetId);
         return JsonMessage.success(user);
     }
 

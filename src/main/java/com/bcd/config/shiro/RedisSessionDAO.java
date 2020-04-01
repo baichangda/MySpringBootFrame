@@ -3,10 +3,8 @@ package com.bcd.config.shiro;
 import com.bcd.base.config.redis.RedisUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.DelegatingSession;
-import org.apache.shiro.session.mgt.SimpleSession;
-import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.hibernate.type.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -28,7 +26,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
     private final static long TIME_OUT_SECONDS=60*30L;
 
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,Session> redisTemplate;
 
     private final static String SHIRO_SESSION_KEY_PRE="shiro:";
 
@@ -64,7 +62,13 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
         logger.info("get from redis");
         Session session=super.doReadSession(sessionId);
         if(session==null) {
-            session=(Session) redisTemplate.opsForValue().get(getKey(sessionId));
+            try {
+                session = redisTemplate.opsForValue().get(getKey(sessionId));
+            }catch (SerializationException ex){
+                //用于处理修改了session data的数据结构但是redis中依然存在数据导致反序列化失败
+                logger.warn("redis session data struct changed,delete it[{}]", sessionId);
+                redisTemplate.delete(getKey(sessionId));
+            }
         }
         cache(session,sessionId);
         return session;
@@ -89,7 +93,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     public void doDelete(Session session) {
         super.doDelete(session);
         //这里从redis里面移除
-        redisTemplate.delete(getKey(session.getId()).toString().getBytes());
+        redisTemplate.delete(getKey(session.getId()));
     }
 
     @Override

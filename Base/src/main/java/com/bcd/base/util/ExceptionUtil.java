@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/7/27.
@@ -59,16 +59,22 @@ public class ExceptionUtil {
      * @param throwable
      * @return
      */
-    public static JsonMessage<String> toJsonMessage(Throwable throwable) {
+    public static JsonMessage toJsonMessage(Throwable throwable) {
         Throwable realException = parseRealException(throwable);
         if (realException == null) {
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
         }
         if (realException instanceof BaseRuntimeException) {
-            return JsonMessage.fail(realException.getMessage(), ((BaseRuntimeException) realException).getCode(), getStackTraceMessage(realException));
+            return JsonMessage.fail(realException.getMessage(), ((BaseRuntimeException) realException).getCode());
         } else if (realException instanceof ConstraintViolationException) {
             String message = ((ConstraintViolationException) realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2) -> e1 + "," + e2).orElse("");
-            return JsonMessage.fail(message);
+            Set<ConstraintViolation<?>> constraintViolationSet= ((ConstraintViolationException) realException).getConstraintViolations();
+            Map<String,Object> dataMap=new HashMap<>();
+            constraintViolationSet.forEach(e->{
+                //由于设置了jackson忽略为null属性,此时将null转换为"NULL"
+                dataMap.put(e.getPropertyPath().toString(),e.getInvalidValue()==null?"NULL":e.getInvalidValue());
+            });
+            return JsonMessage.fail(message,null,dataMap);
         } else if (realException instanceof MethodArgumentNotValidException) {
             String message = ((MethodArgumentNotValidException) realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             return JsonMessage.fail(message);

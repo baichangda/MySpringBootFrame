@@ -64,10 +64,10 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
      * 登录
      * @param username
      * @param encryptPassword 使用公钥加密后的密码
-     * @param timeZone
+     * @param offsetId
      * @return
      */
-    public UserBean login(String username,String encryptPassword,String timeZone){
+    public UserBean login(String username,String encryptPassword,String offsetId){
         //1、构造shiro登录对象
         UsernamePasswordToken token;
         //2、根据是否加密处理选择不同处理方式
@@ -90,7 +90,7 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
         UserBean user= findOne(
                 new StringCondition("username",username, StringCondition.Handler.EQUAL)
         );
-        user.setTimeZone(timeZone);
+        user.setOffsetId(offsetId);
         currentUser.getSession().setAttribute("user",user);
         return user;
     }

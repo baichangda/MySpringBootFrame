@@ -19,6 +19,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "t_sys_user")
 public class UserBean extends BaseBean<Long>{
+    private final static long serialVersionUID=1L;
+
     //field
     @NotNull(message = "[用户类型]不能为空")
     @ApiModelProperty(value = "用户类型(1:管理用户,2:企业用户)(不能为空)")
@@ -69,7 +71,7 @@ public class UserBean extends BaseBean<Long>{
     //"Asia/Shanghai"
     @ApiModelProperty(hidden = true)
     @Transient
-    private String timeZone;
+    private String offsetId;
 
     //method
 
@@ -154,12 +156,12 @@ public class UserBean extends BaseBean<Long>{
         return this.status;
     }
 
-    public String getTimeZone() {
-        return timeZone;
+    public String getOffsetId() {
+        return offsetId;
     }
 
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
+    public void setOffsetId(String offsetId) {
+        this.offsetId = offsetId;
     }
 
     public Integer getType() {

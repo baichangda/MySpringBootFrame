@@ -95,8 +95,8 @@ public class RedisUtil {
      * @param redisConnectionFactory
      * @return
      */
-    public static RedisTemplate<String, Serializable> newString_SerializableRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Serializable> redisTemplate = new RedisTemplate<>();
+    public static <V>RedisTemplate<String, V> newString_SerializableRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(STRING_SERIALIZER);
         redisTemplate.setHashKeySerializer(STRING_SERIALIZER);

@@ -25,8 +25,8 @@ public class DateConverter implements Converter<String,Date> {
             return new Date(t);
         }catch (NumberFormatException e){
             try {
-                String timeZone= ShiroUtil.getCurrentUser().getTimeZone();
-                ZoneOffset zoneOffset= ZoneOffset.of(timeZone);
+                String offsetId= ShiroUtil.getCurrentUser().getOffsetId();
+                ZoneOffset zoneOffset= ZoneOffset.of(offsetId);
                 int sourceLen=source.length();
                 if(sourceLen==DateUtil.DATE_FORMAT_DAY.length()){
                     return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,zoneOffset);
