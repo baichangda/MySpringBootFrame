@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
 
+    public final static ScheduledExecutorService CHECK_PONG_POOL=Executors.newScheduledThreadPool(1);
+
     protected StringBuilder cache=new StringBuilder();
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
@@ -27,6 +29,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
 
     //最后发送时间,当连接断开时候,如果最后发送时间距离当前时间超过1分钟,则不进行重连
     protected volatile long lastSendTime;
+    protected long maxReConnectTimeInMillis=60*1000;
 
     //是否停止连接
     //当断线后会检测是否应该重连,如果false,则设置此为true
@@ -72,17 +75,32 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
         this.notifyAll();
     }
 
+    /**
+     * 开启心跳检测
+     * 处理如下情况:
+     * 1、由于长时间客户端和服务端不进行数据通信,此时由于防火墙等其他因素关闭tcp连接,导致不可用
+     *      此时客户端需要发送ping,不关注结果,发送成功即代表session可用,否则会触发
+     *      {@link java.net.SocketTimeoutException}即{@link IOException}
+     *
+     * 2、tcp协议层下的硬件层网络连接突然断开,此时在tcp层面此连接依然可用,此时需要断开连接;
+     *      此时close源码参考:
+     *      {@link org.apache.tomcat.websocket.WsSession#sendCloseMessage(CloseReason)}
+     *      1、close源码在此情况tomcat源码先会调用发送close message到客户端直到超时,关闭远程session
+     *      2、检测是否{@link javax.websocket.CloseReason.CloseCodes#CLOSED_ABNORMALLY},
+     *          对应{@link CloseStatus#NO_CLOSE_FRAME},是则触发onError
+     *      3、触发onClose
+     */
     protected void startHeartBeatCheck(){
         this.heartBeatPool= Executors.newSingleThreadScheduledExecutor();
         this.heartBeatPool.scheduleWithFixedDelay(()->{
             try {
                 session.sendMessage(new PingMessage());
             } catch (IOException ex1) {
-                logger.error("Send Ping Failed",ex1);
+                logger.error("send ping failed", ex1);
                 try {
-                    session.close();
+                    session.close(CloseStatus.NO_CLOSE_FRAME);
                 } catch (IOException ex2) {
-                    logger.error("Close Session Failed After Send Ping Failed",ex2);
+                    logger.error("close session failed after send ping failed", ex2);
                 }
             }
         },10,30, TimeUnit.SECONDS);
@@ -124,7 +142,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
      * @return
      */
     protected boolean checkIsReConnectAfterDisConnect(){
-        return (System.currentTimeMillis()-lastSendTime)<60*1000;
+        return (System.currentTimeMillis()-lastSendTime)<maxReConnectTimeInMillis;
     }
 
     /**
@@ -194,8 +212,10 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
         //2、清除发送的缓存
         cache.delete(0,cache.length());
         //3、关闭心跳检测线程池
-        this.heartBeatPool.shutdown();
-        this.heartBeatPool=null;
+        if(this.heartBeatPool!=null){
+            this.heartBeatPool.shutdown();
+            this.heartBeatPool=null;
+        }
     }
 
     /**
@@ -239,7 +259,14 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
                     }
                 }
             } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
+                try {
+                    //发送信息失败则关闭session
+                    logger.error("send message error",e);
+                    session.close(CloseStatus.NO_CLOSE_FRAME);
+                } catch (IOException ex) {
+                    logger.error("close session after send message error",e);
+                }
+                return false;
             }
         }else{
             logger.error("Session Closed");
