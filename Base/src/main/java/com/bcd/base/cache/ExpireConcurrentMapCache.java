@@ -13,7 +13,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
 
     private String name;
     private Long aliveTime;
-    private ExpireThreadSafeMap<Object,Object> dataMap=new ExpireThreadSafeMap<>(2000L);
+    private ExpireThreadSafeMap<Object,Object> dataMap;
 
 
     public ExpireConcurrentMapCache(String name, Long aliveTime) {
@@ -24,6 +24,8 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
         super(allowNullValues);
         this.name = name;
         this.aliveTime = aliveTime;
+        this.dataMap=new ExpireThreadSafeMap<>(2000L);
+        this.dataMap.init();
     }
 
     @Nullable

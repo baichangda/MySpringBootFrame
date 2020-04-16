@@ -23,10 +23,12 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient {
 
-    public final ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map =new ExpireThreadSafeMap<>();
+    public ExpireThreadSafeMap<String,Consumer<String>> sn_to_callBack_map;
 
     public BaseJsonWebSocketClient(String url) {
         super(url);
+        this.sn_to_callBack_map =new ExpireThreadSafeMap<>();
+        this.sn_to_callBack_map.init();
     }
 
     /**

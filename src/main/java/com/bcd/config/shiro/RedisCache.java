@@ -48,6 +48,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
         this.localTimeout=localTimeout;
         this.localScanPeriod=localScanPeriod;
         this.map=new ExpireThreadSafeMap<>(localScanPeriod);
+        this.map.init();
     }
 
     @Override
