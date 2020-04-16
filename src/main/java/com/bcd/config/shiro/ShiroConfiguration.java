@@ -170,7 +170,7 @@ public class ShiroConfiguration{
         //anon：它对应的过滤器里面是空的,什么都没做,可以理解为不拦截
         //user: authc后或者rememberMe的都可以访问
         filterChainMap.put("/api/anonymous/**", "anon");
-        filterChainMap.put("/api/sys/user/login", "anon");
+        filterChainMap.put("/api/sys/user/login*", "anon");
         filterChainMap.put("/api/i18n/changeLocal", "anon");
 //        filterChainMap.put("/api/**/list", "user");
 //        filterChainMap.put("/api/**/page", "user");
