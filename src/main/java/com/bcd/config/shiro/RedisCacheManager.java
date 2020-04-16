@@ -11,7 +11,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisCacheManager extends AbstractCacheManager{
     RedisTemplate<String, String> redisTemplate;
 
-    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    long localTimeout;
+
+    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory,long localTimeout) {
         this.redisTemplate = new RedisTemplate<>();
         this.redisTemplate.setConnectionFactory(redisConnectionFactory);
         this.redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
@@ -19,11 +21,12 @@ public class RedisCacheManager extends AbstractCacheManager{
         this.redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
         this.redisTemplate.setHashValueSerializer(RedisUtil.JDK_SERIALIZATION_SERIALIZER);
         this.redisTemplate.afterPropertiesSet();
+        this.localTimeout=localTimeout;
     }
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new RedisCache(redisTemplate,s);
+        return new RedisCache(redisTemplate,s,localTimeout,3*60*1000);
     }
 
 }

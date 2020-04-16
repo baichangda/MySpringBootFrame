@@ -8,9 +8,9 @@ import org.hibernate.type.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.*;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +59,6 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public Session doReadSession(Serializable sessionId) {
-        logger.info("get from redis");
         Session session=super.doReadSession(sessionId);
         if(session==null) {
             try {
@@ -101,4 +100,6 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
         Set<String> keySet= redisTemplate.keys(SHIRO_SESSION_KEY_PRE+"*");
         return redisTemplate.opsForValue().multiGet(keySet);
     }
+
+
 }

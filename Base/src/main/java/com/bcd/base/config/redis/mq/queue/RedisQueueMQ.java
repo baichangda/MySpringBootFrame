@@ -152,9 +152,9 @@ public class RedisQueueMQ<V> {
                         if (ex instanceof QueryTimeoutException) {
                             logger.error("redisQueueMQ queue[" + name + "] QueryTimeoutException", ex);
                         } else {
-                            logger.error("redisQueueMQ queue[" + name + "] error,try after 3s", ex);
+                            logger.error("redisQueueMQ queue[" + name + "] error,try after 10s", ex);
                             try {
-                                Thread.sleep(3000L);
+                                Thread.sleep(10000L);
                             } catch (InterruptedException e) {
                                 logger.error("redisQueueMQ queue[" + name + "] interrupted,exit ...", ex);
                                 break;

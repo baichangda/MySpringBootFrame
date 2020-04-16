@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 @Configuration
 @SuppressWarnings("unchecked")
-public class RedisConfig implements ApplicationListener<ContextRefreshedEvent> {
+public class RedisConfig{
 
     /**
      * key 用 StringRedisSerializer
@@ -44,9 +44,4 @@ public class RedisConfig implements ApplicationListener<ContextRefreshedEvent> {
         return redisMessageListenerContainer;
     }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        String val=((RedisTemplate<String,String>)event.getApplicationContext().getBean("string_string_redisTemplate")).opsForValue().get("a");
-        System.out.println("================================"+val);
-    }
 }

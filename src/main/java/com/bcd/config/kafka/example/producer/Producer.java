@@ -34,8 +34,8 @@ public class Producer implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
-            sendMessage("test".getBytes(),"bcd".getBytes());
-        },3,3, TimeUnit.SECONDS);
+//        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
+//            sendMessage("test".getBytes(),"bcd".getBytes());
+//        },3,3, TimeUnit.SECONDS);
     }
 }

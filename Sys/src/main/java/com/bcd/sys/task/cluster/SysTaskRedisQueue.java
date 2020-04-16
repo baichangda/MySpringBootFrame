@@ -84,8 +84,8 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             if(ex instanceof QueryTimeoutException){
                 logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute QueryTimeoutException", ex);
             }else{
-                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute error,try after 3s",ex);
-                Thread.sleep(3000L);
+                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute error,try after 10s",ex);
+                Thread.sleep(10000L);
             }
         }
     }

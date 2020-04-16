@@ -3,6 +3,7 @@ package com.bcd.config.shiro;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -50,7 +51,7 @@ import java.util.Map;
 public class ShiroConfiguration{
     private static final Logger logger = LoggerFactory.getLogger(ShiroConfiguration.class);
     /**
-     * 缓存管理器
+     * ehcache缓存管理器
      * @return
      */
     @Bean
@@ -60,9 +61,23 @@ public class ShiroConfiguration{
         return cacheManager;
     }
 
-//    @Bean
+    /**
+     * redis缓存管理器
+     * @return
+     */
+    @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
-        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory);
+        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory,5000);
+        return cacheManager;
+    }
+
+    /**
+     * 本地过期map缓存管理器
+     * @return
+     */
+    @Bean
+    public ExpireMapCacheManager expireMapCacheManager(){
+        ExpireMapCacheManager cacheManager = new ExpireMapCacheManager(5000);
         return cacheManager;
     }
 
@@ -72,7 +87,8 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager, CacheManager cacheManager){
+    public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager,
+                                                               RedisCacheManager redisCacheManager,ExpireMapCacheManager expireMapCacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealms(realm);
@@ -83,7 +99,11 @@ public class ShiroConfiguration{
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
         //设置缓存管理器
-        securityManager.setCacheManager(cacheManager);
+        securityManager.setCacheManager(redisCacheManager);
+        //单独设置session缓存管理器
+        if(sessionManager instanceof CacheManagerAware){
+            ((CacheManagerAware) sessionManager).setCacheManager(expireMapCacheManager);
+        }
         return securityManager;
     }
 

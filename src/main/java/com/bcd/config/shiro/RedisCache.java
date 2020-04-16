@@ -1,34 +1,66 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.map.ExpireThreadSafeMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * redis缓存管理器
+ * 其中有两级缓存(本地过期缓存、redis缓存)
+ * 避免高频率访问redis
+ * @param <K>
+ * @param <V>
+ */
 public class RedisCache<K,V> implements Cache<K,V> {
 
-    private static String hashKey="shiroCache";
+    Logger logger= LoggerFactory.getLogger(RedisCache.class);
+
+    long localTimeout;
+
+    long localScanPeriod;
+
+    ExpireThreadSafeMap<K,V> map;
+
+    String key;
 
     RedisTemplate<String, String> redisTemplate;
 
     BoundHashOperations<String, K, V> boundHashOperations;
 
-    public RedisCache(RedisTemplate<String, String> redisTemplate,String key) {
+    /**
+     *
+     * @param redisTemplate
+     * @param key
+     * @param localTimeout 本地缓存失效时间
+     * @param localScanPeriod 本地缓存扫描器间隔
+     */
+    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeout,long localScanPeriod) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations=redisTemplate.boundHashOps(key);
+        this.key=key;
+        this.localTimeout=localTimeout;
+        this.localScanPeriod=localScanPeriod;
+        this.map=new ExpireThreadSafeMap<>(localScanPeriod);
     }
 
     @Override
     public V get(K k) throws CacheException {
-        return (V)boundHashOperations.get(k.toString());
+        return map.computeIfAbsent(k,e->{
+            return boundHashOperations.get(k);
+        },localTimeout);
     }
 
     @Override
     public V put(K k, V v) throws CacheException {
         V old=get(k);
+        map.put(k,v,localTimeout);
         boundHashOperations.put(k,v);
         return old;
     }
@@ -36,13 +68,15 @@ public class RedisCache<K,V> implements Cache<K,V> {
     @Override
     public V remove(K k) throws CacheException {
         V old=get(k);
+        map.remove(k);
         boundHashOperations.delete(k);
         return old;
     }
 
     @Override
     public void clear() throws CacheException {
-        redisTemplate.delete(hashKey);
+        map.clear();
+        redisTemplate.delete(key);
     }
 
     @Override

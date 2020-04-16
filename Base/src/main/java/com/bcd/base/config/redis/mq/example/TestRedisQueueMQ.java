@@ -7,7 +7,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInitializable {
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
         super("test",redisConnectionFactory, ValueSerializerType.STRING);
