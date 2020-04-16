@@ -13,9 +13,9 @@ import io.swagger.annotations.*;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
@@ -30,59 +30,43 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
 
- /**
+    /**
      * 查询用户列表
      * @return
      */
-    @Cacheable
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "type", value = "类型(1:管理用户,2:企业用户)", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "username", value = "用户名", dataType = "String"),
-        @ApiImplicitParam(name = "password", value = "密码", dataType = "String"),
-        @ApiImplicitParam(name = "email", value = "邮箱", dataType = "String"),
-        @ApiImplicitParam(name = "phone", value = "手机号", dataType = "String"),
-        @ApiImplicitParam(name = "realName", value = "真实姓名", dataType = "String"),
-        @ApiImplicitParam(name = "sex", value = "性别", dataType = "String"),
-        @ApiImplicitParam(name = "birthdayBegin", value = "生日开始", dataType = "String"),
-        @ApiImplicitParam(name = "birthdayEnd", value = "生日结束", dataType = "String"),
-        @ApiImplicitParam(name = "cardNumber", value = "身份证号", dataType = "String"),
-        @ApiImplicitParam(name = "status", value = "是否可用(0:禁用,1:可用)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "用户列表")
     public JsonMessage<List<UserBean>> list(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "username",required = false) String username,
-        @RequestParam(value = "password",required = false) String password,
-        @RequestParam(value = "email",required = false) String email,
-        @RequestParam(value = "phone",required = false) String phone,
-        @RequestParam(value = "realName",required = false) String realName,
-        @RequestParam(value = "sex",required = false) String sex,
-        @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
-        @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
-        @RequestParam(value = "cardNumber",required = false) String cardNumber,
-        @RequestParam(value = "status",required = false) Integer status
+            @ApiParam(value = "生日开始") @RequestParam(value = "birthdayBegin", required = false) Date birthdayBegin,
+            @ApiParam(value = "生日结束") @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
+            @ApiParam(value = "身份证号") @RequestParam(value = "cardNumber", required = false) String cardNumber,
+            @ApiParam(value = "邮箱") @RequestParam(value = "email", required = false) String email,
+            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
+            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(value = "密码") @RequestParam(value = "password", required = false) String password,
+            @ApiParam(value = "手机号") @RequestParam(value = "phone", required = false) String phone,
+            @ApiParam(value = "真实姓名") @RequestParam(value = "realName", required = false) String realName,
+            @ApiParam(value = "性别") @RequestParam(value = "sex", required = false) String sex,
+            @ApiParam(value = "是否可用(0:禁用,1:可用)") @RequestParam(value = "status", required = false) Integer status,
+            @ApiParam(value = "类型(1:管理用户,2:企业用户)") @RequestParam(value = "type", required = false) Integer type,
+            @ApiParam(value = "用户名") @RequestParam(value = "username", required = false) String username
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
-            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
-            new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("sex",sex, StringCondition.Handler.ALL_LIKE),
-            new DateCondition("birthday",birthdayBegin, DateCondition.Handler.GE),
-            new DateCondition("birthday",birthdayEnd, DateCondition.Handler.LE),
-            new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
-            new NumberCondition("status",status, NumberCondition.Handler.EQUAL)
+                new DateCondition("birthday",birthdayBegin, DateCondition.Handler.GE),
+                new DateCondition("birthday",birthdayEnd, DateCondition.Handler.LE),
+                new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
+                new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("sex",sex, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
+                new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
+                new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(userService.findAll(condition));
     }
@@ -94,55 +78,36 @@ public class UserController extends BaseController {
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户分页")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "type", value = "类型(1:管理用户,2:企业用户)", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "username", value = "用户名", dataType = "String"),
-        @ApiImplicitParam(name = "password", value = "密码", dataType = "String"),
-        @ApiImplicitParam(name = "email", value = "邮箱", dataType = "String"),
-        @ApiImplicitParam(name = "phone", value = "手机号", dataType = "String"),
-        @ApiImplicitParam(name = "realName", value = "真实姓名", dataType = "String"),
-        @ApiImplicitParam(name = "sex", value = "性别", dataType = "String"),
-        @ApiImplicitParam(name = "birthdayBegin", value = "生日开始", dataType = "String"),
-        @ApiImplicitParam(name = "birthdayEnd", value = "生日结束", dataType = "String"),
-        @ApiImplicitParam(name = "cardNumber", value = "身份证号", dataType = "String"),
-        @ApiImplicitParam(name = "status", value = "是否可用(0:禁用,1:可用)", dataType = "String"),
-        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "username",required = false) String username,
-        @RequestParam(value = "password",required = false) String password,
-        @RequestParam(value = "email",required = false) String email,
-        @RequestParam(value = "phone",required = false) String phone,
-        @RequestParam(value = "realName",required = false) String realName,
-        @RequestParam(value = "sex",required = false) String sex,
-        @RequestParam(value = "birthdayBegin",required = false) Date birthdayBegin,
-        @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
-        @RequestParam(value = "cardNumber",required = false) String cardNumber,
-        @RequestParam(value = "status",required = false) Integer status,
-        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-        @RequestParam(value = "pageSize",required = false) Integer pageSize
+            @ApiParam(value = "生日开始") @RequestParam(value = "birthdayBegin", required = false) Date birthdayBegin,
+            @ApiParam(value = "生日结束") @RequestParam(value = "birthdayEnd",required = false) Date birthdayEnd,
+            @ApiParam(value = "身份证号") @RequestParam(value = "cardNumber", required = false) String cardNumber,
+            @ApiParam(value = "邮箱") @RequestParam(value = "email", required = false) String email,
+            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
+            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(value = "密码") @RequestParam(value = "password", required = false) String password,
+            @ApiParam(value = "手机号") @RequestParam(value = "phone", required = false) String phone,
+            @ApiParam(value = "真实姓名") @RequestParam(value = "realName", required = false) String realName,
+            @ApiParam(value = "性别") @RequestParam(value = "sex", required = false) String sex,
+            @ApiParam(value = "是否可用(0:禁用,1:可用)") @RequestParam(value = "status", required = false) Integer status,
+            @ApiParam(value = "用户名") @RequestParam(value = "username", required = false) String username,
+            @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
+            @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
-            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
-            new StringCondition("username",username, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("sex",sex, StringCondition.Handler.ALL_LIKE),
-            new DateCondition("birthday",birthdayBegin, DateCondition.Handler.GE),
-            new DateCondition("birthday",birthdayEnd, DateCondition.Handler.LE),
-            new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
-            new NumberCondition("status",status, NumberCondition.Handler.EQUAL)
+                new DateCondition("birthday",birthdayBegin, DateCondition.Handler.GE),
+                new DateCondition("birthday",birthdayEnd, DateCondition.Handler.LE),
+                new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
+                new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("sex",sex, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
+                new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
@@ -156,14 +121,13 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "用户实体") @RequestBody UserBean user){
+    public JsonMessage save(@ApiParam(value = "用户实体") @Validated @RequestBody UserBean user){
         if(user.getId()==null){
             user.setPassword(userService.encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
         }
         userService.save(user);
         return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
-
 
     /**
      * 删除用户

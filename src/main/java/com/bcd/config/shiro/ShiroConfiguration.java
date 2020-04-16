@@ -2,9 +2,11 @@ package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.base.config.shiro.AuthorizationHandler;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -21,6 +23,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -52,9 +55,15 @@ public class ShiroConfiguration{
      */
     @Bean
     public EhCacheManager ehCacheManager(){
-        EhCacheManager ehcacheManager = new EhCacheManager();
-        ehcacheManager.setCacheManagerConfigFile("classpath:com/bcd/config/ehcache-shiro.xml");
-        return ehcacheManager;
+        EhCacheManager cacheManager = new EhCacheManager();
+        cacheManager.setCacheManagerConfigFile("classpath:com/bcd/config/ehcache-shiro.xml");
+        return cacheManager;
+    }
+
+//    @Bean
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
+        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory);
+        return cacheManager;
     }
 
     /**
@@ -63,10 +72,10 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean
-    public DefaultWebSecurityManager defaultWebSecurityManager(AuthorizingRealm realm, SessionManager sessionManager, EhCacheManager ehCacheManager){
+    public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager, CacheManager cacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
-        securityManager.setRealm(realm);
+        securityManager.setRealms(realm);
         //设置rememberMeManager
         RememberMeManager rememberMeManager=new MyCookieRememberMeManager();
 //        RememberMeManager rememberMeManager=new MyWebHeaderRememberMeManager();
@@ -74,7 +83,7 @@ public class ShiroConfiguration{
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
         //设置缓存管理器
-        securityManager.setCacheManager(ehCacheManager);
+        securityManager.setCacheManager(cacheManager);
         return securityManager;
     }
 

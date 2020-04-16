@@ -1,3 +1,33 @@
+buildscript {
+    ext {
+        springBootVersion = '+'
+        shiroVersion='+'
+        kafkaVersion='+'
+        tablestoreVersion='+'
+        mnsVersion='+'
+        smsVersion='+'
+        liveVersion='+'
+        ossVersion='+'
+        aliyunSdkCoreVersion='+'
+        flywayVersion = '5.+'
+        mavenRepoUrl='https://maven.aliyun.com/repository/central'
+    }
+
+    repositories {
+        mavenLocal()
+        maven { url "${mavenRepoUrl}" }
+//        jcenter()
+//        mavenCentral()
+    }
+
+    dependencies {
+        //使用springboot框架
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        //使用flyway插件
+        classpath "org.flywaydb:flyway-gradle-plugin:${flywayVersion}"
+    }
+}
+
 //所有模块配置
 allprojects{
     group 'com.bcd'
@@ -114,8 +144,6 @@ allprojects{
 
 apply plugin: 'org.flywaydb.flyway'
 
-
-
 flyway {
     url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
     user = 'root'
@@ -143,36 +171,6 @@ bootRun {
     //开启缓存行补齐
     args.add('-XX:-RestrictContended')
     jvmArgs(args)
-}
-
-buildscript {
-    ext {
-        springBootVersion = '+'
-        shiroVersion='+'
-        kafkaVersion='+'
-        tablestoreVersion='+'
-        mnsVersion='+'
-        smsVersion='+'
-        liveVersion='+'
-        ossVersion='+'
-        aliyunSdkCoreVersion='+'
-        flywayVersion = '5.+'
-        mavenRepoUrl='https://maven.aliyun.com/repository/central'
-    }
-
-    repositories {
-        mavenLocal()
-        maven { url "${mavenRepoUrl}" }
-//        jcenter()
-//        mavenCentral()
-    }
-
-    dependencies {
-        //使用springboot框架
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        //使用flyway插件
-        classpath "org.flywaydb:flyway-gradle-plugin:${flywayVersion}"
-    }
 }
 
 dependencies {

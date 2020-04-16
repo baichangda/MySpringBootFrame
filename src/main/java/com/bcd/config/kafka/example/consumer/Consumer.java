@@ -2,6 +2,7 @@ package com.bcd.config.kafka.example.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +17,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-//@Service
+@Service
 public class Consumer {
     @KafkaListener(topics = "test")
     public void processMessage(ConsumerRecord<byte[],byte[]> consumerRecord) {
-        System.out.println(consumerRecord);
+        System.out.println(new String(consumerRecord.value()));
     }
 
 }

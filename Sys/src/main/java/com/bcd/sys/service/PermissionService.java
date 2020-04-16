@@ -6,11 +6,11 @@ import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import com.bcd.rdb.service.BaseService;
-import com.bcd.sys.bean.PermissionBean;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import com.bcd.sys.bean.PermissionBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Method;
@@ -18,12 +18,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by Administrator on 2017/4/18.
+ *
  */
 @Service
-public class PermissionService extends BaseService<PermissionBean,Long> implements SpringInitializable{
+public class PermissionService extends BaseService<PermissionBean,Long> implements SpringInitializable {
     @Override
-    @Transactional
     public void init(ContextRefreshedEvent event) {
         initNotePermission();
     }
@@ -54,4 +53,5 @@ public class PermissionService extends BaseService<PermissionBean,Long> implemen
         }).collect(Collectors.toList());
         saveAll(permissionBeanList);
     }
+
 }

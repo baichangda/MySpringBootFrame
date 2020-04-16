@@ -80,15 +80,15 @@ spring:
 #        master: myMaster
 #        nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
       #集群配置
-#      cluster:
-#        maxRedirects: 3
-#        nodes:
-#          - 119.23.34.40:7001
-#          - 119.23.34.40:7002
-#          - 119.23.34.40:7003
-#          - 39.108.14.114:7004
-#          - 39.108.14.114:7005
-#          - 39.108.14.114:7006
+#       cluster:
+#         maxRedirects: 3
+#         nodes:
+#           - 114.116.107.184:7001
+#           - 114.116.107.184:7002
+#           - 114.116.107.184:7003
+#           - 114.115.141.139:7004
+#           - 114.115.141.139:7005
+#           - 114.115.141.139:7006
 
       #单机配置
       host: 127.0.0.1
@@ -104,12 +104,12 @@ spring:
 #  kafka配置
    kafka:
      consumer:
-        bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
-        group-id: zd
+        bootstrap-servers: 114.116.107.184:9092,114.116.107.184:9093,114.115.141.139:9092
+        group-id: bcd
         key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
         value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
      producer:
-        bootstrap-servers: 10.10.11.147:9092,10.10.11.148:9092,10.10.11.149:9092
+        bootstrap-servers: 114.116.107.184:9092,114.116.107.184:9093,114.115.141.139:9092
         key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 

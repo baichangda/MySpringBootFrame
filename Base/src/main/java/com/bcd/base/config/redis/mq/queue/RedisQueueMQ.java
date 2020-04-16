@@ -138,23 +138,28 @@ public class RedisQueueMQ<V> {
                 long timeout = ((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout();
                 while (!stop) {
                     try {
-                        try {
-                            byte[] data = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
-                            if (data != null) {
-                                workPool.execute(() -> {
-                                    try {
-                                        onMessageFromRedis(data);
-                                    } catch (Exception e) {
-                                        logger.error(e.getMessage(), e);
-                                    }
-                                });
-                            }
-                        } catch (QueryTimeoutException ex) {
-                            logger.error("RedisQueueMQ[" + getClass().getName() + "] schedule task QueryTimeoutException", ex);
+                        byte[] data = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
+                        if (data != null) {
+                            workPool.execute(() -> {
+                                try {
+                                    onMessageFromRedis(data);
+                                } catch (Exception e) {
+                                    logger.error(e.getMessage(), e);
+                                }
+                            });
                         }
-                    } catch (Exception e) {
-                        logger.error("redis queue[" + name + "] cycle error,exit...", e);
-                        return;
+                    } catch (Exception ex) {
+                        if (ex instanceof QueryTimeoutException) {
+                            logger.error("redisQueueMQ queue[" + name + "] QueryTimeoutException", ex);
+                        } else {
+                            logger.error("redisQueueMQ queue[" + name + "] error,try after 3s", ex);
+                            try {
+                                Thread.sleep(3000L);
+                            } catch (InterruptedException e) {
+                                logger.error("redisQueueMQ queue[" + name + "] interrupted,exit ...", ex);
+                                break;
+                            }
+                        }
                     }
                 }
             });

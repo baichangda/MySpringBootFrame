@@ -1,15 +1,21 @@
 package com.bcd.config.kafka.example.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-//@Service
-public class Producer {
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+@Service
+public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
-    private KafkaTemplate<byte[],byte[]> kafkaTemplate;
+    private KafkaTemplate kafkaTemplate;
 
     public void sendMessage(byte[] key,byte[] msg){
         ListenableFuture<SendResult<byte[],byte[]>> listenableFuture= kafkaTemplate.send("test",key, msg);
@@ -24,5 +30,12 @@ public class Producer {
                 System.out.println("onSucceed!");
             }
         });
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
+            sendMessage("test".getBytes(),"bcd".getBytes());
+        },3,3, TimeUnit.SECONDS);
     }
 }

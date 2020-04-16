@@ -64,23 +64,29 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
      */
     private void fetchAndExecute() throws InterruptedException {
         lock.acquire();
-        Object[] data=new Object[1];
         try {
-            data[0]= boundListOperations.rightPop(popIntervalMills, TimeUnit.MILLISECONDS);
-        }catch (QueryTimeoutException ex){
-            logger.error("SysTaskRedisQueue fetchAndExecute QueryTimeoutException",ex);
-        }
-        if (data[0] == null) {
+            Object[] data=new Object[1];
+            data[0] = boundListOperations.rightPop(popIntervalMills, TimeUnit.MILLISECONDS);
+            if (data[0] == null) {
+                lock.release();
+            } else {
+                workPool.execute(() -> {
+                    try {
+                        onTask(data[0]);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                        lock.release();
+                    }
+                });
+            }
+        }catch (Exception ex){
             lock.release();
-        }else{
-            workPool.execute(() -> {
-                try {
-                    onTask(data[0]);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    lock.release();
-                }
-            });
+            if(ex instanceof QueryTimeoutException){
+                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute QueryTimeoutException", ex);
+            }else{
+                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute error,try after 3s",ex);
+                Thread.sleep(3000L);
+            }
         }
     }
 
@@ -155,8 +161,9 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             while(!stop){
                 try {
                     fetchAndExecute();
-                } catch (Exception e) {
-                    logger.error("SysTaskRedisQueue["+name+"] stop,exit...", e);
+                } catch (InterruptedException ex) {
+                    //处理打断情况,此时退出
+                    logger.error("SysTaskRedisQueue["+name+"] interrupted,exit...", ex);
                     break;
                 }
             }

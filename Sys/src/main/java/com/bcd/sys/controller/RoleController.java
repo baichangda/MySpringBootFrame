@@ -37,29 +37,20 @@ public class RoleController extends BaseController {
     @RequiresNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询角色列表",notes = "查询角色列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "name", value = "角色名称", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "code", value = "编码", dataType = "String"),
-        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "角色列表")
     public JsonMessage<List<RoleBean>> list(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "name",required = false) String name,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "code",required = false) String code,
-        @RequestParam(value = "remark",required = false) String remark
+            @ApiParam(value = "编码") @RequestParam(value = "code", required = false) String code,
+            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
+            @ApiParam(value = "角色名称") @RequestParam(value = "name", required = false) String name,
+            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(value = "备注") @RequestParam(value = "remark", required = false) String remark
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
-            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
-            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
+                new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+                new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
+                new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(roleService.findAll(condition));
     }
@@ -71,33 +62,22 @@ public class RoleController extends BaseController {
     @RequiresNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询角色列表",notes = "查询角色分页")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "name", value = "角色名称", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "code", value = "编码", dataType = "String"),
-        @ApiImplicitParam(name = "remark", value = "备注", dataType = "String"),
-        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "角色分页结果集")
     public JsonMessage<Page<RoleBean>> page(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "name",required = false) String name,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "code",required = false) String code,
-        @RequestParam(value = "remark",required = false) String remark,
-        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-        @RequestParam(value = "pageSize",required = false) Integer pageSize
+            @ApiParam(value = "编码") @RequestParam(value = "code", required = false) String code,
+            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
+            @ApiParam(value = "角色名称") @RequestParam(value = "name", required = false) String name,
+            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
+            @ApiParam(value = "备注") @RequestParam(value = "remark", required = false) String remark,
+            @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
+            @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
-            new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
+                new StringCondition("code",code, StringCondition.Handler.ALL_LIKE),
+                new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
+                new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
+                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
+                new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
@@ -127,6 +107,7 @@ public class RoleController extends BaseController {
     @ApiOperation(value = "删除角色",notes = "删除角色")
     @ApiResponse(code = 200,message = "删除结果")
     public JsonMessage delete(@ApiParam(value = "角色id数组") @RequestParam Long[] ids){
+        //验证删除权限
         roleService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }

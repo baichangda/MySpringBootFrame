@@ -5,13 +5,16 @@ import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
+import com.bcd.base.util.DateZoneUtil;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
-import com.bcd.sys.shiro.MyShiroRealm;
+import com.bcd.sys.shiro.PhoneCodeToken;
+import com.bcd.sys.shiro.UsernamePasswordRealm;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
@@ -20,13 +23,17 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +45,11 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
     private final static Logger logger= LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private MyShiroRealm myShiroRealm;
+    @Qualifier("string_string_redisTemplate")
+    private RedisTemplate<String,String> redisTemplate;
+
+    @Autowired
+    private UsernamePasswordRealm myShiroRealm;
 
     @Override
     public void init(ContextRefreshedEvent event) {
@@ -55,43 +66,86 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
             }
             userBean.setPassword(password);
             userBean.setStatus(1);
-            userBean.setType(1);
             save(userBean);
         }
     }
 
     /**
-     * 登录
+     * 手机号、验证码登陆
+     * @param phone
+     * @param phoneCode
+     * @return
+     */
+    public UserBean login(String phone,String phoneCode){
+        PhoneCodeToken token=new PhoneCodeToken(phone,phoneCode);
+        return login(token, DateZoneUtil.ZONE_OFFSET.getId(),()->{
+            return findOne(new StringCondition("phone",phone));
+        });
+    }
+
+    /**
+     * 发送随机验证码
+     * @param phone
+     */
+    public void sendPhoneCode(String phone){
+        String key="phoneCode:"+phone;
+        long expireTimeInSeconds=redisTemplate.getExpire(key);
+        if(expireTimeInSeconds>0){
+            throw BaseRuntimeException.getException("等待"+expireTimeInSeconds+"秒后重试");
+        }else{
+            if(expireTimeInSeconds==-1){
+                //如果没有过期时间,则删除异常key
+                redisTemplate.delete(key);
+            }else{
+                //如果不存在,则构造key发送短信
+                String phoneCode= RandomStringUtils.randomNumeric(6);
+                boolean res=redisTemplate.opsForValue().setIfAbsent("phoneCode:"+phone,phoneCode,3*60, TimeUnit.SECONDS);
+                if(res){
+                    //todo 发送短信
+
+                }else{
+                    //如果有其他服务器抢先发送了验证码,则再次获取时间
+                    expireTimeInSeconds=redisTemplate.getExpire(key);
+                    throw BaseRuntimeException.getException("等待"+expireTimeInSeconds+"秒后重试");
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 用户名、密码登陆
      * @param username
      * @param encryptPassword 使用公钥加密后的密码
      * @param offsetId
      * @return
      */
     public UserBean login(String username,String encryptPassword,String offsetId){
-        //1、构造shiro登录对象
         UsernamePasswordToken token;
-        //2、根据是否加密处理选择不同处理方式
+        //根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
-            //2.1、使用私钥解密密码
+            //使用私钥解密密码
             PrivateKey privateKey = KeysConst.PRIVATE_KEY;
             String password= RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
-            //2.2、构造登录对象
+            //构造登录对象
             token = new UsernamePasswordToken(username, password);
         }else{
             token = new UsernamePasswordToken(username, encryptPassword);
         }
-        //2.3、设置记住我
-        token.setRememberMe(true);
-        //3、获取当前subject
-        Subject currentUser = SecurityUtils.getSubject();
-        //4、进行登录操作
-        currentUser.login(token);
-        //5、设置用户信息到session中
-        UserBean user= findOne(
-                new StringCondition("username",username, StringCondition.Handler.EQUAL)
-        );
+        return login(token,offsetId,()->{
+            return findOne(new StringCondition("username",username));
+        });
+    }
+
+    private UserBean login(AuthenticationToken token,String offsetId, Supplier<UserBean> supplier){
+        //获取当前subject
+        Subject subject = SecurityUtils.getSubject();
+        //进行登录操作
+        subject.login(token);
+        //设置用户信息到session中
+        UserBean user=supplier.get();
         user.setOffsetId(offsetId);
-        currentUser.getSession().setAttribute("user",user);
+        subject.getSession().setAttribute("user",user);
         return user;
     }
 

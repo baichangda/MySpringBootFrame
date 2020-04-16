@@ -19,16 +19,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "t_sys_role")
-public class RoleBean extends BaseBean<Long> {
+public class RoleBean extends BaseBean<Long>{
     //field
     @NotBlank(message = "[角色名称]不能为空")
     @Size(max = 20,message = "[角色名称]长度不能超过20")
     @ApiModelProperty(value = "角色名称(不能为空,长度不能超过20)")
     private String name;
-
-    @Size(max = 100,message = "[关联机构编码]长度不能超过100")
-    @ApiModelProperty(value = "关联机构编码(长度不能超过100)")
-    private String orgCode;
 
     @NotBlank(message = "[编码]不能为空")
     @Size(max = 50,message = "[编码]长度不能超过50")
@@ -47,14 +43,6 @@ public class RoleBean extends BaseBean<Long> {
 
     public String getName(){
         return this.name;
-    }
-
-    public void setOrgCode(String orgCode){
-        this.orgCode=orgCode;
-    }
-
-    public String getOrgCode(){
-        return this.orgCode;
     }
 
     public void setCode(String code){

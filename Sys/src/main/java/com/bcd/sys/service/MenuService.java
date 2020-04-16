@@ -23,33 +23,8 @@ public class MenuService extends BaseService<MenuBean,Long> {
      * @return
      */
     public List<MenuBean> adminMenuTree(){
-        //1、查出当前所有菜单
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        List<MenuBean> menuBeanList;
-        switch (curUser.getType()){
-            //1.1、管理用户
-            case 1:{
-                String sql="select * from t_sys_menu";
-                menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class));
-                break;
-            }
-            //1.2、企业用户
-            case 2:{
-                String sql="SELECT\n" +
-                        "\td.* \n" +
-                        "FROM\n" +
-                        "\t( SELECT * FROM t_sys_org WHERE org_code = ? ) a\n" +
-                        "\tINNER JOIN t_sys_user_role b ON a.admin_id = b.user_id\n" +
-                        "\tINNER JOIN t_sys_role_menu c ON b.role_id = c.role_id\n" +
-                        "\tINNER JOIN t_sys_menu d ON c.menu_id = d.id";
-                String orgCode=curUser.getOrgCode();
-                menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class),orgCode);
-                break;
-            }
-            default:{
-                throw BaseRuntimeException.getException("当前用户类型错误");
-            }
-        }
+        String sql="select * from t_sys_menu";
+        List<MenuBean> menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class));
         //3、组装成树并返回
         return listToTree(menuBeanList);
     }

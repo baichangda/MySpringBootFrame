@@ -5,8 +5,11 @@ import com.bcd.sys.bean.UserBean;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/4/26.
@@ -18,8 +21,11 @@ public class ShiroUtil {
      */
     public static void clearCurrentUserCachedAuthorizationInfo(){
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
-        realm.clearCurrentUserCachedAuthorizationInfo();
+        Map<String, Realm> nameToRealm= rsm.getRealms().stream().collect(Collectors.toMap(e->e.getName(), e->e));
+        PrincipalCollection principalCollection= SecurityUtils.getSubject().getPrincipals();
+        for (String realmName : principalCollection.getRealmNames()) {
+            Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e->((MyAuthorizingRealm)e).clearCurrentUserCachedAuthorizationInfo(principalCollection));
+        }
     }
 
     /**
@@ -40,10 +46,15 @@ public class ShiroUtil {
      * 获取当前登录用户的所有角色
      * @return
      */
-    public static Collection<String> getCurrentUserRoles(){
+    public static Set<String> getCurrentUserRoles(){
+        Set<String> roleSet=new HashSet<>();
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
-        return realm.getAllRoles();
+        Map<String,Realm> nameToRealm= rsm.getRealms().stream().collect(Collectors.toMap(e->e.getName(), e->e));
+        PrincipalCollection principalCollection= SecurityUtils.getSubject().getPrincipals();
+        for (String realmName : principalCollection.getRealmNames()) {
+            Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e->roleSet.addAll(((MyAuthorizingRealm)e).getAllRoles(principalCollection)));
+        }
+        return roleSet;
     }
 
     /**
@@ -51,9 +62,14 @@ public class ShiroUtil {
      * @return
      */
     public static Collection<String> getCurrentUserPermissions(){
+        Set<String> permissionSet=new HashSet<>();
         RealmSecurityManager rsm= (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        MyAuthorizingRealm realm=  (MyAuthorizingRealm)rsm.getRealms().iterator().next();
-        return realm.getAllPermissions();
+        Map<String,Realm> nameToRealm= rsm.getRealms().stream().collect(Collectors.toMap(e->e.getName(), e->e));
+        PrincipalCollection principalCollection= SecurityUtils.getSubject().getPrincipals();
+        for (String realmName : principalCollection.getRealmNames()) {
+            Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e->permissionSet.addAll(((MyAuthorizingRealm)e).getAllPermissions(principalCollection)));
+        }
+        return permissionSet;
     }
 
 }

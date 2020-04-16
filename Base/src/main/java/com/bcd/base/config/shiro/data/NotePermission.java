@@ -5,9 +5,6 @@ public enum NotePermission {
     user_edit("user:edit", "用户维护"),
     user_runAs("user:runAs", "用户身份授权"),
 
-    org_search("org:search", "机构查询"),
-    org_edit("org:edit", "机构维护"),
-
     role_search("role:search", "角色查询"),
     role_edit("role:edit", "角色维护"),
 
@@ -17,9 +14,6 @@ public enum NotePermission {
 
     permission_search("permission:search", "权限查询"),
     permission_edit("permission:edit", "权限维护"),
-
-    companyRegister_search("org:search", "机构查询"),
-    companyRegister_edit("org:edit", "机构维护"),
 
     sysTask_search("sysTask:search", "系统任务查询"),
     sysTask_stop("sysTask:destroy", "系统任务停止"),;

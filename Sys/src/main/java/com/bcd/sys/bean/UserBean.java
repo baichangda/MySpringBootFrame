@@ -22,14 +22,6 @@ public class UserBean extends BaseBean<Long>{
     private final static long serialVersionUID=1L;
 
     //field
-    @NotNull(message = "[用户类型]不能为空")
-    @ApiModelProperty(value = "用户类型(1:管理用户,2:企业用户)(不能为空)")
-    private Integer type;
-
-    @Size(max = 100,message = "[关联机构编码]长度不能超过100")
-    @ApiModelProperty(value = "关联机构编码(长度不能超过100)")
-    private String orgCode;
-
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50,message = "[用户名]长度不能超过50")
     @ApiModelProperty(value = "用户名(不能为空,长度不能超过50)")
@@ -75,14 +67,6 @@ public class UserBean extends BaseBean<Long>{
 
     //method
 
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
 
     public void setUsername(String username){
         this.username=username;
@@ -164,11 +148,4 @@ public class UserBean extends BaseBean<Long>{
         this.offsetId = offsetId;
     }
 
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
 }

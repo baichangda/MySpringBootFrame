@@ -6,6 +6,7 @@ import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
+import com.bcd.sys.service.PermissionService;
 import com.bcd.sys.service.UserService;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -21,17 +22,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class MyShiroRealm extends MyAuthorizingRealm {
+public class UsernamePasswordRealm extends MyAuthorizingRealm {
 
     @Autowired
     private UserService userService;
 
-    public MyShiroRealm() {
+    @Autowired
+    PermissionService permissionService;
+
+    public UsernamePasswordRealm() {
         if (CommonConst.IS_PASSWORD_ENCODED) {
             HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
             hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
             setCredentialsMatcher(hashedCredentialsMatcher);
         }
+        setAuthenticationTokenClass(UsernamePasswordToken.class);
+        //关闭登陆缓存
+        setAuthenticationCachingEnabled(false);
+        //开启权限缓存
+        setAuthorizationCachingEnabled(true);
     }
 
     /**
@@ -74,14 +83,16 @@ public class MyShiroRealm extends MyAuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        Object userName = super.getAvailablePrincipal(principals);
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        if (userName != null) {
-            UserBean user = userService.findOne(new StringCondition("username", userName));
-            Set<String> roleSet = new HashSet<>();
-            Set<String> permissionSet = new HashSet<>();
-            info.setRoles(roleSet);
-            info.setStringPermissions(permissionSet);
+        if(principals.getRealmNames().contains(getName())) {
+            Object userName = super.getAvailablePrincipal(principals);
+            if (userName != null) {
+                UserBean user = userService.findOne(new StringCondition("username", userName));
+                Set<String> roleSet = new HashSet<>();
+                Set<String> permissionSet = new HashSet<>();
+                info.setRoles(roleSet);
+                info.setStringPermissions(permissionSet);
+            }
         }
         //返回null将会导致用户访问任何被拦截的请求时都会自动跳转到unauthorizedUrl指定的地址
         return info;

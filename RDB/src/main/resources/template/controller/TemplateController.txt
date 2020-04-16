@@ -32,9 +32,6 @@ public class @{upperModuleName}Controller extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询@{moduleNameCN}列表",notes = "查询@{moduleNameCN}列表")
-    @ApiImplicitParams({
-@{controllerListSwaggerParams}
-    })
     @ApiResponse(code = 200,message = "@{moduleNameCN}列表")
     public JsonMessage<List<@{upperModuleName}Bean>> list(
 @{controllerListParams}
@@ -51,16 +48,11 @@ public class @{upperModuleName}Controller extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询@{moduleNameCN}列表",notes = "查询@{moduleNameCN}分页")
-    @ApiImplicitParams({
-@{controllerListSwaggerParams},
-        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "@{moduleNameCN}分页结果集")
     public JsonMessage<Page<@{upperModuleName}Bean>> page(
 @{controllerListParams},
-        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-        @RequestParam(value = "pageSize",required = false) Integer pageSize
+        @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
+        @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
 @{controllerListConditions}

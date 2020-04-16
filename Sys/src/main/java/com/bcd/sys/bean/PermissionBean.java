@@ -21,15 +21,15 @@ import javax.persistence.*;
 @Table(name = "t_sys_permission")
 public class PermissionBean extends BaseBean<Long> {
     //field
-    @NotBlank(message = "[角色名称]不能为空")
-    @Size(max = 20,message = "[角色名称]长度不能超过20")
-    @ApiModelProperty(value = "角色名称(不能为空,长度不能超过20)")
-    private String name;
-
     @NotBlank(message = "[编码]不能为空")
     @Size(max = 50,message = "[编码]长度不能超过50")
     @ApiModelProperty(value = "编码(不能为空,长度不能超过50)")
     private String code;
+
+    @NotBlank(message = "[角色名称]不能为空")
+    @Size(max = 20,message = "[角色名称]长度不能超过20")
+    @ApiModelProperty(value = "角色名称(不能为空,长度不能超过20)")
+    private String name;
 
     @Size(max = 256,message = "[备注]长度不能超过256")
     @ApiModelProperty(value = "备注(长度不能超过256)")
@@ -40,20 +40,20 @@ public class PermissionBean extends BaseBean<Long> {
 
 
     //method
-    public void setName(String name){
-        this.name=name;
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
     public void setCode(String code){
         this.code=code;
     }
 
     public String getCode(){
         return this.code;
+    }
+
+    public void setName(String name){
+        this.name=name;
+    }
+
+    public String getName(){
+        return this.name;
     }
 
     public void setRemark(String remark){

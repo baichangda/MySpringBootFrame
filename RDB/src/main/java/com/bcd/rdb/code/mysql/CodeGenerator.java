@@ -6,6 +6,7 @@ import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.code.Config;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,17 +267,12 @@ public class CodeGenerator {
         //缩进
         final String blank = "        ";
         List<JavaColumn> javaColumnList = (List<JavaColumn>) config.getDataMap().get("fieldList");
-        StringBuilder swaggerParamSb=new StringBuilder();
         StringBuilder paramsSb = new StringBuilder();
         StringBuilder conditionsSb = new StringBuilder();
         for (int i = 0; i <= javaColumnList.size() - 1; i++) {
             JavaColumn column = javaColumnList.get(i);
             if(CodeConst.IGNORE_FIELD_NAME.contains(column.getName())){
                 continue;
-            }
-            if(swaggerParamSb.length()>0){
-                swaggerParamSb.append(",");
-                swaggerParamSb.append("\n");
             }
             if (paramsSb.length()>0) {
                 paramsSb.append(",");
@@ -292,23 +288,21 @@ public class CodeGenerator {
             String swaggerType=CodeConst.JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.get(type);
             String paramBegin = column.getName() + "Begin";
             String paramEnd = column.getName() + "End";
-            //1、controllerListSwaggerParams和controllerListParams
-            swaggerParamSb.append(blank);
+            //1、controllerListParams
             paramsSb.append(blank);
             if (type.equals("Date")) {
-                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramBegin+"\", value = \""+column.getComment()+"开始\", dataType = \""+swaggerType+"\")");
-                swaggerParamSb.append(",");
-                swaggerParamSb.append("\n");
-                swaggerParamSb.append(blank);
-                swaggerParamSb.append("@ApiImplicitParam(name = \""+paramEnd+"\", value = \""+column.getComment()+"结束\", dataType = \""+swaggerType+"\")");
-
+                paramsSb.append("@ApiParam(value = \""+column.getComment()+"开始\")");
+                paramsSb.append(" ");
                 paramsSb.append("@RequestParam(value = \"" + paramBegin + "\", required = false) " + type + " " + paramBegin);
                 paramsSb.append(",");
                 paramsSb.append("\n");
                 paramsSb.append(blank);
+                paramsSb.append("@ApiParam(value = \""+column.getComment()+"结束\")");
+                paramsSb.append(" ");
                 paramsSb.append("@RequestParam(value = \"" + paramEnd + "\",required = false) " + type + " " + paramEnd);
             } else {
-                swaggerParamSb.append("@ApiImplicitParam(name = \""+column.getName()+"\", value = \""+column.getComment()+"\", dataType = \""+swaggerType+"\")");
+                paramsSb.append("@ApiParam(value = \""+column.getComment()+"\")");
+                paramsSb.append(" ");
                 paramsSb.append("@RequestParam(value = \"" + param + "\", required = false) " + type + " " + param);
             }
             //2、controllerListConditions
@@ -329,7 +323,6 @@ public class CodeGenerator {
             }
 
         }
-        config.getValueMap().put("controllerListSwaggerParams", swaggerParamSb.toString());
         config.getValueMap().put("controllerListParams", paramsSb.toString());
         config.getValueMap().put("controllerListConditions", conditionsSb.toString());
     }
@@ -477,44 +470,8 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code/test";
+        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/Sys/src/main/java/com/bcd/sys";
         List<Config> list = Arrays.asList(
-                new Config(path,
-                        new TableConfig("Role", "角色", "t_sys_role")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedBeanValidate(true)
-                                .setNeedParamValidate(true)
-                ),
-                new Config(path,
-                        new TableConfig("User", "用户", "t_sys_user")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedBeanValidate(true)
-                                .setNeedParamValidate(true)
-                ),
-                new Config(path,
-                        new TableConfig("Permission", "角色", "t_sys_permission")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedBeanValidate(true)
-                                .setNeedParamValidate(true)
-                ),
-                new Config(path,
-                        new TableConfig("Menu", "菜单", "t_sys_menu")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedBeanValidate(true)
-                                .setNeedParamValidate(true)
-                ),
                 new Config(path,
                         new TableConfig("Org", "组织机构", "t_sys_org")
                                 .setNeedCreateControllerFile(true)
@@ -523,15 +480,17 @@ public class CodeGenerator {
                                 .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
+                                .setNeedCreateInfo(true)
                 ),
                 new Config(path,
-                        new TableConfig("Task", "系统任务", "t_sys_task")
+                        new TableConfig("Permission", "权限", "t_sys_permission")
                                 .setNeedCreateControllerFile(true)
                                 .setNeedCreateServiceFile(true)
                                 .setNeedCreateRepositoryFile(true)
                                 .setNeedCreateBeanFile(true)
                                 .setNeedBeanValidate(true)
                                 .setNeedParamValidate(true)
+                                .setNeedCreateInfo(true)
                 )
         );
         CodeGenerator.generate(list);

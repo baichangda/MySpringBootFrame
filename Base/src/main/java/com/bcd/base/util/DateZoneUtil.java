@@ -1,6 +1,7 @@
 package com.bcd.base.util;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 public class DateZoneUtil {
     public final static ZoneId ZONE_ID = ZoneId.of("Asia/Shanghai");
+    public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
     /**
      * @param dateStr

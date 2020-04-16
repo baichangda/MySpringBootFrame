@@ -69,11 +69,9 @@ public class TaskController extends BaseController {
         @RequestParam(value = "finishTimeEnd",required = false) Date finishTimeEnd,
         @RequestParam(value = "filePaths",required = false) String filePaths
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
@@ -125,11 +123,9 @@ public class TaskController extends BaseController {
         @RequestParam(value = "pageNum",required = false)Integer pageNum,
         @RequestParam(value = "pageSize",required = false) Integer pageSize
     ){
-        UserBean curUser= ShiroUtil.getCurrentUser();
-        orgCode=curUser.getType()==1?orgCode:curUser.getOrgCode();
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-            new StringCondition("orgCode",orgCode, StringCondition.Handler.LEFT_LIKE),
+            new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
             new StringCondition("name",name, StringCondition.Handler.ALL_LIKE),
             new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
             new NumberCondition("type",type, NumberCondition.Handler.EQUAL),

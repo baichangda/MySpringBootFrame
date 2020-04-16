@@ -31,21 +31,16 @@ public class TestController extends BaseController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询测试列表",notes = "查询测试列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "postlinecode", value = "班线code(长度20)", dataType = "String"),
-        @ApiImplicitParam(name = "postlinename", value = "班线名称(长度30)", dataType = "String"),
-        @ApiImplicitParam(name = "id", value = "主键(唯一标识符,自动生成)(不需要赋值)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "测试列表")
     public JsonMessage<List<TestBean>> list(
-        @RequestParam(value = "postlinecode", required = false) String postlinecode,
-        @RequestParam(value = "postlinename", required = false) String postlinename,
-        @RequestParam(value = "id", required = false) String id
+        @ApiParam(value = "班线code(长度20)") @RequestParam(value = "postlinecode", required = false) String postlinecode,
+        @ApiParam(value = "班线名称(长度30)") @RequestParam(value = "postlinename", required = false) String postlinename,
+        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(value = "id", required = false) String id
     ){
         Condition condition= Condition.and(
             new StringCondition("postlinecode",postlinecode, StringCondition.Handler.ALL_LIKE),
             new StringCondition("postlinename",postlinename, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("id",id, StringCondition.Handler.EQUAL)
+            new StringCondition("id",id, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(testService.findAll(condition));
     }
@@ -57,25 +52,18 @@ public class TestController extends BaseController {
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询测试分页",notes = "查询测试分页")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "postlinecode", value = "班线code(长度20)", dataType = "String"),
-        @ApiImplicitParam(name = "postlinename", value = "班线名称(长度30)", dataType = "String"),
-        @ApiImplicitParam(name = "id", value = "主键(唯一标识符,自动生成)(不需要赋值)", dataType = "String"),
-        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
-        @RequestParam(value = "postlinecode", required = false) String postlinecode,
-        @RequestParam(value = "postlinename", required = false) String postlinename,
-        @RequestParam(value = "id", required = false) String id,
-        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-        @RequestParam(value = "pageSize",required = false) Integer pageSize
+        @ApiParam(value = "班线code(长度20)") @RequestParam(value = "postlinecode", required = false) String postlinecode,
+        @ApiParam(value = "班线名称(长度30)") @RequestParam(value = "postlinename", required = false) String postlinename,
+        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(value = "id", required = false) String id,
+        @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
+        @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
             new StringCondition("postlinecode",postlinecode, StringCondition.Handler.ALL_LIKE),
             new StringCondition("postlinename",postlinename, StringCondition.Handler.ALL_LIKE),
-            new StringCondition("id",id, StringCondition.Handler.EQUAL)
+            new StringCondition("id",id, StringCondition.Handler.ALL_LIKE)
         );
         return JsonMessage.success(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
