@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
  * @param <V>
  */
 @SuppressWarnings("unchecked")
-public class ExpireThreadSafeMap<K, V> {
-    private final static Logger logger = LoggerFactory.getLogger(ExpireThreadSafeMap.class);
+public class ExpireConcurrentHashMap<K, V> {
+    private final static Logger logger = LoggerFactory.getLogger(ExpireConcurrentHashMap.class);
     private final Map<K, ExpireValue<V>> dataMap = new ConcurrentHashMap<>();
 
 
@@ -59,14 +59,14 @@ public class ExpireThreadSafeMap<K, V> {
     /**
      * 不开启扫描和回调
      */
-    public ExpireThreadSafeMap(){
+    public ExpireConcurrentHashMap(){
         this(null,null);
     }
 
     /**
      * @param delay 扫描计划执行间隔,为null表示不开启扫描
      */
-    public ExpireThreadSafeMap(Long delay) {
+    public ExpireConcurrentHashMap(Long delay) {
         this(delay,null);
     }
 
@@ -74,7 +74,7 @@ public class ExpireThreadSafeMap<K, V> {
      * @param delay          扫描计划执行间隔,为null则表示不进行扫描
      * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
      */
-    public ExpireThreadSafeMap(Long delay, ExecutorService expireWorkPool) {
+    public ExpireConcurrentHashMap(Long delay, ExecutorService expireWorkPool) {
         this.delay = delay;
         this.expireWorkPool = expireWorkPool;
     }
@@ -200,7 +200,7 @@ public class ExpireThreadSafeMap<K, V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireThreadSafeMap<String, String> map = new ExpireThreadSafeMap<>(1*1000L);
+        ExpireConcurrentHashMap<String, String> map = new ExpireConcurrentHashMap<>(1*1000L);
         map.init();
         long t1=System.currentTimeMillis();
         for (int i = 1; i <= 100000; i++) {

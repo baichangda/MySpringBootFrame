@@ -1,19 +1,17 @@
 package com.bcd.base.cache;
 
-import com.bcd.base.map.ExpireThreadSafeMap;
-import com.bcd.base.util.JsonUtil;
+import com.bcd.base.map.ExpireConcurrentHashMap;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.lang.Nullable;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @SuppressWarnings("unchecked")
 public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
 
     private String name;
     private Long aliveTime;
-    private ExpireThreadSafeMap<Object,Object> dataMap;
+    private ExpireConcurrentHashMap<Object,Object> dataMap;
 
 
     public ExpireConcurrentMapCache(String name, Long aliveTime) {
@@ -24,7 +22,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
         super(allowNullValues);
         this.name = name;
         this.aliveTime = aliveTime;
-        this.dataMap=new ExpireThreadSafeMap<>(2000L);
+        this.dataMap=new ExpireConcurrentHashMap<>(2000L);
         this.dataMap.init();
     }
 
