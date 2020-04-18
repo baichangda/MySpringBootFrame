@@ -22,7 +22,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
         super(allowNullValues);
         this.name = name;
         this.aliveTime = aliveTime;
-        this.dataMap=new ExpireSoftReferenceConcurrentHashMap<>(10000L);
+        this.dataMap=new ExpireSoftReferenceConcurrentHashMap<>(5000L);
         this.dataMap.init();
     }
 
