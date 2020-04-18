@@ -1,6 +1,6 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.map.ExpireConcurrentHashMap;
+import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 
@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ExpireMapCache<K,V> implements Cache<K,V> {
 
-    public ExpireConcurrentHashMap<K,V> map;
+    public ExpireSoftReferenceConcurrentHashMap<K,V> map;
 
     //ms
     long timeout;
@@ -22,7 +22,7 @@ public class ExpireMapCache<K,V> implements Cache<K,V> {
     public ExpireMapCache(long timeout, long scanPeriod) {
         this.timeout = timeout;
         this.scanPeriod=scanPeriod;
-        this.map=new ExpireConcurrentHashMap<>(scanPeriod);
+        this.map=new ExpireSoftReferenceConcurrentHashMap<>(scanPeriod);
         this.map.init();
     }
 

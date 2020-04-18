@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.map.ExpireConcurrentHashMap;
+import com.bcd.base.map.ExpireCallBackConcurrentHashMap;
+import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     long localScanPeriod;
 
-    ExpireConcurrentHashMap<K,V> map;
+    ExpireSoftReferenceConcurrentHashMap<K,V> map;
 
     String key;
 
@@ -47,7 +48,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
         this.key=key;
         this.localTimeout=localTimeout;
         this.localScanPeriod=localScanPeriod;
-        this.map=new ExpireConcurrentHashMap<>(localScanPeriod);
+        this.map=new ExpireSoftReferenceConcurrentHashMap<>(localScanPeriod);
         this.map.init();
     }
 

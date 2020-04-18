@@ -1,6 +1,6 @@
 package com.bcd.base.cache;
 
-import com.bcd.base.map.ExpireConcurrentHashMap;
+import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.lang.Nullable;
 
@@ -11,7 +11,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
 
     private String name;
     private Long aliveTime;
-    private ExpireConcurrentHashMap<Object,Object> dataMap;
+    private ExpireSoftReferenceConcurrentHashMap<Object,Object> dataMap;
 
 
     public ExpireConcurrentMapCache(String name, Long aliveTime) {
@@ -22,7 +22,7 @@ public class ExpireConcurrentMapCache extends AbstractValueAdaptingCache {
         super(allowNullValues);
         this.name = name;
         this.aliveTime = aliveTime;
-        this.dataMap=new ExpireConcurrentHashMap<>(2000L);
+        this.dataMap=new ExpireSoftReferenceConcurrentHashMap<>(10000L);
         this.dataMap.init();
     }
 
