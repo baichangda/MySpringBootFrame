@@ -16,6 +16,14 @@ import java.util.stream.Collectors;
  * 过期的弱引用 线程安全hashMap
  * 适合作为缓存
  *
+ * 两种情况下会自动移除缓存
+ * 1、过期扫描线程池扫描到 value过期,移除
+ * 2、进行mini gc、old gc时候会移除
+ *
+ * 注意mini gc会频繁发生,适用于如下场景
+ * 1、缓存内容较小
+ * 2、缓存内存不重要,可以很轻易的重建
+ *
  * 注意:
  * 在调用如下方法时候会检查过期并触发回调
  * 在调用{@link #get(Object)}、{@link #contains(Object)}}

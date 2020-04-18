@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 /**
  * 过期value
  * 其中存储了插入时候时间戳
- * 此value为软引用,在gc时候如果发现空间不足则会回收掉
+ * 此value为软引用,在old gc时候如果发现空间不足则会回收掉
  * @param <K,V>
  */
 public class ExpireSoftReferenceValue<K,V> extends SoftReference<ReferenceData<K,V>> {

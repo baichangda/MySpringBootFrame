@@ -4,14 +4,14 @@ package com.bcd.base.map;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.Executors;
 
 /**
  * 过期value
  * 其中存储了插入时候时间戳
- * 此value为软引用,在gc时候如果发现空间不足则会回收掉
+ * 此value为弱引用,在mini gc和old gc时候都会回收掉
+ *
  * @param <K,V>
  */
 public class ExpireWeakReferenceValue<K,V> extends WeakReference<ReferenceData<K,V>> {
