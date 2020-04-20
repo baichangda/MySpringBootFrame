@@ -60,7 +60,7 @@ public class UserBean extends BaseBean<Long>{
     @ApiModelProperty(value = "是否可用(0:禁用,1:可用)(不能为空)")
     private Integer status;
 
-    //"Asia/Shanghai"
+    //"+8"
     @ApiModelProperty(hidden = true)
     @Transient
     private String offsetId;
