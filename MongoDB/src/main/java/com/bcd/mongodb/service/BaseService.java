@@ -72,10 +72,15 @@ public class BaseService<T,K extends Serializable>{
 
     public Page<T> findAll(Condition condition, Pageable pageable){
         Query query= ConditionUtil.toQuery(condition);
+        long count=mongoTemplate.count(query,beanClass);
         query.with(pageable);
-        long count=repository.count();
         List<T> list=mongoTemplate.find(query,beanClass);
         return new PageImpl(list, pageable, count);
+    }
+
+    public long count(Condition condition){
+        Query query= ConditionUtil.toQuery(condition);
+        return mongoTemplate.count(query,beanClass);
     }
 
     public T findById(K id){
