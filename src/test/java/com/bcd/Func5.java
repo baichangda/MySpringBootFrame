@@ -12,9 +12,12 @@ public class Func5 extends NamedTaskFunction<TaskBean>{
     }
 
     @Override
-    public TaskBean apply(TaskBean task)   throws InterruptedException{
-        Thread.sleep(20*1000L);
-        System.out.println(task.getParams()[0]);
-        return task;
+    public void apply(TaskBean task){
+        try {
+            Thread.sleep(10*1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("func5 finish");
     }
 }

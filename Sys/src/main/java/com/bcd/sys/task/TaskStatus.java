@@ -3,9 +3,14 @@ package com.bcd.sys.task;
 public enum TaskStatus{
         WAITING(1,"等待中"),
         EXECUTING(2,"执行中"),
-        STOPPED(3,"任务被终止"),
-        SUCCEED(4,"执行成功"),
-        FAILED(5,"执行失败");
+        SUCCEED(3,"执行成功"),
+        FAILED(4,"执行失败"),
+
+        CANCELED(5,"任务被取消"),
+        STOPPING(6,"任务停止中"),
+        STOPPED(7,"任务被终止"),
+
+        EXCEPTION(8,"任务执行异常");
 
         private int status;
         private String name;

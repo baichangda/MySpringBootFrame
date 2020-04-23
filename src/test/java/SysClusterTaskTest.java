@@ -1,8 +1,6 @@
 import com.bcd.*;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.service.OrgService;
 import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.TaskUtil;
 import com.bcd.sys.task.cluster.ClusterTaskUtil;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class SysClusterTaskTest {
 
-    @Autowired
-    OrgService orgService;
+
 
     @org.junit.Test
     public void test() throws InterruptedException{
@@ -29,7 +25,7 @@ public class SysClusterTaskTest {
         Serializable t5=ClusterTaskUtil.registerTask(new TaskBean("测试5"), Func5.NAME,"集群测试5参数");
 //
         Thread.sleep(3000L);
-        Boolean[] res= ClusterTaskUtil.stopTask(true,t2,t5);
+        Boolean[] res= ClusterTaskUtil.stopTask(t2,t5);
         System.out.println(res[0]+"   "+res[1]);
 
         while(CommonConst.SYS_TASK_POOL.getActiveCount()!=0){

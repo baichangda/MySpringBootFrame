@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StopSysTaskContext {
     private String code;
-    private boolean mayInterruptIfRunning;
     private String[] ids;
     private Map<String,Boolean> result=new ConcurrentHashMap<>();
 
@@ -18,14 +17,6 @@ public class StopSysTaskContext {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public boolean isMayInterruptIfRunning() {
-        return mayInterruptIfRunning;
-    }
-
-    public void setMayInterruptIfRunning(boolean mayInterruptIfRunning) {
-        this.mayInterruptIfRunning = mayInterruptIfRunning;
     }
 
     public String[] getIds() {

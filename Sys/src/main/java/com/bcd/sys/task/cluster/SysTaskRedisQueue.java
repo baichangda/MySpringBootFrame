@@ -3,7 +3,7 @@ package com.bcd.sys.task.cluster;
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.SysTaskRunnable;
+import com.bcd.sys.task.TaskRunnable;
 import com.bcd.sys.task.TaskUtil;
 import com.bcd.sys.task.TaskDAO;
 import com.bcd.sys.task.NamedTaskFunction;
@@ -107,16 +107,17 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             throw exception;
         }
         //3、使用线程池执行任务
+        TaskRunnable<T> runnable=new TaskRunnable(task, taskFunction);
         Future future= CommonConst.SYS_TASK_POOL.submit(()->{
             try {
                 //3.1、执行任务
-                new SysTaskRunnable(task, taskFunction, taskDAO).run();
+                runnable.run();
             }finally {
                 //3.2、执行完毕后释放锁
                 lock.release();
             }
         });
-        CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(id.toString(),future);
+        CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(id.toString(),runnable);
     }
 
     public void send(T task) {

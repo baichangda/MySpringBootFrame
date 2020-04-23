@@ -1,7 +1,10 @@
 package com.bcd;
 
+import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.bean.TaskBean;
+import com.bcd.sys.service.RoleService;
 import com.bcd.sys.task.NamedTaskFunction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,14 +14,20 @@ public class Func4 extends NamedTaskFunction<TaskBean>{
         super(NAME);
     }
 
+    @Autowired
+    RoleService roleService;
+
     @Override
-    public TaskBean apply(TaskBean task)   throws InterruptedException{
+    public void apply(TaskBean task){
         try {
-            Thread.sleep(20*1000L);
-            System.out.println(task.getParams()[0]);
+            Thread.sleep(10*1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return task;
+        RoleBean roleBean=new RoleBean();
+        roleBean.setName("testFun4");
+        roleBean.setCode("testFun4");
+        roleService.save(roleBean);
+        System.out.println("func4 finish");
     }
 }

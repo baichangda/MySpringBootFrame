@@ -1,7 +1,6 @@
 package com.bcd.sys.task.cluster;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.task.CommonConst;
 import com.bcd.sys.task.Task;
 import com.bcd.sys.task.TaskUtil;
 import com.bcd.sys.task.TaskDAO;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 @SuppressWarnings("unchecked")
 @Component
@@ -70,7 +68,7 @@ public class ClusterTaskUtil {
         try {
             task.setFunctionName(functionName);
             task.setParams(params);
-            id=TaskUtil.onCreate(task);
+            id=TaskUtil.onCreated(task);
             sysTaskRedisQueue.send(task);
         }catch (Exception e){
             throw BaseRuntimeException.getException(e);
@@ -79,74 +77,68 @@ public class ClusterTaskUtil {
     }
     /**
      * 终止任务(redis队列任务模式)
-     * @param mayInterruptIfRunning
      * @param ids
      * @return
      */
-    public static Boolean[] stopTask(boolean mayInterruptIfRunning, Serializable...ids){
+    public static Boolean[] stopTask(Serializable...ids){
         //先移除队列中正在等待的任务
         LinkedHashMap<Serializable,Boolean> resMap=sysTaskRedisQueue.remove(ids);
         //先执行从队列中移除任务的回调
         resMap.forEach((k,v)->{
             if(v){
                 Task task= taskDAO.doRead(k);
-                TaskUtil.onStop(task);
+                TaskUtil.onCanceled(task);
             }
         });
-        //如果参数为不打断正在运行的任务,则更新状态并直接返回;否则打断每个集群实例正在执行的任务
-        if(mayInterruptIfRunning) {
-            //更新终止成功任务的状态,同时记录终止失败任务id并准备进行运行任务打断
-            List<Serializable> failedIdList = new LinkedList<>();
-            resMap.forEach((k, v) -> {
-                if (!v) {
-                    failedIdList.add(k);
-                }
-            });
-            //如果没有移除失败的任务,则直接返回结果;否则进行运行任务打断
-            if (!failedIdList.isEmpty()) {
-                //通过redis通知其他服务器执行
-                String code = RandomStringUtils.randomAlphabetic(32);
-                StopSysTask stopSysTask = new StopSysTask();
-                String[] idArr = failedIdList.stream().map(Object::toString).toArray(String[]::new);
-                stopSysTask.setIds(idArr);
-                stopSysTask.setCode(code);
-                stopSysTask.setMayInterruptIfRunning(true);
-                //定义结果
-                StopSysTaskContext stopSysTaskContext = new StopSysTaskContext();
-                stopSysTaskContext.setCode(code);
-                stopSysTaskContext.setIds(idArr);
-                stopSysTaskContext.setMayInterruptIfRunning(true);
-                ClusterTaskUtil.STOP_SYS_TASK_CODE_TO_CONTEXT_MAP.put(code, stopSysTaskContext);
-                //发送通知
-                stopSysTaskListener.send(stopSysTask);
-                //主线程等待结果
-                synchronized (stopSysTaskContext) {
-                    try {
-                        long t1 = System.currentTimeMillis();
-                        long timeout = 30 * 1000;
-                        while (true) {
-                            stopSysTaskContext.wait(timeout);
-                            //每次唤醒后检查是否所有结果都处理了
-                            if (idArr.length == stopSysTaskContext.getResult().size()) {
-                                break;
-                            }
-                            //检查是否超时
-                            timeout -= (System.currentTimeMillis() - t1);
-                            if (timeout <= 0) {
-                                break;
-                            }
+        //更新终止成功任务的状态,同时记录终止失败任务id并准备进行运行任务打断
+        List<Serializable> failedIdList = new LinkedList<>();
+        resMap.forEach((k, v) -> {
+            if (!v) {
+                failedIdList.add(k);
+            }
+        });
+        //如果没有移除失败的任务,则直接返回结果;否则进行运行任务打断
+        if (!failedIdList.isEmpty()) {
+            //通过redis通知其他服务器执行
+            String code = RandomStringUtils.randomAlphabetic(32);
+            StopSysTask stopSysTask = new StopSysTask();
+            String[] idArr = failedIdList.stream().map(Object::toString).toArray(String[]::new);
+            stopSysTask.setIds(idArr);
+            stopSysTask.setCode(code);
+            //定义结果
+            StopSysTaskContext stopSysTaskContext = new StopSysTaskContext();
+            stopSysTaskContext.setCode(code);
+            stopSysTaskContext.setIds(idArr);
+            ClusterTaskUtil.STOP_SYS_TASK_CODE_TO_CONTEXT_MAP.put(code, stopSysTaskContext);
+            //发送通知
+            stopSysTaskListener.send(stopSysTask);
+            //主线程等待结果
+            synchronized (stopSysTaskContext) {
+                try {
+                    long t1 = System.currentTimeMillis();
+                    long timeout = 30 * 1000;
+                    while (true) {
+                        stopSysTaskContext.wait(timeout);
+                        //每次唤醒后检查是否所有结果都处理了
+                        if (idArr.length == stopSysTaskContext.getResult().size()) {
+                            break;
                         }
-                    } catch (InterruptedException e) {
-                        throw BaseRuntimeException.getException(e);
+                        //检查是否超时
+                        timeout -= (System.currentTimeMillis() - t1);
+                        if (timeout <= 0) {
+                            break;
+                        }
                     }
+                } catch (InterruptedException e) {
+                    throw BaseRuntimeException.getException(e);
                 }
-                //处理结果
-                Map<String, Boolean> curResMap = stopSysTaskContext.getResult();
-                for (int i = 0, end = idArr.length; i < end; i++) {
-                    Boolean curRes = curResMap.get(idArr[i]);
-                    if (curRes!=null&&curRes) {
-                        resMap.put(failedIdList.get(i), true);
-                    }
+            }
+            //处理结果
+            Map<String, Boolean> curResMap = stopSysTaskContext.getResult();
+            for (int i = 0, end = idArr.length; i < end; i++) {
+                Boolean curRes = curResMap.get(idArr[i]);
+                if (curRes!=null&&curRes) {
+                    resMap.put(failedIdList.get(i), true);
                 }
             }
         }

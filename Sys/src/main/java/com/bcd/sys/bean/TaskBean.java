@@ -201,7 +201,7 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     }
 
     @Override
-    public void onCreate() {
+    public void onCreated() {
         createTime=new Date();
         status= TaskStatus.WAITING.getStatus();
         UserBean userBean= ShiroUtil.getCurrentUser();
@@ -213,15 +213,9 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     }
 
     @Override
-    public void onStart() {
+    public void onStarted() {
         startTime=new Date();
         status= TaskStatus.EXECUTING.getStatus();
-    }
-
-    @Override
-    public void onStop() {
-        finishTime=new Date();
-        status= TaskStatus.STOPPED.getStatus();
     }
 
     @Override
@@ -256,5 +250,15 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     @Override
     public Object[] getParams() {
         return params;
+    }
+
+    @Override
+    public void setStatus(int status) {
+        this.status=status;
+    }
+
+    @Override
+    public void onStopped() {
+        finishTime=new Date();
     }
 }

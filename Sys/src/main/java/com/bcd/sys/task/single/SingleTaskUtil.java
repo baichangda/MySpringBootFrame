@@ -2,24 +2,31 @@ package com.bcd.sys.task.single;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.SysTaskRunnable;
+import com.bcd.sys.task.TaskRunnable;
 import com.bcd.sys.task.TaskUtil;
 import com.bcd.sys.task.TaskDAO;
 import com.bcd.sys.task.Task;
 import com.bcd.sys.task.TaskFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component
 public class SingleTaskUtil {
+
+    static Logger logger= LoggerFactory.getLogger(SingleTaskUtil.class);
+
     private static TaskDAO taskDAO;
     @Autowired
     public void init(TaskDAO taskDAO){
@@ -35,60 +42,30 @@ public class SingleTaskUtil {
     public static <T extends Task> Serializable registerTask(T task, TaskFunction<T> function){
         Serializable id;
         try {
-            id =TaskUtil.onCreate(task);
+            id =TaskUtil.onCreated(task);
         }catch (Exception e){
             throw BaseRuntimeException.getException(e);
         }
-        Future future= CommonConst.SYS_TASK_POOL.submit(new SysTaskRunnable(task,function,taskDAO));
-        CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.put(id.toString(),future);
+        TaskRunnable<T> taskRunnable=new TaskRunnable<>(task,function);
+        CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(id.toString(),taskRunnable);
+        CommonConst.SYS_TASK_POOL.execute(taskRunnable);
         return id;
     }
 
     /**
      * 停止任务
      * 只停止本机正在执行的任务
-     * @param mayInterruptIfRunning
      * @param ids
      * @return
      */
-    public static boolean[] stopTask(boolean mayInterruptIfRunning,Serializable ...ids){
+    public static boolean[] stopTask(Serializable ...ids){
         if(ids==null||ids.length==0){
             return new boolean[0];
         }
         boolean []res=new boolean[ids.length];
-        if(mayInterruptIfRunning){
-            List<Future> futureList= Arrays.stream(ids).map(id->CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.get(id.toString())).collect(Collectors.toList());
-            //先移除队列中
-            for(int i=0,end=futureList.size();i<end;i++) {
-                Future future=futureList.get(i);
-                res[i]=CommonConst.SYS_TASK_POOL.remove((FutureTask)future);
-            }
-            //检查所有的结果
-            for(int i=0,end=res.length;i<end;i++){
-                if(res[i]){
-                    //从队列移除成功的触发更新回调
-                    Task task = taskDAO.doRead(ids[i]);
-                    TaskUtil.onStop(task);
-                }else{
-                    //不成功的进行强制移除
-                    Future future=futureList.get(i);
-                    future.cancel(true);
-                }
-            }
-        }else{
-            for(int i=0,end=res.length;i<end;i++) {
-                Future future = CommonConst.SYS_TASK_ID_TO_FUTURE_MAP.get(ids[i].toString());
-                boolean curRes=future.cancel(false);
-                res[i]=curRes;
-            }
-            //更新任务状态
-            for(int i=0,end=res.length;i<end;i++){
-                if(res[i]) {
-                    //更新任务状态并触发停止回调
-                    Task task = taskDAO.doRead(ids[i]);
-                    TaskUtil.onStop(task);
-                }
-            }
+        for(int i=0,end=res.length;i<end;i++) {
+            TaskRunnable runnable = CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.get(ids[i].toString());
+            res[i]=runnable.shutdown();
         }
         return res;
     }

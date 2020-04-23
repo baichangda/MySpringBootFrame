@@ -13,7 +13,7 @@ public class Func3 extends NamedTaskFunction<TaskBean>{
     }
 
     @Override
-    public TaskBean apply(TaskBean task)   throws InterruptedException{
+    public void apply(TaskBean task){
         throw BaseRuntimeException.getException("Func3发生错误");
     }
 }

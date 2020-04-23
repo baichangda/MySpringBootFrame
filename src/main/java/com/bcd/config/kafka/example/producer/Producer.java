@@ -12,7 +12,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@Service
+//@Service
 public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private KafkaTemplate kafkaTemplate;
