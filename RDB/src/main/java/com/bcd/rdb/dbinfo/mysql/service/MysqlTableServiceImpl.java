@@ -25,7 +25,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 @Service
 public class MysqlTableServiceImpl extends TablesService {
-    private String[] headArr = new String[]{"字段名", "数据类型", "不能为空", "默认值", "备注"};
+    private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public Workbook exportDBDesignerExcel(String dbName) {
         try(Connection connection=DBInfoUtil.getSpringConn()){
