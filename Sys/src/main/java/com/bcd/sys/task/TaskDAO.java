@@ -17,7 +17,7 @@ public interface TaskDAO<K extends Serializable,T extends Task> {
      * @param id
      * @return
      */
-    Task doRead(K id);
+    T doRead(K id);
 
     /**
      * 更新task

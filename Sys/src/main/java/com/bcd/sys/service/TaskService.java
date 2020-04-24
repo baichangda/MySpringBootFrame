@@ -3,7 +3,6 @@ package com.bcd.sys.service;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.TaskDAO;
-import com.bcd.sys.task.Task;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -19,7 +18,7 @@ public class TaskService extends BaseService<TaskBean,Long> implements TaskDAO<L
     }
 
     @Override
-    public Task doRead(Long id) {
+    public TaskBean doRead(Long id) {
         return findById(id);
     }
 
