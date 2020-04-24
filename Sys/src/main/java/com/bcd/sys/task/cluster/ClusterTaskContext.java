@@ -7,7 +7,7 @@ import com.bcd.sys.task.TaskContext;
 import com.bcd.sys.task.TaskFunction;
 import com.bcd.sys.task.single.SingleTaskContext;
 
-
+@SuppressWarnings("unchecked")
 public class ClusterTaskContext<T extends Task> extends TaskContext<T> {
 
     protected String functionName;

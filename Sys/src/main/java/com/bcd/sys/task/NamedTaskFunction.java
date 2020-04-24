@@ -3,6 +3,7 @@ package com.bcd.sys.task;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("unchecked")
 public abstract class NamedTaskFunction<T extends Task> implements TaskFunction<T>{
     private final static ConcurrentHashMap<String,NamedTaskFunction> storage=new ConcurrentHashMap<>();
 
