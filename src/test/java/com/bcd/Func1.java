@@ -24,4 +24,9 @@ public class Func1 extends NamedTaskFunction<TaskBean>{
     public String getName() {
         return NAME;
     }
+
+    @Override
+    public boolean supportShutdown(TaskContext<TaskBean> context) {
+        return true;
+    }
 }

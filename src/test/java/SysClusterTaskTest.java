@@ -47,7 +47,7 @@ public class SysClusterTaskTest {
                 func5));
 //
         Thread.sleep(3000L);
-        Boolean[] res= ClusterTaskUtil.stopTask(t2,t5);
+        Boolean[] res= ClusterTaskUtil.stopTask(t1,t5);
         System.out.println(res[0]+"   "+res[1]);
 
         while(CommonConst.SYS_TASK_POOL.getActiveCount()!=0){
