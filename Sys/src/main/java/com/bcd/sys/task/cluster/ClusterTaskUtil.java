@@ -1,9 +1,7 @@
 package com.bcd.sys.task.cluster;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.task.Task;
-import com.bcd.sys.task.TaskUtil;
-import com.bcd.sys.task.TaskDAO;
+import com.bcd.sys.task.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,19 +55,16 @@ public class ClusterTaskUtil {
     }
     /**
      * 注册任务(redis队列任务模式)
-     * @param task 任务
-     * @param functionName 任务执行方法名称
-     * @param params 任务执行参数
+     * @param context 任务上下文环境
      * @param <T> 任务泛型
      * @return
      */
-    public static <T extends ClusterTask>Serializable registerTask(T task, String functionName, Object ... params){
+    public static <T extends Task>Serializable registerTask(ClusterTaskContext<T> context){
         Serializable id;
         try {
-            task.setFunctionName(functionName);
-            task.setParams(params);
+            T task= context.getTask();
             id=TaskUtil.onCreated(task);
-            sysTaskRedisQueue.send(task);
+            sysTaskRedisQueue.send(context);
         }catch (Exception e){
             throw BaseRuntimeException.getException(e);
         }

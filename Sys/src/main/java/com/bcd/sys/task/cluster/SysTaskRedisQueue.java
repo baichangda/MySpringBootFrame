@@ -2,15 +2,9 @@ package com.bcd.sys.task.cluster;
 
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.task.CommonConst;
-import com.bcd.sys.task.TaskRunnable;
-import com.bcd.sys.task.TaskUtil;
-import com.bcd.sys.task.TaskDAO;
-import com.bcd.sys.task.NamedTaskFunction;
-import com.bcd.sys.task.TaskFunction;
+import com.bcd.sys.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.QueryTimeoutException;
@@ -22,15 +16,12 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component
-public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializable {
+public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> implements SpringInitializable {
     private final static Logger logger= LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
-    private Map<String,NamedTaskFunction<T>> taskFunctionMap;
-
     private Semaphore lock=new Semaphore(CommonConst.SYS_TASK_POOL.getMaximumPoolSize());
 
     private BoundListOperations boundListOperations;
@@ -49,13 +40,15 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
      */
     private ExecutorService workPool=Executors.newCachedThreadPool();
 
-    @Autowired
-    private TaskDAO taskDAO;
-
     public SysTaskRedisQueue(@Qualifier("string_serializable_redisTemplate")RedisTemplate redisTemplate) {
         this.name=ClusterTaskUtil.SYS_TASK_LIST_NAME;
         this.boundListOperations=redisTemplate.boundListOps(this.name);
         this.popIntervalMills =((LettuceConnectionFactory)redisTemplate.getConnectionFactory()).getTimeout()/2;
+    }
+
+    @Override
+    public void init(ContextRefreshedEvent event) {
+        start();
     }
 
     /**
@@ -72,7 +65,7 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             } else {
                 workPool.execute(() -> {
                     try {
-                        onTask(data[0]);
+                        onTask((C)data[0]);
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                         lock.release();
@@ -92,23 +85,21 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
 
     /**
      * 接收到任务处理
-     * @param data
+     * @param context
      */
-    public void onTask(Object data) {
+    public void onTask(C context) {
         //1、接收并解析任务数据
-        T task=(T) data;
-        Serializable id=task.getId();
-        String functionName=task.getFunctionName();
-        TaskFunction<T> taskFunction= taskFunctionMap.get(functionName);
+        T task=context.getTask();
+        TaskFunction<T> taskFunction=context.getFunction();
         //2、如果找不到对应执行方法实体,则任务执行失败并抛出异常
         if(taskFunction==null){
-            BaseRuntimeException exception= BaseRuntimeException.getException("Can't Find ClusterTask["+functionName+"],Please Check It");
+            BaseRuntimeException exception= BaseRuntimeException.getException("can't find clusterTaskFunction["+context.getFunctionName()+"]");
             TaskUtil.onFailed(task,exception);
             throw exception;
         }
         //3、使用线程池执行任务
-        TaskRunnable<T> runnable=new TaskRunnable(task, taskFunction);
-        Future future= CommonConst.SYS_TASK_POOL.submit(()->{
+        TaskRunnable<T> runnable=new TaskRunnable(context);
+        CommonConst.SYS_TASK_POOL.execute(()->{
             try {
                 //3.1、执行任务
                 runnable.run();
@@ -117,11 +108,11 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
                 lock.release();
             }
         });
-        CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(id.toString(),runnable);
+        CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(task.getId().toString(),runnable);
     }
 
-    public void send(T task) {
-        boundListOperations.leftPush(task);
+    public void send(C context) {
+        boundListOperations.leftPush(context);
     }
 
     public LinkedHashMap<Serializable,Boolean> remove(Serializable ... ids) {
@@ -129,12 +120,12 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             return new LinkedHashMap<>();
         }
         LinkedHashMap<Serializable,Boolean> resMap=new LinkedHashMap<>();
-        List<T> dataList= boundListOperations.range(0L,-1L);
+        List<C> contextList= boundListOperations.range(0L,-1L);
         for (Serializable id : ids) {
             boolean res=false;
-            for (T task : dataList) {
-                if(id.equals(task.getId())){
-                    Long count=boundListOperations.remove(1,task);
+            for (C context : contextList) {
+                if(id.equals(context.getTask().getId())){
+                    Long count=boundListOperations.remove(1,context);
                     if(count!=null&&count==1){
                         res=true;
                         break;
@@ -147,12 +138,6 @@ public class SysTaskRedisQueue<T extends ClusterTask> implements SpringInitializ
             resMap.put(id,res);
         }
         return resMap;
-    }
-
-    @Override
-    public void init(ContextRefreshedEvent event) {
-        taskFunctionMap=event.getApplicationContext().getBeansOfType(NamedTaskFunction.class).values().stream().collect(Collectors.toMap(NamedTaskFunction::getName, e->e,(e1, e2)->e1));
-        start();
     }
 
 

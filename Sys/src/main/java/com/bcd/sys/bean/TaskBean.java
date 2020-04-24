@@ -3,8 +3,8 @@ package com.bcd.sys.bean;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.SuperBaseBean;
+import com.bcd.sys.task.Task;
 import com.bcd.sys.task.TaskStatus;
-import com.bcd.sys.task.cluster.ClusterTask;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Lazy;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,7 +24,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
+public class TaskBean extends SuperBaseBean<Long> implements Task {
 
 
     //field
@@ -79,12 +78,6 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
     @Size(max = 50,message = "[创建ip]长度不能超过50")
     @ApiModelProperty(value = "创建ip(长度不能超过50)")
     private String createIp;
-
-    @Transient
-    private Object[] params;
-
-    @Transient
-    private String functionName;
 
     public TaskBean(String name) {
         this.name=name;
@@ -232,24 +225,6 @@ public class TaskBean extends SuperBaseBean<Long> implements ClusterTask{
         Throwable realException= ExceptionUtil.parseRealException(ex);
         message= ExceptionUtil.getMessage(realException);
         stackMessage=ExceptionUtil.getStackTraceMessage(realException);
-    }
-
-    public void setParams(Object[] params) {
-        this.params = params;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
-    }
-
-    @Override
-    public String getFunctionName() {
-        return functionName;
-    }
-
-    @Override
-    public Object[] getParams() {
-        return params;
     }
 
     @Override

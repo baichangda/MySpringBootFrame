@@ -10,6 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TaskRunnable<T extends Task> implements Runnable{
     private final static Logger logger= LoggerFactory.getLogger(TaskRunnable.class);
 
+    private final TaskContext<T> context;
+
     private final T task;
 
     private final TaskFunction<T> function;
@@ -41,10 +43,11 @@ public class TaskRunnable<T extends Task> implements Runnable{
      */
     final AtomicInteger status=new AtomicInteger(0);
 
-    public TaskRunnable(T task, TaskFunction<T> function) {
-        this.task = task;
-        this.function=function;
-        this.supportShutdownRunning =function.supportShutdown(task);
+    public TaskRunnable(TaskContext<T> context) {
+        this.context=context;
+        this.task=context.getTask();
+        this.function=context.getFunction();
+        this.supportShutdownRunning =context.getFunction().supportShutdown(context);
         this.status.set(1);
     }
 
@@ -98,7 +101,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
                     if (status.compareAndSet(2, 6)) {
                         //如果设置成功,说明已开始执行Function
                         TaskUtil.onStopping(task);
-                        function.shutdown(task);
+                        function.shutdown(context);
                         return true;
                     } else {
                         if (status.compareAndSet(1, 6)) {
@@ -139,7 +142,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
             //触发开始方法
             TaskUtil.onStarted(task);
             //执行任务
-            function.apply(task);
+            function.apply(context);
             //尝试设置状态执行中->执行成功(2->3)
             if(status.compareAndSet(2,3)){
                 TaskUtil.onSucceed(task);
