@@ -28,8 +28,8 @@ public class StringUtil {
         StringBuilder result = new StringBuilder();
         char[] arr= str.toCharArray();
         boolean nextIsUpper = false;
-        result.append(Character.toLowerCase(str.charAt(0)));
-        for (int i = 1; i < arr.length-1; i++) {
+        result.append(Character.toLowerCase(arr[0]));
+        for (int i = 1; i <= arr.length-1; i++) {
             char c = arr[i];
             if (c == splitStr) {
                 nextIsUpper = true;
