@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -20,16 +22,19 @@ public class RestTemplateConfig {
     /**
      * 使用spring设置的消息转换器
      * @param factory
-     * @param httpMessageConverter
+     * @param mappingJackson2HttpMessageConverter
      * @return
      */
-    @Bean
-    public RestTemplate restTemplate(ClientHttpRequestFactory factory,@Qualifier("httpMessageConverter") HttpMessageConverter httpMessageConverter) {
+    @Bean("restTemplate")
+    public RestTemplate restTemplate(ClientHttpRequestFactory factory,
+                                     @Qualifier("mappingJackson2HttpMessageConverter") MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter,
+                                     @Qualifier("mappingJackson2XmlHttpMessageConverter") MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
-        List<HttpMessageConverter<?>> messageConverters=new ArrayList<>();
-        //在此添加转换器配置
-        messageConverters.add(httpMessageConverter);
-        restTemplate.setMessageConverters(messageConverters);
+        //在此添加转换器配置,移除默认
+        restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2XmlHttpMessageConverter.class));
+        restTemplate.getMessageConverters().add(mappingJackson2XmlHttpMessageConverter);
+        restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2HttpMessageConverter.class));
+        restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
         return restTemplate;
     }
 

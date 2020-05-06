@@ -5,7 +5,7 @@ import com.bcd.config.exception.handler.impl.DefaultExceptionResponseHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 @Configuration
 public class ExceptionConfig {
     @Bean
-    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("httpMessageConverter") HttpMessageConverter converter) {
+    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("mappingJackson2HttpMessageConverter") MappingJackson2HttpMessageConverter converter) {
         ExceptionResponseHandler handler=new DefaultExceptionResponseHandler(converter);
         return handler;
     }

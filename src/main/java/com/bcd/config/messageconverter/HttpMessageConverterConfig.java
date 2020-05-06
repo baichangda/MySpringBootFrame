@@ -25,7 +25,7 @@ public class HttpMessageConverterConfig implements ApplicationListener<ContextRe
         requestMappingHandlerAdapter.getMessageConverters().removeIf(e->e instanceof MappingJackson2XmlHttpMessageConverter&& e!=xmlHttpMessageConverter());
     }
 
-    @Bean(name = "httpMessageConverter")
+    @Bean(name = "mappingJackson2HttpMessageConverter")
     public MappingJackson2HttpMessageConverter httpMessageConverter(){
         /**
          * 必须设置支持的数据类型(不能设置为*);否则可能会导致请求报错
@@ -41,7 +41,7 @@ public class HttpMessageConverterConfig implements ApplicationListener<ContextRe
         return httpMessageConverter;
     }
 
-    @Bean(name = "xmlHttpMessageConverter")
+    @Bean(name = "mappingJackson2XmlHttpMessageConverter")
     public MappingJackson2XmlHttpMessageConverter xmlHttpMessageConverter(){
         /**
          * 必须设置支持的数据类型(不能设置为*);否则可能会导致请求报错

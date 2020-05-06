@@ -45,8 +45,18 @@ dependencies {
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
 
     //swagger集成
-    compile "io.springfox:springfox-swagger2:${swaggerVersion}"
-    compile "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+    /**
+     * 排除swagger-models原因是因为
+     * spring-swagger2版本jar中一直引用的swagger-models 1.5.20版本
+     * 此版本存在bug
+     * 非string类型如果不设置example则会导致进入swagger页面报错,从1.5.22版本解决了这个问题
+     * 所以引用1.5的最新版本 1.5.24
+     */
+    compile ("io.springfox:springfox-swagger2:${swaggerVersion}"){
+        exclude group: 'io.swagger', module: 'swagger-models'
+    }
+    compile ("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+    compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
 
 }
 buildscript {
@@ -58,6 +68,7 @@ buildscript {
         commonsIoVersion='+'
         commonsLangVersion='+'
         swaggerVersion='+'
+        swaggerModelVersion='1.5.24'
         commonsPool2='+'
         jedisVersion='+'
     }
