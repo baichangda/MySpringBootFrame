@@ -384,7 +384,7 @@ public class BaseService<T, K extends Serializable> {
         if (resultList == null || resultList.isEmpty()) {
             return true;
         } else {
-            if (excludeIds == null || excludeIds.length == 0 || Arrays.stream(excludeIds).filter(Objects::nonNull).count() == 0) {
+            if (excludeIds == null || excludeIds.length == 0 || Arrays.stream(excludeIds).allMatch(Objects::isNull)) {
                 return false;
             } else {
                 Set<K> idSet = Arrays.stream(excludeIds).filter(Objects::nonNull).collect(Collectors.toSet());

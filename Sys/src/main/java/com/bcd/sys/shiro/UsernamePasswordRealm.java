@@ -57,7 +57,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
         );
         if (user != null) {
             if (user.getStatus() == null || user.getStatus() == 0) {
-                throw ShiroMessageDefine.ERROR_SHIRO_DISABLED_ACCOUNT.toRuntimeException();
+                throw new DisabledAccountException();
             }
             // 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
             SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), getName());
@@ -66,7 +66,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
             }
             return simpleAuthenticationInfo;
         } else {
-            throw ShiroMessageDefine.ERROR_SHIRO_UNKNOWN_ACCOUNT.toRuntimeException();
+            throw new UnknownAccountException();
         }
     }
 

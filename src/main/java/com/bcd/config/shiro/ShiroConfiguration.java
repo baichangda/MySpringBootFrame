@@ -2,6 +2,8 @@ package com.bcd.config.shiro;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.base.config.shiro.AuthorizationHandler;
+import org.apache.shiro.authc.Authenticator;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -103,6 +105,11 @@ public class ShiroConfiguration{
         //单独设置session缓存管理器
         if(sessionManager instanceof CacheManagerAware){
             ((CacheManagerAware) sessionManager).setCacheManager(expireMapCacheManager);
+        }
+        //设置登陆验证器
+        Authenticator authenticator= securityManager.getAuthenticator();
+        if(authenticator instanceof ModularRealmAuthenticator){
+            ((ModularRealmAuthenticator)authenticator).setAuthenticationStrategy(new FirstSupportStrategy());
         }
         return securityManager;
     }
