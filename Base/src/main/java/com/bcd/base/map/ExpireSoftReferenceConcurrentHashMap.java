@@ -65,7 +65,7 @@ public class ExpireSoftReferenceConcurrentHashMap<K, V> {
     }
 
     private void startExpireSchedule() {
-        this.expireScanPool.scheduleAtFixedRate(this::scanAndClearExpired,delay,delay,TimeUnit.MICROSECONDS);
+        this.expireScanPool.scheduleAtFixedRate(this::scanAndClearExpired,delay,delay,TimeUnit.MILLISECONDS);
     }
 
     /**
