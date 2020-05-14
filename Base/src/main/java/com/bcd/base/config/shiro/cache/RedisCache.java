@@ -1,6 +1,5 @@
-package com.bcd.config.shiro;
+package com.bcd.base.config.shiro.cache;
 
-import com.bcd.base.map.ExpireCallBackConcurrentHashMap;
 import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;

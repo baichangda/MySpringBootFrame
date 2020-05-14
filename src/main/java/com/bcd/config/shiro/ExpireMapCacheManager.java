@@ -1,5 +1,6 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.cache.ExpireMapCache;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;

@@ -79,7 +79,7 @@ public class ShiroConfiguration{
      */
     @Bean
     public ExpireMapCacheManager expireMapCacheManager(){
-        ExpireMapCacheManager cacheManager = new ExpireMapCacheManager(5000);
+        ExpireMapCacheManager cacheManager = new ExpireMapCacheManager(3000);
         return cacheManager;
     }
 

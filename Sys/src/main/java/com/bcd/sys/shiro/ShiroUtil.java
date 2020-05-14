@@ -24,7 +24,7 @@ public class ShiroUtil {
         Map<String, Realm> nameToRealm= rsm.getRealms().stream().collect(Collectors.toMap(e->e.getName(), e->e));
         PrincipalCollection principalCollection= SecurityUtils.getSubject().getPrincipals();
         for (String realmName : principalCollection.getRealmNames()) {
-            Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e->((MyAuthorizingRealm)e).clearCurrentUserCachedAuthorizationInfo(principalCollection));
+            Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e->((MyAuthorizingRealm)e).clearCachedAuthorizationInfo(principalCollection));
         }
     }
 

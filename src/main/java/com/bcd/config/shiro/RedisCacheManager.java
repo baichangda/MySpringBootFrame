@@ -1,6 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.base.config.redis.RedisUtil;
+import com.bcd.base.config.shiro.cache.RedisCache;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;

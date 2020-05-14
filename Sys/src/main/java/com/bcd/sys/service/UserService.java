@@ -11,6 +11,7 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
+import com.bcd.sys.shiro.PhoneCodeRealm;
 import com.bcd.sys.shiro.PhoneCodeToken;
 import com.bcd.sys.shiro.UsernamePasswordRealm;
 import org.apache.commons.codec.binary.Base64;
@@ -18,8 +19,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +35,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,5 +251,43 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
             throw MessageDefine.ERROR_NOT_RUN_AS.toRuntimeException();
         }
         subject.releaseRunAs();
+    }
+
+    /**
+     * 踢出用户
+     * 1、清除session
+     * 2、清除realm的缓存信息
+     * @param username
+     * @param phone
+     */
+    public void kickUser(String username,String phone){
+        DefaultWebSecurityManager securityManager= (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
+        DefaultWebSessionManager sessionManager=(DefaultWebSessionManager)securityManager.getSessionManager();
+        SessionDAO sessionDAO= sessionManager.getSessionDAO();
+        Collection<Session> sessionCollection= sessionDAO.getActiveSessions();
+        Collection<Realm> realms= securityManager.getRealms();
+        //清除session
+        sessionCollection.forEach(e->{
+            UserBean userBean=(UserBean) e.getAttribute("user");
+            if(userBean.getUsername()!=null&&userBean.getUsername().equals(username)){
+                //清除session
+                sessionDAO.delete(e);
+
+            }
+        });
+        //根据username和phone清除对应realm的缓存信息
+        realms.forEach(realm -> {
+            if(realm instanceof UsernamePasswordRealm){
+                if(username!=null) {
+                    ((UsernamePasswordRealm) realm).clearCachedAuthenticationInfo(new SimplePrincipalCollection(username, realm.getName()));
+                    ((UsernamePasswordRealm) realm).clearCachedAuthorizationInfo(new SimplePrincipalCollection(username, realm.getName()));
+                }
+            }else if(realm instanceof PhoneCodeRealm){
+                if(phone!=null) {
+                    ((PhoneCodeRealm) realm).clearCachedAuthenticationInfo(new SimplePrincipalCollection(phone, realm.getName()));
+                    ((PhoneCodeRealm) realm).clearCachedAuthorizationInfo(new SimplePrincipalCollection(phone, realm.getName()));
+                }
+            }
+        });
     }
 }

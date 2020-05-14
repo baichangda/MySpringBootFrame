@@ -2,7 +2,9 @@ package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
+import com.bcd.base.config.shiro.cache.RedisCache;
 import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.bean.UserBean;
@@ -14,9 +16,13 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheException;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -25,12 +31,30 @@ import java.util.Set;
 
 @Component
 public class PhoneCodeRealm extends MyAuthorizingRealm {
-    public PhoneCodeRealm() {
+    public PhoneCodeRealm(RedisConnectionFactory redisConnectionFactory) {
         setAuthenticationTokenClass(PhoneCodeToken.class);
         //关闭登陆缓存
         setAuthenticationCachingEnabled(false);
         //开启权限缓存
         setAuthorizationCachingEnabled(true);
+        //设置缓存管理器
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setHashValueSerializer(RedisUtil.newJackson2JsonRedisSerializer(SimpleAuthorizationInfo.class));
+        redisTemplate.afterPropertiesSet();
+        setCacheManager(new CacheManager() {
+            @Override
+            public <K, V> Cache<K, V> getCache(String s) throws CacheException {
+                if(s.equals(getAuthorizationCacheName())){
+                    return new RedisCache<>(redisTemplate,s,60*1000,3*60*1000);
+                }else{
+                    return null;
+                }
+            }
+        });
     }
 
     @Autowired
@@ -86,6 +110,8 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
         return info;
     }
 
-
-
+    @Override
+    protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
+        return principals.toString();
+    }
 }
