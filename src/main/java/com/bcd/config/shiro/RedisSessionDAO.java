@@ -29,7 +29,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
     private HashOperations<String, String, Session> hashOperations;
 
-    private final static String SHIRO_SESSION_HASH_KEY="shiroSession";
+    private final static String SHIRO_SESSION_HASH_KEY=RedisUtil.SYSTEM_REDIS_KEY_PRE+"shiroSession";
 
     public RedisSessionDAO(RedisConnectionFactory redisConnectionFactory) {
         hashOperations=RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory).opsForHash();
