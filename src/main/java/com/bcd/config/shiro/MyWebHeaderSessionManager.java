@@ -8,6 +8,7 @@ import org.apache.shiro.session.mgt.DelegatingSession;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
+import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
@@ -23,10 +24,8 @@ import java.io.Serializable;
  * 2、生成新session时候,在response header中加入 sessionId
  *
  */
-public class MyWebHeaderSessionManager extends DefaultSessionManager {
+public class MyWebHeaderSessionManager extends DefaultSessionManager implements WebSessionManagerSupport {
     private static final Logger log = LoggerFactory.getLogger(MyWebHeaderSessionManager.class);
-
-    private static final String DEFAULT_SESSION_HEADER_KEY_NAME="JSESSIONID";
 
     private String sessionHeaderKeyName;
 
@@ -35,7 +34,7 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
     }
 
     public MyWebHeaderSessionManager() {
-        this(DEFAULT_SESSION_HEADER_KEY_NAME);
+        this(ShiroHttpSession.DEFAULT_SESSION_ID_NAME);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
         ServletRequest request = WebUtils.getRequest(key);
         Serializable id = super.getSessionId(key);
         if (id == null && WebUtils.isWeb(key)) {
-            id = this.getSessionId(request);
+            id = this.getSessionId(request,null);
         }
         if(id!=null&&WebUtils.isWeb(key)){
             //当id不为空时候,设置sessionId来源、值、有效性到request中
@@ -78,8 +77,8 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
     }
 
 
-    private Serializable getSessionId(ServletRequest request){
-       return WebUtils.toHttp(request).getHeader(sessionHeaderKeyName);
+    public Serializable getSessionId(ServletRequest request,ServletResponse response){
+        return WebUtils.toHttp(request).getHeader(sessionHeaderKeyName);
     }
 
     @Override
@@ -105,10 +104,17 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager {
         return new DelegatingSession(this, sessionKey);
     }
 
+    /**
+     * 重写此方法主要是为了在发送session过期时候,向request中添加标记
+     * 便于在{@link MyAuthenticationFilter#onAccessDenied(ServletRequest, ServletResponse)}
+     * 中判断是否是session过期来返回不同的错误信息
+     */
     @Override
     protected void onExpiration(Session s, ExpiredSessionException ese, SessionKey key) {
         super.onExpiration(s, ese, key);
         onInvalidation(key);
+        //add by bcd
+        WebUtils.getRequest(key).setAttribute("timeout",true);
     }
 
     @Override

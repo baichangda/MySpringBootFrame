@@ -35,10 +35,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -260,19 +257,20 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
      * @param username
      * @param phone
      */
-    public void kickUser(String username,String phone){
+    public void kickUser(String username,String phone,String kickMessage){
         DefaultWebSecurityManager securityManager= (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
         DefaultWebSessionManager sessionManager=(DefaultWebSessionManager)securityManager.getSessionManager();
         SessionDAO sessionDAO= sessionManager.getSessionDAO();
         Collection<Session> sessionCollection= sessionDAO.getActiveSessions();
         Collection<Realm> realms= securityManager.getRealms();
         //清除session
+        Set<String> kickSessionSet=new HashSet<>();
         sessionCollection.forEach(e->{
             UserBean userBean=(UserBean) e.getAttribute("user");
             if(userBean.getUsername()!=null&&userBean.getUsername().equals(username)){
                 //清除session
                 sessionDAO.delete(e);
-
+                kickSessionSet.add(e.getId().toString());
             }
         });
         //根据username和phone清除对应realm的缓存信息
@@ -289,5 +287,13 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
                 }
             }
         });
+
+        //记录踢出用户的sessionId到redis中,便于其他用户如果检测到属于被踢出的,返回对应的错误信息
+        if(!kickSessionSet.isEmpty()){
+            for (String s : kickSessionSet) {
+                redisTemplate.opsForValue().set(CommonConst.KICK_SESSION_ID_PRE+s,kickMessage
+                        ,CommonConst.KICK_SESSION_EXPIRE_IN_SECOND,TimeUnit.SECONDS);
+            }
+        }
     }
 }

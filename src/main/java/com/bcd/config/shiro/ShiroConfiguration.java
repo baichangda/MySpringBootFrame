@@ -21,6 +21,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -122,9 +123,9 @@ public class ShiroConfiguration{
     @Bean
     public SessionManager sessionManager(RedisConnectionFactory redisConnectionFactory){
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
-        DefaultWebSessionManager sessionManager=new DefaultWebSessionManager();
+        DefaultWebSessionManager sessionManager=new MyDefaultWebSessionManager();
         sessionManager.setSessionDAO(new RedisSessionDAO(redisConnectionFactory));
-        sessionManager.setGlobalSessionTimeout(-1000L);
+        sessionManager.setGlobalSessionTimeout(60*1000);
         return sessionManager;
     }
 
@@ -147,10 +148,13 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean(name = "shiroFilter")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager, ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler){
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultWebSecurityManager securityManager,
+                                                         ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler,
+                                                         SessionManager sessionManager,
+                                                         @Qualifier("string_string_redisTemplate") RedisTemplate<String,String> redisTemplate){
         ShiroFilterFactoryBean factoryBean = new MyShiroFilterFactoryBean();
         Map<String,Filter> filterMap=new HashMap<>();
-        filterMap.put("authc",new MyAuthenticationFilter(handler));
+        filterMap.put("authc",new MyAuthenticationFilter(handler,(WebSessionManagerSupport) sessionManager,redisTemplate));
         filterMap.put("perms",new MyAuthorizationFilter(handler,authorizationHandler));
         filterMap.put("user",new MyUserFilter(handler));
         factoryBean.setFilters(filterMap);

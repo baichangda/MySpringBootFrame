@@ -1,5 +1,6 @@
 package com.bcd.sys.keys;
 
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.security.RSASecurity;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -80,7 +81,7 @@ public class KeysConst {
     /**
      * redis 存储公钥私钥redis key名(仅在集群环境有效)
      */
-    public static final String REDIS_KEY_NAME="publicPrivateKeys";
+    public static final String REDIS_KEY_NAME= RedisUtil.SYSTEM_REDIS_KEY_PRE+"publicPrivateKeys";
 
 
 }

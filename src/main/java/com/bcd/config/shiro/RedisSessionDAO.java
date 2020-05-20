@@ -3,14 +3,17 @@ package com.bcd.config.shiro;
 import com.bcd.base.config.redis.RedisUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.hibernate.type.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -24,18 +27,12 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
     Logger logger= LoggerFactory.getLogger(RedisSessionDAO.class);
 
-    private final static long TIME_OUT_SECONDS=60*30L;
+    private HashOperations<String, String, Session> hashOperations;
 
-    private RedisTemplate<String,Session> redisTemplate;
-
-    private final static String SHIRO_SESSION_KEY_PRE="shiro:";
+    private final static String SHIRO_SESSION_HASH_KEY="shiroSession";
 
     public RedisSessionDAO(RedisConnectionFactory redisConnectionFactory) {
-        redisTemplate = RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
-    }
-
-    private String getKey(Serializable sessionId){
-        return SHIRO_SESSION_KEY_PRE+sessionId.toString();
+        hashOperations=RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory).opsForHash();
     }
 
 
@@ -48,7 +45,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     public Serializable doCreate(Session session) {
         Serializable sessionId= super.doCreate(session);
         //在这里创建session到redis中
-        redisTemplate.opsForValue().set(getKey(sessionId),session,TIME_OUT_SECONDS,TimeUnit.SECONDS);
+        hashOperations.put(SHIRO_SESSION_HASH_KEY,sessionId.toString(),session);
         return sessionId;
     }
 
@@ -59,17 +56,17 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public Session doReadSession(Serializable sessionId) {
+        logger.info("get from redis");
         Session session=super.doReadSession(sessionId);
         if(session==null) {
             try {
-                session = redisTemplate.opsForValue().get(getKey(sessionId));
+                session=hashOperations.get(SHIRO_SESSION_HASH_KEY,sessionId.toString());
             }catch (SerializationException ex){
                 //用于处理修改了session data的数据结构但是redis中依然存在数据导致反序列化失败
                 logger.warn("redis session data struct changed,delete it[{}]", sessionId);
-                redisTemplate.delete(getKey(sessionId));
+                hashOperations.delete(SHIRO_SESSION_HASH_KEY,sessionId.toString());
             }
         }
-        cache(session,sessionId);
         return session;
     }
 
@@ -81,7 +78,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     @Override
     public void doUpdate(Session session) throws UnknownSessionException{
         super.doUpdate(session);
-        redisTemplate.opsForValue().set(getKey(session.getId()),session,TIME_OUT_SECONDS,TimeUnit.SECONDS);
+        hashOperations.put(SHIRO_SESSION_HASH_KEY,session.getId().toString(),session);
     }
 
     /**70f36102-07ed-48dd-a64e-ce7de3860012
@@ -92,13 +89,12 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     public void doDelete(Session session) {
         super.doDelete(session);
         //这里从redis里面移除
-        redisTemplate.delete(getKey(session.getId()));
+        hashOperations.delete(SHIRO_SESSION_HASH_KEY,session.getId());
     }
 
     @Override
     public Collection<Session> getActiveSessions() {
-        Set<String> keySet= redisTemplate.keys(SHIRO_SESSION_KEY_PRE+"*");
-        return redisTemplate.opsForValue().multiGet(keySet);
+        return new ArrayList<>(hashOperations.values(SHIRO_SESSION_HASH_KEY));
     }
 
 

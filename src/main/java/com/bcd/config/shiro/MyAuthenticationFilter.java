@@ -1,19 +1,18 @@
 package com.bcd.config.shiro;
 
 import com.bcd.base.config.shiro.ShiroMessageDefine;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.message.JsonMessage;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.web.filter.AccessControlFilter;
+import com.bcd.sys.define.CommonConst;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * 自定义的authc的过滤器，替换shiro默认的过滤器
@@ -40,15 +39,40 @@ import java.io.IOException;
 public class MyAuthenticationFilter extends AuthenticationFilter {
     private static final Logger log = LoggerFactory.getLogger(MyAuthenticationFilter.class);
     private ExceptionResponseHandler handler;
+    private WebSessionManagerSupport webSessionManagerSupport;
+    private RedisTemplate<String,String> redisTemplate;
 
-    public MyAuthenticationFilter(ExceptionResponseHandler handler) {
+    public MyAuthenticationFilter(ExceptionResponseHandler handler, WebSessionManagerSupport webSessionManagerSupport,
+                                  RedisTemplate<String,String> redisTemplate) {
         this.handler=handler;
+        this.webSessionManagerSupport=webSessionManagerSupport;
+        this.redisTemplate=redisTemplate;
     }
 
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+        if(request.getAttribute("timeout")==null){
+            //获取sessionId
+            Serializable sessionId= webSessionManagerSupport.getSessionId(request,response);
+            if(sessionId==null){
+                handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+            }else{
+                //此时先检测是否有被踢出标志
+                String key=CommonConst.KICK_SESSION_ID_PRE+sessionId.toString();
+                String kickMessage=redisTemplate.opsForValue().get(key);
+                if(kickMessage==null){
+                    handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_UNAUTHENTICATED.toJsonMessage());
+                }else{
+                    //标志获取后删除
+                    redisTemplate.delete(key);
+                    handler.handle(WebUtils.toHttp(response), JsonMessage.fail(kickMessage));
+                }
+            }
+        }else{
+            //处理session过期异常返回信息
+            handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_EXPIREDSESSIONEXCEPTION.toJsonMessage());
+        }
         return false;
     }
 }
