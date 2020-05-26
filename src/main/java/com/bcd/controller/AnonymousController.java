@@ -24,6 +24,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/anonymous")
+@Api(tags = "公开/MenuController")
 public class AnonymousController extends BaseController{
 
     @Autowired

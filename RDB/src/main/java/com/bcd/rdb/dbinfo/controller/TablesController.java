@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/tables")
+@Api(tags = "数据库设计/TablesController")
 public class TablesController extends BaseController {
 
     @Autowired

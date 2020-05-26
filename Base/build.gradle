@@ -57,6 +57,8 @@ dependencies {
     }
     compile ("io.springfox:springfox-swagger-ui:${swaggerVersion}")
     compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
+    // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
+    compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
 
 }
 buildscript {
@@ -69,6 +71,7 @@ buildscript {
         commonsLangVersion='+'
         swaggerVersion='+'
         swaggerModelVersion='1.5.24'
+        swaggerBootstrapUiVersion='+'
         commonsPool2='+'
         jedisVersion='+'
     }

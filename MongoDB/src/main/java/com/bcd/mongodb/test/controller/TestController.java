@@ -17,6 +17,7 @@ import com.bcd.mongodb.test.bean.TestBean;
 import com.bcd.mongodb.test.service.TestService;
 
 @SuppressWarnings(value = "unchecked")
+@Api(tags = "测试/Test")
 @RestController
 @RequestMapping("/api/test/test")
 public class TestController extends BaseController {

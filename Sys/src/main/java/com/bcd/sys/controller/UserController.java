@@ -25,6 +25,7 @@ import com.bcd.sys.service.UserService;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/user")
+@Api(tags = "用户管理/UserController")
 public class UserController extends BaseController {
 
     @Autowired

@@ -18,6 +18,7 @@ import com.bcd.sys.service.MenuService;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/menu")
+@Api(tags = "菜单管理/MenuController")
 public class MenuController extends BaseController {
 
     @Autowired

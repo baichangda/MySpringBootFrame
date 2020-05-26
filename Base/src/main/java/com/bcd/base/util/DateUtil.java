@@ -1,6 +1,7 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -381,12 +382,19 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        ZoneId zoneId1 = ZoneId.of("Asia/Shanghai");
-        ZoneId zoneId2 = ZoneId.of("+8");
-        ZonedDateTime zdt1 = LocalDateTime.of(1988, 6, 30, 11, 11).atZone(zoneId1);
-        ZonedDateTime zdt2 = LocalDateTime.of(1988, 6, 30, 11, 11).atZone(zoneId2);
-        logger.debug("{}", zdt1.toInstant().toEpochMilli());
-        logger.debug("{}", zdt2.toInstant().toEpochMilli());
-        logger.debug("{}", OffsetDateTime.now().getOffset());
+//        ZoneId zoneId1 = ZoneId.of("Asia/Shanghai");
+//        ZoneId zoneId2 = ZoneId.of("+8");
+//        ZonedDateTime zdt1 = LocalDateTime.of(1988, 6, 30, 11, 11).atZone(zoneId1);
+//        ZonedDateTime zdt2 = LocalDateTime.of(1988, 6, 30, 11, 11).atZone(zoneId2);
+//        logger.debug("{}", zdt1.toInstant().toEpochMilli());
+//        logger.debug("{}", zdt2.toInstant().toEpochMilli());
+//        logger.debug("{}", OffsetDateTime.now().getOffset());
+        Date d1= Date.from(LocalDateTime.of(2019,10,1,0,0,0).toInstant(ZoneOffset.of("+8")));
+        Date d2=Date.from(LocalDateTime.of(2020,4,1,0,0,0).toInstant(ZoneOffset.of("+8")));
+        long diff= getDiff(d1,d2,ChronoUnit.DAYS,true);
+
+        System.out.println(diff);
+
+        System.out.println(getCeilDate(new Date(),ChronoUnit.DAYS,ZoneOffset.of("+8")));
     }
 }

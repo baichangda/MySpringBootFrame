@@ -23,6 +23,7 @@ import com.bcd.sys.service.RoleService;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/role")
+@Api(tags = "任务管理/RoleController")
 public class RoleController extends BaseController {
 
     @Autowired

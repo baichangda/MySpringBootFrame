@@ -17,6 +17,7 @@ import java.util.Locale;
  */
 @RestController
 @RequestMapping("/api/i18n")
+@Api(tags = "国际化/I18NController")
 public class I18NController {
 
     @SuppressWarnings("unchecked")

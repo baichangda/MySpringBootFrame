@@ -17,6 +17,7 @@ import @{package}.bean.@{upperModuleName}Bean;
 import @{package}.service.@{upperModuleName}Service;
 
 @SuppressWarnings(value = "unchecked")
+@Api(tags = "@{moduleNameCN}/@{upperModuleName}")
 @RestController
 @RequestMapping("/api@{requestMappingPre}/@{lowerModuleName}")
 public class @{upperModuleName}Controller extends BaseController {
