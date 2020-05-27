@@ -3,6 +3,7 @@ package com.bcd.sys.service;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.init.SpringInitializable;
+import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.base.util.DateZoneUtil;
@@ -13,6 +14,7 @@ import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
 import com.bcd.sys.shiro.PhoneCodeRealm;
 import com.bcd.sys.shiro.PhoneCodeToken;
+import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.shiro.UsernamePasswordRealm;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -22,8 +24,10 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
@@ -34,6 +38,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -251,13 +256,20 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
     }
 
     /**
-     * 踢出用户
-     * 1、清除session
-     * 2、清除realm的缓存信息
+     * 踢出用户名用户、手机号用户
+     * 根据传参数不同踢出对应登陆的用户
      * @param username
      * @param phone
+     * @param kickMessage
      */
     public void kickUser(String username,String phone,String kickMessage){
+        if(username==null&&phone==null){
+            return;
+        }
+        Serializable curSessionId=SecurityUtils.getSubject().getSession().getId();
+        UserBean curUser= ShiroUtil.getCurrentUser();
+        String curUserName=curUser.getUsername();
+        String curPhone=curUser.getPhone();
         DefaultWebSecurityManager securityManager= (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
         DefaultWebSessionManager sessionManager=(DefaultWebSessionManager)securityManager.getSessionManager();
         SessionDAO sessionDAO= sessionManager.getSessionDAO();
@@ -265,27 +277,44 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
         Collection<Realm> realms= securityManager.getRealms();
         //清除session
         Set<String> kickSessionSet=new HashSet<>();
+        Set<PrincipalCollection> principalCollectionSet=new HashSet<>();
         sessionCollection.forEach(e->{
-            UserBean userBean=(UserBean) e.getAttribute("user");
-            if(userBean.getUsername()!=null&&userBean.getUsername().equals(username)){
-                //清除session
-                sessionDAO.delete(e);
-                kickSessionSet.add(e.getId().toString());
+            //忽略踢出自己
+            if(!e.getId().equals(curSessionId)){
+                UserBean userBean = (UserBean) e.getAttribute("user");
+                boolean isDel=false;
+
+                if(username!=null){
+                    if (username.equals(userBean.getUsername())) {
+                        isDel=true;
+                    }
+                }
+                if(!isDel&&phone!=null){
+                    if (phone.equals(userBean.getPhone())) {
+                        isDel=true;
+                    }
+                }
+                if(isDel){
+                    //清除session
+                    sessionDAO.delete(e);
+                    kickSessionSet.add(e.getId().toString());
+                    //判断当前session用户名是否是当前登陆用户名,是则添加进入set,用于清除权限缓存
+                    PrincipalCollection principalCollection= (PrincipalCollection)e.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+                    if(!principalCollection.getPrimaryPrincipal().equals(curUserName)&&
+                            !principalCollection.getPrimaryPrincipal().equals(curPhone)){
+                        principalCollectionSet.add(principalCollection);
+                    }
+                }
             }
         });
-        //根据username和phone清除对应realm的缓存信息
-        realms.forEach(realm -> {
-            if(realm instanceof UsernamePasswordRealm){
-                if(username!=null) {
-                    ((UsernamePasswordRealm) realm).clearCachedAuthenticationInfo(new SimplePrincipalCollection(username, realm.getName()));
-                    ((UsernamePasswordRealm) realm).clearCachedAuthorizationInfo(new SimplePrincipalCollection(username, realm.getName()));
+        //清除对应realm的缓存信息
+        principalCollectionSet.forEach(principalCollection -> {
+            realms.forEach(realm -> {
+                if(principalCollection.getRealmNames().contains(realm.getName())){
+                    ((MyAuthorizingRealm)realm).clearCachedAuthenticationInfo(principalCollection);
+                    ((MyAuthorizingRealm)realm).clearCachedAuthorizationInfo(principalCollection);
                 }
-            }else if(realm instanceof PhoneCodeRealm){
-                if(phone!=null) {
-                    ((PhoneCodeRealm) realm).clearCachedAuthenticationInfo(new SimplePrincipalCollection(phone, realm.getName()));
-                    ((PhoneCodeRealm) realm).clearCachedAuthorizationInfo(new SimplePrincipalCollection(phone, realm.getName()));
-                }
-            }
+            });
         });
 
         //记录踢出用户的sessionId到redis中,便于其他用户如果检测到属于被踢出的,返回对应的错误信息
