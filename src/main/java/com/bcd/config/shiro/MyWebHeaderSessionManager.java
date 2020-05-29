@@ -114,7 +114,13 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager implements 
         super.onExpiration(s, ese, key);
         onInvalidation(key);
         //add by bcd
-        WebUtils.getRequest(key).setAttribute("timeout",true);
+        if (key != null) {
+            ServletRequest request = WebUtils.getRequest(key);
+            if (request != null) {
+                request.setAttribute("timeout", true);
+
+            }
+        }
     }
 
     @Override

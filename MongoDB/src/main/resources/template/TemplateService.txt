@@ -1,0 +1,10 @@
+package ${packagePre}.service;
+
+import com.bcd.mongodb.service.BaseService;
+import org.springframework.stereotype.Service;
+import ${packagePre}.bean.${moduleName?cap_first}Bean;
+
+@Service
+public class ${moduleName?cap_first}Service extends BaseService<${moduleName?cap_first}Bean,${pkType}> {
+
+}

@@ -8,6 +8,9 @@ dependencies {
     //yaml包支持
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.25'
 
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.30'
+
     compile("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
     compile project(':Base')
 }

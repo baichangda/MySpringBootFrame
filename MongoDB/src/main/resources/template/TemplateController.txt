@@ -1,0 +1,127 @@
+package ${packagePre}.controller;
+
+import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.*;
+import com.bcd.base.controller.BaseController;
+import com.bcd.base.define.MessageDefine;
+import com.bcd.base.message.JsonMessage;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
+import java.util.Date;
+import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import ${packagePre}.bean.${moduleName?cap_first}Bean;
+import ${packagePre}.service.${moduleName?cap_first}Service;
+
+@SuppressWarnings(value = "unchecked")
+@Api(tags = "${moduleNameCN}/${moduleName?cap_first}")
+@RestController
+@RequestMapping("/api${requestMappingPre}/${moduleName?uncap_first}")
+public class ${moduleName?cap_first}Controller extends BaseController {
+
+    @Autowired
+    private ${moduleName?cap_first}Service ${moduleName?uncap_first}Service;
+
+
+
+    /**
+     * 查询${moduleNameCN}列表
+     * @return
+     */
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @ApiOperation(value="查询${moduleNameCN}列表",notes = "查询${moduleNameCN}列表")
+    @ApiResponse(code = 200,message = "${moduleNameCN}列表")
+    public JsonMessage<List<${moduleName?cap_first}Bean>> list(
+        <#list fieldList as field>
+          <#if field.type == "Date">
+        @ApiParam(value = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
+        @ApiParam(value = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End<#if field_has_next>,</#if>
+          <#else>
+        @ApiParam(value = "${field.comment}") @RequestParam(required = false) Date ${field.name}<#if field_has_next>,</#if>
+          </#if>
+        </#list>
+    ){
+        Condition condition= Condition.and(
+        <#list fieldList as field>
+           <#if field.type == "Date">
+           new DateCondition("${field.name}",${field.name}Begin, DateCondition.Handler.GE),
+           new DateCondition("${field.name}",${field.name}End, DateCondition.Handler.LE)<#if field_has_next>,</#if>
+           <#elseif field.type == "String">
+           new StringCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           <#elseif field.type == "Long"||field.type == "Integer"||field.type == "Short"||field.type == "Byte"||field.type=="BigDecimal">
+           new NumberCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           <#elseif field.type == "Boolean">
+           new BooleanCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           </#if>
+        </#list>
+        );
+        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition));
+    }
+
+    /**
+     * 查询${moduleNameCN}分页
+     * @return
+     */
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @ApiOperation(value="查询${moduleNameCN}列表",notes = "查询${moduleNameCN}分页")
+    @ApiResponse(code = 200,message = "${moduleNameCN}分页结果集")
+    public JsonMessage<Page<${moduleName?cap_first}Bean>> page(
+        <#list fieldList as field>
+          <#if field.type == "Date">
+        @ApiParam(value = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
+        @ApiParam(value = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End,
+          <#else>
+        @ApiParam(value = "${field.comment}") @RequestParam(required = false) Date ${field.name},
+          </#if>
+        </#list>
+        @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
+        @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(required = false,defaultValue = "20") Integer pageSize
+    ){
+        Condition condition= Condition.and(
+        <#list fieldList as field>
+           <#if field.type == "Date">
+           new DateCondition("${field.name}",${field.name}Begin, DateCondition.Handler.GE),
+           new DateCondition("${field.name}",${field.name}End, DateCondition.Handler.LE)<#if field_has_next>,</#if>
+           <#elseif field.type == "String">
+           new StringCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           <#elseif field.type == "Long"||field.type == "Integer"||field.type == "Short"||field.type == "Byte"||field.type=="BigDecimal">
+           new NumberCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           <#elseif field.type == "Boolean">
+           new BooleanCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           </#if>
+        </#list>
+        );
+        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+    }
+
+    /**
+     * 保存${moduleNameCN}
+     * @param ${moduleName?uncap_first}
+     * @return
+     */
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @ApiOperation(value = "保存${moduleNameCN}",notes = "保存${moduleNameCN}")
+    @ApiResponse(code = 200,message = "保存结果")
+    public JsonMessage save(@ApiParam(value = "${moduleNameCN}实体") <#if validateSaveParam>@Validated</#if> @RequestBody ${moduleName?cap_first}Bean ${moduleName?uncap_first}){
+        ${moduleName?uncap_first}Service.save(${moduleName?uncap_first});
+        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+    }
+
+
+    /**
+     * 删除${moduleNameCN}
+     * @param ids
+     * @return
+     */
+    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除${moduleNameCN}",notes = "删除${moduleNameCN}")
+    @ApiResponse(code = 200,message = "删除结果")
+    public JsonMessage delete(@ApiParam(value = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
+        ${moduleName?uncap_first}Service.deleteById(ids);
+        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+    }
+
+}

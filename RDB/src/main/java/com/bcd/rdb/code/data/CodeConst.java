@@ -1,4 +1,7 @@
-package com.bcd.rdb.code.freemarker.data;
+package com.bcd.rdb.code.data;
+
+import freemarker.template.Configuration;
+import freemarker.template.Version;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +12,8 @@ import java.util.Set;
  * Created by Administrator on 2017/8/14.
  */
 public class CodeConst {
+    public final static Version FREEMARKER_VERSION= Configuration.VERSION_2_3_30;
+
     public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/RDB/src/main/resources/template";
 
     public final static Map<String,String> DB_TYPE_TO_JAVA_TYPE =new HashMap<>();
@@ -26,60 +31,6 @@ public class CodeConst {
         DB_TYPE_TO_JAVA_TYPE.put("datetime","Date");
         DB_TYPE_TO_JAVA_TYPE.put("date","Date");
 
-    }
-
-    public final static Map<String,String> JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE =new HashMap<>();
-
-    static {
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("BigDecimal","java.math.BigDecimal");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Byte","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Short","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Long","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("String","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Integer","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Float","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Double","String");
-        JAVA_TYPE_TO_SWAGGER_FULL_JAVA_TYPE.put("Date","String");
-    }
-
-    public final static Map<String,String> TYPE_TO_CONDITION =new HashMap<>();
-    static{
-        TYPE_TO_CONDITION.put("BigDecimal","NumberCondition");
-        TYPE_TO_CONDITION.put("Byte","NumberCondition");
-        TYPE_TO_CONDITION.put("byte","NumberCondition");
-        TYPE_TO_CONDITION.put("Short","NumberCondition");
-        TYPE_TO_CONDITION.put("short","NumberCondition");
-        TYPE_TO_CONDITION.put("Long","NumberCondition");
-        TYPE_TO_CONDITION.put("long","NumberCondition");
-        TYPE_TO_CONDITION.put("String","StringCondition");
-        TYPE_TO_CONDITION.put("Integer","NumberCondition");
-        TYPE_TO_CONDITION.put("int","NumberCondition");
-        TYPE_TO_CONDITION.put("Float","NumberCondition");
-        TYPE_TO_CONDITION.put("float","NumberCondition");
-        TYPE_TO_CONDITION.put("Double","NumberCondition");
-        TYPE_TO_CONDITION.put("double","NumberCondition");
-        TYPE_TO_CONDITION.put("Date","DateCondition");
-        TYPE_TO_CONDITION.put("Boolean","BooleanCondition");
-        TYPE_TO_CONDITION.put("boolean","BooleanCondition");
-    }
-
-    public final static Map<String,String> BASE_TYPE_TO_PACKAGE_TYPE =new HashMap<>();
-    static{
-        BASE_TYPE_TO_PACKAGE_TYPE.put("long","Long");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("int","Integer");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("float","Float");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("double","Double");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("boolean","Boolean");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("byte","Byte");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("char","Character");
-        BASE_TYPE_TO_PACKAGE_TYPE.put("short","Short");
-    }
-
-    public final static Set<String> SUPPORT_PK_TYPE=new HashSet<>();
-    static {
-        SUPPORT_PK_TYPE.add("Long");
-        SUPPORT_PK_TYPE.add("String");
-        SUPPORT_PK_TYPE.add("Integer");
     }
 
     public final static Set<String> IGNORE_FIELD_NAME =new HashSet<>();

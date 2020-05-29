@@ -1,0 +1,11 @@
+package ${packagePre}.repository;
+
+import com.bcd.mongodb.repository.BaseRepository;
+import org.springframework.stereotype.Repository;
+import ${packagePre}.bean.${moduleName?cap_first}Bean;
+
+
+@Repository
+public interface ${moduleName?cap_first}Repository extends BaseRepository<${moduleName?cap_first}Bean, ${pkType}> {
+
+}

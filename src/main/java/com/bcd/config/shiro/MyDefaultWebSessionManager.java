@@ -19,7 +19,12 @@ public class MyDefaultWebSessionManager extends DefaultWebSessionManager impleme
     @Override
     protected void onExpiration(Session s, ExpiredSessionException ese, SessionKey key) {
         super.onExpiration(s, ese, key);
-        WebUtils.getRequest(key).setAttribute("timeout",true);
+        if(key!=null){
+            ServletRequest request= WebUtils.getRequest(key);
+            if(request!=null){
+                request.setAttribute("timeout",true);
+            }
+        }
     }
 
     @Override
