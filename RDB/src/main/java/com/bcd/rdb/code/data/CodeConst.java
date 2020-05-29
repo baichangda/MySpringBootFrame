@@ -1,4 +1,4 @@
-package com.bcd.rdb.code.mysql;
+package com.bcd.rdb.code.freemarker.data;
 
 import java.util.HashMap;
 import java.util.HashSet;

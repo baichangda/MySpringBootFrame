@@ -1,0 +1,59 @@
+package ${packagePre}.bean;
+
+<#if superBeanType == 1>
+import com.bcd.rdb.bean.BaseBean;
+<#else>
+import com.bcd.rdb.bean.SuperBaseBean;
+</#if>
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
+
+
+
+import javax.persistence.*;
+
+/**
+ *  ${moduleNameCN}
+ */
+@Entity
+@Table(name = "${tableName}")
+public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {
+    //field
+    <#list fieldList as field>
+      <#if field.type == "String">
+      <#if field.nullable>
+    @ApiModelProperty(value = "${field.comment}(长度不能超过${field.strLen})")
+      <#else>
+    @ApiModelProperty(value = "${field.comment}(不能为空)(长度不能超过${field.strLen})")
+    @NotBlank(message = "[${field.commentPre}]不能为空")
+      </#if>
+    @Size(max = ${field.strLen},message="[${field.commentPre}]长度不能超过${field.strLen}")
+      <#else>
+      <#if field.nullable>
+    @ApiModelProperty(value = "${field.comment}")
+      <#else>
+    @ApiModelProperty(value = "${field.comment}(不能为空)")
+    @NotNull(message = "[${field.commentPre}]不能为空")
+      </#if>
+      </#if>
+    private ${field.type} ${field.name};
+
+    </#list>
+
+    //method
+    <#list fieldList as field>
+    public ${field.type} get${(field.name)?cap_first}(){
+        return ${field.name};
+    }
+
+    public void set${(field.name)?cap_first}(${field.type} ${field.name}){
+        this.${field.name}=${field.name};
+    }
+    </#list>
+}
