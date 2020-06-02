@@ -33,15 +33,16 @@ public class CodeConst {
 
     }
 
-    public final static Set<String> IGNORE_FIELD_NAME =new HashSet<>();
+    public final static Set<String> CREATE_INFO_FIELD_NAME =new HashSet<>();
     static{
-        IGNORE_FIELD_NAME.add("createTime");
-        IGNORE_FIELD_NAME.add("updateTime");
-        IGNORE_FIELD_NAME.add("createUserId");
-        IGNORE_FIELD_NAME.add("createUserName");
-        IGNORE_FIELD_NAME.add("updateUserId");
-        IGNORE_FIELD_NAME.add("updateUserName");
-        IGNORE_FIELD_NAME.add("createIp");
-        IGNORE_FIELD_NAME.add("updateIp");
+        CREATE_INFO_FIELD_NAME.add("id");
+        CREATE_INFO_FIELD_NAME.add("createTime");
+        CREATE_INFO_FIELD_NAME.add("updateTime");
+        CREATE_INFO_FIELD_NAME.add("createUserId");
+        CREATE_INFO_FIELD_NAME.add("createUserName");
+        CREATE_INFO_FIELD_NAME.add("updateUserId");
+        CREATE_INFO_FIELD_NAME.add("updateUserName");
+        CREATE_INFO_FIELD_NAME.add("createIp");
+        CREATE_INFO_FIELD_NAME.add("updateIp");
     }
 }

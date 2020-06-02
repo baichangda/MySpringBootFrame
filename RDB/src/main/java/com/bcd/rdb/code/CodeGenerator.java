@@ -120,7 +120,7 @@ public class CodeGenerator {
         data.setPackagePre(initPackagePre(tableConfig));
         data.setTableName(tableConfig.getTableName());
         data.setPkType(initPkType(connection,tableConfig));
-        data.setSuperBeanType(tableConfig.needCreateBeanFile?1:2);
+        data.setSuperBeanType(tableConfig.needCreateInfo?1:2);
         data.setFieldList(initBeanField(tableConfig,connection));
         return data;
     }
@@ -189,7 +189,7 @@ public class CodeGenerator {
      * 初始化java字段集合
      * @param config
      * @param connection
-     */
+     */`
     private static List<BeanField> initBeanField(TableConfig config,Connection connection){
         String tableName = config.getTableName();
         List<Map<String,Object>> res = DBInfoUtil.findColumns(connection,config.getConfig().getDb(),tableName);
@@ -202,15 +202,19 @@ public class CodeGenerator {
             dbColumn.setStrLen(Integer.parseInt(e.get("CHARACTER_MAXIMUM_LENGTH").toString()));
             return dbColumn.toBeanField();
         }).filter(e->{
-               if(config.isNeedCreateInfo()){
-                    if(CodeConst.IGNORE_FIELD_NAME.contains(e.getName())){
+            if("id".equals(e.getName())){
+                return false;
+            }else {
+                if (config.isNeedCreateInfo()) {
+                    if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.getName())) {
                         return false;
-                    }else{
+                    } else {
                         return true;
                     }
-               }else{
-                   return true;
-               }
+                } else {
+                    return true;
+                }
+            }
         }).collect(Collectors.toList());
     }
 
