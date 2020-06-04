@@ -27,7 +27,7 @@ public class DefaultAuthorizationHandler implements AuthorizationHandler {
      */
     private boolean skip(){
         UserBean user= ShiroUtil.getCurrentUser();
-        if(user!=null&& CommonConst.ADMIN_ID.equals(user.getId())){
+        if(user!=null&& CommonConst.ADMIN_ID==user.getId()){
             return true;
         }else{
             return false;

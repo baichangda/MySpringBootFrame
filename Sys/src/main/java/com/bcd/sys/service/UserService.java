@@ -7,6 +7,7 @@ import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
 import com.bcd.base.util.DateZoneUtil;
+import com.bcd.rdb.jdbc.sql.SqlUtil;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -62,14 +63,14 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
 
     @Override
     public void init(ContextRefreshedEvent event) {
-        String username="admin";
-        UserBean userBean= findOne(new StringCondition("username",username));
+        UserBean userBean= findById(CommonConst.ADMIN_ID);
         if(userBean==null){
             userBean=new UserBean();
-            userBean.setUsername(username);
+            userBean.setId(CommonConst.ADMIN_ID);
+            userBean.setUsername(CommonConst.ADMIN_USERNAME);
             String password;
             if(CommonConst.IS_PASSWORD_ENCODED){
-                password=encryptPassword(username, CommonConst.INITIAL_PASSWORD);
+                password=encryptPassword(CommonConst.ADMIN_USERNAME, CommonConst.INITIAL_PASSWORD);
             }else{
                 password= CommonConst.INITIAL_PASSWORD;
             }

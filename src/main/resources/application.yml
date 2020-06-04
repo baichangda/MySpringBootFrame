@@ -8,6 +8,9 @@ server:
     session:
       timeout: 1800
 spring:
+   servlet:
+     multipart:
+       max-file-size: 10MB
    resources:
      cache:
        period: -1

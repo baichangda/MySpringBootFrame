@@ -35,7 +35,7 @@ public class MenuService extends BaseService<MenuBean,Long> {
      */
     public List<MenuBean> userMenuTree(Long userId){
         List<MenuBean> menuBeanList;
-        if(CommonConst.ADMIN_ID.equals(userId)){
+        if(CommonConst.ADMIN_ID==userId){
             String sql="select * from t_sys_menu";
             menuBeanList=jdbcTemplate.query(sql,new BeanPropertyRowMapper<>(MenuBean.class));
         }else {

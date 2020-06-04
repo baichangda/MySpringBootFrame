@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateUtil;
 import com.bcd.define.MessageDefine;
 import com.bcd.sys.shiro.ShiroUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ import java.util.Date;
 public class DateConverter implements Converter<String,Date> {
     @Override
     public Date convert(String source) {
-        if(source==null){
+        if(StringUtils.isEmpty(source)){
             return null;
         }
         try {

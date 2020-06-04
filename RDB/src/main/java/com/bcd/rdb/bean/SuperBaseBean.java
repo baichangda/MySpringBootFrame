@@ -4,6 +4,7 @@ package com.bcd.rdb.bean;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -17,7 +18,8 @@ import java.io.Serializable;
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
     @ApiModelProperty(value = "主键(唯一标识符,自动生成)(不需要赋值)")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "my")
+    @GenericGenerator(name="my",strategy = "com.bcd.rdb.jpa.MyIdentityGenerator")
     @Column(name = "id", nullable = false)
     public K id;
 

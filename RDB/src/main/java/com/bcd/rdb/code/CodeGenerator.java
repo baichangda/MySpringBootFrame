@@ -189,7 +189,7 @@ public class CodeGenerator {
      * 初始化java字段集合
      * @param config
      * @param connection
-     */`
+     */
     private static List<BeanField> initBeanField(TableConfig config,Connection connection){
         String tableName = config.getTableName();
         List<Map<String,Object>> res = DBInfoUtil.findColumns(connection,config.getConfig().getDb(),tableName);

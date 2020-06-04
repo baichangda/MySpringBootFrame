@@ -6,7 +6,8 @@ import com.bcd.base.config.redis.RedisUtil;
 import java.io.Serializable;
 
 public class CommonConst {
-    public final static Serializable ADMIN_ID=1L;
+    public final static long ADMIN_ID=1L;
+    public final static String ADMIN_USERNAME="admin";
     public final static boolean IS_PASSWORD_ENCODED=false;
     public final static String INITIAL_PASSWORD ="123qwe";
 
