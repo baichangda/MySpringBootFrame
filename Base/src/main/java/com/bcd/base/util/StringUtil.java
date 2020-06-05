@@ -254,42 +254,48 @@ public class StringUtil {
         int stackIndex=-1;
         double[] stack=new double[list.size()];
         for (String s : list) {
-            switch (s){
-                case "+":{
-                    double num2=stack[stackIndex--];
-                    double num1=stack[stackIndex--];
-                    stack[++stackIndex]=num1+num2;
+            switch (s) {
+                case "+": {
+                    double num2 = stack[stackIndex--];
+                    double num1 = stack[stackIndex--];
+                    stack[++stackIndex] = num1 + num2;
                     break;
                 }
-                case "-":{
-                    double num2=stack[stackIndex--];
-                    double num1=stack[stackIndex--];
-                    stack[++stackIndex]=num1-num2;
+                case "-": {
+                    double num2 = stack[stackIndex--];
+                    double num1 = stack[stackIndex--];
+                    stack[++stackIndex] = num1 - num2;
                     break;
                 }
-                case "*":{
-                    double num2=stack[stackIndex--];
-                    double num1=stack[stackIndex--];
-                    stack[++stackIndex]=num1*num2;
+                case "*": {
+                    double num2 = stack[stackIndex--];
+                    double num1 = stack[stackIndex--];
+                    stack[++stackIndex] = num1 * num2;
                     break;
                 }
-                case "/":{
-                    double num2=stack[stackIndex--];
-                    double num1=stack[stackIndex--];
-                    stack[++stackIndex]=num1/num2;
+                case "/": {
+                    double num2 = stack[stackIndex--];
+                    double num1 = stack[stackIndex--];
+                    stack[++stackIndex] = num1 / num2;
                     break;
                 }
-                default:{
-                    //如果是数字
-                    if(NUMBER_PATTERN.matcher(s).matches()){
-                        stack[++stackIndex]=Double.parseDouble(s);
+                default: {
+                    Number val = map.get(s);
+                    if(val==null){
+                        stack[++stackIndex] = Double.parseDouble(s);
                     }else{
-                        Number val=map.get(s);
-                        if(val==null){
-                            throw BaseRuntimeException.getException("map val["+s+"] not exists or null");
-                        }
-                        stack[++stackIndex]=val.doubleValue();
+                        stack[++stackIndex] = val.doubleValue();
                     }
+                    //如果是数字
+//                    if (NUMBER_PATTERN.matcher(s).matches()) {
+//                        stack[++stackIndex] = Double.parseDouble(s);
+//                    } else {
+//                        Number val = map.get(s);
+//                        if (val == null) {
+//                            throw BaseRuntimeException.getException("map val[" + s + "] not exists");
+//                        }
+//                        stack[++stackIndex] = val.doubleValue();
+//                    }
                     break;
                 }
             }
