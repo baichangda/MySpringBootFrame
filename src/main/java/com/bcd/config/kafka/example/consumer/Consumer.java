@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-//@Service
+@Service
 public class Consumer {
     @KafkaListener(topics = "test")
     public void processMessage(ConsumerRecord<byte[],byte[]> consumerRecord) {

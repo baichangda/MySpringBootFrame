@@ -12,7 +12,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-//@Service
+@Service
 public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private KafkaTemplate kafkaTemplate;
@@ -34,8 +34,8 @@ public class Producer implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-//        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
-//            sendMessage("test".getBytes(),"bcd".getBytes());
-//        },3,3, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
+            sendMessage("test".getBytes(),"bcd".getBytes());
+        },3,3, TimeUnit.SECONDS);
     }
 }

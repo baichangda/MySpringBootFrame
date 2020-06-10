@@ -107,12 +107,14 @@ spring:
 #  kafka配置
    kafka:
      consumer:
-        bootstrap-servers: 114.116.107.184:9092,114.116.107.184:9093,114.115.141.139:9092
+        bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+#        bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
         group-id: bcd
         key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
         value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
      producer:
-        bootstrap-servers: 114.116.107.184:9092,114.116.107.184:9093,114.115.141.139:9092
+        bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+#        bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
         key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
