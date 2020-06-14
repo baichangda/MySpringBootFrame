@@ -176,6 +176,8 @@ public class BaseService<T, K extends Serializable> {
     /**
      * 优于普通删除方法
      *
+     * 注意:调用此方法的方法必须加上 @Transactional
+     *
      * @param condition
      * @return 删除的记录条数
      */
@@ -193,6 +195,8 @@ public class BaseService<T, K extends Serializable> {
 
     /**
      * 优于普通更新方法
+     *
+     * 注意:调用此方法的方法必须加上 @Transactional
      *
      * @param condition
      * @param attrMap   更新的字段和值的map
