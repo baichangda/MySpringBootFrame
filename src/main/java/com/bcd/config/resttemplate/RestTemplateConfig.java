@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class RestTemplateConfig {
                                      @Qualifier("mappingJackson2XmlHttpMessageConverter") MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         //在此添加转换器配置,移除默认
+        restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
         restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2XmlHttpMessageConverter.class));
         restTemplate.getMessageConverters().add(mappingJackson2XmlHttpMessageConverter);
         restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2HttpMessageConverter.class));

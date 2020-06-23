@@ -60,6 +60,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
     compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
 
+    // https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format
+    compile group: 'com.googlecode.protobuf-java-format', name: 'protobuf-java-format', version: '1.4'
+
+
 }
 buildscript {
     ext {

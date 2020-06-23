@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class Consumer {
-    @KafkaListener(topics = "test")
+    @KafkaListener(topics = "zs-feedback",groupId = "zs-device-platform1")
     public void processMessage(ConsumerRecord<byte[],byte[]> consumerRecord) {
         System.out.println(new String(consumerRecord.value()));
     }

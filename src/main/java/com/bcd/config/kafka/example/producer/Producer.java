@@ -12,13 +12,13 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@Service
+//@Service
 public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private KafkaTemplate kafkaTemplate;
 
     public void sendMessage(byte[] key,byte[] msg){
-        ListenableFuture<SendResult<byte[],byte[]>> listenableFuture= kafkaTemplate.send("test",key, msg);
+        ListenableFuture<SendResult<byte[],byte[]>> listenableFuture= kafkaTemplate.send("zs-feedback",key, msg);
         listenableFuture.addCallback(new ListenableFutureCallback<SendResult<byte[],byte[]>>() {
             @Override
             public void onFailure(Throwable ex) {
