@@ -73,7 +73,7 @@ buildscript {
         commonsCodecVersion='+'
         commonsIoVersion='+'
         commonsLangVersion='+'
-        swaggerVersion='+'
+        swaggerVersion='2.9.2'
         swaggerModelVersion='1.5.24'
         swaggerBootstrapUiVersion='+'
         commonsPool2='+'
