@@ -4,6 +4,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
+
     compile project(':Base')
 }
 buildscript {

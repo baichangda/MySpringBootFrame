@@ -13,8 +13,6 @@ dependencies {
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
     compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
     compile("org.apache.commons:commons-pool2:${commonsPool2}")
-    //jedis同步客户端,可以不进行引用(此jar默认引入了apache commons-pool2)
-//    compile("redis.clients:jedis:${jedisVersion}")
 
 
     //springboot validation支持
@@ -77,6 +75,5 @@ buildscript {
         swaggerModelVersion='1.5.24'
         swaggerBootstrapUiVersion='+'
         commonsPool2='+'
-        jedisVersion='+'
     }
 }

@@ -8,6 +8,7 @@ dependencies {
     //yaml包支持
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.25'
 
+
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
 
@@ -19,6 +20,7 @@ buildscript {
         mysqlVersion = '8.+'
         jsqlparserVersion='+'
         freemarkerVersion = '+'
+
     }
 }
 

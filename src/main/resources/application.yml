@@ -118,42 +118,6 @@ spring:
         key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
         value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
-#aliyun:
-#   mns:
-#      test1:
-#        enable: true
-#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
-#        queueWaitSeconds: 30
-#        topic: bcd-test
-#        queue: bcd-test1
-#        subscription: bcd-test1
-#      test2:
-#        enable: true
-#        #新建队列的长轮训时间,如果队列是在阿里云控制台创建,则此配置不生效
-#        queueWaitSeconds: 30
-#        topic: bcd-test
-#        queue: bcd-test2
-#        subscription: bcd-test2
-#      endPoint:
-#   accessKeySecret:
-#   accessKeyId:
-#   rocketMq:
-#      producerId: PID_Proudcer_4
-#      onsAddr: http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet
-#   tableStore:
-#      endPoint: http://rooster-dev.cn-hangzhou.ots.aliyuncs.com
-#      instanceName: rooster-dev
-#   sms:
-#      product: Dysmsapi
-#      domain: dysmsapi.aliyuncs.com
-#      regionId: cn-hangzhou
-#      endpointName: cn-hangzhou
-#   live:
-#      domainName: live.incarcloud.com
-#      regionId: cn-shanghai
-#   oss:
-#      endPoint: oss-cn-beijing.aliyuncs.com
-#      bucketName: iceasmp
    mail:
       host: smtp.qq.com
       username:

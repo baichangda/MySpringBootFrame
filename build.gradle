@@ -1,22 +1,16 @@
 buildscript {
     ext {
         springBootVersion = '+'
+        kafkaVersion = '+'
         shiroVersion='+'
-        kafkaVersion='+'
-        tablestoreVersion='+'
-        mnsVersion='+'
-        smsVersion='+'
-        liveVersion='+'
-        ossVersion='+'
-        aliyunSdkCoreVersion='+'
-        flywayVersion = '5.+'
+        flywayVersion = '+'
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
+        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-//        jcenter()
 //        mavenCentral()
     }
 
@@ -42,8 +36,7 @@ allprojects{
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-        maven { url 'https://repository.incarcloud.com/content/repositories/snapshots/' }
-//        jcenter()
+//        maven { url "${incarMavenRepoUrl}" }
 //        mavenCentral()
     }
 
@@ -56,61 +49,25 @@ allprojects{
         }
     }
     dependencies{
-        //springboot rabbitmq支持
-        compile("org.springframework.boot:spring-boot-starter-amqp:${springBootVersion}")
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-        //邮件支持
-        compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
+        //flyway支持
+        compile("org.flywaydb:flyway-core:${flywayVersion}")
         //shiro权限框架集成
         compile("org.apache.shiro:shiro-spring:${shiroVersion}")
         compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
-        //rocketmq集成
-        compile("com.aliyun.openservices:ons-client:1.7.0.Final")
-        //阿里云 tablestore集成
-        compile("com.aliyun.openservices:tablestore:${tablestoreVersion}") {
-            //解决阿里云传递性依赖
-            exclude group: 'org.apache.logging.log4j', module: 'slf4j-api'
-            exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
-            exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
-        }
-        //阿里云mns集成
-        compile("com.aliyun.mns:aliyun-sdk-mns:${mnsVersion}")
-        //阿里云sms集成
-        compile ("com.aliyun:aliyun-java-sdk-dysmsapi:${smsVersion}")
-        compile ("com.aliyun:aliyun-java-sdk-core:${aliyunSdkCoreVersion}")
-        //阿里云视频直播live集成
-        compile ("com.aliyun:aliyun-java-sdk-live:${liveVersion}")
-        //阿里云oss对象存储集成
-        compile ("com.aliyun.oss:aliyun-sdk-oss:${ossVersion}")
-        //flyway支持
-        compile("org.flywaydb:flyway-core:${flywayVersion}")
+        //邮件支持
+        compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
     }
-
-    compileJava{
-        options.compilerArgs << "-Xlint:unchecked"
-        options.compilerArgs << "-parameters"
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xdiags:verbose"
-    }
-
-    compileTestJava{
-        options.compilerArgs << "-Xlint:unchecked"
-        options.compilerArgs << "-parameters"
-        options.encoding = "UTF-8"
-        options.compilerArgs << "-Xdiags:verbose"
-    }
-
-    jar {
-        enabled = true
-    }
-
-
 
     //生成jar时打包源码
     task sourceJar(type: Jar) {
         from sourceSets.main.java.srcDirs
         classifier "sources"
+    }
+
+    jar {
+        enabled = true
     }
 
     //发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
