@@ -1,6 +1,8 @@
 dependencies {
     //springboot支持
     compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+    //yml自定义配置提示
+    compile("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
     //springboot aop支持
     compile("org.springframework.boot:spring-boot-starter-aop:${springBootVersion}")
     //springboot web支持
