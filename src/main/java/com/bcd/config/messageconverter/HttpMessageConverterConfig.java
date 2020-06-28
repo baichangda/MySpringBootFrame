@@ -6,25 +6,14 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Configuration
-public class HttpMessageConverterConfig implements ApplicationListener<ContextRefreshedEvent> {
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        RequestMappingHandlerAdapter requestMappingHandlerAdapter= contextRefreshedEvent.getApplicationContext().getBean(RequestMappingHandlerAdapter.class);
-        //移除默认的MappingJackson2HttpMessageConverter和MappingJackson2XmlHttpMessageConverter
-        requestMappingHandlerAdapter.getMessageConverters().removeIf(e->e instanceof MappingJackson2HttpMessageConverter&& e!=httpMessageConverter());
-        requestMappingHandlerAdapter.getMessageConverters().removeIf(e->e instanceof MappingJackson2XmlHttpMessageConverter&& e!=xmlHttpMessageConverter());
-    }
-
+public class HttpMessageConverterConfig{
     @Bean(name = "mappingJackson2HttpMessageConverter")
     public MappingJackson2HttpMessageConverter httpMessageConverter(){
         /**
