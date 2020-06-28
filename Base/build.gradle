@@ -15,31 +15,22 @@ dependencies {
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
     compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
     compile("org.apache.commons:commons-pool2:${commonsPool2}")
-
-
     //springboot validation支持
     compile("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
 
-
+    //jackson xml
+    compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}")
 
     //poi 集成
     compile("org.apache.poi:poi:${poiVersion}")
     compile("org.apache.poi:poi-ooxml:${poiVersion}")
 
-    //json
-    compile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    compile("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
-    compile("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
-    compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}")
-
-    //apache commons beanUtils
-    compile("commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}")
+    //shiro权限框架集成
+    compile("org.apache.shiro:shiro-spring:${shiroVersion}")
+    compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
 
     //apache commons codec
     compile("commons-codec:commons-codec:${commonsCodecVersion}")
-
-    //apache commons io
-    compile("commons-io:commons-io:${commonsIoVersion}")
 
     //apache commons lang3
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
@@ -59,23 +50,17 @@ dependencies {
     compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
     // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
     compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
-
-    // https://mvnrepository.com/artifact/com.googlecode.protobuf-java-format/protobuf-java-format
-    compile group: 'com.googlecode.protobuf-java-format', name: 'protobuf-java-format', version: '1.4'
-
-
 }
 buildscript {
     ext {
-        jacksonVersion = '+'
         poiVersion = '+'
-        commonsBeanutilsVersion ='+'
         commonsCodecVersion='+'
-        commonsIoVersion='+'
         commonsLangVersion='+'
         swaggerVersion='2.9.2'
         swaggerModelVersion='1.5.24'
         swaggerBootstrapUiVersion='+'
         commonsPool2='+'
+        shiroVersion = '+'
+        jacksonVersion= '+'
     }
 }

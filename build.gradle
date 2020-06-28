@@ -2,7 +2,6 @@ buildscript {
     ext {
         springBootVersion = '+'
         kafkaVersion = '+'
-        shiroVersion='+'
         flywayVersion = '+'
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
         incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
@@ -51,11 +50,6 @@ allprojects{
     dependencies{
         //springboot kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-        //flyway支持
-        compile("org.flywaydb:flyway-core:${flywayVersion}")
-        //shiro权限框架集成
-        compile("org.apache.shiro:shiro-spring:${shiroVersion}")
-        compile("org.apache.shiro:shiro-ehcache:${shiroVersion}")
         //邮件支持
         compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
     }

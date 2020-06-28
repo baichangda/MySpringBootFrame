@@ -97,13 +97,6 @@ spring:
       host: 127.0.0.1
       port: 6379
 
-#  rabbitmq配置
-#   rabbitmq:
-#      host: 121.40.157.200
-#      port: 5672
-#      username: briair
-#      password: briair
-
 #  kafka配置
    kafka:
      consumer:
@@ -123,8 +116,6 @@ spring:
       username:
       password:
       default-encoding: UTF-8
-   flyway:
-      out-of-order: true
 
 my:
   #是否启用集群定时任务失败注解
