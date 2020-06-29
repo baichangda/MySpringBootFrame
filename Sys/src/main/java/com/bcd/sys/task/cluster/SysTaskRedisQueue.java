@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.QueryTimeoutException;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,10 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
 
     private BoundListOperations boundListOperations;
 
-    private long popIntervalMills;
+    /**
+     * 当rpop操作结果为null时候,每次rpop的间隔时间
+     */
+    private int popNullIntervalInSecond;
 
     private volatile boolean stop;
 
@@ -43,7 +45,7 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
     public SysTaskRedisQueue(@Qualifier("string_serializable_redisTemplate")RedisTemplate redisTemplate) {
         this.name=ClusterTaskUtil.SYS_TASK_LIST_NAME;
         this.boundListOperations=redisTemplate.boundListOps(this.name);
-        this.popIntervalMills =((LettuceConnectionFactory)redisTemplate.getConnectionFactory()).getTimeout()/2;
+        this.popNullIntervalInSecond=30;
     }
 
     @Override
@@ -58,14 +60,14 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
     private void fetchAndExecute() throws InterruptedException {
         lock.acquire();
         try {
-            Object[] data=new Object[1];
-            data[0] = boundListOperations.rightPop(popIntervalMills, TimeUnit.MILLISECONDS);
-            if (data[0] == null) {
+            Object data=boundListOperations.rightPop();
+            if (data == null) {
+                TimeUnit.SECONDS.sleep(popNullIntervalInSecond);
                 lock.release();
             } else {
                 workPool.execute(() -> {
                     try {
-                        onTask((C)data[0]);
+                        onTask((C) data);
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                         lock.release();
@@ -168,5 +170,13 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
         if(workPool!=null) {
             workPool.shutdown();
         }
+    }
+
+    public int getPopNullIntervalInSecond() {
+        return popNullIntervalInSecond;
+    }
+
+    public void setPopNullIntervalInSecond(int popNullIntervalInSecond) {
+        this.popNullIntervalInSecond = popNullIntervalInSecond;
     }
 }

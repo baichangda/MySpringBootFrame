@@ -73,7 +73,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
      * 7:已停止
      * 8:异常终止
      *
-     * 1,2则变更为6
+     * 1,2直接变更为6
      * 3,4,8直接返回失败
      * 6,7直接返回成功
      */
