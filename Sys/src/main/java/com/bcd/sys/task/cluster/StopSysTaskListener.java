@@ -9,7 +9,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 @Component
 public class StopSysTaskListener extends RedisTopicMQ<StopSysTask>{

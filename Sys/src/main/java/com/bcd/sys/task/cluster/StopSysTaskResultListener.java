@@ -2,7 +2,6 @@ package com.bcd.sys.task.cluster;
 
 import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
-import com.bcd.sys.task.CommonConst;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
