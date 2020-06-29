@@ -58,13 +58,12 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
      * @throws InterruptedException
      */
     private void fetchAndExecute() throws InterruptedException {
-        lock.acquire();
-        try {
-            Object data=boundListOperations.rightPop();
-            if (data == null) {
-                TimeUnit.SECONDS.sleep(popNullIntervalInSecond);
-                lock.release();
-            } else {
+        Object data=boundListOperations.rightPop();
+        if (data == null) {
+            TimeUnit.SECONDS.sleep(popNullIntervalInSecond);
+        } else {
+            lock.acquire();
+            try {
                 workPool.execute(() -> {
                     try {
                         onTask((C) data);
@@ -73,14 +72,14 @@ public class SysTaskRedisQueue<T extends Task,C extends ClusterTaskContext<T>> i
                         lock.release();
                     }
                 });
-            }
-        }catch (Exception ex){
-            lock.release();
-            if(ex instanceof QueryTimeoutException){
-                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute QueryTimeoutException", ex);
-            }else{
-                logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute error,try after 10s",ex);
-                Thread.sleep(10000L);
+            }catch (Exception ex){
+                lock.release();
+                if(ex instanceof QueryTimeoutException){
+                    logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute QueryTimeoutException", ex);
+                }else{
+                    logger.error("SysTaskRedisQueue["+name+"] fetchAndExecute error,try after 10s",ex);
+                    TimeUnit.SECONDS.sleep(10);
+                }
             }
         }
     }
