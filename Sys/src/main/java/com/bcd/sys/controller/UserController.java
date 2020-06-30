@@ -78,7 +78,7 @@ public class UserController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询用户列表",notes = "查询用户分页")
+    @ApiOperation(value="查询用户分页",notes = "查询用户分页")
     @ApiResponse(code = 200,message = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
             @ApiParam(value = "生日开始") @RequestParam(value = "birthdayBegin", required = false) Date birthdayBegin,
@@ -123,10 +123,8 @@ public class UserController extends BaseController {
     @ApiOperation(value = "保存用户",notes = "保存用户")
     @ApiResponse(code = 200,message = "保存结果")
     public JsonMessage save(@ApiParam(value = "用户实体") @Validated @RequestBody UserBean user){
-        if(user.getId()==null){
-            user.setPassword(userService.encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
-        }
-        userService.save(user);
+
+        userService.saveUser(user);
         return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
 

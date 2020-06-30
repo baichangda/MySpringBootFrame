@@ -125,7 +125,7 @@ public class ShiroConfiguration{
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
         DefaultWebSessionManager sessionManager=new MyDefaultWebSessionManager();
         sessionManager.setSessionDAO(new RedisSessionDAO(redisConnectionFactory));
-        sessionManager.setGlobalSessionTimeout(60*1000);
+        sessionManager.setGlobalSessionTimeout(30*60*1000);
         return sessionManager;
     }
 

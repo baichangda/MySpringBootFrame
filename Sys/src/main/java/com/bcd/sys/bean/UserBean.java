@@ -28,8 +28,6 @@ public class UserBean extends BaseBean<Long>{
     private String username;
 
     @JsonIgnore
-    @NotBlank(message = "[密码]不能为空")
-    @Size(max = 100,message = "[密码]长度不能超过100")
     @ApiModelProperty(value = "密码(不能为空,长度不能超过100)")
     private String password;
 

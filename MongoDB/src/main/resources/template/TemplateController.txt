@@ -66,7 +66,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询${moduleNameCN}列表",notes = "查询${moduleNameCN}分页")
+    @ApiOperation(value="查询${moduleNameCN}分页",notes = "查询${moduleNameCN}分页")
     @ApiResponse(code = 200,message = "${moduleNameCN}分页结果集")
     public JsonMessage<Page<${moduleName?cap_first}Bean>> page(
         <#list fieldList as field>
