@@ -283,6 +283,10 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
             //忽略踢出自己
             if(!e.getId().equals(curSessionId)){
                 UserBean userBean = (UserBean) e.getAttribute("user");
+                //忽略未登陆session
+                if(userBean==null){
+                    return;
+                }
                 boolean isDel=false;
 
                 if(username!=null){
