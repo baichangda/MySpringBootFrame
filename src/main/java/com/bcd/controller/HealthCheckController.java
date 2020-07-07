@@ -12,6 +12,7 @@ public class HealthCheckController {
     @RequestMapping(value = "/",method = RequestMethod.GET)
     @ApiOperation(value = "健康检查(默认访问路径)",notes = "健康检查(默认访问路径)")
     @ApiResponse(code = 200,message = "健康检查(默认访问路径)")
-    public void healthCheck(){
+    public String healthCheck(){
+        return "succeed";
     }
 }
