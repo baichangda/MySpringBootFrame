@@ -12,44 +12,6 @@ import java.util.function.*;
 @SuppressWarnings("unchecked")
 public class CollectionUtil {
 
-    /**
-     * 合并多个集合的元素
-     *
-     * @param mergeFun 如果合并的方法为空,则无条件合并两个集合的元素,且返回结果集类型为提供集合数组的第一个非空的集合
-     * @param lists
-     * @param <T>
-     * @return
-     */
-    public static <T> List<T> mergeList(BinaryOperator<List<T>> mergeFun, Supplier<? extends List> listSupplier, List<T>... lists) {
-        List<T> resList = listSupplier.get();
-        //1、如果集合参数为null或者长度为0则直接返回
-        if (lists == null || lists.length == 0) {
-            return resList;
-        }
-        //2、如果非空的集合为0则返回非null集合第一个元素,为1则直接返回这个元素
-        List<T>[] notEmptyLists = Arrays.stream(lists).filter(e -> e != null && !e.isEmpty()).toArray(len -> new List[len]);
-        if (notEmptyLists.length == 0) {
-            return resList;
-        } else if (notEmptyLists.length == 1) {
-            resList.addAll(notEmptyLists[0]);
-            return resList;
-        }
-        //3、如果合并的方法为空,则无条件合并两个集合的元素
-        if (mergeFun == null) {
-            for (int i = 0; i <= notEmptyLists.length - 1; i++) {
-                resList.addAll(notEmptyLists[i]);
-            }
-        } else {
-            List<T> tempList = notEmptyLists[0];
-            for (int i = 1; i <= notEmptyLists.length - 1; i++) {
-                tempList = mergeFun.apply(tempList, notEmptyLists[i]);
-            }
-            resList.addAll(tempList);
-        }
-        return resList;
-    }
-
-
     public static <K, A, V, B> Map<A, B> replaceMap(Function<K, A> keyFun, Function<V, B> valFun, Supplier<? extends Map<A, B>> mapSupplier, Map<K, V> map) {
         return replaceMap(keyFun, valFun, null, mapSupplier, map);
     }
