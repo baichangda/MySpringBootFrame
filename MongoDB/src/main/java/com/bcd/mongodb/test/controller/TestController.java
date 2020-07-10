@@ -52,7 +52,7 @@ public class TestController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询测试列表",notes = "查询测试分页")
+    @ApiOperation(value="查询测试分页",notes = "查询测试分页")
     @ApiResponse(code = 200,message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
         @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) Date postlinecode,
