@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 //@Service
+@SuppressWarnings("unchecked")
 public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private KafkaTemplate kafkaTemplate;
