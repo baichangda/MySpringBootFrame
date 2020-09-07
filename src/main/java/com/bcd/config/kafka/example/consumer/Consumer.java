@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Service
+//@Service
 public class Consumer {
     @KafkaListener(topics = "zs-feedback",groupId = "zs-device-platform1")
     public void processMessage(ConsumerRecord<byte[],byte[]> consumerRecord) {

@@ -35,6 +35,7 @@ allprojects{
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
+        maven { url "https://jitpack.io" }
 //        maven { url "${incarMavenRepoUrl}" }
 //        mavenCentral()
     }
@@ -52,6 +53,8 @@ allprojects{
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
         //邮件支持
         compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
+        //xjar加密
+        compile("com.github.core-lib:xjar:4.0.1")
     }
 
     //生成jar时打包源码
