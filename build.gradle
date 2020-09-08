@@ -55,6 +55,10 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
         //xjar加密
         compile("com.github.core-lib:xjar:4.0.1")
+
+        // https://mvnrepository.com/artifact/com.hynnet/jacob
+        compile group: 'com.hynnet', name: 'jacob', version: '1.18'
+
     }
 
     //生成jar时打包源码
