@@ -7,9 +7,9 @@ public class TestUtil {
     public static void main(String[] args) throws Exception {
         XCryptos
                 .encryption()
-                .from("/Users/baichangda/bcd/workspace/MySpringBootFrame/build/libs/MySpringBootFrame-1.0-SNAPSHOT.jar")
+                .from("/Users/baichangda/hlj/workspace/bwt-vms-electrice-fence/target/electricfence-1.0-SNAPSHOT.jar")
                 .use("test")
-                .include("/com/bcd/**/*.class")
+                .include("/com/bwt/**/*.class")
                 .to("/Users/baichangda/xjartest/result.jar");
     }
 }
