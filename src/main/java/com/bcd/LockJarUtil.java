@@ -12,12 +12,17 @@ import java.nio.file.Paths;
 public class LockJarUtil {
 
     /**
+     *
      * 加密jar并在jar对应的文件夹下面生成
      * result.jar 加密后的jar
      * xjar.go 未编译之前的go脚本文件
      * xjar.? 根据windows、linux环境不同生成的对应可执行程序
      *
      * 可以通过 xjar.? java -jar result.jar 启动jar
+     *
+     * 注意:
+     * 打包的服务器必须安装golang环境
+     *
      * @param sourceJarPath
      * @param includeClass
      */
