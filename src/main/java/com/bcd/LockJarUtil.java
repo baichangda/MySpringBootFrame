@@ -105,7 +105,9 @@ public class LockJarUtil {
 
 
     public static void main(String[] args) throws Exception {
-        lockJar("D:\\workspace\\bwt-vms-electrice-fence\\target\\electricfence-1.0-SNAPSHOT.jar",
+//        lockJar("D:\\workspace\\bwt-vms-electrice-fence\\target\\electricfence-1.0-SNAPSHOT.jar",
+//                "/com/bwt/**/*.class");
+        lockJar("/Users/baichangda/hlj/workspace/bwt-vms-electrice-fence/target/electricfence-1.0-SNAPSHOT.jar",
                 "/com/bwt/**/*.class");
     }
 }
