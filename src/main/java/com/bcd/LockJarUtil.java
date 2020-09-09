@@ -67,10 +67,17 @@ public class LockJarUtil {
     public static void goBuild(String path) throws InterruptedException, IOException {
         String goPath=path+File.separator+"xjar.go";
         String cmdPath=path+File.separator;
-        String cmd="go build -o "+cmdPath+" "+goPath;
+        String cmd = "go build -o " + cmdPath + " " + goPath;
         System.out.println("run ["+cmd+"]");
-        String[] command = { "/bin/sh", "-c", cmd };
-        Process process = Runtime.getRuntime().exec(command);
+        Process process ;
+        if(isWindows()){
+            process= Runtime.getRuntime().exec("cmd /c"+cmd);
+        }else {
+            String[] command = { "/bin/sh", "-c", cmd };
+            process= Runtime.getRuntime().exec(command);
+        }
+
+
         process.waitFor();
         try (InputStream is = process.getErrorStream()) {
             int len = is.available();
@@ -82,8 +89,23 @@ public class LockJarUtil {
         }
     }
 
+    /**
+     * 判断是否是windows操作系统
+     * @return
+     */
+    public static boolean isWindows(){
+        String os=System.getProperty("os.name").toLowerCase();
+        if(os.indexOf("windows")>=0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+
     public static void main(String[] args) throws Exception {
-        lockJar("/Users/baichangda/hlj/workspace/bwt-vms-electrice-fence/target/electricfence-1.0-SNAPSHOT.jar",
+        lockJar("D:\\workspace\\bwt-vms-electrice-fence\\target\\electricfence-1.0-SNAPSHOT.jar",
                 "/com/bwt/**/*.class");
     }
 }
