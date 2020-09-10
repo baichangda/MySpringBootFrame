@@ -14,7 +14,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 @Configuration
 public class ExceptionConfig {
     @Bean
-    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("mappingJackson2HttpMessageConverter") MappingJackson2HttpMessageConverter converter) {
+    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("mappingJackson2HttpMessageConverter_my") MappingJackson2HttpMessageConverter converter) {
         ExceptionResponseHandler handler=new DefaultExceptionResponseHandler(converter);
         return handler;
     }
