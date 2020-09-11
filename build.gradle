@@ -105,14 +105,24 @@ bootJar {
 }
 
 flyway {
-    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
-    user = 'root'
-    password = '123456'
+    //mysql
+//    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
+//    user = 'root'
+//    password = '123456'
+//    def subLocations=[]
+//    for(project in subprojects){
+//        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/mysql')
+//    }
+    //pgsql
+    url = 'jdbc:postgresql://localhost:5432/baichangda'
+    user = 'baichangda'
+//    password = ''
     def subLocations=[]
     for(project in subprojects){
-        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration')
+        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
     }
     flyway.locations =subLocations
+    println(flyway.locations)
 }
 
 flywayMigrate {

@@ -4,7 +4,10 @@ dependencies {
     //springboot jdbc支持
     compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
     //mysql驱动包
-    runtime "mysql:mysql-connector-java:${mysqlVersion}"
+//    runtime "mysql:mysql-connector-java:${mysqlVersion}"
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    compile group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
@@ -15,6 +18,7 @@ dependencies {
 buildscript {
     ext {
         mysqlVersion = '8.+'
+        pgsqlVersion = '42.2.+'
         jsqlparserVersion='+'
         freemarkerVersion = '+'
 

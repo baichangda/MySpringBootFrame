@@ -2,6 +2,7 @@ package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
