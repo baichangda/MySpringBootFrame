@@ -17,9 +17,6 @@ CREATE TABLE "public"."t_sys_menu" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_menu"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_menu"."id" IS '主键';
 
 COMMENT ON COLUMN "public"."t_sys_menu"."parent_id" IS '父菜单id';

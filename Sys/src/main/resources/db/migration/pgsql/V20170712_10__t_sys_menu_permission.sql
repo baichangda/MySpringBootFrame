@@ -5,9 +5,6 @@ CREATE TABLE "public"."t_sys_menu_permission" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_menu_permission"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_menu_permission"."menu_id" IS '关联菜单id';
 
 COMMENT ON COLUMN "public"."t_sys_menu_permission"."permission_code" IS '关联权限编码';

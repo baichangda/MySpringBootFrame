@@ -17,9 +17,6 @@ CREATE TABLE "public"."t_sys_task" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_task"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_task"."id" IS '主键';
 
 COMMENT ON COLUMN "public"."t_sys_task"."name" IS '任务名称';

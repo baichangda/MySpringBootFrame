@@ -5,9 +5,6 @@ CREATE TABLE "public"."t_sys_user_role" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_user_role"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_user_role"."user_id" IS '关联用户id';
 
 COMMENT ON COLUMN "public"."t_sys_user_role"."role_code" IS '关联角色编码';

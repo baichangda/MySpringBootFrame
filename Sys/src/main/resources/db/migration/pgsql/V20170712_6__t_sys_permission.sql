@@ -16,9 +16,6 @@ CREATE TABLE "public"."t_sys_permission" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_permission"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_permission"."id" IS 'id';
 
 COMMENT ON COLUMN "public"."t_sys_permission"."name" IS '角色名称';

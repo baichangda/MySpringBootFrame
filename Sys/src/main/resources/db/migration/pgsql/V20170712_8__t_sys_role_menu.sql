@@ -5,9 +5,6 @@ CREATE TABLE "public"."t_sys_role_menu" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_role_menu"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_role_menu"."role_code" IS '关联角色编码';
 
 COMMENT ON COLUMN "public"."t_sys_role_menu"."menu_id" IS '关联菜单id';

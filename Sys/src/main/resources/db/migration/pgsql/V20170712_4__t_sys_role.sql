@@ -15,9 +15,6 @@ CREATE TABLE "public"."t_sys_role" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_role"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_role"."id" IS '主键';
 
 COMMENT ON COLUMN "public"."t_sys_role"."name" IS '角色名称';

@@ -21,9 +21,6 @@ CREATE TABLE "public"."t_sys_user" (
 )
 ;
 
-ALTER TABLE "public"."t_sys_user"
-  OWNER TO "baichangda";
-
 COMMENT ON COLUMN "public"."t_sys_user"."id" IS '主键';
 
 COMMENT ON COLUMN "public"."t_sys_user"."username" IS '用户名';

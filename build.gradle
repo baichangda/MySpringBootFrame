@@ -114,9 +114,9 @@ flyway {
 //        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/mysql')
 //    }
     //pgsql
-    url = 'jdbc:postgresql://localhost:5432/baichangda'
-    user = 'baichangda'
-//    password = ''
+    url = 'jdbc:postgresql://db.hbluewhale.com:12921/test_bcd'
+    user = 'dbuser'
+    password = 'hlxpassword'
     def subLocations=[]
     for(project in subprojects){
         subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
