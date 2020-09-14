@@ -1,5 +1,6 @@
 package com.bcd.base.config.shiro.cache;
 
+import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
@@ -93,5 +94,9 @@ public class RedisCache<K,V> implements Cache<K,V> {
     @Override
     public Collection<V> values() {
         return boundHashOperations.values();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(NotePermission.menu_authorize.getNote());
     }
 }

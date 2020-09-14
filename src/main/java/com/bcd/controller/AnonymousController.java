@@ -1,5 +1,6 @@
 package com.bcd.controller;
 
+import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
@@ -57,6 +58,10 @@ public class AnonymousController extends BaseController{
         String fileName=I18nUtil.getMessage("AnonymousController.exportApi.fileName")+".xlsx";
         response(workbook,toDateFileName(fileName),response);
         return JsonMessage.success();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(NotePermission.menu_authorize.getNote());
     }
 
 }

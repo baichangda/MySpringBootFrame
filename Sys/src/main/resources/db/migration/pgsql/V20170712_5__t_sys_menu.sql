@@ -1,5 +1,5 @@
 CREATE TABLE "public"."t_sys_menu" (
-  "id" int8 NOT NULL,
+  "id" serial8 NOT NULL,
   "parent_id" int8,
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "url" varchar(256) COLLATE "pg_catalog"."default",

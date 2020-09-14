@@ -1,5 +1,5 @@
 CREATE TABLE "public"."t_sys_user" (
-  "id" int8 NOT NULL,
+  "id" serial8 NOT NULL,
   "username" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "password" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "email" varchar(100) COLLATE "pg_catalog"."default",

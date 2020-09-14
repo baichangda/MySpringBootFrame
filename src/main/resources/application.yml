@@ -16,23 +16,18 @@ spring:
        period: -1
    profiles.active: dev
    freemarker.cache: false
-#  mysql
-#   datasource:
+
+   datasource:
+     #mysql
 #     driver-class-name: com.mysql.cj.jdbc.Driver
-#     hikari:
-#       data-source-properties:
-#         cachePrepStmts: true
-#         prepStmtCacheSize: 250
-#         prepStmtCacheSqlLimit: 2048
-#         useServerPrepStmts: true
-#       minimumIdle: 5
-#       maximumPoolSize: 15
 #     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true
 #     username: root
 #     password: 123456
-#  pgsql
-   datasource:
+     #pgsql
      driver-class-name: org.postgresql.Driver
+     url: jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
+     username: dbuser
+     password: hlxpassword
      hikari:
        data-source-properties:
          cachePrepStmts: true
@@ -41,28 +36,31 @@ spring:
          useServerPrepStmts: true
        minimumIdle: 5
        maximumPoolSize: 15
-     url: jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
-     username: dbuser
-     password: hlxpassword
+
+  #  jpa配置
+   jpa:
+     show-sql: false
+     hibernate:
+       # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate
+       ddl-auto: validate
+     properties:
+       #mysql
+#       hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+       #pgsql
+       hibernate.dialect: org.hibernate.dialect.PostgreSQL95Dialect
+       hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+
+  #  jdbcTemplate配置
+   jdbc:
+     template:
+       fetch-size: -1
+       max-rows: -1
+       query-timeout:
+
 
 #  mongodb配置
    data.mongodb.uri: mongodb://test:test@10.0.14.155:27017/test
-#  jpa配置
-   jpa:
-      show-sql: false
-      hibernate:
-          # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate
-        ddl-auto: validate
-      properties:
-        hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
-        hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
 
-#  jdbcTemplate配置
-   jdbc:
-      template:
-        fetch-size: -1
-        max-rows: -1
-        query-timeout:
 
 #  i18n资源文件配置
    messages:

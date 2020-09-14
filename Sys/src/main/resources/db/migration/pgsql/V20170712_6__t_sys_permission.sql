@@ -1,5 +1,5 @@
 CREATE TABLE "public"."t_sys_permission" (
-  "id" int8 NOT NULL,
+  "id" serial8 NOT NULL,
   "name" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
   "code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "remark" varchar(256) COLLATE "pg_catalog"."default",

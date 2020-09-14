@@ -1,5 +1,5 @@
 CREATE TABLE "public"."t_sys_task" (
-  "id" int8 NOT NULL,
+  "id" serial8 NOT NULL,
   "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "status" int4 NOT NULL,
   "type" int4,
