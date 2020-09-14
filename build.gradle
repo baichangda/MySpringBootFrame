@@ -56,8 +56,7 @@ allprojects{
         //xjar加密
         compile("com.github.core-lib:xjar:4.0.1")
 
-        // https://mvnrepository.com/artifact/com.hynnet/jacob
-        compile group: 'com.hynnet', name: 'jacob', version: '1.18'
+        dependencies { compile files('lib/jacob.jar')}
 
     }
 
