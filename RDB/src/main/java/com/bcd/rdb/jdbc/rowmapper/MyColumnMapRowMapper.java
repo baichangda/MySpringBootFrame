@@ -2,6 +2,7 @@ package com.bcd.rdb.jdbc.rowmapper;
 
 import com.bcd.base.util.StringUtil;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
+import org.springframework.util.StringUtils;
 
 public class MyColumnMapRowMapper extends ColumnMapRowMapper{
     public final static MyColumnMapRowMapper ROW_MAPPER=new MyColumnMapRowMapper();
