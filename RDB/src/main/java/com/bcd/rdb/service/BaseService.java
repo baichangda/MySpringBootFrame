@@ -12,6 +12,7 @@ import com.bcd.rdb.util.RDBUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -368,7 +369,7 @@ public class BaseService<T, K extends Serializable> {
     /**
      * 字段唯一性验证
      * <p>
-     * 对象t主键必须为'id'且必须属于BeanUtil.BASE_DATA_TYPE
+     * 通过{@link org.springframework.data.annotation.Id}识别主键,不支持联合主键
      *
      * @param fieldName  属性名称
      * @param val        属性值
@@ -376,7 +377,6 @@ public class BaseService<T, K extends Serializable> {
      * @return
      */
     public boolean isUnique(String fieldName, Object val, K... excludeIds) {
-        boolean flag = true;
         List<T> resultList = repository.findAll((Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) -> {
             {
                 Predicate predicate = criteriaBuilder.conjunction();
@@ -385,20 +385,26 @@ public class BaseService<T, K extends Serializable> {
                 return predicate;
             }
         });
-        if (resultList == null || resultList.isEmpty()) {
+        if (resultList.isEmpty()) {
             return true;
         } else {
-            if (excludeIds == null || excludeIds.length == 0 || Arrays.stream(excludeIds).allMatch(Objects::isNull)) {
+            if (excludeIds == null || excludeIds.length == 0) {
                 return false;
             } else {
-                Set<K> idSet = Arrays.stream(excludeIds).filter(Objects::nonNull).collect(Collectors.toSet());
-                List filterList = resultList.stream().filter(e -> !idSet.contains(RDBUtil.getPKVal(e))).collect(Collectors.toList());
-                if (filterList != null && !filterList.isEmpty()) {
-                    flag = false;
+                Set<K> excludeIdSet = Arrays.stream(excludeIds).filter(Objects::nonNull).collect(Collectors.toSet());
+                if(excludeIdSet.isEmpty()){
+                    return false;
+                }else {
+                    return resultList.stream().allMatch(e -> {
+                        try {
+                            return excludeIdSet.contains(beanInfo.pkField.get(e));
+                        } catch (IllegalAccessException ex) {
+                            throw BaseRuntimeException.getException(ex);
+                        }
+                    });
                 }
             }
         }
-        return flag;
     }
 
 
@@ -428,14 +434,13 @@ public class BaseService<T, K extends Serializable> {
         }
         //1、循环集合,验证每个唯一字段是否在数据库中有重复值
         for (Field f : getBeanInfo().uniqueFieldList) {
-            Object val;
             try {
-                val = PropertyUtils.getProperty(t, f.getName());
+                Object val = PropertyUtils.getProperty(t, f.getName());
+                if (!isUnique(f.getName(), val, (K)beanInfo.pkField.get(t))) {
+                    throw BaseRuntimeException.getException(getUniqueMessage(f));
+                }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 throw BaseRuntimeException.getException(e);
-            }
-            if (!isUnique(f.getName(), val, (K) RDBUtil.getPKVal(t))) {
-                throw BaseRuntimeException.getException(getUniqueMessage(f));
             }
         }
     }
@@ -473,7 +478,7 @@ public class BaseService<T, K extends Serializable> {
                 for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName = f.getName();
                     Object val = PropertyUtils.getProperty(t, fieldName);
-                    if (!isUnique(f.getName(), val, (K) RDBUtil.getPKVal(t))) {
+                    if (!isUnique(f.getName(), val, (K) beanInfo.pkField.get(t))) {
                         throw BaseRuntimeException.getException(getUniqueMessage(f));
                     }
                 }

@@ -2,9 +2,11 @@ package com.bcd.rdb.bean.info;
 
 import com.bcd.rdb.anno.Unique;
 import com.bcd.base.util.SpringUtil;
+import com.bcd.rdb.util.RDBUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.annotations.Where;
 import org.springframework.cache.Cache;
+import org.springframework.data.annotation.Id;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -25,11 +27,6 @@ public class BeanInfo{
      */
     public Boolean isCheckUnique;
     public List<Field> uniqueFieldList;
-    /**
-     * 当前类逻辑删除字段
-     * isLogicDelete:当前类是否是逻辑删除
-     */
-    public Boolean isLogicDelete;
 
     /**
      * manyToManyFieldList 多对多字段集合
@@ -41,6 +38,11 @@ public class BeanInfo{
     public List<Field> oneToManyFieldList;
     public List<Field> manyToOneFieldList;
     public List<Field> oneToOneFieldList;
+
+    /**
+     * 主键字段
+     */
+    public Field pkField;
 
 
     /**
@@ -73,13 +75,14 @@ public class BeanInfo{
     }
 
     public void init(){
+        initPkField();
         initUnique();
-        initLoginDelete();
         initJPAAnno();
     }
 
     public void initUnique(){
         uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
+        uniqueFieldList.forEach(e->e.setAccessible(true));
         if(uniqueFieldList.isEmpty()){
             isCheckUnique =false;
         }else{
@@ -87,27 +90,27 @@ public class BeanInfo{
         }
     }
 
-    /**
-     * 区别类是否是逻辑删除,判断类是否存在Where注解
-     */
-    public void initLoginDelete(){
-        Where anno= (Where) clazz.getAnnotation(Where.class);
-        if(anno==null){
-            isLogicDelete=false;
-        }else{
-            isLogicDelete=true;
-        }
-    }
-
 
     /**
-     * 则初始化 JPA 注解
+     * 初始化 JPA 注解
      */
     public void initJPAAnno(){
         manyToManyFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, ManyToMany.class));
         oneToManyFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, OneToMany.class));
         manyToOneFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, ManyToOne.class));
         oneToOneFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, OneToOne.class));
+        manyToManyFieldList.forEach(e->e.setAccessible(true));
+        oneToManyFieldList.forEach(e->e.setAccessible(true));
+        manyToOneFieldList.forEach(e->e.setAccessible(true));
+        oneToOneFieldList.forEach(e->e.setAccessible(true));
+    }
+
+    /**
+     * 初始化主键字段
+     */
+    public void initPkField(){
+        pkField= FieldUtils.getFieldsWithAnnotation(clazz,Id.class)[0];
+        pkField.setAccessible(true);
     }
 
 
@@ -134,15 +137,6 @@ public class BeanInfo{
     public void setUniqueFieldList(List<Field> uniqueFieldList) {
         this.uniqueFieldList = uniqueFieldList;
     }
-
-    public Boolean getLogicDelete() {
-        return isLogicDelete;
-    }
-
-    public void setLogicDelete(Boolean logicDelete) {
-        isLogicDelete = logicDelete;
-    }
-
 
     public List<Field> getManyToManyFieldList() {
         return manyToManyFieldList;
@@ -174,5 +168,13 @@ public class BeanInfo{
 
     public void setOneToOneFieldList(List<Field> oneToOneFieldList) {
         this.oneToOneFieldList = oneToOneFieldList;
+    }
+
+    public Field getPkField() {
+        return pkField;
+    }
+
+    public void setPkField(Field pkField) {
+        this.pkField = pkField;
     }
 }

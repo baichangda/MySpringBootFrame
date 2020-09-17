@@ -6,6 +6,9 @@ import org.hibernate.id.IdentityGenerator;
 
 import java.io.Serializable;
 
+/**
+ * 支持自定义主键值
+ */
 public class MyIdentityGenerator extends IdentityGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor s, Object obj) {
