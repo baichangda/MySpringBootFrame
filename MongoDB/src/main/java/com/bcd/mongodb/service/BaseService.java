@@ -4,11 +4,9 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.i18n.I18NData;
 import com.bcd.mongodb.anno.Unique;
+import com.bcd.mongodb.bean.info.BeanInfo;
 import com.bcd.mongodb.repository.BaseRepository;
 import com.bcd.mongodb.util.ConditionUtil;
-import com.bcd.mongodb.util.MongoUtil;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,13 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,13 +33,18 @@ public class BaseService<T,K extends Serializable>{
     @Autowired
     public BaseRepository<T,K> repository;
 
-    public Class<T> beanClass;
+    private volatile BeanInfo beanInfo;
 
-    public List<Field> uniqueFieldList;
-
-    @PostConstruct
-    public void initBeanClass() {
-        this.beanClass = (Class <T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    public BeanInfo getBeanInfo() {
+        if (beanInfo == null) {
+            synchronized (this) {
+                if (beanInfo == null) {
+                    Class beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+                    beanInfo = new BeanInfo(beanClass);
+                }
+            }
+        }
+        return beanInfo;
     }
 
     public List<T> findAll(){
@@ -53,7 +53,7 @@ public class BaseService<T,K extends Serializable>{
 
     public List<T> findAll(Condition condition){
         Query query= ConditionUtil.toQuery(condition);
-        return mongoTemplate.find(query,beanClass);
+        return mongoTemplate.find(query,getBeanInfo().clazz);
     }
 
     public List<T> findAll(Sort sort){
@@ -63,7 +63,7 @@ public class BaseService<T,K extends Serializable>{
     public List<T> findAll(Condition condition,Sort sort){
         Query query= ConditionUtil.toQuery(condition);
         query.with(sort);
-        return mongoTemplate.find(query,beanClass);
+        return mongoTemplate.find(query,getBeanInfo().clazz);
     }
 
     public Page<T> findAll(Pageable pageable){
@@ -72,15 +72,15 @@ public class BaseService<T,K extends Serializable>{
 
     public Page<T> findAll(Condition condition, Pageable pageable){
         Query query= ConditionUtil.toQuery(condition);
-        long count=mongoTemplate.count(query,beanClass);
+        long count=mongoTemplate.count(query,getBeanInfo().clazz);
         query.with(pageable);
-        List<T> list=mongoTemplate.find(query,beanClass);
-        return new PageImpl(list, pageable, count);
+        List<T> list=mongoTemplate.find(query,getBeanInfo().clazz);
+        return new PageImpl<>(list, pageable, count);
     }
 
     public long count(Condition condition){
         Query query= ConditionUtil.toQuery(condition);
-        return mongoTemplate.count(query,beanClass);
+        return mongoTemplate.count(query,getBeanInfo().clazz);
     }
 
     public T findById(K id){
@@ -89,7 +89,7 @@ public class BaseService<T,K extends Serializable>{
 
     public T findOne(Condition condition){
         Query query= ConditionUtil.toQuery(condition);
-        return mongoTemplate.findOne(query,beanClass);
+        return mongoTemplate.findOne(query,(Class<T>)getBeanInfo().clazz);
     }
 
     /**
@@ -111,19 +111,15 @@ public class BaseService<T,K extends Serializable>{
      * @param t
      */
     public void validateUniqueBeforeSave(T t){
-        //1、获取唯一注解的字段集合
-        if(uniqueFieldList==null){
-            uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(beanClass, Unique.class));
-        }
-        //2、循环集合,验证每个唯一字段是否在数据库中有重复值
+        //1、循环集合,验证每个唯一字段是否在数据库中有重复值
         try {
-            for (Field f : uniqueFieldList) {
-                Object val= PropertyUtils.getProperty(t,f.getName());
-                if(!isUnique(f.getName(),val,(K) MongoUtil.getPKVal(t))){
+            for (Field f : getBeanInfo().uniqueFieldList) {
+                Object val= f.get(t);
+                if(!isUnique(f.getName(),val,(K) getBeanInfo().pkField.get(t))){
                     throw BaseRuntimeException.getException(getUniqueMessage(f));
                 }
             }
-        } catch (IllegalAccessException |InvocationTargetException |NoSuchMethodException e) {
+        } catch (IllegalAccessException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -133,17 +129,13 @@ public class BaseService<T,K extends Serializable>{
      * @param iterable
      */
     public void validateUniqueBeforeSave(Iterable<T> iterable){
-        //1、获取唯一注解的字段集合
-        if(uniqueFieldList==null){
-            uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(beanClass, Unique.class));
-        }
-        //2、循环集合,看传入的参数集合中唯一字段是否有重复的值
+        //1、循环集合,看传入的参数集合中唯一字段是否有重复的值
         try {
         Map<String,Set<Object>> fieldValueSetMap=new HashMap<>();
             for (T t : iterable) {
-                for (Field f : uniqueFieldList) {
+                for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName=f.getName();
-                    Object val= PropertyUtils.getProperty(t,fieldName);
+                    Object val= f.get(t);
                     Set<Object> valueSet= fieldValueSetMap.get(fieldName);
                     if(valueSet==null){
                         valueSet=new HashSet<>();
@@ -158,15 +150,14 @@ public class BaseService<T,K extends Serializable>{
             }
             //3、循环集合,验证每个唯一字段是否在数据库中有重复值
             for (T t : iterable) {
-                for (Field f : uniqueFieldList) {
-                    String fieldName=f.getName();
-                    Object val=PropertyUtils.getProperty(t,fieldName);
-                    if(!isUnique(f.getName(),val,(K)MongoUtil.getPKVal(t))){
+                for (Field f : getBeanInfo().uniqueFieldList) {
+                    Object val=f.get(t);
+                    if(!isUnique(f.getName(),val,(K)getBeanInfo().pkField.get(t))){
                         throw BaseRuntimeException.getException(getUniqueMessage(f));
                     }
                 }
             }
-        } catch (IllegalAccessException |InvocationTargetException |NoSuchMethodException e) {
+        } catch (IllegalAccessException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -205,7 +196,7 @@ public class BaseService<T,K extends Serializable>{
 
     public void delete(Condition condition){
         Query query= ConditionUtil.toQuery(condition);
-        mongoTemplate.remove(query,beanClass);
+        mongoTemplate.remove(query,getBeanInfo().clazz);
     }
 
     /**
@@ -216,20 +207,19 @@ public class BaseService<T,K extends Serializable>{
      * @return
      */
     public boolean isUnique(String fieldName,Object val,K ... excludeIds){
-        boolean flag=true;
         Query query=new Query(Criteria.where(fieldName).is(val));
-        List<T> resultList= mongoTemplate.find(query,beanClass);
+        List<T> resultList= mongoTemplate.find(query,getBeanInfo().clazz);
         if(excludeIds==null||excludeIds.length==0){
-            if (resultList!=null&&!resultList.isEmpty()){
-                flag= false;
-            }
+            return resultList.isEmpty();
         }else{
             Set<K> idSet= Arrays.stream(excludeIds).collect(Collectors.toSet());
-            List filterList=resultList.stream().filter(e->!idSet.contains(MongoUtil.getPKVal(e))).collect(Collectors.toList());
-            if (filterList!=null&&!filterList.isEmpty()){
-                flag= false;
-            }
+            return resultList.stream().allMatch(e-> {
+                try {
+                    return idSet.contains(getBeanInfo().pkField.get(e));
+                } catch (IllegalAccessException ex) {
+                    throw BaseRuntimeException.getException(ex);
+                }
+            });
         }
-        return flag;
     }
 }

@@ -45,32 +45,7 @@ public class BeanInfo{
     public Field pkField;
 
 
-    /**
-     * 获取bean信息的缓存,先从自定义的缓存设置中取,取不到则生成bean信息
-     * @param clazz
-     * @return
-     */
-    public static BeanInfo getBeanInfo(Class clazz){
-        BeanInfo beanInfo=null;
-        Cache cache=null;
-        if(SpringUtil.applicationContext!=null){
-            cache=SpringUtil.applicationContext.getBean("beanInfoCache", Cache.class);
-            if(cache!=null){
-                beanInfo= cache.get(clazz.getName(),BeanInfo.class);
-            }
-        }
-        if(beanInfo==null){
-            beanInfo=new BeanInfo(clazz);
-            beanInfo.init();
-            if(cache!=null){
-                cache.put(clazz.getName(),beanInfo);
-            }
-        }
-        return beanInfo;
-    }
-
-
-    private BeanInfo(Class clazz){
+    public BeanInfo(Class clazz){
         this.clazz = clazz;
     }
 

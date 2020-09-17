@@ -8,11 +8,7 @@ import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.repository.BaseRepository;
-import com.bcd.rdb.util.RDBUtil;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +27,6 @@ import javax.persistence.*;
 import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,7 +58,7 @@ public class BaseService<T, K extends Serializable> {
             synchronized (this) {
                 if (beanInfo == null) {
                     Class beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-                    beanInfo = BeanInfo.getBeanInfo(beanClass);
+                    beanInfo = new BeanInfo(beanClass);
                 }
             }
         }
@@ -435,11 +430,11 @@ public class BaseService<T, K extends Serializable> {
         //1、循环集合,验证每个唯一字段是否在数据库中有重复值
         for (Field f : getBeanInfo().uniqueFieldList) {
             try {
-                Object val = PropertyUtils.getProperty(t, f.getName());
+                Object val = f.get(t);
                 if (!isUnique(f.getName(), val, (K)getBeanInfo().pkField.get(t))) {
                     throw BaseRuntimeException.getException(getUniqueMessage(f));
                 }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
                 throw BaseRuntimeException.getException(e);
             }
         }
@@ -460,7 +455,7 @@ public class BaseService<T, K extends Serializable> {
             for (T t : iterable) {
                 for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName = f.getName();
-                    Object val = PropertyUtils.getProperty(t, fieldName);
+                    Object val = f.get(t);
                     Set<Object> valueSet = fieldValueSetMap.get(fieldName);
                     if (valueSet == null) {
                         valueSet = new HashSet<>();
@@ -476,14 +471,13 @@ public class BaseService<T, K extends Serializable> {
             //2、循环集合,验证每个唯一字段是否在数据库中有重复值
             for (T t : iterable) {
                 for (Field f : getBeanInfo().uniqueFieldList) {
-                    String fieldName = f.getName();
-                    Object val = PropertyUtils.getProperty(t, fieldName);
+                    Object val = f.get(t);
                     if (!isUnique(f.getName(), val, (K) getBeanInfo().pkField.get(t))) {
                         throw BaseRuntimeException.getException(getUniqueMessage(f));
                     }
                 }
             }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (IllegalAccessException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
