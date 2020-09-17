@@ -364,7 +364,7 @@ public class BaseService<T, K extends Serializable> {
     /**
      * 字段唯一性验证
      * <p>
-     * 通过{@link org.springframework.data.annotation.Id}识别主键,不支持联合主键
+     * 通过{@link Id}识别主键,不支持联合主键
      *
      * @param fieldName  属性名称
      * @param val        属性值

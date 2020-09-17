@@ -1,17 +1,9 @@
 package com.bcd.rdb.bean.info;
 
 import com.bcd.rdb.anno.Unique;
-import com.bcd.base.util.SpringUtil;
-import com.bcd.rdb.util.RDBUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.hibernate.annotations.Where;
-import org.springframework.cache.Cache;
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -47,9 +39,10 @@ public class BeanInfo{
 
     public BeanInfo(Class clazz){
         this.clazz = clazz;
+        init();
     }
 
-    public void init(){
+    private void init(){
         initPkField();
         initUnique();
         initJPAAnno();
@@ -84,7 +77,7 @@ public class BeanInfo{
      * 初始化主键字段
      */
     public void initPkField(){
-        pkField= FieldUtils.getFieldsWithAnnotation(clazz,Id.class)[0];
+        pkField= FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
     }
 

@@ -15,8 +15,8 @@ spring:
      cache:
        period: -1
    profiles.active: dev
-   freemarker.cache: false
-
+   freemarker:
+     checkTemplateLocation: false
    datasource:
      #mysql
 #     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -39,6 +39,8 @@ spring:
 
   #  jpa配置
    jpa:
+     # 是否允许jpa session在view依然开启,主要用于懒加载由于session关闭而在view层导致获取值异常
+     open-in-view: false
      show-sql: false
      hibernate:
        # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate

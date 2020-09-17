@@ -28,9 +28,10 @@ public class BeanInfo {
 
     public BeanInfo(Class clazz){
         this.clazz = clazz;
+        init();
     }
 
-    public void init(){
+    private void init(){
         initPkField();
         initUnique();
     }
