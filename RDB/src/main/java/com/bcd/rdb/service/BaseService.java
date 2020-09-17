@@ -397,7 +397,7 @@ public class BaseService<T, K extends Serializable> {
                 }else {
                     return resultList.stream().allMatch(e -> {
                         try {
-                            return excludeIdSet.contains(beanInfo.pkField.get(e));
+                            return excludeIdSet.contains(getBeanInfo().pkField.get(e));
                         } catch (IllegalAccessException ex) {
                             throw BaseRuntimeException.getException(ex);
                         }
@@ -436,7 +436,7 @@ public class BaseService<T, K extends Serializable> {
         for (Field f : getBeanInfo().uniqueFieldList) {
             try {
                 Object val = PropertyUtils.getProperty(t, f.getName());
-                if (!isUnique(f.getName(), val, (K)beanInfo.pkField.get(t))) {
+                if (!isUnique(f.getName(), val, (K)getBeanInfo().pkField.get(t))) {
                     throw BaseRuntimeException.getException(getUniqueMessage(f));
                 }
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -478,7 +478,7 @@ public class BaseService<T, K extends Serializable> {
                 for (Field f : getBeanInfo().uniqueFieldList) {
                     String fieldName = f.getName();
                     Object val = PropertyUtils.getProperty(t, fieldName);
-                    if (!isUnique(f.getName(), val, (K) beanInfo.pkField.get(t))) {
+                    if (!isUnique(f.getName(), val, (K) getBeanInfo().pkField.get(t))) {
                         throw BaseRuntimeException.getException(getUniqueMessage(f));
                     }
                 }
