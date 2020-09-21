@@ -1,12 +1,7 @@
 package com.bcd.base.message;
 
 
-import com.bcd.base.json.SimpleFilterBean;
-import com.bcd.base.json.jackson.filter.SimpleJacksonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import io.swagger.annotations.ApiModelProperty;
-import org.springframework.http.converter.json.MappingJacksonValue;
 
 import java.io.Serializable;
 
@@ -25,12 +20,6 @@ public class JsonMessage<T> implements Serializable {
     private String code = "";
     @ApiModelProperty("Api调用成功时返回的数据(Json字符串)")
     private T data;
-
-    public MappingJacksonValue toMappingJacksonValue(SimpleFilterBean... filters) {
-        MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(this);
-        mappingJacksonValue.setFilters(new SimpleFilterProvider().setDefaultFilter(new SimpleJacksonFilter(filters)));
-        return mappingJacksonValue;
-    }
 
     public JsonMessage() {
     }
