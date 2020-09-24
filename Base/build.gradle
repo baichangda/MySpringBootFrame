@@ -19,7 +19,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
 
     //poi 集成
-    compile("org.apache.poi:poi:${poiVersion}")
     compile("org.apache.poi:poi-ooxml:${poiVersion}")
 
     //shiro权限框架集成
@@ -50,6 +49,10 @@ dependencies {
     compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
     // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
     compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+
 }
 buildscript {
     ext {
@@ -62,5 +65,6 @@ buildscript {
         swaggerBootstrapUiVersion='+'
         commonsPool2='+'
         shiroVersion = '+'
+        guavaVersion='+'
     }
 }

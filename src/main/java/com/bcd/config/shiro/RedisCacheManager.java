@@ -27,7 +27,7 @@ public class RedisCacheManager extends AbstractCacheManager{
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new RedisCache(redisTemplate,s,localTimeout,3*60*1000);
+        return new RedisCache(redisTemplate,s,localTimeout,3*60);
     }
 
 }

@@ -4,11 +4,9 @@ import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.*;
-import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -79,8 +77,8 @@ public class ShiroConfiguration{
      * @return
      */
     @Bean
-    public ExpireMapCacheManager expireMapCacheManager(){
-        ExpireMapCacheManager cacheManager = new ExpireMapCacheManager(3000);
+    public LocalCacheManager expireMapCacheManager(){
+        LocalCacheManager cacheManager = new LocalCacheManager(3);
         return cacheManager;
     }
 
@@ -91,7 +89,7 @@ public class ShiroConfiguration{
      */
     @Bean
     public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager,
-                                                               RedisCacheManager redisCacheManager,ExpireMapCacheManager expireMapCacheManager){
+                                                               RedisCacheManager redisCacheManager, LocalCacheManager localCacheManager){
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealms(realm);
@@ -105,7 +103,7 @@ public class ShiroConfiguration{
         securityManager.setCacheManager(redisCacheManager);
         //单独设置session缓存管理器
         if(sessionManager instanceof CacheManagerAware){
-            ((CacheManagerAware) sessionManager).setCacheManager(expireMapCacheManager);
+            ((CacheManagerAware) sessionManager).setCacheManager(localCacheManager);
         }
         //设置登陆验证器
         Authenticator authenticator= securityManager.getAuthenticator();

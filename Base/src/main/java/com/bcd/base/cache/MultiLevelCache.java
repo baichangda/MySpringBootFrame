@@ -12,6 +12,9 @@ import java.util.concurrent.Callable;
  * 读取:从低级缓存到高级缓存,读取到以后写入到 低于读取缓存的 缓存中
  * 写入:从低级缓存到高级缓存
  * 删除:从高级缓存到低级缓存,这样做是为了避免多线程问题(一个线程读取时设置低级缓存,导致低级缓存删除不掉)
+ *
+ * 缓存对一致性要求并不高、保证最终一致性、所以没有加锁
+ *
  */
 @SuppressWarnings("unchecked")
 public class MultiLevelCache implements Cache{

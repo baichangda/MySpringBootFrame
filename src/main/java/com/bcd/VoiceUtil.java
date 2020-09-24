@@ -1,27 +1,54 @@
 package com.bcd;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class VoiceUtil {
 
-    static final LinkedBlockingQueue<String> blockingQueue=new LinkedBlockingQueue<>();
+    static LinkedBlockingQueue<String> windows_blockingQueue;
+
+    volatile static boolean windows_run;
+
+    static ExecutorService windows_pool;
+
+    public static void stopSpeakVoiceText_windows(){
+        //停止线程池
+        windows_pool.shutdown();
+        //打上停止循环标记
+        windows_run=false;
+        //等待任务结束
+        try {
+            while(!windows_pool.awaitTermination(60, TimeUnit.SECONDS)) {
+            }
+        } catch (InterruptedException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+        //销毁队列
+        windows_blockingQueue=null;
+    }
 
     /**
      * 开启单线程执行语音播报
      */
     public static void startSpeakVoiceText_windows(){
-        Executors.newSingleThreadExecutor().execute(()->{
+        windows_run=true;
+        windows_blockingQueue=new LinkedBlockingQueue<>();
+        windows_pool=Executors.newSingleThreadExecutor();
+        windows_pool.execute(()->{
             try {
-                while (true) {
+                while (windows_run) {
+
                     //阻塞式调用
-                    String text = blockingQueue.take();
+                    String text = windows_blockingQueue.take();
                     ActiveXComponent ax=null;
                     Dispatch dispatch=null;
                     try {
@@ -42,7 +69,7 @@ public class VoiceUtil {
                                 Dispatch.call(dispatch, "Speak", new Variant(text));
                             }
                             //播报完后非阻塞式调用检测queue中是否还有消息需要播报,没有则text=null会导致退出while
-                            text = blockingQueue.poll();
+                            text = windows_blockingQueue.poll();
                         }
                     }finally {
                         //释放组件
@@ -60,8 +87,8 @@ public class VoiceUtil {
         });
     }
 
-    public static void addVoiceText_window(String text){
-        blockingQueue.add(text);
+    public static void addVoiceText_windows(String text){
+        windows_blockingQueue.add(text);
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -73,7 +100,7 @@ public class VoiceUtil {
 //        Thread.sleep(5000);
         Scanner scanner=new Scanner(System.in);
         while(scanner.hasNext()){
-            addVoiceText_window(scanner.next()+"测试");
+            addVoiceText_windows(scanner.next()+"测试");
         }
     }
 

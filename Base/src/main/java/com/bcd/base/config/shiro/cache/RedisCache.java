@@ -1,7 +1,8 @@
 package com.bcd.base.config.shiro.cache;
 
-import com.bcd.base.config.shiro.data.NotePermission;
-import com.bcd.base.map.ExpireSoftReferenceConcurrentHashMap;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -9,13 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * redis缓存管理器
  * 其中有两级缓存(本地过期缓存、redis缓存)
  * 避免高频率访问redis
+ *
+ * 缓存对一致性要求并不高、保证最终一致性、所以没有加锁
+ *
  * @param <K>
  * @param <V>
  */
@@ -27,7 +33,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     long localScanPeriod;
 
-    ExpireSoftReferenceConcurrentHashMap<K,V> map;
+    LoadingCache<K,V> cache;
 
     String key;
 
@@ -36,49 +42,68 @@ public class RedisCache<K,V> implements Cache<K,V> {
     BoundHashOperations<String, K, V> boundHashOperations;
 
     /**
+     * 读写锁、保证并发安全
+     */
+    ReentrantReadWriteLock readWriteLock=new ReentrantReadWriteLock();
+
+
+
+    /**
      *
      * @param redisTemplate
      * @param key
-     * @param localTimeout 本地缓存失效时间
-     * @param localScanPeriod 本地缓存扫描器间隔
+     * @param localTimeoutInSecond 本地缓存失效时间
+     * @param localScanPeriodInSecond 本地缓存扫描器间隔
      */
-    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeout,long localScanPeriod) {
+    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeoutInSecond,long localScanPeriodInSecond) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations=redisTemplate.boundHashOps(key);
         this.key=key;
-        this.localTimeout=localTimeout;
-        this.localScanPeriod=localScanPeriod;
-        this.map=new ExpireSoftReferenceConcurrentHashMap<>(localScanPeriod);
-        this.map.init();
+        this.localTimeout=localTimeoutInSecond;
+        this.localScanPeriod=localScanPeriodInSecond;
+        this.cache= CacheBuilder.newBuilder()
+                .expireAfterAccess(Duration.ofSeconds(localTimeoutInSecond))
+                .softValues()
+                .refreshAfterWrite(Duration.ofSeconds(localScanPeriodInSecond))
+                .build(new CacheLoader<K, V>() {
+                    @Override
+                    public V load(K key) {
+                        logger.info("redis cache load [{}]",key);
+                        return boundHashOperations.get(key);
+                    }
+                });
     }
 
     @Override
     public V get(K k) throws CacheException {
-        return map.computeIfAbsent(k,e->{
-            return boundHashOperations.get(k);
-        },localTimeout);
+        readWriteLock.readLock().lock();
+        try {
+            return cache.getIfPresent(k);
+        }finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     @Override
     public V put(K k, V v) throws CacheException {
-        V old=get(k);
-        map.put(k,v,localTimeout);
-        boundHashOperations.put(k,v);
+        V old = get(k);
+        boundHashOperations.put(k, v);
+        cache.put(k, v);
         return old;
     }
 
     @Override
     public V remove(K k) throws CacheException {
         V old=get(k);
-        map.remove(k);
         boundHashOperations.delete(k);
+        cache.invalidate(k);
         return old;
     }
 
     @Override
     public void clear() throws CacheException {
-        map.clear();
         redisTemplate.delete(key);
+        cache.invalidateAll();
     }
 
     @Override
@@ -96,7 +121,4 @@ public class RedisCache<K,V> implements Cache<K,V> {
         return boundHashOperations.values();
     }
 
-    public static void main(String[] args) {
-        System.out.println(NotePermission.menu_authorize.getNote());
-    }
 }

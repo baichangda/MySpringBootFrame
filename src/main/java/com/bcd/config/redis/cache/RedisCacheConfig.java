@@ -1,10 +1,9 @@
 package com.bcd.config.redis.cache;
 
-import com.bcd.base.cache.ExpireConcurrentMapCache;
+import com.bcd.base.cache.LocalCache;
 import com.bcd.base.cache.MultiLevelCache;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +29,7 @@ public class RedisCacheConfig {
 
     /**
      * 定义两级缓存
-     * 一级:过期的concurrentHashMap(过期时间5s);  key: myCache_1::${key}
+     * 一级:google guava缓存(过期时间5s);  key: myCache_1::${key}
      * 二级:redis(过期时间15s);  key: myCache_2::${key}
      * @return
      */
@@ -44,7 +43,7 @@ public class RedisCacheConfig {
                         .entryTtl(Duration.ofMillis(15*1000L))
         );
         MultiLevelCache cache= new MultiLevelCache("myCache",
-                new ExpireConcurrentMapCache("myCache_1",5*1000L),
+                new LocalCache("myCache_1",5L),
                 redisCacheManager.getCache("myCache_2")
         );
         return cache;

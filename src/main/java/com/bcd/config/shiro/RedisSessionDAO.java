@@ -43,8 +43,8 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public Serializable doCreate(Session session) {
-        logger.info("doCreate from redis");
         Serializable sessionId= super.doCreate(session);
+        logger.info("doCreate from redis[{}]",sessionId);
         //在这里创建session到redis中
         hashOperations.put(SHIRO_SESSION_HASH_KEY,sessionId.toString(),session);
         return sessionId;
@@ -57,7 +57,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public Session doReadSession(Serializable sessionId) {
-        logger.info("doReadSession from redis");
+        logger.info("doReadSession from redis[{}]",sessionId);
         Session session=super.doReadSession(sessionId);
         if(session==null) {
             try {
@@ -80,7 +80,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public void doUpdate(Session session) throws UnknownSessionException{
-        logger.info("doUpdate from redis");
+        logger.info("doUpdate from redis[{}]",session.getId());
         super.doUpdate(session);
         hashOperations.put(SHIRO_SESSION_HASH_KEY,session.getId().toString(),session);
     }
@@ -91,7 +91,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
      */
     @Override
     public void doDelete(Session session) {
-        logger.info("doDelete from redis");
+        logger.info("doDelete from redis[{}]",session.getId());
         super.doDelete(session);
         //这里从redis里面移除
         hashOperations.delete(SHIRO_SESSION_HASH_KEY,session.getId());

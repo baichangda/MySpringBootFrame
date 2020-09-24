@@ -49,7 +49,7 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
                 if(s.equals(getAuthorizationCacheName())){
-                    return new RedisCache<>(redisTemplate,s,60*1000,3*60*1000);
+                    return new RedisCache<>(redisTemplate,s,60,3*60);
                 }else{
                     return null;
                 }

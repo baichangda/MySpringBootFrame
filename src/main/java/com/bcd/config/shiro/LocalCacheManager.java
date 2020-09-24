@@ -6,11 +6,11 @@ import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 
 @SuppressWarnings("unchecked")
-public class ExpireMapCacheManager extends AbstractCacheManager{
+public class LocalCacheManager extends AbstractCacheManager{
     long timeoutInSecond;
     long scanPeriodInSecond;
 
-    public ExpireMapCacheManager(long timeoutInSecond) {
+    public LocalCacheManager(long timeoutInSecond) {
         this(timeoutInSecond,3*60);
     }
 
@@ -18,7 +18,7 @@ public class ExpireMapCacheManager extends AbstractCacheManager{
      * @param timeoutInSecond key过期时间
      * @param scanPeriodInSecond 扫描线程运行周期
      */
-    public ExpireMapCacheManager(long timeoutInSecond, long scanPeriodInSecond) {
+    public LocalCacheManager(long timeoutInSecond, long scanPeriodInSecond) {
         this.timeoutInSecond = timeoutInSecond;
         this.scanPeriodInSecond = scanPeriodInSecond;
     }
