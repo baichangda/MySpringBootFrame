@@ -1,7 +1,6 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,24 +329,44 @@ public class DateUtil {
             sb.append(zdt.getYear());
         }
         if (unitIndex <= ChronoUnit.MONTHS.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.getMonthValue(), "00"));
+            sb.append(prepend_0(zdt.getMonthValue(), 2));
         }
         if (unitIndex <= ChronoUnit.DAYS.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.getDayOfMonth(), "00"));
+            sb.append(prepend_0(zdt.getDayOfMonth(), 2));
         }
         if (unitIndex <= ChronoUnit.HOURS.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.getHour(), "00"));
+            sb.append(prepend_0(zdt.getHour(), 2));
         }
         if (unitIndex <= ChronoUnit.MINUTES.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.getMinute(), "00"));
+            sb.append(prepend_0(zdt.getMinute(), 2));
         }
         if (unitIndex <= ChronoUnit.SECONDS.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.getSecond(), "00"));
+            sb.append(prepend_0(zdt.getSecond(), 2));
         }
         if (unitIndex <= ChronoUnit.MILLIS.ordinal()) {
-            sb.append(FormatUtil.formatToString(zdt.get(ChronoField.MILLI_OF_SECOND), "000"));
+            sb.append(prepend_0(zdt.get(ChronoField.MILLI_OF_SECOND), 3));
         }
         return Long.parseLong(sb.toString());
+    }
+
+    /**
+     * 数字前面补齐0
+     * @param num
+     * @param len
+     * @return
+     */
+    private static String prepend_0(int num,int len){
+        String numStr=num+"";
+        if(numStr.length()==len){
+            return numStr;
+        }else{
+            StringBuilder sb=new StringBuilder();
+            for(int i=numStr.length();i<=len;i++){
+                sb.append("0");
+            }
+            sb.append(numStr);
+            return sb.toString();
+        }
     }
 
     /**

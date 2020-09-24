@@ -36,7 +36,7 @@ public class AnonymousController extends BaseController{
     @ApiOperation(value = "获取公钥",notes = "获取公钥")
     @ApiResponse(code = 200,message = "公钥信息",response = JsonMessage.class)
     public JsonMessage<String> getPublicKey(){
-        return JsonMessage.success(KeysConst.PUBLIC_KEY_BASE64);
+        return JsonMessage.success().withData(KeysConst.PUBLIC_KEY_BASE64);
     }
 
     @SuppressWarnings("unchecked")
@@ -46,7 +46,7 @@ public class AnonymousController extends BaseController{
     public JsonMessage<String> getCookie(){
         Subject subject=SecurityUtils.getSubject();
         String cookie=Optional.ofNullable(subject).map(Subject::getSession).map(Session::getId).orElse("").toString();
-        return JsonMessage.success(cookie);
+        return JsonMessage.success().withData(cookie);
     }
 
     @SuppressWarnings("unchecked")

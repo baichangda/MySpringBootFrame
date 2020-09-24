@@ -4,6 +4,7 @@ import com.bcd.base.i18n.I18NData;
 import com.bcd.base.util.StringUtil;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 
 /**
  * Created by Administrator on 2017/7/26.
@@ -23,18 +24,8 @@ public class Message implements Serializable {
         this.i18NData = i18NData;
     }
 
-    protected Message(String msg, String code) {
-        this.code = code;
-        this.msg = msg;
-    }
-
-    public Message(I18NData i18NData, String code) {
-        this.code = code;
-        this.i18NData = i18NData;
-    }
-
     public JsonMessage toJsonMessage(boolean result, Object... params) {
-        return new JsonMessage(result, getValue(params), code);
+        return new JsonMessage(result).withMessage(getValue(params)).withCode(code);
     }
 
     public String getValue(Object... params) {
@@ -45,7 +36,7 @@ public class Message implements Serializable {
                 return i18NData.getValue(params);
             }
         } else {
-            return StringUtil.replaceLikeI18N(msg, params);
+            return MessageFormat.format(msg,params);
         }
     }
 
@@ -53,15 +44,34 @@ public class Message implements Serializable {
         return new Message(msg);
     }
 
-    public static Message getMessage(String msg, String code) {
-        return new Message(msg, code);
-    }
-
     public static Message getMessage(I18NData i18NData) {
         return new Message(i18NData);
     }
 
-    public static Message getMessage(I18NData i18NData, String code) {
-        return new Message(i18NData, code);
+    public String getCode() {
+        return code;
+    }
+
+    public Message withCode(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public Message withMsg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public I18NData getI18NData() {
+        return i18NData;
+    }
+
+    public Message withI18NData(I18NData i18NData) {
+        this.i18NData = i18NData;
+        return this;
     }
 }

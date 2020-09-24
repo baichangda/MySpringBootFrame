@@ -18,9 +18,6 @@ dependencies {
     //springboot validation支持
     compile("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
 
-    //jackson xml
-    compile("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}")
-
     //poi 集成
     compile("org.apache.poi:poi:${poiVersion}")
     compile("org.apache.poi:poi-ooxml:${poiVersion}")
@@ -62,6 +59,5 @@ buildscript {
         swaggerBootstrapUiVersion='+'
         commonsPool2='+'
         shiroVersion = '+'
-        jacksonVersion= '+'
     }
 }

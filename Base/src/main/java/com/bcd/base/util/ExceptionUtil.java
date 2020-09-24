@@ -65,7 +65,7 @@ public class ExceptionUtil {
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
         }
         if (realException instanceof BaseRuntimeException) {
-            return JsonMessage.fail(realException.getMessage(), ((BaseRuntimeException) realException).getCode());
+            return ((BaseRuntimeException) realException).toJsonMessage();
         } else if (realException instanceof ConstraintViolationException) {
             String message = ((ConstraintViolationException) realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             Set<ConstraintViolation<?>> constraintViolationSet= ((ConstraintViolationException) realException).getConstraintViolations();
@@ -74,12 +74,12 @@ public class ExceptionUtil {
                 //由于设置了jackson忽略为null属性,此时将null转换为"NULL"
                 dataMap.put(e.getPropertyPath().toString(),e.getInvalidValue()==null?"NULL":e.getInvalidValue());
             });
-            return JsonMessage.fail(message,null,dataMap);
+            return JsonMessage.fail().withMessage(message).withData(dataMap);
         } else if (realException instanceof MethodArgumentNotValidException) {
             String message = ((MethodArgumentNotValidException) realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2) -> e1 + "," + e2).orElse("");
-            return JsonMessage.fail(message);
+            return JsonMessage.fail().withMessage(message);
         } else {
-            return JsonMessage.fail(realException.getMessage());
+            return JsonMessage.fail().withMessage(realException.getMessage());
         }
     }
 

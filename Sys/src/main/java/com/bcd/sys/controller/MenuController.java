@@ -63,7 +63,7 @@ public class MenuController extends BaseController {
     @ApiResponse(code = 200,message = "菜单树")
     public JsonMessage adminMenuTree(){
         List<MenuBean> menuBeanList= menuService.adminMenuTree();
-        return JsonMessage.success(menuBeanList);
+        return JsonMessage.success().withData(menuBeanList);
     }
 
     /**
@@ -78,7 +78,7 @@ public class MenuController extends BaseController {
     public JsonMessage userMenuTree(@ApiParam(value = "用户id",example="1")
                                     @RequestParam(value = "userId",required = false) Long userId){
         List<MenuBean> menuBeanList= menuService.userMenuTree(userId);
-        return JsonMessage.success(menuBeanList);
+        return JsonMessage.success().withData(menuBeanList);
     }
 
     /**
@@ -92,7 +92,7 @@ public class MenuController extends BaseController {
     public JsonMessage selfMenuTree(){
         UserBean userBean= ShiroUtil.getCurrentUser();
         List<MenuBean> menuBeanList= menuService.userMenuTree(userBean.getId());
-        return JsonMessage.success(menuBeanList);
+        return JsonMessage.success().withData(menuBeanList);
     }
 
 }

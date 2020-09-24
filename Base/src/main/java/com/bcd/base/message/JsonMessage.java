@@ -25,90 +25,50 @@ public class JsonMessage<T> implements Serializable {
     }
 
     public JsonMessage(boolean result) {
-        this(result, null);
-    }
-
-    public JsonMessage(boolean result, String message) {
-        this(result, message, null);
-    }
-
-    public JsonMessage(boolean result, String message, String code) {
-        this(result, message, code, null);
-    }
-
-    public JsonMessage(boolean result, String message, String code, T data) {
-        this.result = result;
-        if (message != null) {
-            this.message = message;
-        }
-        if (code != null) {
-            this.code = code;
-        }
-        this.data = data;
+        this.result=result;
     }
 
     public static <T> JsonMessage<T> success() {
-        return JsonMessage.success(null);
-    }
-
-    public static <T> JsonMessage<T> success(T data) {
-        return JsonMessage.success(data, null);
-    }
-
-    public static <T> JsonMessage<T> success(T data, String message) {
-        return JsonMessage.success(data, message, null);
-    }
-
-    public static <T> JsonMessage<T> success(T data, String message, String code) {
-        return new JsonMessage<>(true, message, code,  data);
+        return new JsonMessage<>(true);
     }
 
     public static <T> JsonMessage<T> fail() {
-        return JsonMessage.fail(null);
-    }
-
-    public static <T> JsonMessage<T> fail(String message) {
-        return JsonMessage.fail(message, null);
-    }
-
-    public static <T> JsonMessage<T> fail(String message, String code) {
-        return JsonMessage.fail(message, code, null);
-    }
-
-
-    public static <T> JsonMessage<T> fail(String message, String code,T data) {
-        return new JsonMessage<>(false, message, code, data);
+        return new JsonMessage<>(false);
     }
 
     public boolean isResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+    public JsonMessage withResult(boolean result) {
         this.result = result;
+        return this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public JsonMessage withMessage(String message) {
         this.message = message;
+        return this;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public JsonMessage withCode(String code) {
         this.code = code;
+        return this;
     }
 
     public T getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public JsonMessage withData(T data) {
         this.data = data;
+        return this;
     }
 }

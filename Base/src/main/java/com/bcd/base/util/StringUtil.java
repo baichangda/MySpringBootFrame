@@ -1,8 +1,6 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,28 +70,6 @@ public class StringUtil {
         dataMap.forEach((k, v) ->
                 newStr[0] = newStr[0].replaceAll("\\$\\{" + escapeExprSpecialWord(k) + "\\}", escapeExprSpecialWord(v))
         );
-        return newStr[0];
-    }
-
-    /**
-     * 替换字符串中{*}格式变量
-     * 模拟I18n的替换规则
-     * 从{0}开始...
-     *
-     * @param str
-     * @param params
-     * @return
-     */
-    public static String replaceLikeI18N(String str, Object... params) {
-        if (params == null || params.length == 0) {
-            return str;
-        }
-        Map<String, Object> paramMap = new HashMap<>();
-        for (int i = 0; i <= params.length - 1; i++) {
-            paramMap.put("\\{" + i + "\\}", params[i]);
-        }
-        String[] newStr = new String[]{str};
-        paramMap.forEach((k, v) -> newStr[0] = newStr[0].replaceAll(k, v.toString()));
         return newStr[0];
     }
 

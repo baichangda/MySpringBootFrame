@@ -37,7 +37,7 @@ public class ApiHandler {
             if (Void.TYPE.isAssignableFrom(returnType)) {
                 return null;
             }else{
-                jsonMessage = JsonMessage.success(res);
+                jsonMessage = JsonMessage.success().withData(res);
             }
         } catch (Exception e) {
             //4、转换异常结果

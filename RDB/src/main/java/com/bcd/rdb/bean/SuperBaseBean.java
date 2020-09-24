@@ -2,7 +2,6 @@ package com.bcd.rdb.bean;
 
 
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,7 +11,6 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2017/5/2.
  */
-@JsonFilter("bcd")
 @MappedSuperclass
 @SuppressWarnings("unchecked")
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {

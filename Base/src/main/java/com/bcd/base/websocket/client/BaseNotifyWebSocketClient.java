@@ -52,7 +52,7 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
                 sn_to_notify_info_map.put(sn, new NotifyInfo(sn, event, paramJson, consumer, url));
                 return sn;
             } else {
-                throw BaseRuntimeException.getException(jsonMessage.getMessage(), jsonMessage.getCode());
+                throw BaseRuntimeException.getException(jsonMessage.getMessage()).withCode(jsonMessage.getCode());
             }
         }
     }

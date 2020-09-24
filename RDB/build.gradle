@@ -7,7 +7,7 @@ dependencies {
 //    runtime "mysql:mysql-connector-java:${mysqlVersion}"
 
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    compile group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
+    runtime group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"

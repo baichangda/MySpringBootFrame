@@ -10,7 +10,6 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 
 @SuppressWarnings("unchecked")
@@ -68,7 +67,7 @@ public class RedisUtil {
         } else if (type instanceof JavaType) {
             redisSerializer = new Jackson2JsonRedisSerializer<>((JavaType) type);
         } else {
-            throw BaseRuntimeException.getException("Param Type[" + type.getTypeName() + "] Not Support");
+            throw BaseRuntimeException.getException("Param Type[{0}] Not Support",type.getTypeName());
         }
         redisSerializer.setObjectMapper(JsonUtil.GLOBAL_OBJECT_MAPPER);
         return redisSerializer;

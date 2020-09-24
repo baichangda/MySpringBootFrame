@@ -1,20 +1,11 @@
 package com.bcd.config.messageconverter;
 
 import com.bcd.base.util.JsonUtil;
-import com.bcd.base.util.XmlUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,11 +26,4 @@ public class HttpMessageConverterConfig{
         MappingJackson2HttpMessageConverter httpMessageConverter=new MappingJackson2HttpMessageConverter(JsonUtil.GLOBAL_OBJECT_MAPPER);
         return httpMessageConverter;
     }
-
-    @Bean(name = "mappingJackson2XmlHttpMessageConverter_my")
-    public MappingJackson2XmlHttpMessageConverter xmlHttpMessageConverter(){
-        MappingJackson2XmlHttpMessageConverter xmlHttpMessageConverter=new MappingJackson2XmlHttpMessageConverter(XmlUtil.GLOBAL_XML_MAPPER);
-        return xmlHttpMessageConverter;
-    }
-
 }

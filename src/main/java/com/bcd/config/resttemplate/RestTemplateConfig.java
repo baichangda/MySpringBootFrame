@@ -29,13 +29,10 @@ public class RestTemplateConfig {
      */
     @Bean("restTemplate")
     public RestTemplate restTemplate(ClientHttpRequestFactory factory,
-                                     @Qualifier("mappingJackson2HttpMessageConverter_my") MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter,
-                                     @Qualifier("mappingJackson2XmlHttpMessageConverter_my") MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter) {
+                                     @Qualifier("mappingJackson2HttpMessageConverter_my") MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         RestTemplate restTemplate = new RestTemplate(factory);
         //在此添加转换器配置,移除默认
         restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2XmlHttpMessageConverter.class));
-        restTemplate.getMessageConverters().add(mappingJackson2XmlHttpMessageConverter);
         restTemplate.getMessageConverters().removeIf(e->e.getClass().isAssignableFrom(MappingJackson2HttpMessageConverter.class));
         restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
         return restTemplate;

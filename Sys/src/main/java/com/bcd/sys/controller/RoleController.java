@@ -53,7 +53,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(roleService.findAll(condition));
+        return JsonMessage.success().withData(roleService.findAll(condition));
     }
 
     /**
@@ -80,7 +80,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark",remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success().withData(roleService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**

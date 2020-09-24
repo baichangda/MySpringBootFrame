@@ -44,7 +44,7 @@ public class TestController extends BaseController {
            new StringCondition("postlinename",postlinename),
            new StringCondition("id",id)
         );
-        return JsonMessage.success(testService.findAll(condition));
+        return JsonMessage.success().withData(testService.findAll(condition));
     }
 
     /**
@@ -66,7 +66,7 @@ public class TestController extends BaseController {
            new StringCondition("postlinename",postlinename),
            new StringCondition("id",id)
         );
-        return JsonMessage.success(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success().withData(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**

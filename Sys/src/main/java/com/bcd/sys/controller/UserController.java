@@ -69,7 +69,7 @@ public class UserController extends BaseController {
                 new NumberCondition("type",type, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(userService.findAll(condition));
+        return JsonMessage.success().withData(userService.findAll(condition));
     }
 
     /**
@@ -110,7 +110,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success().withData(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
@@ -160,7 +160,7 @@ public class UserController extends BaseController {
             @ApiParam(value = "时区偏移量")
             @RequestParam(value="offsetId",required = false,defaultValue = "+8")String offsetId){
         UserBean user= userService.login(username,password,offsetId);
-        return JsonMessage.success(user);
+        return JsonMessage.success().withData(user);
     }
 
     /**

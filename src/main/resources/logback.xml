@@ -37,14 +37,15 @@
         </encoder>
     </appender>
     <!-- show parameters for hibernate sql 专为 Hibernate 定制 -->
-    <!--<logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />-->
-    <!--<logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="DEBUG" />-->
+    <!-- jpa参数绑定日志 -->
+<!--    <logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />-->
+    <!-- jpa解析日志 -->
+<!--    <logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="TRACE" />-->
+    <!-- jpa sql -->
     <logger name="org.hibernate.SQL" level="DEBUG" />
-    <!--<logger name="org.hibernate.engine.QueryParameters" level="DEBUG" />-->
-    <!--<logger name="org.hibernate.engine.query.HQLQueryPlan" level="DEBUG" />-->
+
     <!-- show parameters for jdbcTemplate sql 专为 jdbcTemplate 定制 -->
-    <logger name="org.springframework.jdbc.core.JdbcTemplate" additivity="true" level="DEBUG" />
-    <logger name="org.springframework.jdbc.core.StatementCreatorUtils" additivity="true" level="DEBUG" />
+    <logger name="org.springframework.jdbc.core.*" additivity="true" level="DEBUG" />
     <!-- 日志输出级别 -->
     <root level="INFO">
         <appender-ref ref="STDOUT" />

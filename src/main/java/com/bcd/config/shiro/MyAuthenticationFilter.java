@@ -66,7 +66,7 @@ public class MyAuthenticationFilter extends AuthenticationFilter {
                 }else{
                     //标志获取后删除
                     redisTemplate.delete(key);
-                    handler.handle(WebUtils.toHttp(response), JsonMessage.fail(kickMessage));
+                    handler.handle(WebUtils.toHttp(response), JsonMessage.fail().withMessage(kickMessage));
                 }
             }
         }else{

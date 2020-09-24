@@ -15,35 +15,34 @@ public class ErrorMessage extends Message {
         super(i18NData);
     }
 
-    public ErrorMessage(String msg, String code) {
-        super(msg, code);
-    }
-
-    public ErrorMessage(I18NData i18NData, String code) {
-        super(i18NData, code);
-    }
-
     public JsonMessage toJsonMessage(Object... params) {
-        return JsonMessage.fail(getValue(params), code);
+        return JsonMessage.fail().withMessage(getValue(params)).withCode(code);
     }
 
     public BaseRuntimeException toRuntimeException(Object... params) {
-        return new BaseRuntimeException(getValue(params), code);
+        return BaseRuntimeException.getException(getValue(params)).withCode(code);
     }
 
     public static ErrorMessage getMessage(String msg) {
         return new ErrorMessage(msg);
     }
 
-    public static ErrorMessage getMessage(String msg, String code) {
-        return new ErrorMessage(msg, code);
-    }
-
     public static ErrorMessage getMessage(I18NData i18NData) {
         return new ErrorMessage(i18NData);
     }
 
-    public static ErrorMessage getMessage(I18NData i18NData, String code) {
-        return new ErrorMessage(i18NData, code);
+    public ErrorMessage withCode(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public ErrorMessage withMsg(String msg) {
+        this.msg = msg;
+        return this;
+    }
+
+    public ErrorMessage withI18NData(I18NData i18NData) {
+        this.i18NData = i18NData;
+        return this;
     }
 }
