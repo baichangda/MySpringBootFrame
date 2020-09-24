@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@Api(tags = "健康监测/HealthCheckController")
+@Api(tags = "健康检查/HealthCheckController")
 public class HealthCheckController {
     @RequestMapping(value = "/",method = RequestMethod.GET)
     @ApiOperation(value = "健康检查(默认访问路径)",notes = "健康检查(默认访问路径)")
