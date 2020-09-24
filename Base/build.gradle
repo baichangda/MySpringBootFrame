@@ -39,6 +39,9 @@ dependencies {
      * 此版本存在bug
      * 非string类型如果不设置example则会导致进入swagger页面报错,从1.5.22版本解决了这个问题
      * 所以引用1.5的最新版本 1.5.24
+     *
+     * 注意:
+     * 指定google guava时候需要引用高版本
      */
     compile ("io.springfox:springfox-swagger2:${swaggerVersion}"){
         exclude group: 'io.swagger', module: 'swagger-models'
