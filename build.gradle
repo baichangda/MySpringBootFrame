@@ -4,7 +4,7 @@ buildscript {
         kafkaVersion = '+'
         flywayVersion = '+'
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
-        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
+//        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
@@ -21,14 +21,21 @@ buildscript {
     }
 }
 
+/**
+ * ----------------------------------------------------------------------------
+ */
+
 //所有模块配置
 allprojects{
     group 'com.bcd'
-    version '1.0-SNAPSHOT'
+    version '1.0'
     apply plugin: 'java'
     apply plugin: 'idea'
-    //加入maven发布依赖
     apply plugin: 'maven-publish'
+    //加入maven发布依赖
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
+
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -45,14 +52,14 @@ allprojects{
     idea {
         module {
             downloadSources=true
-//            downloadJavadoc=true
+            downloadJavadoc=true
         }
     }
     dependencies{
-        //springboot kafka支持
+        //spring kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
         //邮件支持
-        compile("org.springframework.boot:spring-boot-starter-mail:${springBootVersion}")
+        compile("org.springframework.boot:spring-boot-starter-mail")
         //xjar加密
         compile("com.github.core-lib:xjar:4.0.1")
 
@@ -91,8 +98,10 @@ allprojects{
     }
 }
 
-apply plugin: 'org.flywaydb.flyway'
-apply plugin: 'org.springframework.boot'
+
+/**
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
@@ -102,6 +111,30 @@ bootJar {
         attributes 'Start-Class': 'com.bcd.Application'
     }
 }
+
+bootRun {
+    /**
+     * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
+     * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
+     */
+    List args=new ArrayList<>();
+    if (project.hasProperty('jvmArgs')) {
+        args.addAll(project.jvmArgs.split("\\s+") as List)
+    }
+    //开启缓存行补齐
+    args.add('-XX:-RestrictContended')
+    args.add('-Dfile.encoding=UTF-8')
+
+    jvmArgs(args)
+}
+
+
+
+/**
+ * ----------------------------------------------------------------------------
+ */
+
+apply plugin: 'org.flywaydb.flyway'
 
 flyway {
     def subLocations=[]
@@ -127,21 +160,9 @@ flywayMigrate {
     outOfOrder=true
 }
 
-bootRun {
-    /**
-     * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
-     * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
-     */
-    List args=new ArrayList<>();
-    if (project.hasProperty('jvmArgs')) {
-        args.addAll(project.jvmArgs.split("\\s+") as List)
-    }
-    //开启缓存行补齐
-    args.add('-XX:-RestrictContended')
-    args.add('-Dfile.encoding=UTF-8')
-
-    jvmArgs(args)
-}
+/**
+ * ----------------------------------------------------------------------------
+ */
 
 dependencies {
     compile project(':Sys')

@@ -1,22 +1,22 @@
 dependencies {
     //springboot支持
-    compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter")
     //yml自定义配置提示
-    compile("org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-configuration-processor")
     //springboot aop支持
-    compile("org.springframework.boot:spring-boot-starter-aop:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
-    compile("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-web")
     //springboot test支持
-    compile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-test")
     //springboot websocket支持
-    compile("org.springframework.boot:spring-boot-starter-websocket:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-websocket")
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
-    compile("org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.apache.commons:commons-pool2:${commonsPool2}")
     //springboot validation支持
-    compile("org.springframework.boot:spring-boot-starter-validation:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-validation")
 
     //poi 集成
     compile("org.apache.poi:poi-ooxml:${poiVersion}")

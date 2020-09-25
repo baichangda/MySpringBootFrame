@@ -1,6 +1,6 @@
 dependencies {
     //springboot mongodb支持
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     compile group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
