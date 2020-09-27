@@ -1,5 +1,3 @@
 dependencies {
-
     compile project(':RDB')
-    compile project(':MongoDB')
 }

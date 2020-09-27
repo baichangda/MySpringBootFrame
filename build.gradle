@@ -166,5 +166,5 @@ flywayMigrate {
 
 dependencies {
     compile project(':Sys')
-    compile project(':MongoDB')
+//    compile project(':MongoDB')
 }
