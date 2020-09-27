@@ -19,16 +19,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Service
+//@Service
 public class Consumer {
     Logger logger= LoggerFactory.getLogger(Consumer.class);
     @KafkaListener(topics = "zs-feedback",groupId = "zs-device-platform1")
     public void processMessage(ConsumerRecord<byte[],byte[]> consumerRecord) {
         logger.info("receive message key[{}] value[{}]",new String(consumerRecord.key()),new String(consumerRecord.value()));
-        for (org.apache.kafka.clients.consumer.Consumer consumer : ConsumerConfig.consumerList) {
-            consumer.
-
-        }
     }
 
 }
