@@ -6,6 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.ConsumerPostProcessor;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.handler.HandlerExceptionResolverComposite;
 
 
 /**
@@ -18,4 +24,10 @@ public class ExceptionConfig {
         ExceptionResponseHandler handler=new DefaultExceptionResponseHandler(converter);
         return handler;
     }
+
+    @Bean("handlerExceptionResolverComposite")
+    public HandlerExceptionResolverComposite handlerExceptionResolverComposite(HandlerExceptionResolver handlerExceptionResolver){
+        return (HandlerExceptionResolverComposite)handlerExceptionResolver;
+    }
+
 }

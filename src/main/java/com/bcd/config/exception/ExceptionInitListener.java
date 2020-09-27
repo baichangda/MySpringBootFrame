@@ -1,6 +1,7 @@
 package com.bcd.config.exception;
 
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 默认HandlerExceptionResolverComposite加载源码在
+ * {@link org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport#handlerExceptionResolver}
+ *
  * 在系统加载完毕之后,取出spring的默认异常处理器
  * 把默认的 DefaultHandlerExceptionResolver 替换成 自定义的异常解析器
  *
@@ -37,7 +41,7 @@ public class ExceptionInitListener implements ApplicationListener<ContextRefresh
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         ExceptionResponseHandler exceptionResponseHandler=contextRefreshedEvent.getApplicationContext().getBean(ExceptionResponseHandler.class);
-        HandlerExceptionResolverComposite handlerExceptionResolverComposite=contextRefreshedEvent.getApplicationContext().getBean(HandlerExceptionResolverComposite.class);
+        HandlerExceptionResolverComposite handlerExceptionResolverComposite=(HandlerExceptionResolverComposite)contextRefreshedEvent.getApplicationContext().getBean("handlerExceptionResolverComposite");
         List<HandlerExceptionResolver> resolvers=new ArrayList<>();
         resolvers.addAll(handlerExceptionResolverComposite.getExceptionResolvers().subList(0,handlerExceptionResolverComposite.getExceptionResolvers().size()-1));
         resolvers.add(new CustomExceptionHandler(exceptionResponseHandler));
