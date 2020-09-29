@@ -18,6 +18,7 @@ import java.util.*;
 /**
  * Created by Administrator on 2017/7/27.
  */
+@SuppressWarnings("unchecked")
 public class ExceptionUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(ExceptionUtil.class);
