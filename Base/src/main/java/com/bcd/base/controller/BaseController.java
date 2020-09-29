@@ -53,17 +53,9 @@ public class BaseController {
             response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
             response.setContentType("application/octet-stream");
             response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            try (OutputStream os = response.getOutputStream()) {
-                FileUtil.write(is, os);
-            }
+            FileUtil.write(is, response.getOutputStream());
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
-            }
         }
     }
 
@@ -106,12 +98,6 @@ public class BaseController {
             }
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
-        } finally {
-            try {
-                workbook.close();
-            } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
-            }
         }
     }
 

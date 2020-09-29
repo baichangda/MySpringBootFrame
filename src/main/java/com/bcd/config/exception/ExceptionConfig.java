@@ -25,6 +25,11 @@ public class ExceptionConfig {
         return handler;
     }
 
+    /**
+     * 生成此bean原因是因为在spring cloud模式下、需要一个{@link HandlerExceptionResolverComposite}类型异常解析器
+     * @param handlerExceptionResolver
+     * @return
+     */
     @Bean("handlerExceptionResolverComposite")
     public HandlerExceptionResolverComposite handlerExceptionResolverComposite(HandlerExceptionResolver handlerExceptionResolver){
         return (HandlerExceptionResolverComposite)handlerExceptionResolver;
