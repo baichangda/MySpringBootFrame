@@ -29,10 +29,10 @@ public class DateConverter implements Converter<String,Date> {
                 String offsetId= ShiroUtil.getCurrentUser().getOffsetId();
                 ZoneOffset zoneOffset= ZoneOffset.of(offsetId);
                 int sourceLen=source.length();
-                if(sourceLen==DateUtil.DATE_FORMAT_DAY.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_DAY,zoneOffset);
-                }else if(sourceLen==DateUtil.DATE_FORMAT_SECOND.length()){
-                    return DateUtil.stringToDate(source,DateUtil.DATE_FORMAT_SECOND,zoneOffset);
+                if(sourceLen==DateUtil.PARAM_DATE_FORMAT_DAY.length()){
+                    return DateUtil.stringToDate(source,DateUtil.PARAM_DATE_FORMAT_DAY,zoneOffset);
+                }else if(sourceLen==DateUtil.PARAM_DATE_FORMAT_SECOND.length()){
+                    return DateUtil.stringToDate(source,DateUtil.PARAM_DATE_FORMAT_SECOND,zoneOffset);
                 }else{
                     throw MessageDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException(source);
                 }

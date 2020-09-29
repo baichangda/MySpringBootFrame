@@ -29,7 +29,9 @@ public class DateUtil {
     private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
     public final static String DATE_FORMAT_DAY = "yyyy-MM-dd";
+    public final static String PARAM_DATE_FORMAT_DAY = "yyyyMMdd";
     public final static String DATE_FORMAT_SECOND = "yyyy-MM-dd HH:mm:ss";
+    public final static String PARAM_DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
 
     /**
      * 将日期转换为字符串
