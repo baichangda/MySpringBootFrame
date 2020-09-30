@@ -157,6 +157,7 @@ flyway {
 }
 
 flywayMigrate {
+    //是否允许无序的迁移
     outOfOrder=true
 }
 
