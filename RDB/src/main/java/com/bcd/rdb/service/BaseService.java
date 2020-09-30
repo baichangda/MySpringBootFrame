@@ -142,7 +142,8 @@ public class BaseService<T, K extends Serializable> {
     public void insertBatch(List<T> list,String ...ignoreFields){
         validateUniqueBeforeSave(list);
         Set<String> ignoreFieldSet=Arrays.stream(ignoreFields).collect(Collectors.toSet());
-        ignoreFieldSet.add("id");
+        //忽略主键字段、主键一般为自增
+        ignoreFieldSet.add(beanInfo.pkField.getName());
         BatchCreateSqlResult batchCreateSqlResult= SqlUtil.generateBatchCreateResult(list,beanInfo.tableName,null,ignoreFieldSet.toArray(new String[0]));
         jdbcTemplate.batchUpdate(batchCreateSqlResult.getSql(),batchCreateSqlResult.getParamList());
     }
