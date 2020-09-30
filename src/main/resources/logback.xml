@@ -45,7 +45,10 @@
     <logger name="org.hibernate.SQL" level="DEBUG" />
 
     <!-- show parameters for jdbcTemplate sql 专为 jdbcTemplate 定制 -->
-    <logger name="org.springframework.jdbc.core.*" additivity="true" level="DEBUG" />
+    <!-- spring jdbc参数绑定日志 -->
+<!--    <logger name="org.springframework.jdbc.core.StatementCreatorUtils" additivity="true" level="TRACE" />-->
+    <!-- spring jdbc sql -->
+    <logger name="org.springframework.jdbc.core" additivity="true" level="DEBUG" />
     <!-- 日志输出级别 -->
     <root level="INFO">
         <appender-ref ref="STDOUT" />

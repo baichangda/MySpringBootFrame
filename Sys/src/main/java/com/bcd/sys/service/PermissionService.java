@@ -7,6 +7,8 @@ import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import com.bcd.rdb.service.BaseService;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.springframework.aop.framework.AopContext;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
@@ -51,7 +53,7 @@ public class PermissionService extends BaseService<PermissionBean,Long> implemen
             permissionBean.setName(e.getNote());
             return permissionBean;
         }).collect(Collectors.toList());
-        saveAll(permissionBeanList);
+        ((PermissionService)AopContext.currentProxy()).insertBatch(permissionBeanList);
     }
 
 }

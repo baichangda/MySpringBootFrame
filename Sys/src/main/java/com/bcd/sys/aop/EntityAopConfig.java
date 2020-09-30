@@ -21,9 +21,13 @@ import java.util.Iterator;
 @Component
 public class EntityAopConfig {
     /**
-     * 切面:所有 Repository 层的save开头的方法
+     * 切面:
+     * 1、所有 Repository 层的save开头的方法
+     * 2、所有 Service 层insert、update开头的方法
+     *
      */
-    @Pointcut("execution(* com.bcd..repository.*Repository.save*(..))")
+    @Pointcut("execution(* com.bcd..repository.*Repository.save*(..)) || " +
+            "execution(* com.bcd..service.*Service.insertBatch(..))")
     public void savePointCut(){
 
     }

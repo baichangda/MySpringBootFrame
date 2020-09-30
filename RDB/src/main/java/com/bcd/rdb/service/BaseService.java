@@ -6,6 +6,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.condition.Condition;
 import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.bcd.rdb.jdbc.sql.BatchCreateSqlResult;
+import com.bcd.rdb.jdbc.sql.SqlUtil;
 import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.repository.BaseRepository;
 import org.apache.commons.lang3.ClassUtils;
@@ -134,6 +136,15 @@ public class BaseService<T, K extends Serializable> {
     public List<T> saveAll(Iterable<T> iterable) {
         validateUniqueBeforeSave(iterable);
         return repository.saveAll(iterable);
+    }
+
+    @Transactional
+    public void insertBatch(List<T> list,String ...ignoreFields){
+        validateUniqueBeforeSave(list);
+        Set<String> ignoreFieldSet=Arrays.stream(ignoreFields).collect(Collectors.toSet());
+        ignoreFieldSet.add("id");
+        BatchCreateSqlResult batchCreateSqlResult= SqlUtil.generateBatchCreateResult(list,beanInfo.tableName,null,ignoreFieldSet.toArray(new String[0]));
+        jdbcTemplate.batchUpdate(batchCreateSqlResult.getSql(),batchCreateSqlResult.getParamList());
     }
 
     @Transactional

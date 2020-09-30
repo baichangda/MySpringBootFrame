@@ -14,6 +14,12 @@ public class BeanInfo{
      * service的实体类
      */
     public Class clazz;
+
+    /**
+     * 实体类表名
+     */
+    public String tableName;
+
     /**
      * Unique 注解字段集合
      */
@@ -43,9 +49,15 @@ public class BeanInfo{
     }
 
     private void init(){
+        initTableName();
         initPkField();
         initUnique();
         initJPAAnno();
+    }
+
+    public void initTableName(){
+        Table table= ((Table)clazz.getAnnotation(Table.class));
+        this.tableName= table==null?null:table.name();
     }
 
     public void initUnique(){
@@ -144,5 +156,13 @@ public class BeanInfo{
 
     public void setPkField(Field pkField) {
         this.pkField = pkField;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

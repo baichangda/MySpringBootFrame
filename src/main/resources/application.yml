@@ -46,11 +46,13 @@ spring:
        # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate
        ddl-auto: validate
      properties:
-       #mysql
-#       hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
-       #pgsql
-       hibernate.dialect: org.hibernate.dialect.PostgreSQL95Dialect
-       hibernate.current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+       hibernate:
+         #mysql
+#         dialect: org.hibernate.dialect.MySQL8Dialect
+         #pgsql
+         dialect: org.hibernate.dialect.PostgreSQL95Dialect
+         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+
 
   #  jdbcTemplate配置
    jdbc:
