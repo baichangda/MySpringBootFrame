@@ -10,7 +10,7 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-//        mavenCentral()
+        mavenCentral()
     }
 
     dependencies {
@@ -62,6 +62,7 @@ allprojects{
         compile("org.springframework.boot:spring-boot-starter-mail")
         //xjar加密
         compile("com.github.core-lib:xjar:4.0.1")
+
 
         dependencies { compile files('lib/jacob.jar')}
 
