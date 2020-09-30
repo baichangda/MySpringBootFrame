@@ -23,11 +23,13 @@ public class EntityAopConfig {
     /**
      * 切面:
      * 1、所有 Repository 层的save开头的方法
-     * 2、所有 Service 层insert、update开头的方法
+     * 2、所有 Service 层insertBatch、updateBatch、saveBatch开头的方法
      *
      */
     @Pointcut("execution(* com.bcd..repository.*Repository.save*(..)) || " +
-            "execution(* com.bcd..service.*Service.insertBatch(..))")
+            "execution(* com.bcd..service.*Service.insertBatch(..)) || " +
+            "execution(* com.bcd..service.*Service.updateBatch(..)) || " +
+            "execution(* com.bcd..service.*Service.saveBatch(..))")
     public void savePointCut(){
 
     }

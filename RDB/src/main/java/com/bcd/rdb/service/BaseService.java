@@ -7,6 +7,7 @@ import com.bcd.base.condition.Condition;
 import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.bcd.rdb.jdbc.sql.BatchCreateSqlResult;
+import com.bcd.rdb.jdbc.sql.BatchUpdateSqlResult;
 import com.bcd.rdb.jdbc.sql.SqlUtil;
 import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.repository.BaseRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -30,6 +32,8 @@ import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -138,14 +142,69 @@ public class BaseService<T, K extends Serializable> {
         return repository.saveAll(iterable);
     }
 
+    /**
+     * 批量新增、不做唯一校验、所有的对象采用新增方式
+     * @param list
+     * @param ignoreFields
+     */
     @Transactional
     public void insertBatch(List<T> list,String ...ignoreFields){
-        validateUniqueBeforeSave(list);
+        if(list.isEmpty()){
+            return;
+        }
         Set<String> ignoreFieldSet=Arrays.stream(ignoreFields).collect(Collectors.toSet());
         //忽略主键字段、主键一般为自增
-        ignoreFieldSet.add(beanInfo.pkField.getName());
-        BatchCreateSqlResult batchCreateSqlResult= SqlUtil.generateBatchCreateResult(list,beanInfo.tableName,null,ignoreFieldSet.toArray(new String[0]));
+        ignoreFieldSet.add(getBeanInfo().pkField.getName());
+        BatchCreateSqlResult batchCreateSqlResult= SqlUtil.generateBatchCreateResult(list,getBeanInfo().tableName,null,ignoreFieldSet.toArray(new String[0]));
         jdbcTemplate.batchUpdate(batchCreateSqlResult.getSql(),batchCreateSqlResult.getParamList());
+    }
+
+    /**
+     * 批量更新、不做唯一校验、所有的对象采用更新方式、所有对象主键不能为null
+     * @param list
+     * @param ignoreFields
+     */
+    @Transactional
+    public void updateBatch(List<T> list,String ...ignoreFields){
+        if(list.isEmpty()){
+            return;
+        }
+        Set<String> ignoreFieldSet=Arrays.stream(ignoreFields).collect(Collectors.toSet());
+        //忽略主键字段、主键一般为自增
+        ignoreFieldSet.add(getBeanInfo().pkField.getName());
+        BatchUpdateSqlResult batchUpdateSqlResult= SqlUtil.generateBatchUpdateResult(list,getBeanInfo().tableName,null,ignoreFieldSet.toArray(new String[0]));
+        jdbcTemplate.batchUpdate(batchUpdateSqlResult.getSql(),batchUpdateSqlResult.getParamList());
+    }
+
+    /**
+     * 批量新增/更新、根据主键是否有值来区分新增还是更新
+     * @param list
+     * @param ignoreFields
+     */
+    @Transactional
+    public void saveBatch(List<T> list,String ...ignoreFields){
+        if(list.isEmpty()){
+            return;
+        }
+        List<T> insertList=new ArrayList<>();
+        List<T> updateList=new ArrayList<>();
+        try {
+            for (T t : list) {
+                if (getBeanInfo().pkField.get(t) == null) {
+                    insertList.add(t);
+                }else{
+                    updateList.add(t);
+                }
+            }
+        }catch (IllegalAccessException ex){
+            throw BaseRuntimeException.getException(ex);
+        }
+        if(!insertList.isEmpty()){
+            insertBatch(insertList,ignoreFields);
+        }
+        if(!updateList.isEmpty()){
+            updateBatch(updateList,ignoreFields);
+        }
     }
 
     @Transactional
