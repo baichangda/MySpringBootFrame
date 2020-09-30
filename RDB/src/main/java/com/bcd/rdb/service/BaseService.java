@@ -170,7 +170,7 @@ public class BaseService<T, K extends Serializable> {
             return;
         }
         Set<String> ignoreFieldSet=Arrays.stream(ignoreFields).collect(Collectors.toSet());
-        //忽略主键字段、主键一般为自增
+        //忽略主键字段
         ignoreFieldSet.add(getBeanInfo().pkField.getName());
         BatchUpdateSqlResult batchUpdateSqlResult= SqlUtil.generateBatchUpdateResult(list,getBeanInfo().tableName,null,ignoreFieldSet.toArray(new String[0]));
         jdbcTemplate.batchUpdate(batchUpdateSqlResult.getSql(),batchUpdateSqlResult.getParamList());
