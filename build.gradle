@@ -2,7 +2,7 @@ buildscript {
     ext {
         springBootVersion = '+'
         kafkaVersion = '+'
-        flywayVersion = '+'
+        flywayVersion = '7.0.0'
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
@@ -44,7 +44,7 @@ allprojects{
         maven { url "${mavenRepoUrl}" }
         maven { url "https://jitpack.io" }
 //        maven { url "${incarMavenRepoUrl}" }
-//        mavenCentral()
+        mavenCentral()
     }
 
     //下载源码和文档

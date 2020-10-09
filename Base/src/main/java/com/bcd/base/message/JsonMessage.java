@@ -40,7 +40,7 @@ public class JsonMessage<T> implements Serializable {
         return result;
     }
 
-    public JsonMessage withResult(boolean result) {
+    public JsonMessage<T> withResult(boolean result) {
         this.result = result;
         return this;
     }
@@ -49,7 +49,7 @@ public class JsonMessage<T> implements Serializable {
         return message;
     }
 
-    public JsonMessage withMessage(String message) {
+    public JsonMessage<T> withMessage(String message) {
         this.message = message;
         return this;
     }
@@ -58,7 +58,7 @@ public class JsonMessage<T> implements Serializable {
         return code;
     }
 
-    public JsonMessage withCode(String code) {
+    public JsonMessage<T> withCode(String code) {
         this.code = code;
         return this;
     }
@@ -67,8 +67,8 @@ public class JsonMessage<T> implements Serializable {
         return data;
     }
 
-    public JsonMessage withData(T data) {
+    public <R> JsonMessage<R> withData(T data) {
         this.data = data;
-        return this;
+        return (JsonMessage<R>)this;
     }
 }
