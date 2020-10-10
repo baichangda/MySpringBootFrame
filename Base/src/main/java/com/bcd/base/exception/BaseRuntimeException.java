@@ -62,6 +62,6 @@ public class BaseRuntimeException extends RuntimeException {
     }
 
     public static void main(String[] args) {
-        throw BaseRuntimeException.getException("{0}-{1}",null,100000);
+        throw BaseRuntimeException.getException("[{0}]-[{1}]",null,100000);
     }
 }
