@@ -12,17 +12,10 @@ import java.util.*;
 
 /**
  * 日期帮助类
- * 1、所有涉及到时区逻辑,日期转换均转换成 ZonedDateTime 运算然后再 转回Date
- * 2、所有涉及到时区的参数,最好使用ZonedId.of()里面传入时区英文,原因如下:
- * 在初始化ZonedDateTime时候，如果传入的时区参数ZoneId.of()中参数为
+ * 1、所有涉及到时区逻辑,日期转换均转换成 LocalDateTime 运算然后再 转回Date
  *
- *
- * @see ZoneId#SHORT_IDS 中非偏移量
- * 和
- * 偏移量(+08:00) 时候会导致不一样的结果
- * 前者为带时区处理了夏令时,后者仅仅为时区偏移量不考虑夏令时
- * 详情参见:
- * @see ZoneId#of(String)
+ * 不考虑夏令时问题
+ * {@link ZoneId#of(String)} 中传入+8和时区英文，前者仅仅是偏移量，后者会导致夏令时
  */
 public class DateUtil {
 
@@ -38,14 +31,14 @@ public class DateUtil {
      *
      * @param date
      * @param format
-     * @param zoneId
+     * @param zoneOffset
      * @return
      */
-    public static String dateToString(Date date, String format, ZoneId zoneId) {
-        if (date == null || format == null || zoneId == null) {
+    public static String dateToString(Date date, String format, ZoneOffset zoneOffset) {
+        if (date == null || format == null || zoneOffset == null) {
             return null;
         }
-        return DateTimeFormatter.ofPattern(format).withZone(zoneId).format(date.toInstant());
+        return DateTimeFormatter.ofPattern(format).withZone(zoneOffset).format(date.toInstant());
     }
 
 
@@ -54,14 +47,14 @@ public class DateUtil {
      *
      * @param dateStr
      * @param format
-     * @param zoneId
+     * @param zoneOffset
      * @return
      */
-    public static Date stringToDate(String dateStr, String format, ZoneId zoneId) {
-        if (dateStr == null || format == null || zoneId == null) {
+    public static Date stringToDate(String dateStr, String format, ZoneOffset zoneOffset) {
+        if (dateStr == null || format == null || zoneOffset == null) {
             return null;
         }
-        return Date.from(Instant.from(DateTimeFormatter.ofPattern(format).withZone(zoneId).parse(dateStr)));
+        return Date.from(Instant.from(DateTimeFormatter.ofPattern(format).withZone(zoneOffset).parse(dateStr)));
     }
 
 
@@ -70,10 +63,10 @@ public class DateUtil {
      *
      * @param date
      * @param unit   支持 ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS
-     * @param zoneId 时区
+     * @param zoneOffset 时区
      * @return
      */
-    public static Date getFloorDate(Date date, ChronoUnit unit, ZoneId zoneId) {
+    public static Date getFloorDate(Date date, ChronoUnit unit, ZoneOffset zoneOffset) {
         if (date == null) {
             return null;
         }
@@ -81,19 +74,19 @@ public class DateUtil {
         if (Arrays.stream(units).noneMatch(e -> e == unit)) {
             throw BaseRuntimeException.getException("[DateUtil.getFloorDate],ChronoUnit[" + unit.toString() + "] Not Support!");
         }
-        ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), zoneId);
+        LocalDateTime ldt = LocalDateTime.ofInstant(date.toInstant(), zoneOffset);
         if (unit.ordinal() <= ChronoUnit.DAYS.ordinal()) {
-            zdt = zdt.truncatedTo(unit);
+            ldt = ldt.truncatedTo(unit);
         } else {
-            zdt = zdt.truncatedTo(ChronoUnit.DAYS);
+            ldt = ldt.truncatedTo(ChronoUnit.DAYS);
             switch (unit) {
                 case MONTHS: {
-                    zdt = zdt.withDayOfMonth(1);
+                    ldt = ldt.withDayOfMonth(1);
                     break;
                 }
                 case YEARS: {
-                    zdt = zdt.withDayOfMonth(1);
-                    zdt = zdt.withMonth(1);
+                    ldt = ldt.withDayOfMonth(1);
+                    ldt = ldt.withMonth(1);
                     break;
                 }
                 default: {
@@ -101,7 +94,7 @@ public class DateUtil {
                 }
             }
         }
-        return Date.from(zdt.toInstant());
+        return Date.from(ldt.toInstant(zoneOffset));
     }
 
 
@@ -110,10 +103,10 @@ public class DateUtil {
      *
      * @param date
      * @param unit   支持 ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS
-     * @param zoneId 时区
+     * @param zoneOffset 时区
      * @return
      */
-    public static Date getCeilDate(Date date, ChronoUnit unit, ZoneId zoneId) {
+    public static Date getCeilDate(Date date, ChronoUnit unit, ZoneOffset zoneOffset) {
         if (date == null) {
             return null;
         }
@@ -121,7 +114,7 @@ public class DateUtil {
         if (Arrays.stream(units).noneMatch(e -> e == unit)) {
             throw BaseRuntimeException.getException("[DateUtil.getCeilDate],ChronoUnit[" + unit.toString() + "] Not Support!");
         }
-        ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), zoneId);
+        LocalDateTime zdt = LocalDateTime.ofInstant(date.toInstant(), zoneOffset);
         if (unit.ordinal() <= ChronoUnit.DAYS.ordinal()) {
             zdt = zdt.truncatedTo(unit);
             zdt = zdt.plus(1, unit);
@@ -145,7 +138,7 @@ public class DateUtil {
                 }
             }
         }
-        return Date.from(zdt.toInstant());
+        return Date.from(zdt.toInstant(zoneOffset));
     }
 
 
@@ -157,20 +150,20 @@ public class DateUtil {
      * @param startDate
      * @param endDate
      * @param unit      支持 ChronoUnit.DAYS,ChronoUnit.WEEKS,ChronoUnit.MONTHS
-     * @param zoneId    时区
+     * @param zoneOffset    时区
      * @return 每一个数组第一个为开始时间, 第二个为结束时间;开始时间为当天0.0.0,结束时间为当天23.59.59
      */
-    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit, ZoneId zoneId) {
+    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit, ZoneOffset zoneOffset) {
         List<Date[]> returnList = new ArrayList<>();
-        ZonedDateTime zdt1 = ZonedDateTime.ofInstant(startDate.toInstant(), zoneId);
-        ZonedDateTime zdt2 = ZonedDateTime.ofInstant(endDate.toInstant(), zoneId);
+        LocalDateTime ldt1 = LocalDateTime.ofInstant(startDate.toInstant(), zoneOffset);
+        LocalDateTime ldt2 = LocalDateTime.ofInstant(endDate.toInstant(), zoneOffset);
         switch (unit) {
             case DAYS: {
-                ZonedDateTime start = zdt1.with(ChronoField.SECOND_OF_DAY, 0);
-                ZonedDateTime end = zdt1.with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
+                LocalDateTime start = ldt1.with(ChronoField.SECOND_OF_DAY, 0);
+                LocalDateTime end = ldt1.with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
                 while (true) {
-                    returnList.add(new Date[]{Date.from(start.toInstant()), Date.from(end.toInstant())});
-                    if (!zdt2.isBefore(start) && !zdt2.isAfter(end)) {
+                    returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
+                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
                         break;
                     } else {
                         start = start.plusDays(1);
@@ -181,12 +174,12 @@ public class DateUtil {
                 break;
             }
             case WEEKS: {
-                int dayOfWeek = zdt1.get(ChronoField.DAY_OF_WEEK);
-                ZonedDateTime start = zdt1.plusDays(1 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, 0);
-                ZonedDateTime end = zdt1.plusDays(7 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
+                int dayOfWeek = ldt1.get(ChronoField.DAY_OF_WEEK);
+                LocalDateTime start = ldt1.plusDays(1 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, 0);
+                LocalDateTime end = ldt1.plusDays(7 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
                 while (true) {
-                    returnList.add(new Date[]{Date.from(start.toInstant()), Date.from(end.toInstant())});
-                    if (!zdt2.isBefore(start) && !zdt2.isAfter(end)) {
+                    returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
+                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
                         break;
                     } else {
                         start = start.plusWeeks(1);
@@ -196,20 +189,20 @@ public class DateUtil {
                 if (!returnList.isEmpty()) {
                     Date[] firstEle = returnList.get(0);
                     Date[] lastEle = returnList.get(returnList.size() - 1);
-                    firstEle[0] = Date.from(zdt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant());
-                    lastEle[1] = Date.from(zdt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant());
+                    firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                    lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
                 }
                 break;
             }
             case MONTHS: {
-                ZonedDateTime temp = zdt1;
+                LocalDateTime temp = ldt1;
                 while (true) {
                     int dayOfMonth = temp.get(ChronoField.DAY_OF_MONTH);
                     int max = temp.getMonth().maxLength();
-                    ZonedDateTime start = temp.plusDays(1 - dayOfMonth).with(ChronoField.SECOND_OF_DAY, 0);
-                    ZonedDateTime end = temp.plusDays(max - dayOfMonth).with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
-                    returnList.add(new Date[]{Date.from(start.toInstant()), Date.from(end.toInstant())});
-                    if (!zdt2.isBefore(start) && !zdt2.isAfter(end)) {
+                    LocalDateTime start = temp.plusDays(1 - dayOfMonth).with(ChronoField.SECOND_OF_DAY, 0);
+                    LocalDateTime end = temp.plusDays(max - dayOfMonth).with(ChronoField.SECOND_OF_DAY, ChronoUnit.DAYS.getDuration().getSeconds() - 1);
+                    returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
+                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
                         break;
                     } else {
                         temp = temp.plusMonths(1);
@@ -218,8 +211,8 @@ public class DateUtil {
                 if (!returnList.isEmpty()) {
                     Date[] firstEle = returnList.get(0);
                     Date[] lastEle = returnList.get(returnList.size() - 1);
-                    firstEle[0] = Date.from(zdt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant());
-                    lastEle[1] = Date.from(zdt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant());
+                    firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                    lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
                 }
                 break;
             }
@@ -291,14 +284,14 @@ public class DateUtil {
      *
      * @param startDate
      * @param endDate
-     * @param zoneId
+     * @param zoneOffset
      */
-    public static void formatDateParam(Date startDate, Date endDate, ZoneId zoneId) {
+    public static void formatDateParam(Date startDate, Date endDate, ZoneOffset zoneOffset) {
         if (startDate != null) {
-            startDate.setTime(getFloorDate(startDate, ChronoUnit.DAYS, zoneId).getTime());
+            startDate.setTime(getFloorDate(startDate, ChronoUnit.DAYS, zoneOffset).getTime());
         }
         if (endDate != null) {
-            Date tempDate = getCeilDate(endDate, ChronoUnit.DAYS, zoneId);
+            Date tempDate = getCeilDate(endDate, ChronoUnit.DAYS, zoneOffset);
             Calendar endC = Calendar.getInstance();
             endC.setTime(tempDate);
             endC.add(Calendar.SECOND, -1);
@@ -313,10 +306,10 @@ public class DateUtil {
      *
      * @param date
      * @param unit   最小的日期单位 支持 ChronoUnit.MILLIS,ChronoUnit.SECONDS,ChronoUnit.MINUTES,ChronoUnit.HOURS,ChronoUnit.DAYS,ChronoUnit.MONTHS,ChronoUnit.YEARS
-     * @param zoneId 时区
+     * @param zoneOffset 时区
      * @return
      */
-    public static Long getDateNum(Date date, ChronoUnit unit, ZoneId zoneId) {
+    public static Long getDateNum(Date date, ChronoUnit unit, ZoneOffset zoneOffset) {
         if (date == null) {
             return null;
         }
@@ -325,7 +318,7 @@ public class DateUtil {
             throw BaseRuntimeException.getException("[DateUtil.getDateNum],ChronoUnit[" + unit.toString() + "] Not Support!");
         }
         StringBuilder sb = new StringBuilder();
-        ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), zoneId);
+        LocalDateTime zdt = LocalDateTime.ofInstant(date.toInstant(), zoneOffset);
         int unitIndex = unit.ordinal();
         if (unitIndex <= ChronoUnit.YEARS.ordinal()) {
             sb.append(zdt.getYear());
@@ -387,11 +380,11 @@ public class DateUtil {
             throw BaseRuntimeException.getException("[DateUtil.isEqual],ChronoField[" + field.toString() + "] Not Support!");
         }
         ZoneId zoneId = ZoneId.systemDefault();
-        ZonedDateTime zdt1 = ZonedDateTime.ofInstant(d1.toInstant(), zoneId);
-        ZonedDateTime zdt2 = ZonedDateTime.ofInstant(d2.toInstant(), zoneId);
+        LocalDateTime ldt1 = LocalDateTime.ofInstant(d1.toInstant(), zoneId);
+        LocalDateTime ldt2 = LocalDateTime.ofInstant(d2.toInstant(), zoneId);
         for (ChronoField curField : fields) {
-            int curVal1 = zdt1.get(curField);
-            int curVal2 = zdt2.get(curField);
+            int curVal1 = ldt1.get(curField);
+            int curVal2 = ldt2.get(curField);
             if (curVal1 != curVal2) {
                 return false;
             }
