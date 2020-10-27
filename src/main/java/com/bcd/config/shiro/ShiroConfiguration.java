@@ -180,9 +180,6 @@ public class ShiroConfiguration{
         //user: authc后或者rememberMe的都可以访问
         filterChainMap.put("/api/anonymous/**", "anon");
         filterChainMap.put("/api/sys/user/login*", "anon");
-        filterChainMap.put("/api/i18n/changeLocal", "anon");
-//        filterChainMap.put("/api/**/list", "user");
-//        filterChainMap.put("/api/**/page", "user");
         filterChainMap.put("/api/**","authc");
         factoryBean.setFilterChainDefinitionMap(filterChainMap);
     }

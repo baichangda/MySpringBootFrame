@@ -48,8 +48,7 @@ public class LockJarUtil {
             System.err.println("jar["+sourceJarPath+"] not exists");
         }
 
-        Path dir= jar.getParent();
-        Path result=Paths.get(dir+ File.separator+"result.jar");
+        Path result= Paths.get(sourceJarPath.substring(0,sourceJarPath.lastIndexOf("."))+"-lock.jar");
         Files.deleteIfExists(result);
 
         XCryptos
@@ -58,7 +57,7 @@ public class LockJarUtil {
                 .use("test")
                 .include(includeClass)
                 .to(result.toString());
-        return dir.toString();
+        return result.getParent().toString();
     }
 
     /**
@@ -110,9 +109,9 @@ public class LockJarUtil {
 
 
     public static void main(String[] args) throws Exception {
-//        lockJar("D:\\workspace\\bwt-vms-electrice-fence\\target\\electricfence-1.0-SNAPSHOT.jar",
-//                "/com/bwt/**/*.class");
-        lockJar("/Users/baichangda/hlj/workspace/bwt-vms-electrice-fence/target/electricfence-1.0-SNAPSHOT.jar",
+        lockJar("D:\\workspace\\zhaoshang\\bwt-vms-user\\target\\bwt-vms-user-0.0.1-SNAPSHOT.jar",
                 "/com/bwt/**/*.class");
+//        lockJar("/Users/baichangda/hlj/workspace/bwt-vms-electrice-fence/target/electricfence-1.0-SNAPSHOT.jar",
+//                "/com/bwt/**/*.class");
     }
 }

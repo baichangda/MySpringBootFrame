@@ -39,32 +39,19 @@ public class TaskController extends BaseController {
     @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务列表")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "name", value = "任务名称", dataType = "String"),
-        @ApiImplicitParam(name = "status", value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)", dataType = "String"),
-        @ApiImplicitParam(name = "type", value = "任务类型(1:普通任务;2:文件类型任务)", dataType = "String"),
-        @ApiImplicitParam(name = "message", value = "任务信息(失败时记录失败原因)", dataType = "String"),
-        @ApiImplicitParam(name = "startTimeBegin", value = "任务开始时间开始", dataType = "String"),
-        @ApiImplicitParam(name = "startTimeEnd", value = "任务开始时间结束", dataType = "String"),
-        @ApiImplicitParam(name = "finishTimeBegin", value = "任务完成时间开始", dataType = "String"),
-        @ApiImplicitParam(name = "finishTimeEnd", value = "任务完成时间结束", dataType = "String"),
-        @ApiImplicitParam(name = "filePaths", value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "任务列表")
     public JsonMessage<List<TaskBean>> list(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "name",required = false) String name,
-        @RequestParam(value = "status",required = false) Integer status,
-        @RequestParam(value = "type",required = false) Byte type,
-        @RequestParam(value = "message",required = false) String message,
-        @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
-        @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
-        @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
-        @RequestParam(value = "finishTimeEnd",required = false) Date finishTimeEnd,
-        @RequestParam(value = "filePaths",required = false) String filePaths
+        @ApiParam(value = "主键") @RequestParam(value = "id",required = false) Long id,
+        @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode",required = false) String orgCode,
+        @ApiParam(value = "任务名称") @RequestParam(value = "name",required = false) String name,
+        @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(value = "status",required = false) Integer status,
+        @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(value = "type",required = false) Byte type,
+        @ApiParam(value = "任务信息(失败时记录失败原因)") @RequestParam(value = "message",required = false) String message,
+        @ApiParam(value = "任务开始时间开始") @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
+        @ApiParam(value = "任务开始时间结束") @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
+        @ApiParam(value = "任务完成时间开始") @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
+        @ApiParam(value = "任务完成时间结束") @RequestParam(value = "finishTimeEnd",required = false) Date finishTimeEnd,
+        @ApiParam(value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(value = "filePaths",required = false) String filePaths
     ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
@@ -89,36 +76,21 @@ public class TaskController extends BaseController {
     @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @ApiOperation(value="查询系统任务列表",notes = "查询系统任务分页")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "主键", dataType = "String"),
-        @ApiImplicitParam(name = "orgCode", value = "关联机构编码", dataType = "String"),
-        @ApiImplicitParam(name = "name", value = "任务名称", dataType = "String"),
-        @ApiImplicitParam(name = "status", value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)", dataType = "String"),
-        @ApiImplicitParam(name = "type", value = "任务类型(1:普通任务;2:文件类型任务)", dataType = "String"),
-        @ApiImplicitParam(name = "message", value = "任务信息(失败时记录失败原因)", dataType = "String"),
-        @ApiImplicitParam(name = "startTimeBegin", value = "任务开始时间开始", dataType = "String"),
-        @ApiImplicitParam(name = "startTimeEnd", value = "任务开始时间结束", dataType = "String"),
-        @ApiImplicitParam(name = "finishTimeBegin", value = "任务完成时间开始", dataType = "String"),
-        @ApiImplicitParam(name = "finishTimeEnd", value = "任务完成时间结束", dataType = "String"),
-        @ApiImplicitParam(name = "filePaths", value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)", dataType = "String"),
-        @ApiImplicitParam(name = "pageNum", value = "分页参数(页数)", dataType = "String"),
-        @ApiImplicitParam(name = "pageSize", value = "分页参数(页大小)", dataType = "String")
-    })
     @ApiResponse(code = 200,message = "任务分页结果集")
     public JsonMessage<Page<TaskBean>> page(
-        @RequestParam(value = "id",required = false) Long id,
-        @RequestParam(value = "orgCode",required = false) String orgCode,
-        @RequestParam(value = "name",required = false) String name,
-        @RequestParam(value = "status",required = false) Integer status,
-        @RequestParam(value = "type",required = false) Byte type,
-        @RequestParam(value = "message",required = false) String message,
-        @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
-        @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
-        @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
-        @RequestParam(value = "finishTimeEnd",required = false) Date finishTimeEnd,
-        @RequestParam(value = "filePaths",required = false) String filePaths,
-        @RequestParam(value = "pageNum",required = false)Integer pageNum,
-        @RequestParam(value = "pageSize",required = false) Integer pageSize
+            @ApiParam(value = "主键") @RequestParam(value = "id",required = false) Long id,
+            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode",required = false) String orgCode,
+            @ApiParam(value = "任务名称") @RequestParam(value = "name",required = false) String name,
+            @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(value = "status",required = false) Integer status,
+            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(value = "type",required = false) Byte type,
+            @ApiParam(value = "任务信息(失败时记录失败原因)") @RequestParam(value = "message",required = false) String message,
+            @ApiParam(value = "任务开始时间开始") @RequestParam(value = "startTimeBegin",required = false) Date startTimeBegin,
+            @ApiParam(value = "任务开始时间结束") @RequestParam(value = "startTimeEnd",required = false) Date startTimeEnd,
+            @ApiParam(value = "任务完成时间开始") @RequestParam(value = "finishTimeBegin",required = false) Date finishTimeBegin,
+            @ApiParam(value = "任务完成时间结束") @RequestParam(value = "finishTimeEnd",required = false) Date finishTimeEnd,
+            @ApiParam(value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(value = "filePaths",required = false) String filePaths,
+            @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
+            @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(value = "pageSize",required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
             new NumberCondition("id",id, NumberCondition.Handler.EQUAL),

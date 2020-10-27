@@ -6,7 +6,6 @@ import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.shiro.ShiroUtil;
 import io.swagger.annotations.*;
