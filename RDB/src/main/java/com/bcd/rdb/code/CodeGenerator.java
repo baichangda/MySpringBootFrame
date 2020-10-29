@@ -2,8 +2,10 @@ package com.bcd.rdb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
+import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.code.data.*;
-import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
+import com.bcd.rdb.code.mysql.MysqlDBSupport;
+import com.bcd.rdb.code.pgsql.PgsqlDBSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,9 +19,18 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CodeGenerator {
+
+    public final static CodeGenerator CODE_GENERATOR_MYSQL=new CodeGenerator(new MysqlDBSupport());
+
+    public final static CodeGenerator CODE_GENERATOR_PGSQL=new CodeGenerator(new PgsqlDBSupport());
+
+    DBSupport dbSupport;
+
+    public CodeGenerator(DBSupport dbSupport){
+        this.dbSupport=dbSupport;
+    }
 
     static Logger logger= LoggerFactory.getLogger(CodeGenerator.class);
     /**
@@ -28,7 +39,7 @@ public class CodeGenerator {
      * @param templateDir
      * @param destDir
      */
-    public static void generateBean(BeanData data, String templateDir, String destDir){
+    public void generateBean(BeanData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
         String beanDir = destDir + "/bean";
         FileUtil.createDirectories(Paths.get(beanDir));
@@ -49,7 +60,7 @@ public class CodeGenerator {
      * @param templateDir
      * @param destDir
      */
-    public static void generateRepository(RepositoryData data, String templateDir, String destDir){
+    public void generateRepository(RepositoryData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
         String beanDir = destDir + "/repository";
         FileUtil.createDirectories(Paths.get(beanDir));
@@ -70,7 +81,7 @@ public class CodeGenerator {
      * @param templateDir
      * @param destDir
      */
-    public static void generateService(ServiceData data, String templateDir, String destDir){
+    public void generateService(ServiceData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
         String beanDir = destDir + "/service";
         FileUtil.createDirectories(Paths.get(beanDir));
@@ -91,7 +102,7 @@ public class CodeGenerator {
      * @param templateDir
      * @param destDir
      */
-    public static void generateController(ControllerData data, String templateDir, String destDir){
+    public void generateController(ControllerData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
         String beanDir = destDir + "/controller";
         FileUtil.createDirectories(Paths.get(beanDir));
@@ -113,7 +124,7 @@ public class CodeGenerator {
      * @param connection
      * @return
      */
-    public static BeanData initBeanData(TableConfig tableConfig,Connection connection){
+    public BeanData initBeanData(TableConfig tableConfig,Connection connection){
         BeanData data=new BeanData();
         data.setModuleNameCN(tableConfig.getModuleNameCN());
         data.setModuleName(tableConfig.getModuleName());
@@ -131,7 +142,7 @@ public class CodeGenerator {
      * @param connection
      * @return
      */
-    public static RepositoryData initRepositoryData(TableConfig tableConfig,Connection connection){
+    public RepositoryData initRepositoryData(TableConfig tableConfig,Connection connection){
         RepositoryData data=new RepositoryData();
         data.setModuleNameCN(tableConfig.getModuleNameCN());
         data.setModuleName(tableConfig.getModuleName());
@@ -146,7 +157,7 @@ public class CodeGenerator {
      * @param connection
      * @return
      */
-    public static ServiceData initServiceData(TableConfig tableConfig,Connection connection){
+    public ServiceData initServiceData(TableConfig tableConfig,Connection connection){
         ServiceData data=new ServiceData();
         data.setModuleNameCN(tableConfig.getModuleNameCN());
         data.setModuleName(tableConfig.getModuleName());
@@ -161,7 +172,7 @@ public class CodeGenerator {
      * @param connection
      * @return
      */
-    public static ControllerData initControllerData(TableConfig tableConfig,Connection connection){
+    public ControllerData initControllerData(TableConfig tableConfig,Connection connection){
         ControllerData data=new ControllerData();
         data.setModuleNameCN(tableConfig.getModuleNameCN());
         data.setModuleName(tableConfig.getModuleName());
@@ -179,10 +190,8 @@ public class CodeGenerator {
      * @param connection
      * @param config
      */
-    private static String initPkType(Connection connection, TableConfig config){
-        Map<String,Object> pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDb(),config.getTableName());
-        String pk_db_type=pk.get("DATA_TYPE").toString();
-        return CodeConst.DB_TYPE_TO_JAVA_TYPE.get(pk_db_type);
+    private String initPkType(Connection connection, TableConfig config){
+        return dbSupport.getTablePkType(config,connection).toString();
     }
 
     /**
@@ -190,32 +199,8 @@ public class CodeGenerator {
      * @param config
      * @param connection
      */
-    private static List<BeanField> initBeanField(TableConfig config,Connection connection){
-        String tableName = config.getTableName();
-        List<Map<String,Object>> res = DBInfoUtil.findColumns(connection,config.getConfig().getDb(),tableName);
-        return res.stream().map(e -> {
-            DBColumn dbColumn = new DBColumn();
-            dbColumn.setName(e.get("COLUMN_NAME").toString());
-            dbColumn.setType(e.get("DATA_TYPE").toString());
-            dbColumn.setComment(e.get("COLUMN_COMMENT").toString());
-            dbColumn.setIsNull(e.get("IS_NULLABLE").toString());
-            dbColumn.setStrLen(Integer.parseInt(e.get("CHARACTER_MAXIMUM_LENGTH").toString()));
-            return dbColumn.toBeanField();
-        }).filter(e->{
-            if("id".equals(e.getName())){
-                return false;
-            }else {
-                if (config.isNeedCreateInfo()) {
-                    if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.getName())) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
-        }).collect(Collectors.toList());
+    private List<BeanField> initBeanField(TableConfig config,Connection connection){
+        return dbSupport.getTableBeanFieldList(config,connection);
     }
 
     /**
@@ -223,7 +208,7 @@ public class CodeGenerator {
      * 初始化当前表生成代码目录父包名
      * @param config
      */
-    private static String initPackagePre(TableConfig config) {
+    private String initPackagePre(TableConfig config) {
         StringBuilder springSrcPathSb=new StringBuilder();
         springSrcPathSb.append("src");
         springSrcPathSb.append(File.separatorChar);
@@ -234,7 +219,7 @@ public class CodeGenerator {
         String springSrcPath = springSrcPathSb.toString();
         String targetDirPath=config.getConfig().getTargetDirPath();
         if (targetDirPath.contains(springSrcPath)) {
-            return targetDirPath.split(springSrcPath)[1].replaceAll(File.separator, ".");
+            return targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
         }else{
             throw BaseRuntimeException.getException("targetDirPath["+targetDirPath+"] must contains ["+springSrcPath+"]");
         }
@@ -245,7 +230,7 @@ public class CodeGenerator {
      * @param packagePre
      * @return
      */
-    private static String initRequestMappingPre(String packagePre){
+    private String initRequestMappingPre(String packagePre){
         return "/"+packagePre.substring(packagePre.lastIndexOf('.')+1);
     }
 
@@ -255,8 +240,8 @@ public class CodeGenerator {
      * 2、模版文件路径
      * @param config
      */
-    private static void initConfig(Config config){
-        config.setDb(DBInfoUtil.getDBProps().get("dbName").toString());
+    private void initConfig(Config config){
+        config.setDb(dbSupport.getDb());
         config.setTemplateDirPath(Paths.get(config.getTemplateDirPath()==null? CodeConst.TEMPLATE_DIR_PATH:config.getTemplateDirPath()).toString());
     }
 
@@ -264,9 +249,9 @@ public class CodeGenerator {
      * 根据配置、application.yml数据库信息生成 bean/repository/service/controller 文件
      * @param config
      */
-    public static void generate(Config config){
+    public void generate(Config config){
         initConfig(config);
-        try(Connection connection=DBInfoUtil.getSpringConn()){
+        try(Connection connection=dbSupport.getSpringConn()){
             for (TableConfig tableConfig : config.tableConfigs) {
                 if(tableConfig.isNeedCreateBeanFile()){
                     BeanData beanData= initBeanData(tableConfig,connection);
@@ -291,7 +276,8 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
+//        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
+        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
         Config config = new Config(path,
                         new TableConfig("User", "用户", "t_sys_user")
                                 .setNeedCreateControllerFile(true)
@@ -310,7 +296,8 @@ public class CodeGenerator {
                                 .setNeedValidateSaveParam(true)
                                 .setNeedCreateInfo(true)
                 );
-        CodeGenerator.generate(config);
+//        CodeGenerator.CODE_GENERATOR_MYSQL.generate(config);
+        CodeGenerator.CODE_GENERATOR_PGSQL.generate(config);
     }
 
 }

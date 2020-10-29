@@ -1,11 +1,14 @@
 package com.bcd.rdb.dbinfo.mysql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
+import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
 import org.springframework.util.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -49,7 +52,13 @@ public class DBInfoUtil {
             String url = dataSourceMap.get("url").toString();
             String username = dataSourceMap.get("username").toString();
             String password = dataSourceMap.get("password").toString();
-            String pre = url.substring(0, url.indexOf('?'));
+            int index=url.indexOf('?');
+            String pre;
+            if(index==-1){
+                pre = url;
+            }else{
+                pre = url.substring(0, index);
+            }
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
             props.put("url", dbInfoUrl);
@@ -95,13 +104,13 @@ public class DBInfoUtil {
         }
     }
 
-    public static List<Map<String, Object>> parseResult(ResultSet rs) {
+    public static <T>List<T> parseResult(ResultSet rs,Class<T> resultType) {
         try {
-            List<Map<String, Object>> res = new ArrayList<>();
             ResultSetMetaData headData = rs.getMetaData();
             int columnCount = headData.getColumnCount();
+            List<T> res = new ArrayList<>();
             while (rs.next()) {
-                Map<String, Object> jsonObject = new HashMap<>();
+                T t= resultType.newInstance();
                 for (int i = 1; i <= columnCount; i++) {
                     Object val = null;
                     int columnType = headData.getColumnType(i);
@@ -132,12 +141,14 @@ public class DBInfoUtil {
                             break;
                         }
                     }
-                    jsonObject.put(columnName, val);
+                    Field field=resultType.getDeclaredField(columnName.toLowerCase());
+                    field.setAccessible(true);
+                    field.set(t,val);
                 }
-                res.add(jsonObject);
+                res.add(t);
             }
             return res;
-        } catch (SQLException e) {
+        } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchFieldException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -149,13 +160,13 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static List<Map<String, Object>> findTables(Connection conn,String dbName) {
-        List<Map<String, Object>> res;
+    public static List<TablesBean> findTables(Connection conn,String dbName) {
+        List<TablesBean> res;
         String sql = "select * from tables where table_schema=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                res = parseResult(rs);
+                res = parseResult(rs, TablesBean.class);
             }
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
@@ -169,18 +180,18 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static Map<String, Object> findTable(Connection conn,String dbName, String tableName) {
-        Map<String, Object> res;
+    public static TablesBean findTable(Connection conn,String dbName, String tableName) {
+        TablesBean res;
         String sql = "select * from tables where table_schema=? and table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<Map<String, Object>> jsonArray = parseResult(rs);
-                if (jsonArray == null || jsonArray.isEmpty()) {
+                List<TablesBean> dataList = parseResult(rs,TablesBean.class);
+                if (dataList == null || dataList.isEmpty()) {
                     return null;
                 }
-                res = jsonArray.get(0);
+                res = dataList.get(0);
                 return res;
             }
         } catch (SQLException e) {
@@ -195,14 +206,14 @@ public class DBInfoUtil {
      * @param tableName
      * @return
      */
-    public static List<Map<String, Object>> findColumns(Connection conn,String dbName, String tableName) {
-        List<Map<String, Object>> res;
+    public static List<ColumnsBean> findColumns(Connection conn, String dbName, String tableName) {
+        List<ColumnsBean> res;
         String sql = "select * from columns where table_schema=? and table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                res = parseResult(rs);
+                res = parseResult(rs,ColumnsBean.class);
             }
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
@@ -213,7 +224,7 @@ public class DBInfoUtil {
     /**
      * 获取指定数据库表的主键
      */
-    public static Map<String, Object> findPKColumn(Connection conn,String dbName, String tableName) {
+    public static ColumnsBean findPKColumn(Connection conn,String dbName, String tableName) {
         String sql = "select a.* from " +
                 "(select * from columns where table_schema=? and table_name=?) a inner join" +
                 "(select COLUMN_NAME from STATISTICS where table_schema=? and table_name=? and index_name='PRIMARY') b on a.COLUMN_NAME=b.COLUMN_NAME";
@@ -223,7 +234,7 @@ public class DBInfoUtil {
             pstsm.setString(3, dbName);
             pstsm.setString(4, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<Map<String, Object>> res = parseResult(rs);
+                List<ColumnsBean> res = parseResult(rs,ColumnsBean.class);
                 if (res.isEmpty()) {
                     return null;
                 } else {

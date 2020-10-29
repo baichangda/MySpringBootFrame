@@ -3,6 +3,8 @@ package com.bcd.rdb.dbinfo.mysql.service;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.FileUtil;
+import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
+import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -41,14 +43,14 @@ public class MysqlTableServiceImpl extends TablesService {
         for (int i = 0; i <= headArr.length - 1; i++) {
             emptyList.add("");
         }
-        List<Map<String, Object>> tablesList = DBInfoUtil.findTables(connection,dbName);
-        for (Map<String, Object> table : tablesList) {
-            String tableName = table.get("TABLE_NAME").toString();
+        List<TablesBean> tablesList = DBInfoUtil.findTables(connection,dbName);
+        for (TablesBean table : tablesList) {
+            String tableName = table.getTable_name();
             //如果是flyway的版本信息表,则跳过
             if (tableName.equalsIgnoreCase("flyway_schema_history")) {
                 continue;
             }
-            String tableComment = table.get("TABLE_COMMENT").toString();
+            String tableComment = table.getTable_comment();
             List define = new ArrayList();
             List head = new ArrayList();
             define.add(tableName + "(" + tableComment + ")");
@@ -57,8 +59,7 @@ public class MysqlTableServiceImpl extends TablesService {
             }
             head.addAll(Arrays.asList(headArr));
 
-            List<Map<String, Object>> columnsList = null;
-            columnsList = DBInfoUtil.findColumns(
+            List<ColumnsBean> columnsList = DBInfoUtil.findColumns(
                     connection,dbName, tableName
             );
 
@@ -66,11 +67,11 @@ public class MysqlTableServiceImpl extends TablesService {
             dataList.add(head);
             columnsList.forEach(column -> {
                 List data = new ArrayList();
-                data.add(column.get("COLUMN_NAME"));
-                data.add(column.get("DATA_TYPE"));
-                data.add(column.get("IS_NULLABLE"));
-                data.add(column.get("COLUMN_DEFAULT"));
-                data.add(column.get("COLUMN_COMMENT"));
+                data.add(column.getColumn_type());
+                data.add(column.getData_type());
+                data.add(column.getIs_nullable());
+                data.add(column.getColumn_default());
+                data.add(column.getColumn_comment());
                 dataList.add(data);
             });
             dataList.add(emptyList);

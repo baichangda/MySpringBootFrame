@@ -1,7 +1,6 @@
-package com.bcd.rdb.code.mysql;
+package com.bcd.rdb.code.pgsql;
 
 import com.bcd.rdb.code.data.BeanField;
-import com.bcd.rdb.code.data.CodeConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,26 +10,24 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/7/31.
  */
-public class MysqlDBColumn {
+public class PgsqlDBColumn {
 
     public final static Map<String,String> DB_TYPE_TO_JAVA_TYPE =new HashMap<>();
 
     static{
-        DB_TYPE_TO_JAVA_TYPE.put("decimal","BigDecimal");
-        DB_TYPE_TO_JAVA_TYPE.put("tinyint","Byte");
-        DB_TYPE_TO_JAVA_TYPE.put("smallint","Short");
-        DB_TYPE_TO_JAVA_TYPE.put("bigint","Long");
+        DB_TYPE_TO_JAVA_TYPE.put("numeric","BigDecimal");
+        DB_TYPE_TO_JAVA_TYPE.put("int8","Long");
         DB_TYPE_TO_JAVA_TYPE.put("varchar","String");
-        DB_TYPE_TO_JAVA_TYPE.put("int","Integer");
-        DB_TYPE_TO_JAVA_TYPE.put("float","Float");
-        DB_TYPE_TO_JAVA_TYPE.put("double","Double");
+        DB_TYPE_TO_JAVA_TYPE.put("int2","Integer");
+        DB_TYPE_TO_JAVA_TYPE.put("int4","Integer");
+        DB_TYPE_TO_JAVA_TYPE.put("float4","Float");
+        DB_TYPE_TO_JAVA_TYPE.put("float8","Double");
         DB_TYPE_TO_JAVA_TYPE.put("timestamp","Date");
-        DB_TYPE_TO_JAVA_TYPE.put("datetime","Date");
         DB_TYPE_TO_JAVA_TYPE.put("date","Date");
 
     }
 
-    Logger logger= LoggerFactory.getLogger(MysqlDBColumn.class);
+    Logger logger= LoggerFactory.getLogger(PgsqlDBColumn.class);
     private String name;
     private String type;
     private String comment;
@@ -80,6 +77,7 @@ public class MysqlDBColumn {
     public BeanField toBeanField(){
         String javaType= DB_TYPE_TO_JAVA_TYPE.get(type);
         if(javaType==null){
+
             return null;
         }
         String jName=name;
