@@ -1,5 +1,6 @@
 package com.bcd.base.util;
 
+import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class ExceptionUtil {
                 //由于设置了jackson忽略为null属性,此时将null转换为"NULL"
                 dataMap.put(e.getPropertyPath().toString(),e.getInvalidValue()==null?"NULL":e.getInvalidValue());
             });
-            return JsonMessage.fail().withMessage(message).withData(dataMap);
+            return JsonMessage.fail().withMessage(message).withCode(CommonConst.PARAM_VALIDATE_FAILED_CODE).withData(dataMap);
         } else if (realException instanceof MethodArgumentNotValidException) {
             String message = ((MethodArgumentNotValidException) realException).getBindingResult().getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).filter(Objects::nonNull).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             return JsonMessage.fail().withMessage(message);

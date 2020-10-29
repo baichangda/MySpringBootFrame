@@ -18,7 +18,7 @@ public class JsonMessage<T> implements Serializable {
     private String message = "";
     @ApiModelProperty("Api调用失败时错误编码")
     private String code = "";
-    @ApiModelProperty("Api调用成功时返回的数据(Json字符串)")
+    @ApiModelProperty("Api调用返回的数据(Json字符串)")
     private T data;
 
     public JsonMessage() {
