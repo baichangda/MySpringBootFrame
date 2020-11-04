@@ -1,14 +1,18 @@
 package com.bcd.service;
 
 import com.alibaba.excel.EasyExcel;
+import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -145,7 +149,7 @@ public class ApiService {
      * 导出系统中所有的Api成excel
      * @return
      */
-    public void exportApi(OutputStream os){
+    public void exportApi(OutputStream os) throws IOException {
         //1、获取所有controller
         Map<String,Object> controllerMap= SpringUtil.applicationContext.getBeansWithAnnotation(RestController.class);
         //2、循环controller
@@ -209,6 +213,44 @@ public class ApiService {
 
         //4、生成excel
         //4.1、准备样式
-        EasyExcel.write(os).sheet("接口设计").doWrite(excelList);
+//        EasyExcel.write(os).sheet("接口设计").doWrite(excelList);
+
+        CellStyle[] cellStyle1=new CellStyle[]{null};
+        CellStyle[] cellStyle2=new CellStyle[]{null};
+        XSSFWorkbook workbook= ExcelUtil.exportExcel_2007(excelList,(cell, val)->{
+            int y=cell.getColumnIndex();
+            if(y==0){
+                //4.2、设置标头列样式
+                if(cellStyle1[0]==null){
+                    cellStyle1[0]=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle1[0].setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                    cellStyle1[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle1[0].setBorderLeft(BorderStyle.THIN);
+                    cellStyle1[0].setBorderBottom(BorderStyle.THIN);
+                    cellStyle1[0].setBorderTop(BorderStyle.THIN);
+                    cellStyle1[0].setBorderRight(BorderStyle.THIN);
+                    cellStyle1[0].setWrapText(true);
+                    cellStyle1[0].setVerticalAlignment(VerticalAlignment.CENTER);
+                }
+                cell.setCellStyle(cellStyle1[0]);
+            }else{
+                //4.3、设置内容列样式
+                if(cellStyle2[0]==null){
+                    cellStyle2[0]=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2[0].setBorderLeft(BorderStyle.THIN);
+                    cellStyle2[0].setBorderBottom(BorderStyle.THIN);
+                    cellStyle2[0].setBorderTop(BorderStyle.THIN);
+                    cellStyle2[0].setBorderRight(BorderStyle.THIN);
+                    cellStyle2[0].setWrapText(true);
+
+                }
+                cell.setCellStyle(cellStyle2[0]);
+            }
+            ExcelUtil.inputValue(cell,val);
+        });
+        //4.4、设置列宽
+        workbook.getSheetAt(0).setColumnWidth(0,256*15+184);
+        workbook.getSheetAt(0).setColumnWidth(1,256*100+184);
+        workbook.write(os);
     }
 }

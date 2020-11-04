@@ -28,7 +28,7 @@ import java.util.List;
 public class MysqlTableServiceImpl extends TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
-    public void exportDBDesignerExcel(String dbName,OutputStream os) {
+    public void exportDBDesignerExcel(String dbName,OutputStream os) throws IOException {
         try(Connection connection=DBInfoUtil.getSpringConn()){
             exportDBDesignerExcel(connection,dbName,os);
         } catch (SQLException e) {
@@ -36,7 +36,7 @@ public class MysqlTableServiceImpl extends TablesService {
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os) {
+    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os) throws IOException {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {

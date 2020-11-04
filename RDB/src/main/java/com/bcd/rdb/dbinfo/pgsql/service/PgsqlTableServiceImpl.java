@@ -3,11 +3,13 @@ package com.bcd.rdb.dbinfo.pgsql.service;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ import java.util.List;
 public class PgsqlTableServiceImpl extends TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
-    public void exportDBDesignerExcel(String dbName,OutputStream os) {
+    public void exportDBDesignerExcel(String dbName,OutputStream os) throws IOException {
         try(Connection connection=DBInfoUtil.getSpringConn()){
             exportDBDesignerExcel(connection,dbName,os);
         } catch (SQLException e) {
@@ -36,7 +38,7 @@ public class PgsqlTableServiceImpl extends TablesService {
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os) {
+    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os) throws IOException {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
