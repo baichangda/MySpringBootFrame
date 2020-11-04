@@ -2,6 +2,7 @@ package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +20,7 @@ import javax.persistence.*;
 /**
  *  菜单表
  */
+@Data
 @Entity
 @Table(name = "t_sys_menu")
 public class MenuBean extends BaseBean<Long> {
@@ -45,54 +47,4 @@ public class MenuBean extends BaseBean<Long> {
 
     @Transient
     private List<MenuBean> children=new ArrayList<>();
-
-
-    //method
-    public void setParentId(Long parentId){
-        this.parentId=parentId;
-    }
-
-    public Long getParentId(){
-        return this.parentId;
-    }
-
-    public void setName(String name){
-        this.name=name;
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
-    public void setUrl(String url){
-        this.url=url;
-    }
-
-    public String getUrl(){
-        return this.url;
-    }
-
-    public void setIcon(String icon){
-        this.icon=icon;
-    }
-
-    public String getIcon(){
-        return this.icon;
-    }
-
-    public void setOrderNum(Integer orderNum){
-        this.orderNum=orderNum;
-    }
-
-    public Integer getOrderNum(){
-        return this.orderNum;
-    }
-
-    public List<MenuBean> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<MenuBean> children) {
-        this.children = children;
-    }
 }

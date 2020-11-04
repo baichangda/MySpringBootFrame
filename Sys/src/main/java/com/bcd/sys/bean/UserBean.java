@@ -4,6 +4,7 @@ import com.bcd.rdb.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.Date;
 
@@ -17,6 +18,7 @@ import javax.validation.constraints.Size;
 /**
  *  用户基础信息表
  */
+@Data
 @Entity
 @Table(name = "t_sys_user")
 public class UserBean extends BaseBean<Long>{
@@ -63,88 +65,4 @@ public class UserBean extends BaseBean<Long>{
     @ApiModelProperty(hidden = true)
     @Transient
     private String offsetId;
-
-    //method
-
-
-    public void setUsername(String username){
-        this.username=username;
-    }
-
-    public String getUsername(){
-        return this.username;
-    }
-
-    public void setPassword(String password){
-        this.password=password;
-    }
-
-    public String getPassword(){
-        return this.password;
-    }
-
-    public void setEmail(String email){
-        this.email=email;
-    }
-
-    public String getEmail(){
-        return this.email;
-    }
-
-    public void setPhone(String phone){
-        this.phone=phone;
-    }
-
-    public String getPhone(){
-        return this.phone;
-    }
-
-    public void setRealName(String realName){
-        this.realName=realName;
-    }
-
-    public String getRealName(){
-        return this.realName;
-    }
-
-    public void setSex(String sex){
-        this.sex=sex;
-    }
-
-    public String getSex(){
-        return this.sex;
-    }
-
-    public void setBirthday(Date birthday){
-        this.birthday=birthday;
-    }
-
-    public Date getBirthday(){
-        return this.birthday;
-    }
-
-    public void setCardNumber(String cardNumber){
-        this.cardNumber=cardNumber;
-    }
-
-    public String getCardNumber(){
-        return this.cardNumber;
-    }
-
-    public void setStatus(Integer status){
-        this.status=status;
-    }
-
-    public Integer getStatus(){
-        return this.status;
-    }
-
-    public String getOffsetId() {
-        return offsetId;
-    }
-
-    public void setOffsetId(String offsetId) {
-        this.offsetId = offsetId;
-    }
-
 }

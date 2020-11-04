@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.temporal.ChronoUnit;
@@ -24,82 +25,17 @@ public class BaseController {
     public final static String DEFAULT_RESPONSE_ENCODING = "UTF-8";
 
     /**
-     * 下载文件
-     *
-     * @param content  文件字节数组
-     * @param fileName 导出的文件名
-     * @param response 响应response
+     * 响应文件流时候设置response
+     * @param fileName
+     * @param response
+     * @throws UnsupportedEncodingException
      */
-    protected void response(byte[] content, String fileName, HttpServletResponse response) {
-        try {
-            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            response.getOutputStream().write(content);
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+    protected void configOnResponseFile(String fileName, HttpServletResponse response) throws UnsupportedEncodingException {
+        response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
+        response.setContentType("application/octet-stream");
+        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
     }
 
-    /**
-     * 下载文件流
-     *
-     * @param is       文件流
-     * @param fileName 导出的文件名
-     * @param response 响应response
-     */
-    protected void response(InputStream is, String fileName, HttpServletResponse response) {
-        try {
-            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            FileUtil.write(is, response.getOutputStream());
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-
-    /**
-     * 下载文件
-     *
-     * @param path     文件
-     * @param fileName 导出的文件名
-     * @param response 响应response
-     */
-    protected void response(Path path, String fileName, HttpServletResponse response) {
-        try {
-            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            try (InputStream is = Files.newInputStream(path);
-                 OutputStream os = response.getOutputStream()) {
-                FileUtil.write(is, os);
-            }
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-    /**
-     * 导出excel
-     *
-     * @param workbook excel
-     * @param fileName 导出的文件名
-     * @param response 响应response
-     */
-    protected void response(Workbook workbook, String fileName, HttpServletResponse response) {
-        try {
-            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
-            try (OutputStream os = response.getOutputStream()) {
-                workbook.write(os);
-            }
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
 
     /**
      * 文件名字带上 '-时间数字'

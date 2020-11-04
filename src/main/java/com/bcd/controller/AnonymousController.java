@@ -11,12 +11,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 
@@ -27,6 +31,8 @@ import java.util.Optional;
 @RequestMapping("/api/anonymous")
 @Api(tags = "公开/AnonymousController")
 public class AnonymousController extends BaseController{
+
+    Logger logger= LoggerFactory.getLogger(AnonymousController.class);
 
     @Autowired
     ApiService apiService;
@@ -53,11 +59,14 @@ public class AnonymousController extends BaseController{
     @RequestMapping(value = "/exportApi",method = RequestMethod.GET)
     @ApiOperation(value = "导出所有Api",notes = "导出所有Api")
     @ApiResponse(code = 200,message = "导入的Excel")
-    public JsonMessage<String> exportApi(HttpServletResponse response){
-        XSSFWorkbook workbook=apiService.exportApi();
-        String fileName=I18nUtil.getMessage("AnonymousController.exportApi.fileName")+".xlsx";
-        response(workbook,toDateFileName(fileName),response);
-        return JsonMessage.success();
+    public void exportApi(HttpServletResponse response){
+        try {
+            String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
+            configOnResponseFile(fileName, response);
+            apiService.exportApi(response.getOutputStream());
+        } catch (IOException e) {
+            logger.error("export error",e);
+        }
     }
 
     public static void main(String[] args) {

@@ -3,6 +3,7 @@ buildscript {
         springBootVersion = '+'
         kafkaVersion = '+'
         flywayVersion = '7.0.0'
+        lombokVersion="+"
         mavenRepoUrl='https://maven.aliyun.com/repository/central'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
@@ -65,6 +66,11 @@ allprojects{
 
 
         dependencies { compile files('lib/jacob.jar')}
+
+
+        // https://mvnrepository.com/artifact/org.projectlombok/lombok
+        compileOnly  group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     }
 

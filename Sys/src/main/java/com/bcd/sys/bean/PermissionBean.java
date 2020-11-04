@@ -2,6 +2,10 @@ package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -17,6 +21,7 @@ import javax.persistence.*;
 /**
  *  角色与权限关系表
  */
+@Data
 @Entity
 @Table(name = "t_sys_permission")
 public class PermissionBean extends BaseBean<Long> {
@@ -37,40 +42,4 @@ public class PermissionBean extends BaseBean<Long> {
 
     @ApiModelProperty(value = "关联角色id")
     private Long roleId;
-
-
-    //method
-    public void setCode(String code){
-        this.code=code;
-    }
-
-    public String getCode(){
-        return this.code;
-    }
-
-    public void setName(String name){
-        this.name=name;
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
-    public void setRemark(String remark){
-        this.remark=remark;
-    }
-
-    public String getRemark(){
-        return this.remark;
-    }
-
-    public void setRoleId(Long roleId){
-        this.roleId=roleId;
-    }
-
-    public Long getRoleId(){
-        return this.roleId;
-    }
-
-
 }

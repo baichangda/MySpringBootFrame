@@ -68,10 +68,8 @@ public class PgsqlDBSupport implements DBSupport {
     public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
         ColumnsBean pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDb(),config.getTableName());
         switch (pk.getUdt_name()){
-            case "int2":{
-                return CodeConst.PkType.Integer;
-            }
-            case "int4":{
+            case "int2":
+            case "int4": {
                 return CodeConst.PkType.Integer;
             }
             case "int8":{

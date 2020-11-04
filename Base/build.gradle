@@ -18,8 +18,8 @@ dependencies {
     //springboot validation支持
     compile("org.springframework.boot:spring-boot-starter-validation")
 
-    //poi 集成
-    compile("org.apache.poi:poi-ooxml:${poiVersion}")
+    // https://mvnrepository.com/artifact/com.alibaba/easyexcel
+    compile group: 'com.alibaba', name: 'easyexcel', version: "${easyexcelVersion}"
 
     //shiro权限框架集成
     compile("org.apache.shiro:shiro-spring:${shiroVersion}")
@@ -53,10 +53,13 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
 
+
+
+
 }
 buildscript {
     ext {
-        poiVersion = '+'
+        easyexcelVersion = '+'
         commonsCodecVersion='+'
         commonsLangVersion='+'
         swaggerVersion='2.9.2'
@@ -66,5 +69,6 @@ buildscript {
         commonsPool2='+'
         shiroVersion = '+'
         guavaVersion='+'
+
     }
 }

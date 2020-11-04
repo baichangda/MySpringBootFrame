@@ -6,6 +6,8 @@ import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import io.swagger.annotations.*;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/tables")
 @Api(tags = "数据库设计/TablesController")
 public class TablesController extends BaseController {
+
+    Logger logger= LoggerFactory.getLogger(TablesController.class);
 
     @Autowired
     private TablesService tablesService;
@@ -29,8 +34,13 @@ public class TablesController extends BaseController {
     public void exportDBDesignerExcel(
             @ApiParam(value = "数据库名称") @RequestParam(value = "dbName", required = false) String dbName,
             HttpServletResponse response) {
-        Workbook workbook = tablesService.exportDBDesignerExcel(dbName);
-        String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
-        response(workbook, toDateFileName(fileName), response);
+        try {
+            String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
+            configOnResponseFile(fileName,response);
+            tablesService.exportDBDesignerExcel(dbName,response.getOutputStream());
+        } catch (IOException e) {
+            logger.error("export error",e);
+        }
+
     }
 }

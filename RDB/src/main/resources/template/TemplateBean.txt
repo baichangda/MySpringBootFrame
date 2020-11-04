@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import lombok.Data;
 
 
 
@@ -21,6 +22,7 @@ import javax.persistence.*;
 /**
  *  ${moduleNameCN}
  */
+@Data
 @Entity
 @Table(name = "${tableName}")
 public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {
@@ -46,6 +48,8 @@ public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBea
 
     </#list>
 
+
+<#--
     //method
     <#list fieldList as field>
     public ${field.type} get${(field.name)?cap_first}(){
@@ -56,4 +60,5 @@ public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBea
         this.${field.name}=${field.name};
     }
     </#list>
+-->
 }

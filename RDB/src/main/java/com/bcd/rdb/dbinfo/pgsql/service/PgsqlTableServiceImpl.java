@@ -1,12 +1,12 @@
-package com.bcd.rdb.dbinfo.mysql.service;
+package com.bcd.rdb.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
-import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
-import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
-import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
+import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
+import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
+import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-@ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="com.mysql.cj.jdbc.Driver")
+@ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="org.postgresql.Driver")
 @Service
-public class MysqlTableServiceImpl extends TablesService {
+public class PgsqlTableServiceImpl extends TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public void exportDBDesignerExcel(String dbName,OutputStream os) {
@@ -66,11 +66,11 @@ public class MysqlTableServiceImpl extends TablesService {
             dataList.add(head);
             columnsList.forEach(column -> {
                 List data = new ArrayList();
-                data.add(column.getColumn_type());
-                data.add(column.getData_type());
+                data.add(column.getColumn_name());
+                data.add(column.getUdt_name());
                 data.add(column.getIs_nullable());
                 data.add(column.getColumn_default());
-                data.add(column.getColumn_comment());
+                data.add(column.getDescription());
                 dataList.add(data);
             });
             dataList.add(emptyList);
@@ -90,7 +90,7 @@ public class MysqlTableServiceImpl extends TablesService {
         Path p= Paths.get(file);
         FileUtil.createFileIfNotExists(p);
         try(OutputStream os=Files.newOutputStream(p);
-            Connection connection=DBInfoUtil.getConn(url, username, password)){
+            Connection connection=DBInfoUtil.getConn(url,dbName, username, password)){
             exportDBDesignerExcel(connection,dbName,os);
         }catch (IOException|SQLException e){
             throw BaseRuntimeException.getException(e);
@@ -98,7 +98,7 @@ public class MysqlTableServiceImpl extends TablesService {
     }
 
     public static void main(String[] args) {
-        MysqlTableServiceImpl mysqlTableService=new MysqlTableServiceImpl();
-        mysqlTableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
+        PgsqlTableServiceImpl tableService=new PgsqlTableServiceImpl();
+        tableService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921","dbuser","hlxpassword","test_bcd","d:\\msbf.xlsx");
     }
 }

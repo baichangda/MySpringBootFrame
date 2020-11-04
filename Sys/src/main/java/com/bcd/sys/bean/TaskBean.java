@@ -10,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.Column;
@@ -22,6 +25,7 @@ import javax.validation.constraints.Size;
 /**
  *  系统任务处理表
  */
+@Data
 @Entity
 @Table(name = "t_sys_task")
 public class TaskBean extends SuperBaseBean<Long> implements Task {
@@ -84,113 +88,8 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
         this.percent=0F;
     }
 
-    public TaskBean() {
+    public TaskBean(){
 
-    }
-
-    //method
-    public void setName(String name){
-        this.name=name;
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
-    public void setStatus(Integer status){
-        this.status=status;
-    }
-
-    public Integer getStatus(){
-        return this.status;
-    }
-
-    public void setType(Integer type){
-        this.type=type;
-    }
-
-    public Integer getType(){
-        return this.type;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setStartTime(Date startTime){
-        this.startTime=startTime;
-    }
-
-    public Date getStartTime(){
-        return this.startTime;
-    }
-
-    public void setFinishTime(Date finishTime){
-        this.finishTime=finishTime;
-    }
-
-    public Date getFinishTime(){
-        return this.finishTime;
-    }
-
-    public void setCreateTime(Date createTime){
-        this.createTime=createTime;
-    }
-
-    public Date getCreateTime(){
-        return this.createTime;
-    }
-
-    public void setFilePaths(String filePaths){
-        this.filePaths=filePaths;
-    }
-
-    public String getFilePaths(){
-        return this.filePaths;
-    }
-
-    public void setCreateUserId(Long createUserId){
-        this.createUserId=createUserId;
-    }
-
-    public Long getCreateUserId(){
-        return this.createUserId;
-    }
-
-    public void setCreateUserName(String createUserName){
-        this.createUserName=createUserName;
-    }
-
-    public String getCreateUserName(){
-        return this.createUserName;
-    }
-
-    public void setCreateIp(String createIp){
-        this.createIp=createIp;
-    }
-
-    public String getCreateIp(){
-        return this.createIp;
-    }
-
-    public String getStackMessage() {
-        return stackMessage;
-    }
-
-    public void setStackMessage(String stackMessage) {
-        this.stackMessage = stackMessage;
-    }
-
-    public Float getPercent() {
-        return percent;
-    }
-
-    public void setPercent(Float percent) {
-        this.percent = percent;
     }
 
     @Override
