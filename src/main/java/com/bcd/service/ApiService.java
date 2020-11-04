@@ -1,12 +1,17 @@
 package com.bcd.service;
 
 import com.alibaba.excel.EasyExcel;
-import com.bcd.base.util.ExcelUtil;
+import com.alibaba.excel.metadata.CellData;
+import com.alibaba.excel.metadata.Head;
+import com.alibaba.excel.write.handler.CellWriteHandler;
+import com.alibaba.excel.write.handler.SheetWriteHandler;
+import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
+import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
+import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,6 +26,10 @@ import java.util.*;
 @Service
 @SuppressWarnings("unchecked")
 public class ApiService {
+
+    MySheetWriteHandler sheetWriteHandler=new MySheetWriteHandler();
+    MyCellWriteHandler cellWriteHandler=new MyCellWriteHandler();
+
     /**
      * 获取方法下面所有方法名称和注释的map
      *
@@ -213,44 +222,75 @@ public class ApiService {
 
         //4、生成excel
         //4.1、准备样式
-//        EasyExcel.write(os).sheet("接口设计").doWrite(excelList);
+        EasyExcel.write(os).sheet("接口设计")
+                .registerWriteHandler(sheetWriteHandler)
+                .registerWriteHandler(cellWriteHandler)
+                .doWrite(excelList);
+    }
 
-        CellStyle[] cellStyle1=new CellStyle[]{null};
-        CellStyle[] cellStyle2=new CellStyle[]{null};
-        XSSFWorkbook workbook= ExcelUtil.exportExcel_2007(excelList,(cell, val)->{
+
+    class MySheetWriteHandler implements SheetWriteHandler{
+        @Override
+        public void beforeSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
+
+        }
+
+        @Override
+        public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
+            writeSheetHolder.getCachedSheet().setColumnWidth(0,256*15+184);
+            writeSheetHolder.getCachedSheet().setColumnWidth(1,256*100+184);
+        }
+    }
+
+    class MyCellWriteHandler implements CellWriteHandler {
+        CellStyle cellStyle1=null;
+        CellStyle cellStyle2=null;
+
+        @Override
+        public void beforeCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Row row, Head head, Integer columnIndex, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
             int y=cell.getColumnIndex();
             if(y==0){
-                //4.2、设置标头列样式
-                if(cellStyle1[0]==null){
-                    cellStyle1[0]=cell.getRow().getSheet().getWorkbook().createCellStyle();
-                    cellStyle1[0].setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                    cellStyle1[0].setFillPattern(FillPatternType.SOLID_FOREGROUND);
-                    cellStyle1[0].setBorderLeft(BorderStyle.THIN);
-                    cellStyle1[0].setBorderBottom(BorderStyle.THIN);
-                    cellStyle1[0].setBorderTop(BorderStyle.THIN);
-                    cellStyle1[0].setBorderRight(BorderStyle.THIN);
-                    cellStyle1[0].setWrapText(true);
-                    cellStyle1[0].setVerticalAlignment(VerticalAlignment.CENTER);
+                //设置标头列样式
+                if(cellStyle1==null){
+                    cellStyle1=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle1.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                    cellStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle1.setBorderLeft(BorderStyle.THIN);
+                    cellStyle1.setBorderBottom(BorderStyle.THIN);
+                    cellStyle1.setBorderTop(BorderStyle.THIN);
+                    cellStyle1.setBorderRight(BorderStyle.THIN);
+                    cellStyle1.setWrapText(true);
+                    cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
                 }
-                cell.setCellStyle(cellStyle1[0]);
+                cell.setCellStyle(cellStyle1);
             }else{
-                //4.3、设置内容列样式
-                if(cellStyle2[0]==null){
-                    cellStyle2[0]=cell.getRow().getSheet().getWorkbook().createCellStyle();
-                    cellStyle2[0].setBorderLeft(BorderStyle.THIN);
-                    cellStyle2[0].setBorderBottom(BorderStyle.THIN);
-                    cellStyle2[0].setBorderTop(BorderStyle.THIN);
-                    cellStyle2[0].setBorderRight(BorderStyle.THIN);
-                    cellStyle2[0].setWrapText(true);
+                //设置内容列样式
+                if(cellStyle2==null){
+                    cellStyle2=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2.setBorderLeft(BorderStyle.THIN);
+                    cellStyle2.setBorderBottom(BorderStyle.THIN);
+                    cellStyle2.setBorderTop(BorderStyle.THIN);
+                    cellStyle2.setBorderRight(BorderStyle.THIN);
+                    cellStyle2.setWrapText(true);
 
                 }
-                cell.setCellStyle(cellStyle2[0]);
+                cell.setCellStyle(cellStyle2);
             }
-            ExcelUtil.inputValue(cell,val);
-        });
-        //4.4、设置列宽
-        workbook.getSheetAt(0).setColumnWidth(0,256*15+184);
-        workbook.getSheetAt(0).setColumnWidth(1,256*100+184);
-        workbook.write(os);
+        }
+
+        @Override
+        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
     }
 }

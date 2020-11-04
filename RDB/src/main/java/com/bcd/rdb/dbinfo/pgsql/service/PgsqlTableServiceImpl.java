@@ -3,13 +3,11 @@ package com.bcd.rdb.dbinfo.pgsql.service;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.ExcelUtil;
 import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 

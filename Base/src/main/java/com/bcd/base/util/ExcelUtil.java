@@ -5,18 +5,17 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public class ExcelUtil {
@@ -94,13 +93,13 @@ public class ExcelUtil {
      * 导出excel(.xlsx)
      *
      * @param dataList 数据集合
-     * @return XSSFWorkbook(注意需要关闭)
+     * @return SXSSFWorkbook(注意需要关闭)
      */
-    public static XSSFWorkbook exportExcel_2007(List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
-        XSSFWorkbook workBook = new XSSFWorkbook();
-        Sheet sheet = workBook.createSheet();
+    public static Workbook exportExcel_2007(List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
+        SXSSFWorkbook workbook=new SXSSFWorkbook(new XSSFWorkbook(),100);
+        Sheet sheet = workbook.createSheet();
         writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
-        return workBook;
+        return workbook;
     }
 
     /**
@@ -109,7 +108,7 @@ public class ExcelUtil {
      * @param dataList 数据集合
      * @return HSSFWorkbook(注意需要关闭)
      */
-    public static HSSFWorkbook exportExcel_2003(List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
+    public static Workbook exportExcel_2003(List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
         HSSFWorkbook workBook = new HSSFWorkbook();
         Sheet sheet = workBook.createSheet();
         writeSheet(sheet, 1, 1, cellBiConsumer, dataList);
@@ -152,7 +151,7 @@ public class ExcelUtil {
     public static void writeExcel_2007(Path path, List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
         FileUtil.createFileIfNotExists(path);
         try (OutputStream os = Files.newOutputStream(path);
-             XSSFWorkbook workbook = exportExcel_2007(dataList, cellBiConsumer)) {
+             Workbook workbook = exportExcel_2007(dataList, cellBiConsumer)) {
             workbook.write(os);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
@@ -169,7 +168,7 @@ public class ExcelUtil {
     public static void writeExcel_2003(Path path, List<List> dataList, BiConsumer<Cell, Object> cellBiConsumer) {
         FileUtil.createFileIfNotExists(path);
         try (OutputStream os = Files.newOutputStream(path);
-             HSSFWorkbook workbook = exportExcel_2003(dataList, cellBiConsumer)) {
+             Workbook workbook = exportExcel_2003(dataList, cellBiConsumer)) {
             workbook.write(os);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
@@ -348,64 +347,4 @@ public class ExcelUtil {
         }).collect(Collectors.toList());
     }
 
-
-    public static void main(String[] args) throws IOException {
-        Path dir=Paths.get("/Users/baichangda/bcd/workspace/vcp-32960-gateway/NettyServer/src/main/java/com/incarcloud/nettyserver/tcp/data");
-        Set<String> set=new HashSet<>();
-        set.add("Packet.java");
-        set.add("PacketData.java");
-        Path output=Paths.get("/Users/baichangda/output.xlsx");
-        Files.deleteIfExists(output);
-        Workbook workbook=new XSSFWorkbook();
-        Sheet sheet=workbook.createSheet();
-        List<List> dataList=new ArrayList<>();
-        Files.list(dir).filter(e->!set.contains(e.getFileName().toString())).forEach(p->{
-            String fileName=p.getFileName().toString().split("\\.")[0];
-            dataList.add(Arrays.asList("类型名称",fileName));
-            dataList.add(Arrays.asList("字段","类型","描述"));
-            try(BufferedReader br=Files.newBufferedReader(p)){
-                String line;
-                String comment="";
-                while((line=br.readLine())!=null){
-                    List data=new ArrayList();
-                    line=line.trim();
-                    if(!line.isEmpty()&&!line.contains("return ")&&!line.contains("this.")&&!line.contains("(")
-                            &&!line.contains(")")&&!line.contains("@")&&!line.contains("import ")
-                            &&!line.contains("package ")&&!line.contains("*")&&!line.contains("}")) {
-                        if (line.contains(" class ")) {
-                            int begin = line.indexOf(" class ") + " class ".length();
-                            int end = line.indexOf(" ", begin);
-                            String className = line.substring(begin, end);
-                            data.add(className);
-                        } else if (line.contains("//")) {
-                            int begin = line.indexOf("//") + "//".length();
-                            comment = line.substring(begin);
-                        } else{
-                            String[] fieldArr=line.split(" ");
-                            String type=fieldArr[0].trim();
-                            fieldArr[1]=fieldArr[1].trim();
-                            String fieldName=fieldArr[1].substring(0,fieldArr[1].length()-1);
-                            data.add(fieldName);
-                            data.add(type);
-                            if(fieldName.contains("Hex")){
-                                data.add(comment+"16进制");
-                            }else{
-                                data.add(comment);
-                            }
-                            dataList.add(data);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                throw BaseRuntimeException.getException(e);
-            }
-            dataList.add(Arrays.asList());
-            dataList.add(Arrays.asList());
-        });
-        ExcelUtil.writeSheet(sheet,1,1,(cell,val)->ExcelUtil.inputValue(cell,val),dataList);
-        try(OutputStream os=Files.newOutputStream(output)){
-            workbook.write(os);
-        }
-
-    }
 }

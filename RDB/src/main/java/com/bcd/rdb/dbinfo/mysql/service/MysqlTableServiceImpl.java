@@ -98,7 +98,7 @@ public class MysqlTableServiceImpl extends TablesService {
     }
 
     public static void main(String[] args) {
-        MysqlTableServiceImpl mysqlTableService=new MysqlTableServiceImpl();
-        mysqlTableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
+        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
+        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
     }
 }
