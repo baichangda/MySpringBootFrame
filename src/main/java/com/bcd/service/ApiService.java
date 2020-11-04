@@ -4,8 +4,6 @@ import com.alibaba.excel.EasyExcel;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -116,7 +114,7 @@ public class ApiService {
      */
     public String[] getApiMethods(Method method){
         RequestMapping methodRequestMapping=method.getAnnotation(RequestMapping.class);
-        return Arrays.stream(methodRequestMapping.method()).map(RequestMethod::toString).toArray(len->new String[len]);
+        return Arrays.stream(methodRequestMapping.method()).map(RequestMethod::toString).toArray(String[]::new);
     }
 
     /**
@@ -139,7 +137,7 @@ public class ApiService {
                 pathList.add(controllerPath+methodPath);
             }
         }
-        return pathList.stream().toArray(len->new String[len]);
+        return pathList.toArray(new String[0]);
     }
 
 
