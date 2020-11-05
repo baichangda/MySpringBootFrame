@@ -5,6 +5,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateZoneUtil;
 import com.bcd.base.util.FileUtil;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,6 +23,8 @@ import java.util.Date;
  */
 @MyCacheClass
 public class BaseController {
+
+    protected Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public final static String DEFAULT_RESPONSE_ENCODING = "UTF-8";
 

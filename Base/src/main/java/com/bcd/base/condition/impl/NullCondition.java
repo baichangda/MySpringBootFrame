@@ -3,7 +3,8 @@ package com.bcd.base.condition.impl;
 import com.bcd.base.condition.Condition;
 
 /**
- * Created by Administrator on 2017/6/8.
+ * 是否为null条件
+ * 不依赖val
  */
 public class NullCondition extends Condition {
     public Handler handler;
@@ -27,5 +28,12 @@ public class NullCondition extends Condition {
          * 不为空
          */
         NOT_NULL
+    }
+
+    @Override
+    public String toAnalysis() {
+        return fieldName +
+                " " +
+                handler.toString();
     }
 }

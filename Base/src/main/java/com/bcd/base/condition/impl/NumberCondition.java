@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by Administrator on 2016/12/30.
+ * 日期类型条件
+ * 当val==null时候忽略此条件
  */
 @SuppressWarnings("unchecked")
 public class NumberCondition extends Condition {
@@ -30,6 +31,13 @@ public class NumberCondition extends Condition {
         }
         List<Condition> conditionList= Arrays.stream(vals).map(val->new NumberCondition(fieldName,val,handler)).collect(Collectors.toList());
         return or(conditionList);
+    }
+
+    @Override
+    public String toAnalysis() {
+        return val==null?null:fieldName +
+                " " +
+                handler.toString();
     }
 
     public enum Handler{

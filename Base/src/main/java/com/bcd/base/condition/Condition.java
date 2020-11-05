@@ -32,4 +32,6 @@ public abstract class Condition implements Serializable{
     public static Condition or(Condition... conditionArr){
         return or(Arrays.asList(conditionArr));
     }
+
+    public abstract String toAnalysis();
 }

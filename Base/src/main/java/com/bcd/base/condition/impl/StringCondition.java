@@ -2,13 +2,15 @@ package com.bcd.base.condition.impl;
 
 
 import com.bcd.base.condition.Condition;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by Administrator on 2016/12/30.
+ * 日期类型条件
+ * 当val==null时候忽略此条件
  */
 @SuppressWarnings("unchecked")
 public class StringCondition extends Condition {
@@ -30,6 +32,13 @@ public class StringCondition extends Condition {
         }
         List<Condition> conditionList= Arrays.stream(vals).map(val->new StringCondition(fieldName,val,handler)).collect(Collectors.toList());
         return or(conditionList);
+    }
+
+    @Override
+    public String toAnalysis() {
+        return val==null||"".equals(val)?null:fieldName +
+                " " +
+                handler.toString();
     }
 
     public enum Handler{

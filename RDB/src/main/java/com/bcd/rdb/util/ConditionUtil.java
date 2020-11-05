@@ -23,7 +23,6 @@ public class ConditionUtil {
         JPA_CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new NumberConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
-        JPA_CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new BooleanConditionConverter());
     }
 
     private final static Map<Class,Converter> JDBC_CONDITION_CONVERTER_MAP=new HashMap<>();
@@ -33,7 +32,6 @@ public class ConditionUtil {
         JDBC_CONDITION_CONVERTER_MAP.put(NullCondition.class,new com.bcd.rdb.condition.converter.jdbc.NullConditionConverter());
         JDBC_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new com.bcd.rdb.condition.converter.jdbc.NumberConditionConverter());
         JDBC_CONDITION_CONVERTER_MAP.put(StringCondition.class,new com.bcd.rdb.condition.converter.jdbc.StringConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new com.bcd.rdb.condition.converter.jdbc.BooleanConditionConverter());
     }
 
 
@@ -56,7 +54,7 @@ public class ConditionUtil {
     }
 
     public static <T>Specification<T> toSpecification(Condition condition){
-        Specification<T> specification=(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb)->{
+        return (Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb)->{
             Predicate predicate=convertCondition(condition,root,query,cb);
             if(predicate==null){
                 return cb.and();
@@ -64,7 +62,6 @@ public class ConditionUtil {
                 return predicate;
             }
         };
-        return specification;
     }
 
     public static Predicate convertCondition(Condition condition,Root root, CriteriaQuery query, CriteriaBuilder cb){
