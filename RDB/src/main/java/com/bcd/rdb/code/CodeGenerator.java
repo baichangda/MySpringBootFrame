@@ -22,9 +22,9 @@ import java.util.*;
 
 public class CodeGenerator {
 
-    public final static CodeGenerator CODE_GENERATOR_MYSQL=new CodeGenerator(new MysqlDBSupport());
+    public final static CodeGenerator MYSQL =new CodeGenerator(new MysqlDBSupport());
 
-    public final static CodeGenerator CODE_GENERATOR_PGSQL=new CodeGenerator(new PgsqlDBSupport());
+    public final static CodeGenerator PGSQL =new CodeGenerator(new PgsqlDBSupport());
 
     DBSupport dbSupport;
 
@@ -131,7 +131,7 @@ public class CodeGenerator {
         data.setPackagePre(initPackagePre(tableConfig));
         data.setTableName(tableConfig.getTableName());
         data.setPkType(initPkType(connection,tableConfig));
-        data.setSuperBeanType(tableConfig.needCreateInfo?1:2);
+        data.setSuperBeanType(tableConfig.isNeedCreateInfo()?1:2);
         data.setFieldList(initBeanField(tableConfig,connection));
         return data;
     }
@@ -179,7 +179,7 @@ public class CodeGenerator {
         data.setPackagePre(initPackagePre(tableConfig));
         data.setPkType(initPkType(connection,tableConfig));
         data.setFieldList(initBeanField(tableConfig,connection));
-        data.setValidateSaveParam(tableConfig.needValidateSaveParam);
+        data.setValidateSaveParam(tableConfig.isNeedValidateSaveParam());
         data.setRequestMappingPre(initRequestMappingPre(data.getPackagePre()));
         return data;
     }
@@ -252,7 +252,7 @@ public class CodeGenerator {
     public void generate(Config config){
         initConfig(config);
         try(Connection connection=dbSupport.getSpringConn()){
-            for (TableConfig tableConfig : config.tableConfigs) {
+            for (TableConfig tableConfig : config.getTableConfigs()) {
                 if(tableConfig.isNeedCreateBeanFile()){
                     BeanData beanData= initBeanData(tableConfig,connection);
                     generateBean(beanData,config.getTemplateDirPath(),config.getTargetDirPath());
@@ -275,29 +275,24 @@ public class CodeGenerator {
         }
     }
 
+
     public static void main(String[] args) {
 //        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
         String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
-        Config config = new Config(path,
-                        new TableConfig("User", "用户", "t_sys_user")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedValidateBeanField(true)
-                                .setNeedValidateSaveParam(true)
-                                .setNeedCreateInfo(true),
-                        new TableConfig("Permission", "权限", "t_sys_permission")
-                                .setNeedCreateControllerFile(true)
-                                .setNeedCreateServiceFile(true)
-                                .setNeedCreateRepositoryFile(true)
-                                .setNeedCreateBeanFile(true)
-                                .setNeedValidateBeanField(true)
-                                .setNeedValidateSaveParam(true)
-                                .setNeedCreateInfo(true)
-                );
-//        CodeGenerator.CODE_GENERATOR_MYSQL.generate(config);
-        CodeGenerator.CODE_GENERATOR_PGSQL.generate(config);
+        List<TableConfig> tableConfigs= TableConfig.newHelper()
+                .setNeedCreateBeanFile(true)
+                .setNeedCreateRepositoryFile(true)
+                .setNeedCreateServiceFile(true)
+                .setNeedCreateControllerFile(true)
+                .setNeedValidateBeanField(true)
+                .setNeedValidateSaveParam(true)
+                .setNeedCreateInfo(true)
+                .addModule("User", "用户", "t_sys_user")
+                .addModule("Permission", "权限", "t_sys_permission")
+                .toTableConfigs();
+        Config config= Config.newConfig(path).addTableConfig(tableConfigs);
+//        CodeGenerator.MYSQL.generate(config);
+        CodeGenerator.PGSQL.generate(config);
     }
 
 }

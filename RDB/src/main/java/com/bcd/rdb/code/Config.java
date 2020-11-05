@@ -1,55 +1,43 @@
 package com.bcd.rdb.code;
 
+import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@Data
 public class Config {
     //生成文件的目标文件夹路径
-    public String targetDirPath;
+    private String targetDirPath;
     //模版文件夹路径
-    public String templateDirPath;
+    private String templateDirPath;
     //表配置
-    public TableConfig[] tableConfigs;
+    private List<TableConfig> tableConfigs=new ArrayList<>();
     //数据库
-    public String db;
+    private String db;
 
-    public Config(String targetDirPath, TableConfig... tableConfigs) {
+    private Config(String targetDirPath) {
         this.targetDirPath = targetDirPath;
-        this.tableConfigs = tableConfigs;
-        if(tableConfigs!=null){
-            for (TableConfig tableConfig : tableConfigs) {
-                tableConfig.setConfig(this);
-            }
+    }
+
+    public static Config newConfig(String targetDirPath){
+        return new Config(targetDirPath);
+    }
+
+    public Config addTableConfig(TableConfig ... tableConfigs){
+        this.tableConfigs.addAll(Arrays.asList(tableConfigs));
+        for (TableConfig tableConfig : tableConfigs) {
+            tableConfig.setConfig(this);
         }
+        return this;
     }
 
-    public String getTargetDirPath() {
-        return targetDirPath;
-    }
-
-    public void setTargetDirPath(String targetDirPath) {
-        this.targetDirPath = targetDirPath;
-    }
-
-    public String getTemplateDirPath() {
-        return templateDirPath;
-    }
-
-    public void setTemplateDirPath(String templateDirPath) {
-        this.templateDirPath = templateDirPath;
-    }
-
-    public TableConfig[] getTableConfigs() {
-        return tableConfigs;
-    }
-
-    public void setTableConfigs(TableConfig[] tableConfigs) {
-        this.tableConfigs = tableConfigs;
-    }
-
-    public String getDb() {
-        return db;
-    }
-
-    public void setDb(String db) {
-        this.db = db;
+    public Config addTableConfig(List<TableConfig> tableConfigs){
+        this.tableConfigs.addAll(tableConfigs);
+        for (TableConfig tableConfig : tableConfigs) {
+            tableConfig.setConfig(this);
+        }
+        return this;
     }
 }
