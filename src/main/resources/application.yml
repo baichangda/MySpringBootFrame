@@ -28,25 +28,45 @@ spring:
      url: jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
      username: dbuser
      password: hlxpassword
-     hikari:
-       data-source-properties:
-         cachePrepStmts: true
-         prepStmtCacheSize: 250
-         prepStmtCacheSqlLimit: 2048
-         useServerPrepStmts: true
-       minimumIdle: 5
-       maximumPoolSize: 15
+     druid:
+       initial-size: 5
+       max-active: 15
+       filter:
+         #sql统计配置
+         stat:
+           enabled: true
+           #忽略参数合并sql
+           merge-sql: true
+         #sql防火墙配置
+         wall:
+           enabled: true
+
+       #开启web api调用统计
+       web-stat-filter:
+         enabled: true
+         exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+         #设置session.getAttribute("user")的key名称
+         principal-session-name: user
+         url-pattern: /*
+         #设置身份的cookie名称
+         principal-cookie-name: JSESSIONID
+       #开启stat的servlet、开启这个后才能访问页面
+       stat-view-servlet:
+         enabled: true
+         #不能开启账号密码登录、和shiro框架存在冲突、直接进入index.html页面
+#         login-username: admin
+#         login-password: 123qwe
 
   #  jpa配置
    jpa:
      # 是否允许jpa session在view依然开启,主要用于懒加载由于session关闭而在view层导致获取值异常
      open-in-view: false
-     show-sql: false
      hibernate:
        # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate
        ddl-auto: validate
      properties:
        hibernate:
+         format_sql: true
          #mysql
 #         dialect: org.hibernate.dialect.MySQL8Dialect
          #pgsql
