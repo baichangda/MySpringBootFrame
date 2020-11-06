@@ -44,7 +44,7 @@ spring:
        #开启web api调用统计
        web-stat-filter:
          enabled: true
-         exclusions: "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
+         exclusions: "*.html,*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
          #设置session.getAttribute("user")的key名称
          principal-session-name: user
          url-pattern: /*
