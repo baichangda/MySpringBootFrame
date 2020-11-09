@@ -3,6 +3,11 @@ package com.bcd.mongodb.bean;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
@@ -10,7 +15,9 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2017/5/2.
  */
-@JsonFilter("bcd")
+@Accessors(chain = true)
+@Getter
+@Setter
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
     @ApiModelProperty(value = "主键(唯一标识符,自动生成)(不需要赋值)")
     @Id

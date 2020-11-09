@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import javax.persistence.Entity;
@@ -21,7 +22,9 @@ import javax.persistence.*;
 /**
  *  角色表
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @Entity
 @Table(name = "t_sys_role")
 public class RoleBean extends BaseBean<Long>{

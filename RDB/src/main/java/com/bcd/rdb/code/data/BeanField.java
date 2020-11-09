@@ -1,7 +1,13 @@
 package com.bcd.rdb.code.data;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
+@Accessors(chain = true)
+@Getter
+@Setter
 public class BeanField {
     private String name;
     private String type;
@@ -11,27 +17,7 @@ public class BeanField {
     //type="String"时候才有效
     private Integer strLen;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
+    public BeanField setComment(String comment) {
         this.comment = comment;
         //处理字段注释前缀
         if(StringUtils.isNoneEmpty(comment)){
@@ -41,29 +27,7 @@ public class BeanField {
                 this.commentPre= comment;
             }
         }
+        return this;
     }
 
-    public boolean isNullable() {
-        return nullable;
-    }
-
-    public void setNullable(boolean nullable) {
-        this.nullable = nullable;
-    }
-
-    public Integer getStrLen() {
-        return strLen;
-    }
-
-    public void setStrLen(Integer strLen) {
-        this.strLen = strLen;
-    }
-
-    public String getCommentPre() {
-        return commentPre;
-    }
-
-    public void setCommentPre(String commentPre) {
-        this.commentPre = commentPre;
-    }
 }

@@ -2,11 +2,16 @@ package com.bcd.rdb.code;
 
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 public class TableConfig {
     //模块名(英文)
     private String moduleName;
@@ -36,7 +41,9 @@ public class TableConfig {
     }
 
 
-    @Data
+    @Accessors(chain = true)
+    @Getter
+    @Setter
     public static class Helper{
         //是否需要创建信息(默认需要)
         private boolean needCreateInfo = true;
@@ -88,69 +95,6 @@ public class TableConfig {
                 res.add(tableConfig);
             }
             return res;
-        }
-
-        public boolean isNeedCreateInfo() {
-            return needCreateInfo;
-        }
-
-        public Helper setNeedCreateInfo(boolean needCreateInfo) {
-            this.needCreateInfo = needCreateInfo;
-            return this;
-        }
-
-        public boolean isNeedCreateBeanFile() {
-            return needCreateBeanFile;
-        }
-
-        public Helper setNeedCreateBeanFile(boolean needCreateBeanFile) {
-            this.needCreateBeanFile = needCreateBeanFile;
-            return this;
-        }
-
-        public boolean isNeedCreateRepositoryFile() {
-            return needCreateRepositoryFile;
-        }
-
-        public Helper setNeedCreateRepositoryFile(boolean needCreateRepositoryFile) {
-            this.needCreateRepositoryFile = needCreateRepositoryFile;
-            return this;
-        }
-
-        public boolean isNeedCreateServiceFile() {
-            return needCreateServiceFile;
-        }
-
-        public Helper setNeedCreateServiceFile(boolean needCreateServiceFile) {
-            this.needCreateServiceFile = needCreateServiceFile;
-            return this;
-        }
-
-        public boolean isNeedCreateControllerFile() {
-            return needCreateControllerFile;
-        }
-
-        public Helper setNeedCreateControllerFile(boolean needCreateControllerFile) {
-            this.needCreateControllerFile = needCreateControllerFile;
-            return this;
-        }
-
-        public boolean isNeedValidateBeanField() {
-            return needValidateBeanField;
-        }
-
-        public Helper setNeedValidateBeanField(boolean needValidateBeanField) {
-            this.needValidateBeanField = needValidateBeanField;
-            return this;
-        }
-
-        public boolean isNeedValidateSaveParam() {
-            return needValidateSaveParam;
-        }
-
-        public Helper setNeedValidateSaveParam(boolean needValidateSaveParam) {
-            this.needValidateSaveParam = needValidateSaveParam;
-            return this;
         }
 
     }

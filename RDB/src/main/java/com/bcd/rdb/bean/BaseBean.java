@@ -3,6 +3,9 @@ package com.bcd.rdb.bean;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.MappedSuperclass;
@@ -13,8 +16,9 @@ import java.util.Date;
 /**
  * Created by Administrator on 2017/4/11.
  */
-@Data
-@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@Getter
+@Setter
 @MappedSuperclass
 public class BaseBean<K extends Serializable> extends SuperBaseBean<K> {
 

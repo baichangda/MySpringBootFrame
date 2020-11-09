@@ -4,7 +4,8 @@ import com.bcd.rdb.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -18,7 +19,9 @@ import javax.validation.constraints.Size;
 /**
  *  用户基础信息表
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @Entity
 @Table(name = "t_sys_user")
 public class UserBean extends BaseBean<Long>{
@@ -65,4 +68,5 @@ public class UserBean extends BaseBean<Long>{
     @ApiModelProperty(hidden = true)
     @Transient
     private String offsetId;
+
 }

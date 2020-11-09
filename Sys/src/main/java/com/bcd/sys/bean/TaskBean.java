@@ -13,6 +13,7 @@ import java.util.Date;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.Column;
@@ -25,7 +26,9 @@ import javax.validation.constraints.Size;
 /**
  *  系统任务处理表
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @Entity
 @Table(name = "t_sys_task")
 public class TaskBean extends SuperBaseBean<Long> implements Task {

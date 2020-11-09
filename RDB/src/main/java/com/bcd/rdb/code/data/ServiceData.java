@@ -1,5 +1,13 @@
 package com.bcd.rdb.code.data;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+@Accessors(chain = true)
+@Getter
+@Setter
 public class ServiceData {
     /**
      * 模块名
@@ -20,36 +28,4 @@ public class ServiceData {
      * 主键类型
      */
     private String pkType;
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
-
-    public String getModuleNameCN() {
-        return moduleNameCN;
-    }
-
-    public void setModuleNameCN(String moduleNameCN) {
-        this.moduleNameCN = moduleNameCN;
-    }
-
-    public String getPackagePre() {
-        return packagePre;
-    }
-
-    public void setPackagePre(String packagePre) {
-        this.packagePre = packagePre;
-    }
-
-    public String getPkType() {
-        return pkType;
-    }
-
-    public void setPkType(String pkType) {
-        this.pkType = pkType;
-    }
 }

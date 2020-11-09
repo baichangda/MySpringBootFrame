@@ -23,7 +23,6 @@ public class ConditionUtil {
         CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
         CONDITION_CONVERTER_MAP.put(NumberCondition.class,new NumberConditionConverter());
         CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
-        CONDITION_CONVERTER_MAP.put(BooleanCondition.class,new BooleanConditionConverter());
     }
 
     public static Query toQuery(Condition condition){

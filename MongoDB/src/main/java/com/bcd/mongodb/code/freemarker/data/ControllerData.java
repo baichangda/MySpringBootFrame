@@ -3,6 +3,10 @@ package com.bcd.mongodb.code.freemarker.data;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +15,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+@Accessors(chain = true)
+@Getter
+@Setter
 public class ControllerData {
     /**
      * 模块名
@@ -47,60 +54,4 @@ public class ControllerData {
      */
     private String pkType;
 
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
-
-    public String getPackagePre() {
-        return packagePre;
-    }
-
-    public void setPackagePre(String packagePre) {
-        this.packagePre = packagePre;
-    }
-
-    public String getModuleNameCN() {
-        return moduleNameCN;
-    }
-
-    public void setModuleNameCN(String moduleNameCN) {
-        this.moduleNameCN = moduleNameCN;
-    }
-
-    public String getRequestMappingPre() {
-        return requestMappingPre;
-    }
-
-    public void setRequestMappingPre(String requestMappingPre) {
-        this.requestMappingPre = requestMappingPre;
-    }
-
-    public List<BeanField> getFieldList() {
-        return fieldList;
-    }
-
-    public void setFieldList(List<BeanField> fieldList) {
-        this.fieldList = fieldList;
-    }
-
-    public boolean isValidateSaveParam() {
-        return validateSaveParam;
-    }
-
-    public void setValidateSaveParam(boolean validateSaveParam) {
-        this.validateSaveParam = validateSaveParam;
-    }
-
-    public String getPkType() {
-        return pkType;
-    }
-
-    public void setPkType(String pkType) {
-        this.pkType = pkType;
-    }
 }

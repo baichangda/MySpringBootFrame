@@ -3,6 +3,9 @@ package com.bcd.sys.bean;
 import com.bcd.rdb.bean.BaseBean;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +23,9 @@ import javax.persistence.*;
 /**
  *  菜单表
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @Entity
 @Table(name = "t_sys_menu")
 public class MenuBean extends BaseBean<Long> {

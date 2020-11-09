@@ -13,7 +13,9 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 
 
@@ -22,7 +24,9 @@ import javax.persistence.*;
 /**
  *  ${moduleNameCN}
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @Entity
 @Table(name = "${tableName}")
 public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {

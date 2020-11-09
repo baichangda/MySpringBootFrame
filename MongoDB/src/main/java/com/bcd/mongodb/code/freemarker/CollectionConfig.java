@@ -3,9 +3,16 @@ package com.bcd.mongodb.code.freemarker;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.mongodb.code.freemarker.data.CodeConst;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.nio.file.Paths;
 
+@Accessors(chain = true)
+@Getter
+@Setter
 public class CollectionConfig {
     //模版文件夹路径
     public String templateDirPath;
@@ -76,65 +83,6 @@ public class CollectionConfig {
     public CollectionConfig setClazz(Class clazz) {
         this.clazz = clazz;
         parseTargetDirPath();
-        return this;
-    }
-
-
-    public boolean isNeedValidateSaveParam() {
-        return needValidateSaveParam;
-    }
-
-    public CollectionConfig setNeedValidateSaveParam(boolean needValidateSaveParam) {
-        this.needValidateSaveParam = needValidateSaveParam;
-        return this;
-    }
-
-    public String getRequestMappingPre() {
-        return requestMappingPre;
-    }
-
-    public CollectionConfig setRequestMappingPre(String requestMappingPre) {
-        this.requestMappingPre = requestMappingPre;
-        return this;
-    }
-
-    public boolean isNeedCreateRepositoryFile() {
-        return needCreateRepositoryFile;
-    }
-
-    public CollectionConfig setNeedCreateRepositoryFile(boolean needCreateRepositoryFile) {
-        this.needCreateRepositoryFile = needCreateRepositoryFile;
-        return this;
-    }
-
-    public boolean isNeedCreateServiceFile() {
-        return needCreateServiceFile;
-    }
-
-    public CollectionConfig setNeedCreateServiceFile(boolean needCreateServiceFile) {
-        this.needCreateServiceFile = needCreateServiceFile;
-        return this;
-    }
-
-    public boolean isNeedCreateControllerFile() {
-        return needCreateControllerFile;
-    }
-
-    public CollectionConfig setNeedCreateControllerFile(boolean needCreateControllerFile) {
-        this.needCreateControllerFile = needCreateControllerFile;
-        return this;
-    }
-
-    public String getTargetDirPath() {
-        return targetDirPath;
-    }
-
-    public String getTemplateDirPath() {
-        return templateDirPath;
-    }
-
-    public CollectionConfig setTemplateDirPath(String templateDirPath) {
-        this.templateDirPath = templateDirPath;
         return this;
     }
 }

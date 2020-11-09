@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +101,14 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
     @Override
     public Collection<Session> getActiveSessions() {
         logger.info("getActiveSessions from redis");
-        return new ArrayList<>(hashOperations.values(SHIRO_SESSION_HASH_KEY));
+        try {
+            return new ArrayList<>(hashOperations.values(SHIRO_SESSION_HASH_KEY));
+        }catch (SerializationException ex){
+            //用于处理修改了session data的数据结构但是redis中依然存在数据导致反序列化失败
+            logger.warn("redis session data struct changed,delete all");
+            hashOperations.getOperations().delete(SHIRO_SESSION_HASH_KEY);
+            return Collections.emptyList();
+        }
     }
 
 

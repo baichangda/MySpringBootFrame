@@ -1,6 +1,10 @@
 package com.bcd.rdb.bean.info;
 
 import com.bcd.rdb.anno.Unique;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import javax.persistence.*;
@@ -8,6 +12,9 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+@Accessors(chain = true)
+@Getter
+@Setter
 @SuppressWarnings("unchecked")
 public class BeanInfo{
     /**
@@ -93,76 +100,4 @@ public class BeanInfo{
         pkField.setAccessible(true);
     }
 
-
-    public Class getClazz() {
-        return clazz;
-    }
-
-    public void setClazz(Class clazz) {
-        this.clazz = clazz;
-    }
-
-    public Boolean getCheckUnique() {
-        return isCheckUnique;
-    }
-
-    public void setCheckUnique(Boolean checkUnique) {
-        isCheckUnique = checkUnique;
-    }
-
-    public List<Field> getUniqueFieldList() {
-        return uniqueFieldList;
-    }
-
-    public void setUniqueFieldList(List<Field> uniqueFieldList) {
-        this.uniqueFieldList = uniqueFieldList;
-    }
-
-    public List<Field> getManyToManyFieldList() {
-        return manyToManyFieldList;
-    }
-
-    public void setManyToManyFieldList(List<Field> manyToManyFieldList) {
-        this.manyToManyFieldList = manyToManyFieldList;
-    }
-
-    public List<Field> getOneToManyFieldList() {
-        return oneToManyFieldList;
-    }
-
-    public void setOneToManyFieldList(List<Field> oneToManyFieldList) {
-        this.oneToManyFieldList = oneToManyFieldList;
-    }
-
-    public List<Field> getManyToOneFieldList() {
-        return manyToOneFieldList;
-    }
-
-    public void setManyToOneFieldList(List<Field> manyToOneFieldList) {
-        this.manyToOneFieldList = manyToOneFieldList;
-    }
-
-    public List<Field> getOneToOneFieldList() {
-        return oneToOneFieldList;
-    }
-
-    public void setOneToOneFieldList(List<Field> oneToOneFieldList) {
-        this.oneToOneFieldList = oneToOneFieldList;
-    }
-
-    public Field getPkField() {
-        return pkField;
-    }
-
-    public void setPkField(Field pkField) {
-        this.pkField = pkField;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 }

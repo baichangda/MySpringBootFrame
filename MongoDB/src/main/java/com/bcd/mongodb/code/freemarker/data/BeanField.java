@@ -1,34 +1,21 @@
 package com.bcd.mongodb.code.freemarker.data;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
+@Accessors(chain = true)
+@Getter
+@Setter
 public class BeanField {
     private String name;
     private String type;
     private String comment;
     private String commentPre;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
+    public BeanField setComment(String comment) {
         this.comment = comment;
         //处理字段注释前缀
         if(StringUtils.isNoneEmpty(comment)){
@@ -38,13 +25,6 @@ public class BeanField {
                 this.commentPre= comment;
             }
         }
-    }
-
-    public String getCommentPre() {
-        return commentPre;
-    }
-
-    public void setCommentPre(String commentPre) {
-        this.commentPre = commentPre;
+        return this;
     }
 }

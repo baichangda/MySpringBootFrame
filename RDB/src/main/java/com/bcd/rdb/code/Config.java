@@ -1,12 +1,17 @@
 package com.bcd.rdb.code;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 public class Config {
     //生成文件的目标文件夹路径
     private String targetDirPath;

@@ -56,6 +56,8 @@ spring:
          #不能开启账号密码登录、和shiro框架存在冲突、直接进入index.html页面
 #         login-username: admin
 #         login-password: 123qwe
+       #监控所有模块service文件夹下的类
+       aop-patterns: com.bcd.*.service.*
 
   #  jpa配置
    jpa:

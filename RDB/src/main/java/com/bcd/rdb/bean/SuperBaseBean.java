@@ -4,6 +4,10 @@ package com.bcd.rdb.bean;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -12,7 +16,9 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2017/5/2.
  */
-@Data
+@Accessors(chain = true)
+@Getter
+@Setter
 @MappedSuperclass
 @SuppressWarnings("unchecked")
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
