@@ -26,6 +26,12 @@ public class DBInfoUtil {
     /**
      * 获取spring配置文件中的数据库信息,并将获取到的url转换成information_schema
      *
+     * 获取配置文件中
+     * spring.datasource.url
+     * spring.datasource.username
+     * spring.datasource.password
+     * 所以以上必须有数据
+     *
      * @return
      */
     public static Map<String, Object> getDBProps() {
