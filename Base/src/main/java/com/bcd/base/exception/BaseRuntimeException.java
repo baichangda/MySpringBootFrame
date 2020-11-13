@@ -35,6 +35,7 @@ public class BaseRuntimeException extends RuntimeException {
 
     /**
      * 将异常信息转换为格式化
+     * val表达式从{0}开始
      * @param message
      * @param params
      * @return

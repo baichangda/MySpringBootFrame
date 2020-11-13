@@ -116,7 +116,7 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
                 }else{
                     //如果有其他服务器抢先发送了验证码,则再次获取时间
                     expireTimeInSeconds=redisTemplate.getExpire(key);
-                    throw BaseRuntimeException.getException("等待"+expireTimeInSeconds+"秒后重试");
+                    throw BaseRuntimeException.getException("等待{0}秒后重试",expireTimeInSeconds);
                 }
             }
         }
