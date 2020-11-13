@@ -1,11 +1,9 @@
 package com.bcd.rdb.dbinfo.controller;
 
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
 import io.swagger.annotations.*;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,7 @@ public class TablesController extends BaseController {
             HttpServletResponse response) {
         try {
             String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
-            configOnResponseFile(fileName,response);
+            doBeforeResponseFile(fileName,response);
             tablesService.exportDBDesignerExcel(dbName,response.getOutputStream());
         } catch (IOException e) {
             logger.error("export error",e);

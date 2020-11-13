@@ -7,7 +7,6 @@ import com.bcd.base.util.I18nUtil;
 import com.bcd.service.ApiService;
 import com.bcd.sys.keys.KeysConst;
 import io.swagger.annotations.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 
@@ -62,7 +60,7 @@ public class AnonymousController extends BaseController{
     public void exportApi(HttpServletResponse response){
         try {
             String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
-            configOnResponseFile(fileName, response);
+            doBeforeResponseFile(fileName, response);
             apiService.exportApi(response.getOutputStream());
         } catch (IOException e) {
             logger.error("export error",e);

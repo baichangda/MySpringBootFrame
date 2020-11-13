@@ -29,12 +29,12 @@ public class BaseController {
     public final static String DEFAULT_RESPONSE_ENCODING = "UTF-8";
 
     /**
-     * 响应文件流时候设置response
+     * 响应文件流之前设置response
      * @param fileName
      * @param response
      * @throws UnsupportedEncodingException
      */
-    protected void configOnResponseFile(String fileName, HttpServletResponse response) throws UnsupportedEncodingException {
+    protected void doBeforeResponseFile(String fileName, HttpServletResponse response) throws UnsupportedEncodingException {
         response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
         response.setContentType("application/octet-stream");
         response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
