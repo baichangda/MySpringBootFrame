@@ -3,12 +3,8 @@ package com.bcd.rdb.jdbc.sql;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +44,7 @@ public class SqlUtil {
         //phone
         paramList1.add(null);
         paramList1.add(null);
-        SqlListResult sqlListResult = replaceNull(sql1, paramList1.toArray());
+        SqlListResult sqlListResult = replace_nullParam(sql1, paramList1.toArray());
         System.out.println(sqlListResult.getSql());
         sqlListResult.getParamList().forEach(e -> System.out.print(e + "    "));
 
@@ -68,7 +64,7 @@ public class SqlUtil {
         paramMap2.put("status", null);
         paramMap2.put("type", Arrays.asList(1, null, 3));
         paramMap2.put("phone", new Object[]{null, null});
-        SqlMapResult sqlMapResult = replaceNull(sql2, paramMap2);
+        SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2,true,1,100);
         System.out.println(sqlMapResult.getSql());
         sqlMapResult.getParamMap().forEach((k, v) -> {
             if (v.getClass().isArray()) {
@@ -79,18 +75,65 @@ public class SqlUtil {
             }
         });
 
-        long t1=System.currentTimeMillis();
-        for(int i=1;i<=100000;i++){
-            replaceNull(sql1, paramList1.toArray());
-        }
-        long t2=System.currentTimeMillis();
-        for(int i=1;i<=100000;i++){
-            replaceNull(sql2, paramMap2);
-        }
-        long t3=System.currentTimeMillis();
-        System.out.printf("\n%dms,%dms",t2-t1,t3-t2);
+//        long t1=System.currentTimeMillis();
+//        for(int i=1;i<=100000;i++){
+//            replace_nullParam(sql1, paramList1.toArray());
+//        }
+//        long t2=System.currentTimeMillis();
+//        for(int i=1;i<=100000;i++){
+//            replace_nullParam(sql2, paramMap2);
+//        }
+//        long t3=System.currentTimeMillis();
+//        System.out.printf("\n%dms,%dms",t2-t1,t3-t2);
     }
 
+    public static SqlListResult replace_nullParam(String sql, Object... params){
+        return replace_nullParam_count_limit(sql, false,null,null,params);
+    }
+
+    public static SqlListResult replace_nullParam_count(String sql, Object... params){
+        return replace_nullParam_count_limit(sql, true,null,null,params);
+    }
+
+    public static SqlListResult replace_nullParam_limit(String sql, int pageNum, int pageSize, Object... params){
+        return replace_nullParam_count_limit(sql, false,pageNum,pageSize,params);
+    }
+
+    public static SqlMapResult replace_nullParam(String sql, Map<String, Object> paramMap){
+        return replace_nullParam_count_limit(sql, paramMap,true,null,null);
+    }
+
+    public static SqlMapResult replace_nullParam_count(String sql, Map<String, Object> paramMap){
+        return replace_nullParam_count_limit(sql, paramMap,true,null,null);
+    }
+
+    public static SqlMapResult replace_nullParam_limit(String sql, Map<String, Object> paramMap,int pageNum, int pageSize){
+        return replace_nullParam_count_limit(sql, paramMap,false,pageNum,pageSize);
+    }
+
+    public static String replace_limit(String sql,int pageNum, int pageSize){
+        Objects.requireNonNull(sql);
+        try {
+            Statement statement = CCJSqlParserUtil.parse(sql);
+            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum,pageSize);
+            visitor.parse();
+            return statement.toString();
+        } catch (JSQLParserException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public static String replace_count(String sql){
+        Objects.requireNonNull(sql);
+        try {
+            Statement statement = CCJSqlParserUtil.parse(sql);
+            CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
+            visitor.parse();
+            return statement.toString();
+        } catch (JSQLParserException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
 
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
@@ -100,51 +143,76 @@ public class SqlUtil {
      *
      * @param sql
      * @param paramMap 不会改变
+     * @param count 是否开启count(*)替换
+     * @param pageNum null代表不开启limit offset添加
+     * @param pageSize null代表不开启limit offset添加
      * @return 根据paramMap生成的新sql
      */
-    public static SqlMapResult replaceNull(String sql, Map<String, Object> paramMap) {
-        if (sql == null) {
-            throw BaseRuntimeException.getException("Param[sql] Can Not Be Null");
-        }
-        if (paramMap == null) {
-            throw BaseRuntimeException.getException("Param[paramMap] Can Not Be Null");
-        }
-        if (paramMap.size() == 0) {
-            return new SqlMapResult(sql, new LinkedHashMap<>());
-        }
-        //1、定义新的paramMap
-        Map<String, Object> newParamMap = new LinkedHashMap<>();
-        //2、循环参数map
-        //去除Null元素
-        //去除val为List或Array类型且为空的元素,List或者Array中的Null元素也会被移除
-        paramMap.forEach((k, v) -> {
-            if (v != null) {
-                if (v instanceof List) {
-                    List<Object> validList = ((List<Object>) v).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                    if (!validList.isEmpty()) {
-                        newParamMap.put(k, validList);
-                    }
-                } else if (v.getClass().isArray()) {
-                    List<Object> validList = new ArrayList<>();
-                    int len = Array.getLength(v);
-                    for (int i = 0; i <= len - 1; i++) {
-                        Object val = Array.get(v, i);
-                        if (val != null) {
-                            validList.add(val);
+    public static SqlMapResult replace_nullParam_count_limit(String sql, Map<String, Object> paramMap, Boolean count, Integer pageNum, Integer pageSize) {
+        Objects.requireNonNull(sql);
+        Objects.requireNonNull(paramMap);
+        try {
+            Statement statement=null;
+            //如果count不为null、则替换为select count(*)
+            if(count!=null&&count){
+                statement = CCJSqlParserUtil.parse(sql);
+                CountSqlReplaceVisitor visitor=new CountSqlReplaceVisitor(statement);
+                visitor.parse();
+            }
+            //如果pageNum不为null且pageSize不为null、则加上limit offset
+            if(pageNum!=null&&pageSize!=null){
+                if(statement==null){
+                    statement = CCJSqlParserUtil.parse(sql);
+                }
+                LimitSqlReplaceVisitor visitor=new LimitSqlReplaceVisitor(statement,pageNum,pageSize);
+                visitor.parse();
+            }
+
+            Map<String, Object> newParamMap= new LinkedHashMap<>();
+            if (!paramMap.isEmpty()) {
+                //循环参数map
+                //检查是否含有Null元素已经其中List、Array中是否有null
+                boolean anyNull= paramMap.values().stream().anyMatch(e->{
+                    if(e==null){
+                        return true;
+                    }else{
+                        if (e instanceof List) {
+                            return ((List<Object>) e).stream().anyMatch(Objects::isNull);
+                        } else if (e.getClass().isArray()) {
+                            int len = Array.getLength(e);
+                            for (int i = 0; i <= len - 1; i++) {
+                                Object val = Array.get(e, i);
+                                if (val == null) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }else{
+                            return false;
                         }
                     }
-                    if (!validList.isEmpty()) {
-                        newParamMap.put(k, validList.toArray());
+                });
+                //如果全部不为Null,直接返回
+                if(anyNull){
+                    if(statement==null){
+                        statement = CCJSqlParserUtil.parse(sql);
                     }
-                } else {
-                    newParamMap.put(k, v);
+                    NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramMap);
+                    visitor.parse();
+                    newParamMap=visitor.getNewParamMap();
+                }else{
+                    newParamMap.putAll(paramMap);
                 }
             }
-        });
-        //3、用格式化后的参数生成sql
-        NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(sql, newParamMap);
-        String newSql = visitor.parseSql();
-        return new SqlMapResult(newSql, newParamMap);
+            //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
+            if(statement==null){
+                return new SqlMapResult(sql,newParamMap);
+            }else{
+                return new SqlMapResult(statement.toString(),newParamMap);
+            }
+        } catch (JSQLParserException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     /**
@@ -154,33 +222,64 @@ public class SqlUtil {
      * 采用main方法中例子测试10w次，耗时7080ms
      *
      * @param sql
+     * @param count 是否开启count(*)替换
+     * @param pageNum null代表不开启limit offset添加
+     * @param pageSize null代表不开启limit offset添加
      * @param params 不会改变
      * @return
      * @see SqlListResult#getSql()  格式化后的sql
      * @see SqlListResult#getParamList()  去除Null后的paramList,总是生成新的ArrayList
      */
-    public static SqlListResult replaceNull(String sql, Object... params) {
-        List<Object> paramList = new ArrayList(Arrays.asList(params));
-        if (sql == null) {
-            throw BaseRuntimeException.getException("Param[sql] Can Not Be Null");
+    public static SqlListResult replace_nullParam_count_limit(String sql, Boolean count, Integer pageNum, Integer pageSize, Object... params) {
+        Objects.requireNonNull(sql);
+        Objects.requireNonNull(params);
+
+        try {
+            Statement statement=null;
+            //如果count不为null、则替换为select count(*)
+            if(count!=null&&count){
+                statement = CCJSqlParserUtil.parse(sql);
+                CountSqlReplaceVisitor visitor=new CountSqlReplaceVisitor(statement);
+                visitor.parse();
+            }
+            //如果pageNum不为null且pageSize不为null、则加上limit offset
+            if(pageNum!=null&&pageSize!=null){
+                if(statement==null){
+                    statement = CCJSqlParserUtil.parse(sql);
+                }
+                LimitSqlReplaceVisitor visitor=new LimitSqlReplaceVisitor(statement,pageNum,pageSize);
+                visitor.parse();
+            }
+
+            //最后替换null条件
+            List<Object> newParamList=new ArrayList<>();
+            List<Object> paramList=new ArrayList<>(Arrays.asList(params));
+            if(!paramList.isEmpty()){
+                //判断参数集合是否有Null元素
+                boolean anyNull = paramList.stream().anyMatch(Objects::isNull);
+                //如果有Null,则处理替换
+                if (anyNull) {
+                    if(statement==null){
+                        statement = CCJSqlParserUtil.parse(sql);
+                    }
+                    NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramList);
+                    visitor.parse();
+                    //设置新的参数集合
+                    newParamList=visitor.getNewParamList();
+                }else{
+                    newParamList=new ArrayList<>(paramList);
+                }
+            }
+
+            //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
+            if(statement==null){
+                return new SqlListResult(sql,newParamList);
+            }else{
+                return new SqlListResult(statement.toString(),newParamList);
+            }
+        } catch (JSQLParserException e) {
+            throw BaseRuntimeException.getException(e);
         }
-        if (paramList == null) {
-            throw BaseRuntimeException.getException("Param[paramList] Can Not Be Null");
-        }
-        if (paramList.isEmpty()) {
-            return new SqlListResult(sql, new ArrayList<>());
-        }
-        //1、判断参数集合是否有Null元素
-        boolean hasNull = paramList.stream().anyMatch(Objects::isNull);
-        //1.1、如果全部不为Null,直接返回
-        if (!hasNull) {
-            return new SqlListResult(sql, new ArrayList<>(paramList));
-        }
-        //2、用参数集合生成新sql
-        NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(sql, paramList);
-        String newSql = visitor.parseSql();
-        //3、返回新sql和移除掉Null参数的新集合
-        return new SqlListResult(newSql, paramList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     /**
@@ -469,4 +568,5 @@ public class SqlUtil {
         String sql=generateUpdateSql(filterColumnValueMap.keySet(),null,table);
         return new UpdateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
     }
+
 }

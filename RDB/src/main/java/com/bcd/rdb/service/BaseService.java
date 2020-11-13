@@ -8,6 +8,7 @@ import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.bcd.rdb.jdbc.sql.BatchCreateSqlResult;
 import com.bcd.rdb.jdbc.sql.BatchUpdateSqlResult;
+import com.bcd.rdb.jdbc.sql.SqlListResult;
 import com.bcd.rdb.jdbc.sql.SqlUtil;
 import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.repository.BaseRepository;
@@ -311,125 +312,41 @@ public class BaseService<T, K extends Serializable> {
     /**
      * 分页查询
      *
-     * @param countSql 统计数量sql
      * @param sql      查询结果集sql(不带limit)
      * @param pageable 分页对象参数
-     * @param params   参数(用于countSql和sql)
+     * @param params   参数
      * @return
      */
-    public Page<Map<String, Object>> queryByNativeSql(String countSql, String sql, Pageable pageable, Object... params) {
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class, params);
-        if (count == null || count == 0) {
-            return new PageImpl<>(new ArrayList<>(), pageable, 0);
-        } else {
-            String limitSql = sql + "\n limit ?,?";
-            Object[] limitParams;
-            if (params == null || params.length == 0) {
-                limitParams = new Object[2];
-            } else {
-                limitParams = Arrays.copyOf(params, params.length + 2);
-            }
-            limitParams[limitParams.length - 2] = pageable.getPageNumber() * pageable.getPageSize();
-            limitParams[limitParams.length - 1] = pageable.getPageSize();
-            List<Map<String, Object>> dataList = jdbcTemplate.query(limitSql, MyColumnMapRowMapper.ROW_MAPPER, limitParams);
-            return new PageImpl<>(dataList, pageable, count);
-        }
-    }
-
-    /**
-     * 分页查询并转换为实体类
-     *
-     * @param sql
-     * @param pageable
-     * @param clazz
-     * @param params
-     * @return
-     */
-    public Page<T> queryByNativeSql(String countSql, String sql, Pageable pageable, Class<T> clazz, Object... params) {
-        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class, params);
+    public Page<Map<String, Object>> pageBySql(String sql, Pageable pageable, Object... params) {
+        SqlListResult countSql= SqlUtil.replace_nullParam_count(sql,params);
+        Integer count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList());
         if (count == 0) {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         } else {
-            String limitSql = sql + "\n limit ?,?";
-            Object[] limitParams;
-            if (params == null || params.length == 0) {
-                limitParams = new Object[2];
-            } else {
-                limitParams = Arrays.copyOf(params, params.length + 2);
-            }
-            limitParams[limitParams.length - 2] = pageable.getPageNumber() * pageable.getPageSize();
-            limitParams[limitParams.length - 1] = pageable.getPageSize();
-            List<T> dataList = jdbcTemplate.query(limitSql, new BeanPropertyRowMapper<>(clazz), limitParams);
+            SqlListResult dataSql= SqlUtil.replace_nullParam_limit(sql,pageable.getPageNumber(),pageable.getPageSize(),params);
+            List<Map<String, Object>> dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER , dataSql,dataSql.getParamList().toArray(new Object[0]));
             return new PageImpl<>(dataList, pageable, count);
         }
     }
 
     /**
-     * 采用jdbc查询方式,将condition转换为where条件
-     * condition中的字段名称将会由驼峰格式转换为下划线拼接格式
+     * 分页查询
      *
-     * @param sqlPre    sql语句前缀,where之前
-     *                  example
-     *                  select * from t
-     *                  select a.name,b.* from a inner join b on a.id=b.relation_id
-     * @param sqlSuffix sql语句结尾,where之后
-     *                  example:
-     *                  limit 1,10
-     *                  order by id desc
-     * @param condition 条件
-     * @param clazz     返回结果集
-     *                  三种情况
-     *                  1、java 8大基础类型和包装类型,String
-     *                  2、自定义对象类型
-     * @param <R>       结果集类型
+     * @param sql      查询结果集sql(不带limit)
+     * @param pageable 分页对象参数
+     * @param params   参数
      * @return
      */
-    public <R> List<R> queryByCondition(String sqlPre, Condition condition, String sqlSuffix, Class<R> clazz) {
-        Map<String, Object> paramMap = new HashMap<>();
-        String where = ConditionUtil.convertCondition(condition, paramMap);
-        StringBuilder sql = new StringBuilder(sqlPre);
-        if (where != null) {
-            sql.append(" where");
-            sql.append("\n");
-            sql.append(where);
+    public Page<T> pageBySql(String sql, Pageable pageable, Class<T> clazz, Object... params) {
+        SqlListResult countSql= SqlUtil.replace_nullParam_count(sql,params);
+        Integer count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList());
+        if (count == 0) {
+            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+        } else {
+            SqlListResult dataSql= SqlUtil.replace_nullParam_limit(sql,pageable.getPageNumber(),pageable.getPageSize(),params);
+            List<T> dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz), dataSql,dataSql.getParamList().toArray(new Object[0]));
+            return new PageImpl<>(dataList, pageable, count);
         }
-        if (sqlSuffix != null) {
-            sql.append("\n");
-            sql.append(sqlSuffix);
-        }
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        if (ClassUtils.isPrimitiveOrWrapper(clazz) || clazz == String.class) {
-            return namedParameterJdbcTemplate.queryForList(sql.toString(), paramMap, clazz);
-        }else{
-            return namedParameterJdbcTemplate.query(sql.toString(), paramMap, new BeanPropertyRowMapper<>(clazz));
-        }
-    }
-
-    /**
-     * 逻辑和参数定义参考
-     * {@link BaseService#queryByCondition(String, Condition, String, Class)}
-     *
-     * 返回的结果类型为map
-     * @param sqlPre
-     * @param condition
-     * @param sqlSuffix
-     * @return
-     */
-    public List<Map<String,Object>> queryByCondition(String sqlPre, Condition condition, String sqlSuffix){
-        Map<String, Object> paramMap = new HashMap<>();
-        String where = ConditionUtil.convertCondition(condition, paramMap);
-        StringBuilder sql = new StringBuilder(sqlPre);
-        if (where != null) {
-            sql.append(" where");
-            sql.append("\n");
-            sql.append(where);
-        }
-        if (sqlSuffix != null) {
-            sql.append("\n");
-            sql.append(sqlSuffix);
-        }
-        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        return namedParameterJdbcTemplate.query(sql.toString(),paramMap, MyColumnMapRowMapper.ROW_MAPPER);
     }
 
     /**

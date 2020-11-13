@@ -25,17 +25,6 @@ public class ConditionUtil {
         JPA_CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
     }
 
-    private final static Map<Class,Converter> JDBC_CONDITION_CONVERTER_MAP=new HashMap<>();
-    static{
-        JDBC_CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new com.bcd.rdb.condition.converter.jdbc.ConditionImplConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(DateCondition.class,new com.bcd.rdb.condition.converter.jdbc.DateConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(NullCondition.class,new com.bcd.rdb.condition.converter.jdbc.NullConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new com.bcd.rdb.condition.converter.jdbc.NumberConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(StringCondition.class,new com.bcd.rdb.condition.converter.jdbc.StringConditionConverter());
-    }
-
-
-
     public static <T>Path parseRootPath(Root<T> root, String attrName){
         Path path=null;
         if(attrName.indexOf('.')!=-1){
@@ -74,28 +63,5 @@ public class ConditionUtil {
         }else{
             return (Predicate)converter.convert(condition,root,query,cb);
         }
-    }
-
-    /**
-     * 转换condition为 jdbc where条件
-     * @param condition
-     * @param paramMap
-     * @param deep 层深(用于格式化where sql),最外层调用传1
-     * @return
-     */
-    public static String convertCondition(Condition condition,Map<String,Object> paramMap,Map<String,Integer> paramToCount,int deep){
-        if(condition==null){
-            return null;
-        }
-        Converter converter=JDBC_CONDITION_CONVERTER_MAP.get(condition.getClass());
-        if(converter==null){
-            throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition["+condition.getClass()+"] Have Not Converter!");
-        }else{
-            return (String)converter.convert(condition,paramMap,paramToCount,deep);
-        }
-    }
-
-    public static String convertCondition(Condition condition,Map<String,Object> paramMap){
-        return convertCondition(condition,paramMap,new HashMap<>(),1);
     }
 }
