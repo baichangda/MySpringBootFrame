@@ -228,9 +228,12 @@ public class RpnUtil {
      */
     public static String[] parseArithmeticToRPN(String str){
         List<String> output=new ArrayList<>();
-        int stackIndex=-1;
-        char[] stack=new char[str.length()];
         char[] arr= str.toCharArray();
+        //记录符号位置
+        int stackIndex=-1;
+        //存储符号
+        char[] stack=new char[str.length()];
+        //存储非符号
         StringBuilder temp=new StringBuilder();
         for(int i=0;i<=arr.length-1;i++){
             if(arr[i]=='+'||arr[i]=='-'||arr[i]=='*'||arr[i]=='/'){
@@ -300,5 +303,9 @@ public class RpnUtil {
                 throw BaseRuntimeException.getException("symbol["+c+"] not support");
             }
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(parseArithmeticToRPN("a+(b+c*d-a)*(c-d)")));
     }
 }
