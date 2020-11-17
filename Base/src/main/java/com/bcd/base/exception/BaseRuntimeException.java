@@ -41,8 +41,12 @@ public class BaseRuntimeException extends RuntimeException {
      * @return
      */
     public static BaseRuntimeException getException(String message, Object ... params){
-        Object[] newParams=Arrays.stream(params).map(e->e==null?"":e.toString()).toArray();
-        return new BaseRuntimeException(MessageFormat.format(message,newParams));
+        return new BaseRuntimeException(MessageFormat.format(
+                //转义特殊字符'为''
+                message.replaceAll("'","''")
+                //去除null
+                ,Arrays.stream(params).map(e->e==null?"":e.toString()).toArray())
+        );
     }
 
     public static BaseRuntimeException getException(Throwable e) {

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.temporal.ChronoUnit;
@@ -37,7 +38,7 @@ public class BaseController {
     protected void doBeforeResponseFile(String fileName, HttpServletResponse response) throws UnsupportedEncodingException {
         response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
         response.setContentType("application/octet-stream");
-        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), "ISO-8859-1"));
+        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), StandardCharsets.ISO_8859_1));
     }
 
 

@@ -12,8 +12,17 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.function.Consumer;
 
+
+/**
+ * 如果存在发送附件乱码是因为spring会自动截取过长的附件名称、需要设置如下
+ * System.setProperty("mail.mime.splitlongparameters","false");
+ */
 @Component
 public class MailUtil {
+
+    static {
+        System.setProperty("mail.mime.splitlongparameters","false");
+    }
 
     static JavaMailSender mailSender;
 
