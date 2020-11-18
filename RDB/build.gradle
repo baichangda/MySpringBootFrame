@@ -26,6 +26,6 @@ buildscript {
         jsqlparserVersion='+'
         freemarkerVersion = '+'
         druidVersion= '+'
-    }S
+    }
 }
 

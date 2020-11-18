@@ -1,18 +1,9 @@
 package com.bcd.rdb.code.data;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 @Accessors(chain = true)

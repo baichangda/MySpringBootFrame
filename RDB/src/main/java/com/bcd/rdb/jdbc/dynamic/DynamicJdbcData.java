@@ -1,4 +1,4 @@
-package com.icommand.rdb.jdbc.dynamic;
+package com.bcd.rdb.jdbc.dynamic;
 
 import lombok.Getter;
 import org.springframework.jdbc.core.JdbcTemplate;

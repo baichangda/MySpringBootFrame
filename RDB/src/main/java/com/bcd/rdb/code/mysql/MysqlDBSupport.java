@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.code.DBSupport;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.code.data.BeanField;
-import com.bcd.rdb.code.data.CodeConst;
+import com.bcd.rdb.code.CodeConst;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import org.slf4j.Logger;
@@ -44,23 +44,6 @@ public class MysqlDBSupport implements DBSupport {
                 logger.info("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!",config.getTableName(),mysqlDbColumn.getName(),mysqlDbColumn.getType());
             }
             return beanField;
-        }).filter(e->{
-            if(e==null){
-                return false;
-            }
-            if("id".equals(e.getName())){
-                return false;
-            }else {
-                if (config.isNeedCreateInfo()) {
-                    if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.getName())) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
         }).collect(Collectors.toList());
     }
 

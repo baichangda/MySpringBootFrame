@@ -2,7 +2,6 @@ package com.bcd.rdb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
-import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.code.data.*;
 import com.bcd.rdb.code.mysql.MysqlDBSupport;
 import com.bcd.rdb.code.pgsql.PgsqlDBSupport;
@@ -12,7 +11,6 @@ import freemarker.template.TemplateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -120,119 +118,66 @@ public class CodeGenerator {
 
     /**
      * 根据配置和数据库信息初始化bean数据
-     * @param tableConfig
-     * @param connection
+     * @param context
      * @return
      */
-    public BeanData initBeanData(TableConfig tableConfig,Connection connection){
+    public BeanData initBeanData(CodeGeneratorContext context){
         BeanData data=new BeanData();
-        data.setModuleNameCN(tableConfig.getModuleNameCN());
-        data.setModuleName(tableConfig.getModuleName());
-        data.setPackagePre(initPackagePre(tableConfig));
-        data.setTableName(tableConfig.getTableName());
-        data.setPkType(initPkType(connection,tableConfig));
-        data.setSuperBeanType(tableConfig.isNeedCreateInfo()?1:2);
-        data.setFieldList(initBeanField(tableConfig,connection));
+        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
+        data.setModuleName(context.getTableConfig().getModuleName());
+        data.setPackagePre(context.getPackagePre());
+        data.setTableName(context.getTableConfig().getTableName());
+        data.setPkType(context.getPkType());
+        data.setSuperBeanType(context.getTableConfig().isNeedCreateInfo()?1:2);
+        data.setFieldList(context.getDeclaredBeanFields());
         return data;
     }
 
     /**
      * 根据配置和数据库信息初始化repository数据
-     * @param tableConfig
-     * @param connection
+     * @param context
      * @return
      */
-    public RepositoryData initRepositoryData(TableConfig tableConfig,Connection connection){
+    public RepositoryData initRepositoryData(CodeGeneratorContext context){
         RepositoryData data=new RepositoryData();
-        data.setModuleNameCN(tableConfig.getModuleNameCN());
-        data.setModuleName(tableConfig.getModuleName());
-        data.setPackagePre(initPackagePre(tableConfig));
-        data.setPkType(initPkType(connection,tableConfig));
+        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
+        data.setModuleName(context.getTableConfig().getModuleName());
+        data.setPackagePre(context.getPackagePre());
+        data.setPkType(context.getPkType());
         return data;
     }
 
     /**
      * 根据配置和数据库信息初始化service数据
-     * @param tableConfig
-     * @param connection
+     * @param context
      * @return
      */
-    public ServiceData initServiceData(TableConfig tableConfig,Connection connection){
+    public ServiceData initServiceData(CodeGeneratorContext context){
         ServiceData data=new ServiceData();
-        data.setModuleNameCN(tableConfig.getModuleNameCN());
-        data.setModuleName(tableConfig.getModuleName());
-        data.setPackagePre(initPackagePre(tableConfig));
-        data.setPkType(initPkType(connection,tableConfig));
+        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
+        data.setModuleName(context.getTableConfig().getModuleName());
+        data.setPackagePre(context.getPackagePre());
+        data.setPkType(context.getPkType());
         return data;
     }
 
     /**
      * 根据配置和数据库信息初始化controller数据
-     * @param tableConfig
-     * @param connection
+     * @param context
      * @return
      */
-    public ControllerData initControllerData(TableConfig tableConfig,Connection connection){
+    public ControllerData initControllerData(CodeGeneratorContext context){
         ControllerData data=new ControllerData();
-        data.setModuleNameCN(tableConfig.getModuleNameCN());
-        data.setModuleName(tableConfig.getModuleName());
-        data.setPackagePre(initPackagePre(tableConfig));
-        data.setPkType(initPkType(connection,tableConfig));
-        data.setFieldList(initBeanField(tableConfig,connection));
-        data.setValidateSaveParam(tableConfig.isNeedValidateSaveParam());
-        data.setRequestMappingPre(initRequestMappingPre(data.getPackagePre()));
+        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
+        data.setModuleName(context.getTableConfig().getModuleName());
+        data.setPackagePre(context.getPackagePre());
+        data.setPkType(context.getPkType());
+        data.setFieldList(context.getAllBeanFields());
+        data.setValidateSaveParam(context.getTableConfig().isNeedValidateSaveParam());
+        data.setRequestMappingPre(context.getRequestMappingPre());
         return data;
     }
 
-
-    /**
-     * 初始化主键类型
-     * @param connection
-     * @param config
-     */
-    private String initPkType(Connection connection, TableConfig config){
-        return dbSupport.getTablePkType(config,connection).toString();
-    }
-
-    /**
-     * 初始化java字段集合
-     * @param config
-     * @param connection
-     */
-    private List<BeanField> initBeanField(TableConfig config,Connection connection){
-        return dbSupport.getTableBeanFieldList(config,connection);
-    }
-
-    /**
-     * 初始化包名
-     * 初始化当前表生成代码目录父包名
-     * @param config
-     */
-    private String initPackagePre(TableConfig config) {
-        StringBuilder springSrcPathSb=new StringBuilder();
-        springSrcPathSb.append("src");
-        springSrcPathSb.append(File.separatorChar);
-        springSrcPathSb.append("main");
-        springSrcPathSb.append(File.separatorChar);
-        springSrcPathSb.append("java");
-        springSrcPathSb.append(File.separatorChar);
-        String springSrcPath = springSrcPathSb.toString();
-        String targetDirPath=config.getConfig().getTargetDirPath();
-        if (targetDirPath.contains(springSrcPath)) {
-            return targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
-        }else{
-            throw BaseRuntimeException.getException("targetDirPath["+targetDirPath+"] must contains ["+springSrcPath+"]");
-        }
-    }
-
-    /**
-     * 初始化request mapping
-     * @param packagePre
-     * @return
-     */
-    private String initRequestMappingPre(String packagePre){
-        return "/"+packagePre.substring(packagePre.lastIndexOf('.')+1);
-    }
 
     /**
      * 初始化config属性
@@ -253,20 +198,21 @@ public class CodeGenerator {
         initConfig(config);
         try(Connection connection=dbSupport.getSpringConn()){
             for (TableConfig tableConfig : config.getTableConfigs()) {
+                CodeGeneratorContext context=new CodeGeneratorContext(tableConfig,dbSupport,connection);
                 if(tableConfig.isNeedCreateBeanFile()){
-                    BeanData beanData= initBeanData(tableConfig,connection);
+                    BeanData beanData= initBeanData(context);
                     generateBean(beanData,config.getTemplateDirPath(),config.getTargetDirPath());
                 }
                 if(tableConfig.isNeedCreateRepositoryFile()) {
-                    RepositoryData repositoryData = initRepositoryData(tableConfig, connection);
+                    RepositoryData repositoryData = initRepositoryData(context);
                     generateRepository(repositoryData,config.getTemplateDirPath(),config.getTargetDirPath());
                 }
                 if(tableConfig.isNeedCreateServiceFile()) {
-                    ServiceData serviceData = initServiceData(tableConfig, connection);
+                    ServiceData serviceData = initServiceData(context);
                     generateService(serviceData,config.getTemplateDirPath(),config.getTargetDirPath());
                 }
                 if(tableConfig.isNeedCreateControllerFile()) {
-                    ControllerData controllerData = initControllerData(tableConfig, connection);
+                    ControllerData controllerData = initControllerData(context);
                     generateController(controllerData,config.getTemplateDirPath(),config.getTargetDirPath());
                 }
             }

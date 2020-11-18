@@ -1,8 +1,6 @@
 package com.bcd.rdb.code.mysql;
 
 import com.bcd.rdb.code.data.BeanField;
-import com.bcd.rdb.code.data.CodeConst;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

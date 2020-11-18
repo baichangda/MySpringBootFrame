@@ -1,7 +1,6 @@
 package com.bcd.rdb.code;
 
 import com.bcd.rdb.code.data.BeanField;
-import com.bcd.rdb.code.data.CodeConst;
 
 import java.sql.Connection;
 import java.util.List;

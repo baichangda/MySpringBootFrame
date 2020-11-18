@@ -1,9 +1,12 @@
-package com.icommand.rdb.jdbc.dynamic;
+package com.bcd.rdb.jdbc.dynamic;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.google.common.cache.*;
-import com.icommand.base.exception.BaseRuntimeException;
-import com.icommand.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +33,7 @@ public class DynamicJdbcUtil {
         removalListenerPool=Executors.newSingleThreadExecutor();
     }
 
-    private static LoadingCache<String, DynamicJdbcData> cache =CacheBuilder.newBuilder()
+    private static LoadingCache<String, DynamicJdbcData> cache = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(5))
             .removalListener(RemovalListeners.asynchronous(removalNotification->{
                 //移除数据源时候关闭数据源
@@ -57,7 +60,7 @@ public class DynamicJdbcUtil {
                 }
             });
 
-    private static DruidDataSource getDataSource(String url,String username,String password){
+    private static DruidDataSource getDataSource(String url, String username, String password){
         DruidDataSource dataSource= new DruidDataSource();
         dataSource.setEnable(true);
         dataSource.setMaxActive(3);
@@ -81,8 +84,12 @@ public class DynamicJdbcUtil {
         return url+","+username+","+password;
     }
 
-    public static DynamicJdbcData getJdbcData(String url, String username, String password) throws ExecutionException {
-        return cache.get(getKey(url, username, password));
+    public static DynamicJdbcData getJdbcData(String url, String username, String password){
+        try {
+            return cache.get(getKey(url, username, password));
+        } catch (ExecutionException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     public static void close(String url, String username, String password){
@@ -93,11 +100,11 @@ public class DynamicJdbcUtil {
         cache.invalidateAll();
     }
 
-    public static DynamicJdbcData getTest() throws ExecutionException {
+    public static DynamicJdbcData getTest(){
         return getJdbcData("jdbc:postgresql://192.168.7.211:12921/test_bcd","dbuser","hlxpassword");
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) throws InterruptedException {
         List<Map<String,Object>> dataList1= getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
         List<Map<String,Object>> dataList2= getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
         TimeUnit.SECONDS.sleep(10);

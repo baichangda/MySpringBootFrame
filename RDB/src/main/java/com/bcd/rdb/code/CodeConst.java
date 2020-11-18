@@ -1,4 +1,4 @@
-package com.bcd.rdb.code.data;
+package com.bcd.rdb.code;
 
 import freemarker.template.Configuration;
 import freemarker.template.Version;
