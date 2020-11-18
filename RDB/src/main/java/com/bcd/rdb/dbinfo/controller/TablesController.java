@@ -30,7 +30,7 @@ public class TablesController extends BaseController {
     @ApiOperation(value = "导出数据库设计", notes = "导出数据库设计")
     @ApiResponse(code = 200, message = "导出结果")
     public void exportDBDesignerExcel(
-            @ApiParam(value = "数据库名称") @RequestParam(value = "dbName", required = false) String dbName,
+            @ApiParam(value = "数据库名称") @RequestParam(value = "dbName", required = true) String dbName,
             HttpServletResponse response) {
         try {
             String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
