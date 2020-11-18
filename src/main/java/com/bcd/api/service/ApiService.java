@@ -1,4 +1,4 @@
-package com.bcd.service;
+package com.bcd.helper.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.metadata.CellData;
@@ -8,13 +8,14 @@ import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
+import com.bcd.helper.data.ApiParamData;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -40,50 +41,54 @@ public class ApiService {
      * @param method
      * @return
      */
-    public LinkedHashMap<String,String> getApiParamsMap(Method method){
-        LinkedHashMap<String,String> resultMap=new LinkedHashMap<>();
-        //1、使用spring工具类获取所有参数真实名称
+    public LinkedHashMap<String, ApiParamData> getApiParamsMap(Method method){
+        LinkedHashMap<String,ApiParamData> resultMap=new LinkedHashMap<>();
+        //使用spring工具类获取所有参数真实名称
         LocalVariableTableParameterNameDiscoverer discoverer=new LocalVariableTableParameterNameDiscoverer();
         String [] paramNames=discoverer.getParameterNames(method);
-        //2、获取所有swagger注解参数对应注释
-        Map<String,String> swaggerMap=new HashMap<>();
+        //获取所有swagger注解参数对应注释
+        Map<String,String> name_comment=new HashMap<>();
         ApiImplicitParams apiImplicitParams= method.getAnnotation(ApiImplicitParams.class);
         if(apiImplicitParams!=null&&apiImplicitParams.value().length>0){
             for (ApiImplicitParam apiImplicitParam : apiImplicitParams.value()) {
-                swaggerMap.put(apiImplicitParam.name(),apiImplicitParam.value());
+                name_comment.put(apiImplicitParam.name(),apiImplicitParam.value());
             }
         }
-        //2、获取所有参数
+        //获取所有参数
         Parameter[] parameters= method.getParameters();
         for (int i=0;i<=parameters.length-1;i++) {
-            //2.1、获取 RequestParam 注解
+            //获取 RequestParam 注解
             Parameter parameter=parameters[i];
             RequestParam requestParam=parameter.getAnnotation(RequestParam.class);
             String name;
+            boolean required;
             if(requestParam==null){
-                //2.2、如果 RequestParam 为空,获取 RequestBody 注解
+                //如果 RequestParam 为空,获取 RequestBody 注解
                 RequestBody requestBody=parameter.getAnnotation(RequestBody.class);
                 if(requestBody==null){
-                    //2.2.1、如果 RequestBody 也为空,跳过此参数
+                    //如果 RequestBody 也为空,跳过此参数
                     continue;
                 }else{
-                    //2.2.2、如果是 RequestBody 参数,直接取 参数名
+                    //如果是 RequestBody 参数,直接取 参数名
                     name=paramNames[i];
+                    required=true;
                 }
             }else{
-                //2.3、如果 RequestParam 不为空,判断RequestParam有没有设置别名,没有则设置默认参数名
+                //如果 RequestParam 不为空,判断RequestParam有没有设置别名,没有则设置默认参数名
                 name=requestParam.value();
                 if(StringUtils.isEmpty(name)){
                     name=paramNames[i];
                 }
+                required=requestParam.required();
             }
-            //2.4、获取参数的swagger注解来获取其注释
-            String comment=swaggerMap.get(name);
+            //获取参数的swagger注解来获取其注释
+            String comment=name_comment.get(name);
             if(comment==null) {
                 ApiParam apiParam = parameter.getAnnotation(ApiParam.class);
                 comment = apiParam == null ? "" : apiParam.value();
             }
-            resultMap.put(name,comment);
+            ApiParamData paramData=new ApiParamData(name,comment,required);
+            resultMap.put(name,paramData);
         }
         return resultMap;
     }
@@ -141,7 +146,7 @@ public class ApiService {
      * @param methodRequestMapping
      * @return
      */
-    public String[] getApiPaths(RequestMapping controllerRequestMapping,RequestMapping methodRequestMapping){
+    public String[] getApiPaths(RequestMapping controllerRequestMapping, RequestMapping methodRequestMapping){
        String[] controllerPaths= controllerRequestMapping.value();
        String[] methodPaths= methodRequestMapping.value();
        List<String> pathList=new ArrayList<>();
@@ -172,7 +177,7 @@ public class ApiService {
                 return;
             }
             //2.3、获取controller类下面所有方法
-            List<Method> methodList= org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation(controllerClass,RequestMapping.class);
+            List<Method> methodList= org.apache.commons.lang3.reflect.MethodUtils.getMethodsListWithAnnotation(controllerClass, RequestMapping.class);
             methodList.forEach(method->{
                 //2.3.1、获取方法的 RequestMapping 注解
                 RequestMapping methodRequestMapping=method.getAnnotation(RequestMapping.class);
@@ -189,8 +194,8 @@ public class ApiService {
                 String [] paths=getApiPaths(controllerRequestMapping,methodRequestMapping);
                 String pathStr= Arrays.stream(paths).reduce((e1,e2)->e1+"\n"+e2).orElse("");
                 //2.3.6、获取api参数
-                LinkedHashMap<String,String> paramMap=getApiParamsMap(method);
-                String params=paramMap.entrySet().stream().map(e->e.getKey()+" : "+e.getValue()).reduce((e1,e2)->e1+"\n"+e2).orElse("");
+                LinkedHashMap<String,ApiParamData> paramMap=getApiParamsMap(method);
+                String params=paramMap.values().stream().map(ApiParamData::toString).reduce((e1, e2)->e1+"\n"+e2).orElse("");
                 //2.3.7、获取返回结果备注
                 String response=getApiResponse(method);
                 //2.3.7、组装数据
@@ -229,7 +234,7 @@ public class ApiService {
     }
 
 
-    class MySheetWriteHandler implements SheetWriteHandler{
+    class MySheetWriteHandler implements SheetWriteHandler {
         @Override
         public void beforeSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
 
