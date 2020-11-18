@@ -78,6 +78,7 @@ public class DynamicJdbcUtil {
         try {
             dataSource.init();
         } catch (SQLException e) {
+            dataSource.close();
             throw BaseRuntimeException.getException(e);
         }
         return dataSource;
