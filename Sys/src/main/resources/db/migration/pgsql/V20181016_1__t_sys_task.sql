@@ -1,18 +1,18 @@
 CREATE TABLE "public"."t_sys_task" (
   "id" serial8 NOT NULL,
-  "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "name" varchar(50) NOT NULL,
   "status" int4 NOT NULL,
   "type" int4,
   "percent" float4 NOT NULL,
-  "message" varchar(255) COLLATE "pg_catalog"."default",
-  "stack_message" text COLLATE "pg_catalog"."default",
+  "message" varchar(255),
+  "stack_message" text,
   "start_time" timestamp(6),
   "finish_time" timestamp(6),
   "create_time" timestamp(6),
-  "file_paths" varchar(100) COLLATE "pg_catalog"."default",
+  "file_paths" varchar(100),
   "create_user_id" int8,
-  "create_user_name" varchar(50) COLLATE "pg_catalog"."default",
-  "create_ip" varchar(50) COLLATE "pg_catalog"."default",
+  "create_user_name" varchar(50),
+  "create_ip" varchar(50),
   CONSTRAINT "t_sys_task_pkey" PRIMARY KEY ("id")
 )
 ;

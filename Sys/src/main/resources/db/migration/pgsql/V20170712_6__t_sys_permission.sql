@@ -1,17 +1,17 @@
 CREATE TABLE "public"."t_sys_permission" (
   "id" serial8 NOT NULL,
-  "name" varchar(20) COLLATE "pg_catalog"."default" NOT NULL,
-  "code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "remark" varchar(256) COLLATE "pg_catalog"."default",
+  "name" varchar(20) NOT NULL,
+  "code" varchar(50) NOT NULL,
+  "remark" varchar(256),
   "role_id" int8,
   "create_time" timestamp(6),
   "create_user_id" int8,
-  "create_user_name" varchar(50) COLLATE "pg_catalog"."default",
+  "create_user_name" varchar(50),
   "update_time" timestamp(6),
   "update_user_id" int8,
-  "update_user_name" varchar(50) COLLATE "pg_catalog"."default",
-  "create_ip" varchar(50) COLLATE "pg_catalog"."default",
-  "update_ip" varchar(50) COLLATE "pg_catalog"."default",
+  "update_user_name" varchar(50),
+  "create_ip" varchar(50),
+  "update_ip" varchar(50),
   CONSTRAINT "t_sys_permission_pkey" PRIMARY KEY ("id")
 )
 ;

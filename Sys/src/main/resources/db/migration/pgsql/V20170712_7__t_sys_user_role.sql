@@ -1,6 +1,6 @@
 CREATE TABLE "public"."t_sys_user_role" (
   "user_id" int8 NOT NULL,
-  "role_code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "role_code" varchar(50) NOT NULL,
   CONSTRAINT "t_sys_user_role_pkey" PRIMARY KEY ("user_id", "role_code")
 )
 ;

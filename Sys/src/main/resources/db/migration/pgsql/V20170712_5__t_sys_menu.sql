@@ -1,18 +1,18 @@
 CREATE TABLE "public"."t_sys_menu" (
   "id" serial8 NOT NULL,
   "parent_id" int8,
-  "name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "url" varchar(256) COLLATE "pg_catalog"."default",
-  "icon" varchar(256) COLLATE "pg_catalog"."default",
+  "name" varchar(50) NOT NULL,
+  "url" varchar(256),
+  "icon" varchar(256),
   "order_num" int4 NOT NULL,
   "create_time" timestamp(6),
   "create_user_id" int8,
-  "create_user_name" varchar(50) COLLATE "pg_catalog"."default",
+  "create_user_name" varchar(50),
   "update_time" timestamp(6),
   "update_user_id" int8,
-  "update_user_name" varchar(50) COLLATE "pg_catalog"."default",
-  "create_ip" varchar(50) COLLATE "pg_catalog"."default",
-  "update_ip" varchar(50) COLLATE "pg_catalog"."default",
+  "update_user_name" varchar(50),
+  "create_ip" varchar(50),
+  "update_ip" varchar(50),
   CONSTRAINT "t_sys_menu_pkey" PRIMARY KEY ("id")
 )
 ;

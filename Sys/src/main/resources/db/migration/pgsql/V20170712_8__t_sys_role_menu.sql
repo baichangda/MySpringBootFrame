@@ -1,5 +1,5 @@
 CREATE TABLE "public"."t_sys_role_menu" (
-  "role_code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "role_code" varchar(50) NOT NULL,
   "menu_id" int8 NOT NULL,
   CONSTRAINT "t_sys_role_menu_pkey" PRIMARY KEY ("role_code", "menu_id")
 )

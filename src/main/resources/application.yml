@@ -37,7 +37,6 @@ spring:
          stat:
            enabled: true
            #忽略参数合并sql
-           #如果和flyway一起使用、因为druid bug、则不能开启此项、否则导致报错
            merge-sql: true
          #sql防火墙配置
          wall:
@@ -160,6 +159,11 @@ spring:
       username:
       password:
       default-encoding: UTF-8
+
+  #flyway配置
+  #注意如果使用druid数据源、脚本中不能带 . 字符、否则会导致启动执行脚本失败
+#   flyway:
+#     enabled: true
 
 my:
   #是否启用集群定时任务失败注解

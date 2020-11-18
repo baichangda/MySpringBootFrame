@@ -1,6 +1,6 @@
 CREATE TABLE "public"."t_sys_menu_permission" (
-  "menu_id" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "permission_code" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+  "menu_id" varchar(50) NOT NULL,
+  "permission_code" varchar(50) NOT NULL,
   CONSTRAINT "t_sys_menu_permission_pkey" PRIMARY KEY ("menu_id", "permission_code")
 )
 ;
