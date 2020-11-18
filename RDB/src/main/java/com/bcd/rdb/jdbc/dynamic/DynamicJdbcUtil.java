@@ -13,6 +13,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
@@ -88,7 +90,17 @@ public class DynamicJdbcUtil {
         return url+","+username+","+password;
     }
 
+    private static void test(String url,String username,String password){
+        try (Connection connection= DriverManager.getConnection(url,username,password)){
+
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
     public static DynamicJdbcData getJdbcData(String url, String username, String password){
+        //首先测试
+        test(url, username, password);
         try {
             return cache.get(getKey(url, username, password));
         } catch (ExecutionException e) {
