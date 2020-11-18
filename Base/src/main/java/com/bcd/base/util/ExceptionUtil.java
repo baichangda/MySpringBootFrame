@@ -67,7 +67,9 @@ public class ExceptionUtil {
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
         }
         if (realException instanceof BaseRuntimeException) {
-            return ((BaseRuntimeException) realException).toJsonMessage();
+            return JsonMessage.fail()
+                    .withCode(((BaseRuntimeException) realException).getCode())
+                    .withMessage(realException.getMessage());
         } else if (realException instanceof ConstraintViolationException) {
             String message = ((ConstraintViolationException) realException).getConstraintViolations().stream().map(ConstraintViolation::getMessage).reduce((e1, e2) -> e1 + "," + e2).orElse("");
             Set<ConstraintViolation<?>> constraintViolationSet= ((ConstraintViolationException) realException).getConstraintViolations();

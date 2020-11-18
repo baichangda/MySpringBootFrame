@@ -42,7 +42,6 @@ public class BaseBean<K extends Serializable> extends SuperBaseBean<K> {
     @ApiModelProperty(value = "更新人姓名(长度不能超过50)(不需要赋值)")
     protected String updateUserName;
 
-    @Size
     @Length(max = 50,message = "[创建ip地址]长度不能超过50")
     @ApiModelProperty(value = "创建ip地址(长度不能超过50)(不需要赋值)")
     protected String createIp;

@@ -1,8 +1,6 @@
 package com.bcd.base.config.shiro.cache;
 
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -21,7 +19,7 @@ public class LocalCache<K,V> implements Cache<K,V> {
 
     Logger logger= LoggerFactory.getLogger(LocalCache.class);
 
-    public LoadingCache<K,V> cache;
+    public com.google.common.cache.Cache<K,V> cache;
 
     //s
     long timeoutInSecond;
@@ -37,12 +35,7 @@ public class LocalCache<K,V> implements Cache<K,V> {
                 .expireAfterAccess(Duration.ofSeconds(timeoutInSecond))
                 .softValues()
                 .refreshAfterWrite(Duration.ofSeconds(scanPeriodInSecond))
-                .build(new CacheLoader<K, V>() {
-                    @Override
-                    public V load(K key) {
-                        return null;
-                    }
-                });
+                .build();
     }
 
     @Override

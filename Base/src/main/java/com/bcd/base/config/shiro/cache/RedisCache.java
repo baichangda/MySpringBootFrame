@@ -1,5 +1,6 @@
 package com.bcd.base.config.shiro.cache;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -42,13 +44,6 @@ public class RedisCache<K,V> implements Cache<K,V> {
     BoundHashOperations<String, K, V> boundHashOperations;
 
     /**
-     * 读写锁、保证并发安全
-     */
-    ReentrantReadWriteLock readWriteLock=new ReentrantReadWriteLock();
-
-
-
-    /**
      *
      * @param redisTemplate
      * @param key
@@ -64,7 +59,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
         this.cache= CacheBuilder.newBuilder()
                 .expireAfterAccess(Duration.ofSeconds(localTimeoutInSecond))
                 .softValues()
-                .refreshAfterWrite(Duration.ofSeconds(localScanPeriodInSecond))
+                .refreshAfterWrite(Duration.ofSeconds(localTimeoutInSecond))
                 .build(new CacheLoader<K, V>() {
                     @Override
                     public V load(K key) {
@@ -76,11 +71,10 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     @Override
     public V get(K k) throws CacheException {
-        readWriteLock.readLock().lock();
         try {
-            return cache.getIfPresent(k);
-        }finally {
-            readWriteLock.readLock().unlock();
+            return cache.get(k);
+        } catch (ExecutionException e) {
+            throw BaseRuntimeException.getException(e);
         }
     }
 

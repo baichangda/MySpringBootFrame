@@ -11,9 +11,10 @@ spring:
    servlet:
      multipart:
        max-file-size: 10MB
-   resources:
-     cache:
-       period: -1
+   web:
+     resources:
+       chain:
+         cache: false
    profiles.active: dev
    freemarker:
      checkTemplateLocation: false
@@ -36,6 +37,7 @@ spring:
          stat:
            enabled: true
            #忽略参数合并sql
+           #如果和flyway一起使用、因为druid bug、如果使用druid数据源、则不能开启此项、否则导致报错
            merge-sql: true
          #sql防火墙配置
          wall:

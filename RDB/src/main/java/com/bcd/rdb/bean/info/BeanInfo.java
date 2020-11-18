@@ -34,17 +34,6 @@ public class BeanInfo{
     public List<Field> uniqueFieldList;
 
     /**
-     * manyToManyFieldList 多对多字段集合
-     * oneToManyFieldList 一对多字段集合
-     * manyToOneFieldList 多对一字段集合
-     * oneToOneFieldList 一对一字段集合
-     */
-    public List<Field> manyToManyFieldList;
-    public List<Field> oneToManyFieldList;
-    public List<Field> manyToOneFieldList;
-    public List<Field> oneToOneFieldList;
-
-    /**
      * 主键字段
      */
     public Field pkField;
@@ -59,7 +48,6 @@ public class BeanInfo{
         initTableName();
         initPkField();
         initUnique();
-        initJPAAnno();
     }
 
     public void initTableName(){
@@ -75,21 +63,6 @@ public class BeanInfo{
         }else{
             isCheckUnique =true;
         }
-    }
-
-
-    /**
-     * 初始化 JPA 注解
-     */
-    public void initJPAAnno(){
-        manyToManyFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, ManyToMany.class));
-        oneToManyFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, OneToMany.class));
-        manyToOneFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, ManyToOne.class));
-        oneToOneFieldList=Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, OneToOne.class));
-        manyToManyFieldList.forEach(e->e.setAccessible(true));
-        oneToManyFieldList.forEach(e->e.setAccessible(true));
-        manyToOneFieldList.forEach(e->e.setAccessible(true));
-        oneToOneFieldList.forEach(e->e.setAccessible(true));
     }
 
     /**

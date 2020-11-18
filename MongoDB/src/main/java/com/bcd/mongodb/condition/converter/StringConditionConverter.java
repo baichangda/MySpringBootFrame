@@ -51,7 +51,16 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                         List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.in(notEmptyList);
                     }else if(val.getClass().isArray()){
-                        List notEmptyList=Arrays.asList(val).stream().filter(e->e!=null).collect(Collectors.toList());
+                        List notEmptyList=new ArrayList();
+                        int len= Array.getLength(val);
+                        if(len!=0){
+                            for(int i=0;i<=len-1;i++){
+                                Object o=Array.get(val,i);
+                                if(o!=null){
+                                    notEmptyList.add(o);
+                                }
+                            }
+                        }
                         criteria.in(notEmptyList);
                     }else{
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");
