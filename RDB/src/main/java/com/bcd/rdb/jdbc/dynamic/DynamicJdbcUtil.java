@@ -1,13 +1,9 @@
-package com.bcd.rdb.util;
+package com.icommand.rdb.jdbc.dynamic;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListeners;
-import lombok.Getter;
+import com.google.common.cache.*;
+import com.icommand.base.exception.BaseRuntimeException;
+import com.icommand.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,9 +20,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class JdbcUtil {
+public class DynamicJdbcUtil {
 
-    static Logger logger= LoggerFactory.getLogger(JdbcUtil.class);
+    static Logger logger= LoggerFactory.getLogger(DynamicJdbcUtil.class);
 
     static ExecutorService removalListenerPool;
 
@@ -34,19 +30,19 @@ public class JdbcUtil {
         removalListenerPool=Executors.newSingleThreadExecutor();
     }
 
-    private static LoadingCache<String, JdbcData> cache = CacheBuilder.newBuilder()
+    private static LoadingCache<String, DynamicJdbcData> cache =CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(5))
             .removalListener(RemovalListeners.asynchronous(removalNotification->{
                 //移除数据源时候关闭数据源
-                JdbcData jdbcData= (JdbcData)removalNotification.getValue();
+                DynamicJdbcData jdbcData= (DynamicJdbcData)removalNotification.getValue();
                 DruidDataSource dataSource=((DruidDataSource)jdbcData.getJdbcTemplate().getDataSource());
                 logger.info("dataSource[{}] [{}] start remove",removalNotification.getKey().toString(),dataSource.hashCode());
                 dataSource.close();
                 logger.info("dataSource[{}] [{}] finish remove",removalNotification.getKey().toString(),dataSource.hashCode());
             }, removalListenerPool))
-            .build(new CacheLoader<String, JdbcData>() {
+            .build(new CacheLoader<String, DynamicJdbcData>() {
                 @Override
-                public JdbcData load(String s){
+                public DynamicJdbcData load(String s){
                     //加载新的数据源
                     logger.info("dataSource[{}] start load",s);
                     String [] arr=s.split(",");
@@ -55,13 +51,13 @@ public class JdbcUtil {
                     jdbcTemplate.afterPropertiesSet();
                     TransactionTemplate transactionTemplate=new TransactionTemplate(new JdbcTransactionManager(dataSource));
                     transactionTemplate.afterPropertiesSet();
-                    JdbcData jdbcData=new JdbcData(jdbcTemplate,transactionTemplate);
+                    DynamicJdbcData jdbcData=new DynamicJdbcData(jdbcTemplate,transactionTemplate);
                     logger.info("dataSource[{}] [{}] finish load",s,dataSource.hashCode());
                     return jdbcData;
                 }
             });
 
-    private static DruidDataSource getDataSource(String url, String username, String password){
+    private static DruidDataSource getDataSource(String url,String username,String password){
         DruidDataSource dataSource= new DruidDataSource();
         dataSource.setEnable(true);
         dataSource.setMaxActive(3);
@@ -85,7 +81,7 @@ public class JdbcUtil {
         return url+","+username+","+password;
     }
 
-    public static JdbcData getJdbcData(String url, String username, String password) throws ExecutionException {
+    public static DynamicJdbcData getJdbcData(String url, String username, String password) throws ExecutionException {
         return cache.get(getKey(url, username, password));
     }
 
@@ -97,7 +93,7 @@ public class JdbcUtil {
         cache.invalidateAll();
     }
 
-    public static JdbcData getTest() throws ExecutionException {
+    public static DynamicJdbcData getTest() throws ExecutionException {
         return getJdbcData("jdbc:postgresql://192.168.7.211:12921/test_bcd","dbuser","hlxpassword");
     }
 
@@ -112,13 +108,4 @@ public class JdbcUtil {
     }
 }
 
-@Getter
-class JdbcData{
-    public JdbcData(JdbcTemplate jdbcTemplate, TransactionTemplate transactionTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.transactionTemplate = transactionTemplate;
-    }
 
-    private JdbcTemplate jdbcTemplate;
-    private TransactionTemplate transactionTemplate;
-}

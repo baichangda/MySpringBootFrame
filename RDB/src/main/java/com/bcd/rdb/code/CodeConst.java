@@ -18,7 +18,6 @@ public class CodeConst {
 
     public final static Set<String> CREATE_INFO_FIELD_NAME =new HashSet<>();
     static{
-        CREATE_INFO_FIELD_NAME.add("id");
         CREATE_INFO_FIELD_NAME.add("createTime");
         CREATE_INFO_FIELD_NAME.add("updateTime");
         CREATE_INFO_FIELD_NAME.add("createUserId");
