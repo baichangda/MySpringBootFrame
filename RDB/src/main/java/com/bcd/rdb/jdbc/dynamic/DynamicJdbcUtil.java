@@ -18,31 +18,24 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class DynamicJdbcUtil {
 
     static Logger logger= LoggerFactory.getLogger(DynamicJdbcUtil.class);
 
-    static ExecutorService removalListenerPool;
-
-    static {
-        removalListenerPool=Executors.newSingleThreadExecutor();
-    }
+    private static ScheduledExecutorService cleanUpPool=Executors.newSingleThreadScheduledExecutor();
 
     private static LoadingCache<String, DynamicJdbcData> cache = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(5))
-            .removalListener(RemovalListeners.asynchronous(removalNotification->{
+            .removalListener(removalNotification->{
                 //移除数据源时候关闭数据源
                 DynamicJdbcData jdbcData= (DynamicJdbcData)removalNotification.getValue();
                 DruidDataSource dataSource=((DruidDataSource)jdbcData.getJdbcTemplate().getDataSource());
                 logger.info("dataSource[{}] [{}] start remove",removalNotification.getKey().toString(),dataSource.hashCode());
                 dataSource.close();
                 logger.info("dataSource[{}] [{}] finish remove",removalNotification.getKey().toString(),dataSource.hashCode());
-            }, removalListenerPool))
+            })
             .build(new CacheLoader<String, DynamicJdbcData>() {
                 @Override
                 public DynamicJdbcData load(String s){
@@ -59,6 +52,17 @@ public class DynamicJdbcUtil {
                     return jdbcData;
                 }
             });
+
+    /**
+     * 启动扫描线程
+     * 虽然guava cache有设置过期时间、但是guava cache并不会自动清除、而是等待下次访问才会清除
+     * 所以需要另启动清除线程
+     */
+    static {
+        cleanUpPool.scheduleWithFixedDelay(()->{
+            cache.cleanUp();
+        },3,10,TimeUnit.SECONDS);
+    }
 
     private static DruidDataSource getDataSource(String url, String username, String password){
         DruidDataSource dataSource= new DruidDataSource();
@@ -111,7 +115,7 @@ public class DynamicJdbcUtil {
         List<Map<String,Object>> dataList3= getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
-        removalListenerPool.shutdown();
+        cleanUpPool.shutdown();
     }
 }
 
