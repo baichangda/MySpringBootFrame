@@ -28,9 +28,10 @@ public class ApiController extends BaseController {
     @ApiResponse(code = 200,message = "导入的Excel")
     public void exportApi(HttpServletResponse response){
         try {
-            String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
-            doBeforeResponseFile(fileName, response);
-            apiService.exportApi(response.getOutputStream());
+            apiService.exportApi(response.getOutputStream(),()->{
+                String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
+                doBeforeResponseFile(fileName, response);
+            });
         } catch (IOException e) {
             logger.error("export error",e);
         }

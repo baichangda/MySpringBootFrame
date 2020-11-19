@@ -35,10 +35,14 @@ public class BaseController {
      * @param response
      * @throws UnsupportedEncodingException
      */
-    protected void doBeforeResponseFile(String fileName, HttpServletResponse response) throws UnsupportedEncodingException {
-        response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-        response.setContentType("application/octet-stream");
-        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), StandardCharsets.ISO_8859_1));
+    protected void doBeforeResponseFile(String fileName, HttpServletResponse response){
+        try{
+            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
+            response.setContentType("application/octet-stream");
+            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), StandardCharsets.ISO_8859_1));
+        }catch (UnsupportedEncodingException e){
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
 

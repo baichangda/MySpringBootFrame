@@ -28,15 +28,24 @@ import java.util.List;
 public class MysqlTableServiceImpl extends TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
-    public void exportDBDesignerExcel(String dbName,OutputStream os) throws IOException {
-        try(Connection connection=DBInfoUtil.getSpringConn()){
-            exportDBDesignerExcel(connection,dbName,os);
+    public void exportSpringDBDesignerExcel(String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
+        try(Connection connection= DBInfoUtil.getSpringConn()){
+            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os) throws IOException {
+    @Override
+    public void exportDBDesignerExcel(String url, String username, String password, String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
+        try(Connection connection= DBInfoUtil.getConn(url, username, password)){
+            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os,Runnable doBeforeWrite) throws IOException {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
@@ -75,7 +84,12 @@ public class MysqlTableServiceImpl extends TablesService {
             });
             dataList.add(emptyList);
         }
-        EasyExcel.write(os).excelType(ExcelTypeEnum.XLSX).sheet(dbName+"数据库设计").doWrite(dataList);
+
+        if(doBeforeWrite!=null){
+            doBeforeWrite.run();
+        }
+
+        EasyExcel.write(os).excelType(ExcelTypeEnum.XLSX).sheet(dbName).doWrite(dataList);
     }
 
     /**
@@ -91,7 +105,7 @@ public class MysqlTableServiceImpl extends TablesService {
         FileUtil.createFileIfNotExists(p);
         try(OutputStream os=Files.newOutputStream(p);
             Connection connection=DBInfoUtil.getConn(url, username, password)){
-            exportDBDesignerExcel(connection,dbName,os);
+            exportDBDesignerExcel(connection,dbName,os,null);
         }catch (IOException|SQLException e){
             throw BaseRuntimeException.getException(e);
         }

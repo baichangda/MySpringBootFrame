@@ -91,12 +91,12 @@ public class DBInfoUtil {
      * 获取对应ip:port的information_schema的数据库连接
      * jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
      * @param url 127.0.0.1:3306
-     * @param db test
      * @param username root
      * @param password root
+     * @param db test
      * @return
      */
-    public static Connection getConn(String url,String db,String username,String password) {
+    public static Connection getConn(String url,String username,String password,String db) {
         try {
             return DriverManager.getConnection("jdbc:postgresql://"+url+"/"+db, username, password);
         } catch (SQLException e) {

@@ -163,7 +163,7 @@ public class ApiService {
      * 导出系统中所有的Api成excel
      * @return
      */
-    public void exportApi(OutputStream os) throws IOException {
+    public void exportApi(OutputStream os,Runnable doBeforeWrite) {
         //1、获取所有controller
         Map<String,Object> controllerMap= SpringUtil.applicationContext.getBeansWithAnnotation(RestController.class);
         //2、循环controller
@@ -224,6 +224,10 @@ public class ApiService {
             excelList.add(Arrays.asList("接口返回",response));
             excelList.add(Arrays.asList());
         });
+
+        if(doBeforeWrite!=null){
+            doBeforeWrite.run();
+        }
 
         //4、生成excel
         //4.1、准备样式
