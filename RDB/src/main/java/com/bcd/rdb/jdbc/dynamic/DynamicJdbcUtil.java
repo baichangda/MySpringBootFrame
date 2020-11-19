@@ -6,7 +6,6 @@ import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,16 +19,35 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DynamicJdbcUtil {
 
+    /**
+     * datasource闲置过期时间
+     */
+    private final static int EXPIRE_IN_SECOND=5*60;
+
+    /**
+     * 扫描定时任务线程执行扫描清除周期
+     */
+    private final static int CLEAN_UP_POOL_PERIOD_IN_SECOND=10;
+
+    /**
+     * 数据源最大connection激活数量
+     */
+    private final static int DATA_SOURCE_MAX_ACTIVE=3;
+
+
     static Logger logger= LoggerFactory.getLogger(DynamicJdbcUtil.class);
 
-    private static ScheduledExecutorService cleanUpPool=Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService CLEAN_UP_POOL =Executors.newSingleThreadScheduledExecutor();
 
-    private static LoadingCache<String, DynamicJdbcData> cache = CacheBuilder.newBuilder()
-            .expireAfterAccess(Duration.ofSeconds(5))
+    private static LoadingCache<String, DynamicJdbcData> CACHE = CacheBuilder.newBuilder()
+            .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
             .removalListener(removalNotification->{
                 //移除数据源时候关闭数据源
                 DynamicJdbcData jdbcData= (DynamicJdbcData)removalNotification.getValue();
@@ -61,15 +79,23 @@ public class DynamicJdbcUtil {
      * 所以需要另启动清除线程
      */
     static {
-        cleanUpPool.scheduleWithFixedDelay(()->{
-            cache.cleanUp();
-        },3,10,TimeUnit.SECONDS);
+        CLEAN_UP_POOL.scheduleWithFixedDelay(()->{
+            CACHE.cleanUp();
+        },EXPIRE_IN_SECOND,CLEAN_UP_POOL_PERIOD_IN_SECOND,TimeUnit.SECONDS);
+    }
+
+    private static void test(String url,String username,String password){
+        try (Connection connection=DriverManager.getConnection(url,username,password)){
+
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     private static DruidDataSource getDataSource(String url, String username, String password){
         DruidDataSource dataSource= new DruidDataSource();
         dataSource.setEnable(true);
-        dataSource.setMaxActive(3);
+        dataSource.setMaxActive(DATA_SOURCE_MAX_ACTIVE);
         dataSource.setMinIdle(1);
         dataSource.setInitialSize(1);
         dataSource.setUrl(url);
@@ -91,30 +117,22 @@ public class DynamicJdbcUtil {
         return url+","+username+","+password;
     }
 
-    private static void test(String url,String username,String password){
-        try (Connection connection= DriverManager.getConnection(url,username,password)){
-
-        } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
     public static DynamicJdbcData getJdbcData(String url, String username, String password){
         //首先测试
         test(url, username, password);
         try {
-            return cache.get(getKey(url, username, password));
+            return CACHE.get(getKey(url, username, password));
         } catch (ExecutionException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     public static void close(String url, String username, String password){
-        cache.invalidate(getKey(url, username, password));
+        CACHE.invalidate(getKey(url, username, password));
     }
 
     public static void closeAll(){
-        cache.invalidateAll();
+        CACHE.invalidateAll();
     }
 
     public static DynamicJdbcData getTest(){
@@ -128,7 +146,6 @@ public class DynamicJdbcUtil {
         List<Map<String,Object>> dataList3= getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
-        cleanUpPool.shutdown();
     }
 }
 
