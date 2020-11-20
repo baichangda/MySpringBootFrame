@@ -7,9 +7,10 @@
 .gradle/
 .idea/
 
+**/build/
+**/target/
+**/out/
 **/node_modules/
-build/
-target/
-out/
+**/log/
 **/*-dev.yml
 **/*-test.yml
