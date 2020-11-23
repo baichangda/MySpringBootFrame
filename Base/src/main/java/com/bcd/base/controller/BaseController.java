@@ -27,22 +27,15 @@ public class BaseController {
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    public final static String DEFAULT_RESPONSE_ENCODING = "UTF-8";
-
     /**
      * 响应文件流之前设置response
      * @param fileName
      * @param response
-     * @throws UnsupportedEncodingException
      */
     protected void doBeforeResponseFile(String fileName, HttpServletResponse response){
-        try{
-            response.setCharacterEncoding(DEFAULT_RESPONSE_ENCODING);
-            response.setContentType("application/octet-stream");
-            response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(DEFAULT_RESPONSE_ENCODING), StandardCharsets.ISO_8859_1));
-        }catch (UnsupportedEncodingException e){
-            throw BaseRuntimeException.getException(e);
-        }
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType("application/octet-stream");
+        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
     }
 
 
