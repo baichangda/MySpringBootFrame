@@ -1,21 +1,12 @@
 package com.bcd.base.controller;
 
 import com.bcd.base.cache.anno.MyCacheClass;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.DateZoneUtil;
-import com.bcd.base.util.FileUtil;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -57,4 +48,5 @@ public class BaseController {
             return fileName.substring(0, index) + "-" + dateNum + fileName.substring(index);
         }
     }
+
 }
