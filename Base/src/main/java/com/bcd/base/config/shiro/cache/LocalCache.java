@@ -24,17 +24,12 @@ public class LocalCache<K,V> implements Cache<K,V> {
     //s
     long timeoutInSecond;
 
-    //s
-    long scanPeriodInSecond;
-
-
-    public LocalCache(long timeoutInSecond, long scanPeriodInSecond) {
+    public LocalCache(long timeoutInSecond) {
         this.timeoutInSecond = timeoutInSecond;
-        this.scanPeriodInSecond = scanPeriodInSecond;
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(Duration.ofSeconds(timeoutInSecond))
                 .softValues()
-                .refreshAfterWrite(Duration.ofSeconds(scanPeriodInSecond))
+                .refreshAfterWrite(Duration.ofSeconds(timeoutInSecond))
                 .build();
     }
 
