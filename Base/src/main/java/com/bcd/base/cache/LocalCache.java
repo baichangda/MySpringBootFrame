@@ -1,5 +1,6 @@
 package com.bcd.base.cache;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -21,7 +22,7 @@ public class LocalCache extends AbstractValueAdaptingCache {
     Logger logger= LoggerFactory.getLogger(LocalCache.class);
 
     private String name;
-    private LoadingCache<Object, Object> cache;
+    private Cache<Object, Object> cache;
 
 
     public LocalCache(String name, Long aliveTimeInSecond) {
@@ -33,12 +34,7 @@ public class LocalCache extends AbstractValueAdaptingCache {
         this.cache= CacheBuilder.newBuilder()
                 .expireAfterAccess(Duration.ofSeconds(aliveTimeInSecond))
                 .softValues()
-                .build(new CacheLoader<Object, Object>() {
-            @Override
-            public Object load(Object key) {
-                return null;
-            }
-        });
+                .build();
         this.name = name;
     }
 

@@ -33,8 +33,6 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     long localTimeout;
 
-    long localScanPeriod;
-
     LoadingCache<K,V> cache;
 
     String key;
@@ -48,14 +46,12 @@ public class RedisCache<K,V> implements Cache<K,V> {
      * @param redisTemplate
      * @param key
      * @param localTimeoutInSecond 本地缓存失效时间
-     * @param localScanPeriodInSecond 本地缓存扫描器间隔
      */
-    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeoutInSecond,long localScanPeriodInSecond) {
+    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeoutInSecond) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations=redisTemplate.boundHashOps(key);
         this.key=key;
         this.localTimeout=localTimeoutInSecond;
-        this.localScanPeriod=localScanPeriodInSecond;
         this.cache= CacheBuilder.newBuilder()
                 .expireAfterAccess(Duration.ofSeconds(localTimeoutInSecond))
                 .softValues()
