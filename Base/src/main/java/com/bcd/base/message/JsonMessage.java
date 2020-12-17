@@ -10,6 +10,7 @@ import java.io.Serializable;
  *
  * @param <T>
  */
+@SuppressWarnings("unchecked")
 public class JsonMessage<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     @ApiModelProperty("Api是否调用成功(true/false)")
