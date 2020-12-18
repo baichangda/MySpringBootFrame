@@ -32,8 +32,8 @@ allprojects{
     version '1.0'
     apply plugin: 'java'
     apply plugin: 'idea'
-    apply plugin: 'maven-publish'
     //加入maven发布依赖
+    apply plugin: 'maven-publish'
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'org.springframework.boot'
 
