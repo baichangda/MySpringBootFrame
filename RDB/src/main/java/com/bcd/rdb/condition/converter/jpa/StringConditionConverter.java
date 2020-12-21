@@ -4,7 +4,6 @@ import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.util.ConditionUtil;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.*;
 import java.lang.reflect.Array;
@@ -27,7 +26,7 @@ public class StringConditionConverter implements Converter<StringCondition,Predi
         Root root=(Root)exts[0];
         CriteriaQuery query=(CriteriaQuery)exts[1];
         CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        if(!StringUtils.isEmpty(val)){
+        if(val!=null){
             Path path = ConditionUtil.parseRootPath(root,fieldName);
             switch (handler){
                 case EQUAL: {

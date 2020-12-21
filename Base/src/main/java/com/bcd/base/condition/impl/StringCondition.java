@@ -26,14 +26,6 @@ public class StringCondition extends Condition {
         this(fieldName,val,Handler.EQUAL);
     }
 
-    public static Condition or(String fieldName,Handler handler,Object ... vals){
-        if(fieldName==null||vals==null||handler==null||vals.length==0){
-            return null;
-        }
-        List<Condition> conditionList= Arrays.stream(vals).map(val->new StringCondition(fieldName,val,handler)).collect(Collectors.toList());
-        return or(conditionList);
-    }
-
     @Override
     public String toAnalysis() {
         return val==null||"".equals(val)?null:fieldName +

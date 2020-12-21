@@ -7,6 +7,7 @@ import com.bcd.mongodb.anno.Unique;
 import com.bcd.mongodb.bean.info.BeanInfo;
 import com.bcd.mongodb.repository.BaseRepository;
 import com.bcd.mongodb.util.ConditionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -185,9 +185,10 @@ public class BaseService<T,K extends Serializable>{
     }
 
     public void deleteById(K[] ids){
-        for(int i=0;i<=ids.length-1;i++){
-            repository.deleteById(ids[i]);
-        }
+        mongoTemplate.remove(Criteria.where(getBeanInfo().pkFieldName).in(ids));
+//        for(int i=0;i<=ids.length-1;i++){
+//            repository.deleteById(ids[i]);
+//        }
     }
 
     public void deleteAll(){

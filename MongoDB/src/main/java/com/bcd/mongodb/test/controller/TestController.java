@@ -35,9 +35,9 @@ public class TestController extends BaseController {
     @ApiOperation(value="查询测试列表",notes = "查询测试列表")
     @ApiResponse(code = 200,message = "测试列表")
     public JsonMessage<List<TestBean>> list(
-        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) Date postlinecode,
-        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) Date postlinename,
-        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) Date id
+        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) String postlinecode,
+        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) String postlinename,
+        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id
     ){
         Condition condition= Condition.and(
            new StringCondition("postlinecode",postlinecode),
@@ -55,9 +55,9 @@ public class TestController extends BaseController {
     @ApiOperation(value="查询测试分页",notes = "查询测试分页")
     @ApiResponse(code = 200,message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
-        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) Date postlinecode,
-        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) Date postlinename,
-        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) Date id,
+        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) String postlinecode,
+        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) String postlinename,
+        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id,
         @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
         @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(required = false,defaultValue = "20") Integer pageSize
     ){

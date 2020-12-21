@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -31,6 +32,12 @@ public class BeanInfo {
      * 主键字段
      */
     public Field pkField;
+    public String pkFieldName;
+
+    /**
+     * bean所属collection
+     */
+    public String collection;
 
 
     public BeanInfo(Class clazz){
@@ -41,6 +48,11 @@ public class BeanInfo {
     private void init(){
         initPkField();
         initUnique();
+        initCollection();
+    }
+
+    public void initCollection(){
+        collection= ((Document)clazz.getAnnotation(Document.class)).collection();
     }
 
     public void initUnique(){
@@ -60,6 +72,7 @@ public class BeanInfo {
     public void initPkField(){
         pkField= FieldUtils.getFieldsWithAnnotation(clazz,Id.class)[0];
         pkField.setAccessible(true);
+        pkFieldName=pkField.getName();
     }
 
 }

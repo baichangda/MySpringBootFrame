@@ -6,10 +6,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +21,7 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
         Object val=condition.val;
         StringCondition.Handler handler=condition.handler;
         Criteria criteria= null;
-        if(!StringUtils.isEmpty(val)){
+        if(val!=null){
             criteria=Criteria.where(fieldName);
             switch (handler){
                 case EQUAL: {
