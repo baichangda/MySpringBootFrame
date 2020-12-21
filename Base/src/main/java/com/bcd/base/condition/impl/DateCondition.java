@@ -2,10 +2,6 @@ package com.bcd.base.condition.impl;
 
 import com.bcd.base.condition.Condition;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * 日期类型条件
  * 当val==null时候忽略此条件
