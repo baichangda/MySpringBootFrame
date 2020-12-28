@@ -6,6 +6,7 @@ import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListeners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,6 +49,7 @@ public class DynamicJdbcUtil {
 
     private static LoadingCache<String, DynamicJdbcData> CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
+//            .removalListener(RemovalListeners.asynchronous(removalNotification->{},Executors.newSingleThreadExecutor()))
             .removalListener(removalNotification->{
                 //移除数据源时候关闭数据源
                 DynamicJdbcData jdbcData= (DynamicJdbcData)removalNotification.getValue();
