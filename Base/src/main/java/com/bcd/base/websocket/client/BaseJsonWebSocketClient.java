@@ -1,7 +1,7 @@
 package com.bcd.base.websocket.client;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.map.ExpireCallBackConcurrentHashMap;
+import com.bcd.base.map.ExpireCallBackMap;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.websocket.data.WebSocketData;
@@ -23,12 +23,12 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient {
 
-    public ExpireCallBackConcurrentHashMap<String,Consumer<String>> sn_to_callBack_map;
+    public ExpireCallBackMap<Consumer<String>> sn_to_callBack_map;
 
     public BaseJsonWebSocketClient(String url) {
         super(url);
         //扫描间隔为1s
-        this.sn_to_callBack_map =new ExpireCallBackConcurrentHashMap<>(1000L);
+        this.sn_to_callBack_map =new ExpireCallBackMap<>(1000L);
         this.sn_to_callBack_map.init();
     }
 

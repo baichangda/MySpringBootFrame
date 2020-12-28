@@ -24,8 +24,8 @@ import java.util.function.BiConsumer;
  * @param <V>
  */
 @SuppressWarnings("unchecked")
-public class ExpireCallBackConcurrentHashMap<V> {
-    private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackConcurrentHashMap.class);
+public class ExpireCallBackMap<V> {
+    private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackMap.class);
     private final Map<String, ExpireCallBackValue<V>> dataMap = new ConcurrentHashMap<>();
 
     /**
@@ -65,14 +65,14 @@ public class ExpireCallBackConcurrentHashMap<V> {
     /**
      * 不开启扫描和回调
      */
-    public ExpireCallBackConcurrentHashMap(){
+    public ExpireCallBackMap(){
         this(null,null);
     }
 
     /**
      * @param delay 扫描计划执行间隔,为null表示不开启扫描
      */
-    public ExpireCallBackConcurrentHashMap(Long delay) {
+    public ExpireCallBackMap(Long delay) {
         this(delay,null);
     }
 
@@ -80,7 +80,7 @@ public class ExpireCallBackConcurrentHashMap<V> {
      * @param delay          扫描计划执行间隔,为null则表示不进行扫描
      * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
      */
-    public ExpireCallBackConcurrentHashMap(Long delay, ExecutorService expireWorkPool) {
+    public ExpireCallBackMap(Long delay, ExecutorService expireWorkPool) {
         this.delay = delay;
         this.expireWorkPool = expireWorkPool;
     }
@@ -204,7 +204,7 @@ public class ExpireCallBackConcurrentHashMap<V> {
 
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackConcurrentHashMap<String> map = new ExpireCallBackConcurrentHashMap<>(1*1000L);
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1*1000L);
         map.init();
         long t1=System.currentTimeMillis();
         for (int i = 1; i <= 100000; i++) {
