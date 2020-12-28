@@ -9,8 +9,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 可以插入过期key-value的 Map
@@ -23,18 +21,12 @@ import java.util.stream.Collectors;
  * 适用于绑定过期回调
  * 如果作为缓存可能会导致内存溢出
  *
- * 注意
- * 在调用如下方法时候会检查过期并触发回调
- * 在调用{@link #get(Object)}、{@link #contains(Object)}}
- *
- * @param <K>
  * @param <V>
  */
 @SuppressWarnings("unchecked")
-public class ExpireCallBackConcurrentHashMap<K, V> {
+public class ExpireCallBackConcurrentHashMap<V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackConcurrentHashMap.class);
-    private final Map<K, ExpireCallBackValue<V>> dataMap = new ConcurrentHashMap<>();
-
+    private final Map<String, ExpireCallBackValue<V>> dataMap = new ConcurrentHashMap<>();
 
     /**
      * 用于从map中检索出过期key并移除 定时任务线程池
@@ -57,13 +49,15 @@ public class ExpireCallBackConcurrentHashMap<K, V> {
      * 会触发回调
      */
     public void scanAndClearExpired(){
-        Iterator<Map.Entry<K, ExpireCallBackValue<V>>> it=dataMap.entrySet().iterator();
+        Iterator<Map.Entry<String, ExpireCallBackValue<V>>> it=dataMap.entrySet().iterator();
         while(it.hasNext()){
-            Map.Entry<K, ExpireCallBackValue<V>> cur=it.next();
-            ExpireCallBackValue<V> expireValue =cur.getValue();
-            if(expireValue.isExpired()){
-                it.remove();
-                callback(cur.getKey(),expireValue.getVal(), expireValue.getCallback());
+            Map.Entry<String, ExpireCallBackValue<V>> cur=it.next();
+            synchronized (cur.getKey().intern()) {
+                ExpireCallBackValue<V> expireValue = cur.getValue();
+                if (expireValue.isExpired()) {
+                    it.remove();
+                    callback(cur.getKey(), expireValue.getVal(), expireValue.getCallback());
+                }
             }
         }
     }
@@ -106,7 +100,7 @@ public class ExpireCallBackConcurrentHashMap<K, V> {
 
 
 
-    private void callback(K k, V v,BiConsumer callBack) {
+    private void callback(String k, V v,BiConsumer callBack) {
         if(expireWorkPool!=null) {
             if (callBack != null) {
                 expireWorkPool.execute(() -> {
@@ -122,36 +116,25 @@ public class ExpireCallBackConcurrentHashMap<K, V> {
 
 
     /**
-     * 获取值,触发回调
+     * 获取值
      * @param expireValue
      * @param k
+     * @param triggerCallback
      * @return
      */
-    private V getVal(ExpireCallBackValue<V> expireValue,K k){
+    private V getVal(ExpireCallBackValue<V> expireValue, String k,boolean triggerCallback){
         if (expireValue == null) {
             return null;
         } else {
             if (expireValue.isExpired()) {
+                //移除元素、标记
                 dataMap.remove(k);
-                V v = expireValue.getVal();
-                BiConsumer callBack=expireValue.getCallback();
-                callback(k, v,callBack);
-                return null;
-            } else {
-                return expireValue.getVal();
-            }
-        }
-    }
-
-    /**
-     * 获取值,不触发回调
-     * @param expireValue
-     */
-    private V getVal(ExpireCallBackValue<V> expireValue){
-        if (expireValue == null) {
-            return null;
-        } else {
-            if (expireValue.isExpired()) {
+                //触发回调
+                if(triggerCallback){
+                    V v = expireValue.getVal();
+                    BiConsumer callBack = expireValue.getCallback();
+                    callback(k, v, callBack);
+                }
                 return null;
             } else {
                 return expireValue.getVal();
@@ -161,137 +144,67 @@ public class ExpireCallBackConcurrentHashMap<K, V> {
 
 
     /**
-     * 过期则触发回调
+     * 过期检查且触发回调
      * @param k
      * @return
      */
-    public V get(K k) {
-        ExpireCallBackValue<V> expireValue= dataMap.get(k);
-        return getVal(expireValue,k);
+    public V get(String k) {
+        synchronized (k.intern()){
+            ExpireCallBackValue<V> expireValue= dataMap.get(k);
+            return getVal(expireValue,k,true);
+        }
     }
 
     /**
-     * 不触发回调
+     * put元素、不会过期检查触发回调
      * @param k
      * @param v
      * @param aliveTime
      * @return
      */
-    public V put(K k, V v, long aliveTime) {
+    public V put(String k, V v, long aliveTime) {
         return put(k, v, aliveTime, null);
     }
 
     /**
-     * 不触发回调
+     * put元素、不会过期检查触发回调
      * @param k
      * @param v
      * @param aliveTime
      * @param callback
      * @return
      */
-    public V put(K k, V v, long aliveTime, BiConsumer<K, V> callback) {
+    public V put(String k, V v, long aliveTime, BiConsumer<String, V> callback) {
         ExpireCallBackValue<V> expireValue = new ExpireCallBackValue<>(System.currentTimeMillis() + aliveTime, v, callback);
-        ExpireCallBackValue<V> oldVal = dataMap.put(k, expireValue);
-        return getVal(oldVal);
+        synchronized (k.intern()) {
+            ExpireCallBackValue<V> oldVal = dataMap.put(k, expireValue);
+            return getVal(oldVal, k, false);
+        }
     }
 
     /**
-     * 不触发回调
-     * @param k
-     * @param v
-     * @param aliveTime
-     * @return
-     */
-    public V putIfAbsent(K k, V v, long aliveTime) {
-        return put(k, v, aliveTime, null);
-    }
-
-    /**
-     * 不触发回调
-     * @param k
-     * @param v
-     * @param aliveTime
-     * @param callback
-     * @return
-     */
-    public V putIfAbsent(K k, V v, long aliveTime, BiConsumer<K, V> callback) {
-        ExpireCallBackValue<V> expireValue = new ExpireCallBackValue<>(System.currentTimeMillis() + aliveTime, v, callback);
-        ExpireCallBackValue<V> oldVal = dataMap.putIfAbsent(k, expireValue);
-        return getVal(oldVal);
-    }
-
-    /**
-     * 不触发回调
-     * @param k
-     * @param mappingFunction
-     * @param aliveTime
-     * @return
-     */
-    public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime) {
-        return computeIfAbsent(k, mappingFunction, aliveTime, null);
-    }
-
-    /**
-     * 不触发回调
-     * @param k
-     * @param mappingFunction
-     * @param aliveTime
-     * @param callback
-     * @return
-     */
-    public V computeIfAbsent(K k, Function<? super K, ? extends V> mappingFunction, long aliveTime, BiConsumer<K, V> callback) {
-        Function<? super K, ? extends ExpireCallBackValue<V>> function=e->
-             new ExpireCallBackValue<>(System.currentTimeMillis()+aliveTime,mappingFunction.apply(e),callback);
-        ExpireCallBackValue<V> oldVal= dataMap.computeIfAbsent(k,function);
-        return getVal(oldVal);
-    }
-
-    /**
-     * 不触发回调
+     * remove元素、不会过期检查触发回调
      * @param k
      * @return
      */
-    public V remove(K k) {
-        ExpireCallBackValue<V> oldVal = dataMap.remove(k);
-        return getVal(oldVal);
+    public V remove(String k) {
+        synchronized (k.intern()) {
+            ExpireCallBackValue<V> oldVal = dataMap.remove(k);
+            return getVal(oldVal, k, false);
+        }
     }
 
     /**
      * 不触发回调
      */
-    public void clear() {
+    public synchronized void clear() {
         this.dataMap.clear();
-    }
-
-    /**
-     * 过期则触发回调
-     * @param k
-     * @return
-     */
-    public boolean contains(K k){
-        ExpireCallBackValue<V> expireValue = dataMap.get(k);
-        return getVal(expireValue,k)!=null;
-    }
-
-    public int size(){
-        return dataMap.size();
-    }
-
-    public Set<K> keySet(){
-        return dataMap.keySet();
-    }
-
-    public Collection<V> values(){
-        return dataMap.values().stream()
-                .map(e->e.getVal())
-                .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackConcurrentHashMap<String, String> map = new ExpireCallBackConcurrentHashMap<>(1*1000L);
+        ExpireCallBackConcurrentHashMap<String> map = new ExpireCallBackConcurrentHashMap<>(1*1000L);
         map.init();
         long t1=System.currentTimeMillis();
         for (int i = 1; i <= 100000; i++) {
