@@ -30,7 +30,7 @@ public class DynamicJdbcUtil {
     /**
      * datasource闲置过期时间
      */
-    private final static int EXPIRE_IN_SECOND=5*60;
+    private final static int EXPIRE_IN_SECOND=5;
 
     /**
      * 扫描定时任务线程执行扫描清除周期
@@ -95,6 +95,8 @@ public class DynamicJdbcUtil {
     }
 
     private static DruidDataSource getDataSource(String url, String username, String password){
+        //首先测试
+        test(url, username, password);
         DruidDataSource dataSource= new DruidDataSource();
         dataSource.setEnable(true);
         dataSource.setMaxActive(DATA_SOURCE_MAX_ACTIVE);
@@ -120,8 +122,7 @@ public class DynamicJdbcUtil {
     }
 
     public static DynamicJdbcData getJdbcData(String url, String username, String password){
-        //首先测试
-        test(url, username, password);
+
         try {
             return CACHE.get(getKey(url, username, password));
         } catch (ExecutionException e) {
@@ -138,7 +139,7 @@ public class DynamicJdbcUtil {
     }
 
     public static DynamicJdbcData getTest(){
-        return getJdbcData("jdbc:postgresql://192.168.7.211:12921/test_bcd","dbuser","hlxpassword");
+        return getJdbcData("jdbc:mysql://127.0.0.1:3306/msbf","root","123456");
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -148,6 +149,8 @@ public class DynamicJdbcUtil {
         List<Map<String,Object>> dataList3= getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
+
+        CLEAN_UP_POOL.shutdown();
     }
 }
 

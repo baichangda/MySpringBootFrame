@@ -20,15 +20,15 @@ spring:
      checkTemplateLocation: false
    datasource:
      #mysql
-#     driver-class-name: com.mysql.cj.jdbc.Driver
-#     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true
-#     username: root
-#     password: 123456
+     driver-class-name: com.mysql.cj.jdbc.Driver
+     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true
+     username: root
+     password: 123456
      #pgsql
-     driver-class-name: org.postgresql.Driver
-     url: jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
-     username: dbuser
-     password: hlxpassword
+#     driver-class-name: org.postgresql.Driver
+#     url: jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
+#     username: dbuser
+#     password: hlxpassword
      druid:
        initial-size: 5
        max-active: 15
