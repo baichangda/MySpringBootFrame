@@ -83,7 +83,7 @@ public class RpnUtil {
      */
     public static int calcRPN_char_int(Object[] rpn, int[] vals,int offset){
         int stackIndex=-1;
-        int[] stack=new int[2];
+        int[] stack=new int[rpn.length];
         for (Object s : rpn) {
             if(s instanceof Integer){
                 stack[++stackIndex]=(int)s;
@@ -132,7 +132,7 @@ public class RpnUtil {
      */
     public static double calcRPN_string_double(Object[] rpn, Map<String,Double> map){
         int stackIndex=-1;
-        double[] stack=new double[2];
+        double[] stack=new double[rpn.length];
         for (Object o : rpn) {
             if(o instanceof Double){
                 stack[++stackIndex] = (double)o;
@@ -180,7 +180,7 @@ public class RpnUtil {
      */
     public static double calcRPN_string_string(String[] rpn, Map<String,Double> map){
         int stackIndex=-1;
-        double[] stack=new double[2];
+        double[] stack=new double[rpn.length];
         for (String s : rpn) {
             switch (s) {
                 case "+": {
@@ -242,7 +242,7 @@ public class RpnUtil {
                     temp.delete(0, temp.length());
                 }
                 if(stackIndex>=0){
-                    while(stack[stackIndex]!='('&&get(stack[stackIndex])>=get(arr[i])){
+                    while(stack[stackIndex]!='('&& getSymbolPriority(stack[stackIndex])>= getSymbolPriority(arr[i])){
                         output.add(String.valueOf(stack[stackIndex--]));
                         if(stackIndex==-1){
                             break;
@@ -285,7 +285,7 @@ public class RpnUtil {
      * @param c
      * @return
      */
-    private static int get(char c){
+    private static int getSymbolPriority(char c){
         switch (c){
             case '+':{
                 return 1;
@@ -305,7 +305,151 @@ public class RpnUtil {
         }
     }
 
+    public static String parseRPNToArithmetic(String[] rpn){
+        if(rpn.length==1) {
+            return rpn[0];
+        }else {
+            String[] stack = new String[rpn.length];
+            int[] symbolPriority=new int[rpn.length];
+            int index = -1;
+            for (String s : rpn) {
+                if (s.equals("+") ||
+                        s.equals("-") ||
+                        s.equals("*") ||
+                        s.equals("/")) {
+                    int index2=index--;
+                    int index1=index--;
+                    String s1 = stack[index1];
+                    String s2 = stack[index2];
+                    int p1=symbolPriority[index1];
+                    int p2=symbolPriority[index2];
+                    int curSymbolPriority=getSymbolPriority(s.charAt(0));
+                    if(p1!=-1&&p1<curSymbolPriority){
+                        s1="("+s1+")";
+                    }
+                    if(p2!=-1&&p2<curSymbolPriority){
+                        s2="("+s2+")";
+                    }
+                    int curIndex=++index;
+                    stack[curIndex] = s1+s+s2;
+                    symbolPriority[curIndex]=curSymbolPriority;
+                } else {
+                    int curIndex=++index;
+                    stack[curIndex] = s;
+                    symbolPriority[curIndex] =-1;
+                }
+            }
+            return stack[0];
+        }
+    }
+
+    public static String parseRPNToArithmetic(Object[] rpn){
+        if(rpn.length==1) {
+            return rpn[0].toString();
+        }else {
+            String[] stack = new String[rpn.length];
+            int[] symbolPriority=new int[rpn.length];
+            int index = -1;
+            for (Object o : rpn) {
+                String s = o.toString();
+                if (s.equals("+") ||
+                        s.equals("-") ||
+                        s.equals("*") ||
+                        s.equals("/")) {
+                    int index2 = index--;
+                    int index1 = index--;
+                    String s1 = stack[index1];
+                    String s2 = stack[index2];
+                    int p1 = symbolPriority[index1];
+                    int p2 = symbolPriority[index2];
+                    int curSymbolPriority = getSymbolPriority(s.charAt(0));
+                    if (p1 != -1 && p1 < curSymbolPriority) {
+                        s1 = "(" + s1 + ")";
+                    }
+                    if (p2 != -1 && p2 < curSymbolPriority) {
+                        s2 = "(" + s2 + ")";
+                    }
+                    int curIndex = ++index;
+                    stack[curIndex] = s1 + s + s2;
+                    symbolPriority[curIndex] = curSymbolPriority;
+                } else {
+                    int curIndex = ++index;
+                    stack[curIndex] = s;
+                    symbolPriority[curIndex] = -1;
+                }
+            }
+            return stack[0];
+        }
+    }
+
+    /**
+     * 解y=ax+b
+     * 转换成x=(y-b)/a
+     * 其中a、b皆为常量 a!=0
+     * example:
+     * y=0.1x+100 --> x=(y-100)/0.1 此时rpn长度为5
+     * y=0.1x --> x=y/0.1 此时rpn长度为3
+     * y=x --> x=y 此时rpn长度为1
+     *
+     * @param rpn
+     * @return
+     */
+    public static String[] reverseSimpleRPN(String[] rpn){
+        switch (rpn.length){
+            case 1:{
+                return new String[]{rpn[0]};
+            }
+            case 3:{
+                String[] res=new String[3];
+                res[0]=rpn[0];
+                res[1]=rpn[1];
+                res[2]=reverseSymbol(rpn[2]);
+                return res;
+            }
+            case 5:{
+                String[] res=new String[5];
+                res[0]=rpn[0];
+                res[1]=rpn[3];
+                res[2]=reverseSymbol(rpn[4]);
+                res[3]=rpn[1];
+                res[4]=reverseSymbol(rpn[2]);
+                return res;
+            }
+            default:{
+                throw BaseRuntimeException.getException("rpn[{0}] not support",Arrays.toString(rpn));
+            }
+        }
+    }
+
+    private static String reverseSymbol(String symbol){
+        switch (symbol){
+            case "+":{
+                return "-";
+            }
+            case "-":{
+                return "+";
+            }
+            case "*":{
+                return "/";
+            }
+            case "/":{
+                return "*";
+            }
+            default:{
+                throw BaseRuntimeException.getException("reverseSymbol[{0}] not support",symbol);
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        System.out.println(Arrays.toString(parseArithmeticToRPN("a+(b+c*d-a)*(c-d)")));
+        String[] rpn=parseArithmeticToRPN("a+(a+a*b-a)*(a-b)");
+        System.out.println(Arrays.toString(rpn));
+        System.out.println("a+(a+a*b-a)*(a-b)");
+        System.out.println(parseRPNToArithmetic(rpn));
+        Map<String,Double> map=new HashMap<>();
+        map.put("a",1d);
+        map.put("b",2d);
+        double res=calcRPN_string_double(doWithRpnList_string_double(rpn),map);
+        System.out.println(res);
     }
 }
