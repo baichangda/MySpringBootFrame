@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  * 可以插入过期key-value的 Map
  * 插入的key-value会在aliveTime后被移除
  * 过期策略:
- * 1、懒汉模式: 在调用get、contains时候检查,如果过期则移除
+ * 1、懒汉模式: 在调用get时候检查,如果过期则移除
  * 2、定期检查模式: 启动计划任务执行器周期性的检查所有此类的实例,检查并移除里面过期的key
  * 在过期被移除后,会调用设置的过期回调方法
  *
@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("unchecked")
 public class ExpireCallBackMap<V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackMap.class);
-    private final Map<String, ExpireCallBackValue<V>> dataMap = new ConcurrentHashMap<>();
+    private final Map<String, ExpireCallBackValue<V>> dataMap = new HashMap<>();
 
     /**
      * 用于从map中检索出过期key并移除 定时任务线程池
@@ -195,42 +195,26 @@ public class ExpireCallBackMap<V> {
     }
 
     /**
-     * 不触发回调
+     * removeAll、不会过期检查触发回调
+     * @return
      */
-    public synchronized void clear() {
-        this.dataMap.clear();
+    public void removeAll(){
+        for (String k : dataMap.keySet()) {
+            remove(k);
+        }
     }
 
-
-
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1*1000L);
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1*1000L,Executors.newSingleThreadExecutor());
         map.init();
-        long t1=System.currentTimeMillis();
-        for (int i = 1; i <= 100000; i++) {
-            map.put("test" + i, "test1", 2000L);
-        }
-        long t2=System.currentTimeMillis();
-        System.out.println(t2-t1);
-        AtomicInteger count=new AtomicInteger();
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(()->{
-                System.out.println(count.getAndSet(0));
-             },1,1,TimeUnit.SECONDS);
-        Executors.newSingleThreadExecutor().execute(()->{
-            while(true){
-                String val= map.get("test3333");
-                count.incrementAndGet();
-            }
+        map.put("1","2",1000L,(k,v)->{
+            System.out.println(map.get("1"));
+            System.out.println(map.get("2"));
         });
-        while(true){
-            long t=System.currentTimeMillis();
-            for(int i=1;i<=1000000;i++){
-                map.put((t+i)+"",(t+i)+"",2000L);
-            }
-            long tt=System.currentTimeMillis();
-            Thread.sleep(1000);
-            System.out.println("======"+(tt-t));
-        }
+        map.put("2","3",10000L,(k,v)->{
+            System.out.println(map.get("1"));
+            System.out.println(map.get("2"));
+        });
     }
 
 }
