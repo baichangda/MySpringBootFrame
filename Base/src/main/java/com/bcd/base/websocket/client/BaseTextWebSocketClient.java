@@ -8,7 +8,9 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import javax.websocket.SendHandler;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -81,14 +83,10 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
      * 1、由于长时间客户端和服务端不进行数据通信,此时由于防火墙等其他因素关闭tcp连接,导致不可用
      *      此时客户端需要发送ping,不关注结果,发送成功即代表session可用,否则会触发
      *      {@link java.net.SocketTimeoutException}即{@link IOException}
+     *      如果发生异常、发送超时时候、session会自动关闭并触发close
+     *      参考{@link org.apache.tomcat.websocket.WsRemoteEndpointImplBase#sendMessageBlock(byte, ByteBuffer, boolean, long)} }
      *
-     * 2、tcp协议层下的硬件层网络连接突然断开,此时在tcp层面此连接依然可用,此时需要断开连接;
-     *      此时close源码参考:
-     *      {@link org.apache.tomcat.websocket.WsSession#sendCloseMessage(CloseReason)}
-     *      1、close源码在此情况tomcat源码先会调用发送close message到客户端直到超时,关闭远程session
-     *      2、检测是否{@link javax.websocket.CloseReason.CloseCodes#CLOSED_ABNORMALLY},
-     *          对应{@link CloseStatus#NO_CLOSE_FRAME},是则触发onError
-     *      3、触发onClose
+     *
      */
     protected void startHeartBeatCheck(){
         this.heartBeatPool= Executors.newSingleThreadScheduledExecutor();
@@ -97,11 +95,6 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
                 session.sendMessage(new PingMessage());
             } catch (IOException ex1) {
                 logger.error("send ping failed", ex1);
-                try {
-                    session.close(CloseStatus.NO_CLOSE_FRAME);
-                } catch (IOException ex2) {
-                    logger.error("close session failed after send ping failed", ex2);
-                }
             }
         },10,30, TimeUnit.SECONDS);
     }
