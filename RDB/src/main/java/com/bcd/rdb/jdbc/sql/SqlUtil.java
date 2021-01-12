@@ -145,7 +145,7 @@ public class SqlUtil {
      * 性能表现:
      * 以main方法例子{@link #main(String[])}
      * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
-     * 单线程、测试10w次，耗时6555ms
+     * 单线程、测试10w次、耗时6555ms、约每条耗时0.066ms
      * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
      *
      * @param sql
@@ -228,7 +228,7 @@ public class SqlUtil {
      * 性能表现:
      * 以main方法例子{@link #main(String[])}
      * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
-     * 单线程、测试10w次，耗时6903ms
+     * 单线程、测试10w次，耗时6903ms、约每条耗时0.069ms
      * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
      *
      * @param sql
