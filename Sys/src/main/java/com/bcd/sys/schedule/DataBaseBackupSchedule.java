@@ -29,6 +29,7 @@ public class DataBaseBackupSchedule {
     String username;
     @Value("${database.backup.password}")
     String password;
+    //备份数据库、多个数据库以空格分开
     @Value("${database.backup.databases}")
     String databases;
     @Value("${database.backup.maxFileNum:10}")
@@ -98,7 +99,7 @@ public class DataBaseBackupSchedule {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Process process=Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c","mysqldump -h127.0.0.1 -P3306 -uroot -p1234561 --databases msbf > backup-20210112143021"});
+        Process process=Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c","mysqldump -h127.0.0.1 -P3306 -uroot -p123456 --databases msbf > backup-20210112143021"});
         process.waitFor();
         try(BufferedReader br=new BufferedReader(new InputStreamReader(process.getErrorStream()))){
             String line;
