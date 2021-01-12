@@ -321,7 +321,7 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
                                 int len= Array.getLength(param);
                                 if(len!=0){
                                     List<Object> validList=new ArrayList<>();
-                                    for(int i=0;i<=len-1;i++){
+                                    for(int i=0;i<len;i++){
                                         Object val=Array.get(param,i);
                                         if(val!=null){
                                             validList.add(val);

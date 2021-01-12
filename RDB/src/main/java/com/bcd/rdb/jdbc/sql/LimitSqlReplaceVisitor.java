@@ -6,7 +6,9 @@ import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.*;
 
-
+/**
+ * Sql limit关键字添加 访问器
+ */
 public class LimitSqlReplaceVisitor extends SelectVisitorAdapter implements StatementParser{
 
     private Statement statement;

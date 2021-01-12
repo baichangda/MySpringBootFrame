@@ -9,6 +9,9 @@ import net.sf.jsqlparser.statement.select.*;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Sql 查询字段替换为count(*) 访问器
+ */
 public class CountSqlReplaceVisitor extends SelectVisitorAdapter implements StatementParser{
 
     private final static List<SelectItem> countSelectItems= Collections.singletonList(getCountExpressionItem());
