@@ -1,5 +1,6 @@
 package com.bcd.rdb.code;
 
+import com.bcd.rdb.dbinfo.data.DBInfo;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,10 +21,14 @@ public class Config {
     //表配置
     private List<TableConfig> tableConfigs=new ArrayList<>();
     //数据库
-    private String db;
+    private DBInfo dbInfo;
 
     private Config(String targetDirPath) {
         this.targetDirPath = targetDirPath;
+    }
+
+    public static Config newConfig(String targetDirPath,DBInfo dbInfo){
+        return new Config(targetDirPath);
     }
 
     public static Config newConfig(String targetDirPath){

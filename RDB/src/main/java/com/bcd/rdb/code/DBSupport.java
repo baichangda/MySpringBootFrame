@@ -1,15 +1,15 @@
 package com.bcd.rdb.code;
 
 import com.bcd.rdb.code.data.BeanField;
+import com.bcd.rdb.dbinfo.data.DBInfo;
 
 import java.sql.Connection;
 import java.util.List;
 
 public interface DBSupport {
 
-    Connection getSpringConn();
+    DBInfo getSpringDBConfig();
 
-    String getDb();
 
     /**
      * 获取指定表的列名
@@ -32,4 +32,8 @@ public interface DBSupport {
      */
     CodeConst.PkType getTablePkType(TableConfig config,Connection connection);
 
+
+
 }
+
+

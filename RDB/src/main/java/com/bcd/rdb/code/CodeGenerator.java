@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -186,7 +187,10 @@ public class CodeGenerator {
      * @param config
      */
     private void initConfig(Config config){
-        config.setDb(dbSupport.getDb());
+        //如果配置了dbInfo、则不读取spring yml配置
+        if(config==null){
+            config.setDbInfo(dbSupport.getSpringDBConfig());
+        }
         config.setTemplateDirPath(Paths.get(config.getTemplateDirPath()==null? CodeConst.TEMPLATE_DIR_PATH:config.getTemplateDirPath()).toString());
     }
 
@@ -196,7 +200,7 @@ public class CodeGenerator {
      */
     public void generate(Config config){
         initConfig(config);
-        try(Connection connection=dbSupport.getSpringConn()){
+        try(Connection connection=getConnection(config.getDbInfo().getUrl(),config.getDbInfo().getUsername(),config.getDbInfo().getPassword())){
             for (TableConfig tableConfig : config.getTableConfigs()) {
                 CodeGeneratorContext context=new CodeGeneratorContext(tableConfig,dbSupport,connection);
                 if(tableConfig.isNeedCreateBeanFile()){
@@ -221,10 +225,18 @@ public class CodeGenerator {
         }
     }
 
+    public Connection getConnection(String url,String username,String password){
+        try {
+            return DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
 
     public static void main(String[] args) {
-//        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
-        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
+        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
+//        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
         List<TableConfig> tableConfigs= TableConfig.newHelper()
                 .setNeedCreateBeanFile(true)
                 .setNeedCreateRepositoryFile(true)
@@ -237,8 +249,8 @@ public class CodeGenerator {
                 .addModule("Permission", "权限", "t_sys_permission")
                 .toTableConfigs();
         Config config= Config.newConfig(path).addTableConfig(tableConfigs);
-//        CodeGenerator.MYSQL.generate(config);
-        CodeGenerator.PGSQL.generate(config);
+        CodeGenerator.MYSQL.generate(config);
+//        CodeGenerator.PGSQL.generate(config);
     }
 
 }

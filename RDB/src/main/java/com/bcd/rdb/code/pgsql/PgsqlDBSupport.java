@@ -5,6 +5,7 @@ import com.bcd.rdb.code.DBSupport;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.code.data.BeanField;
 import com.bcd.rdb.code.CodeConst;
+import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PgsqlDBSupport implements DBSupport {
@@ -19,19 +21,14 @@ public class PgsqlDBSupport implements DBSupport {
     Logger logger= LoggerFactory.getLogger(PgsqlDBSupport.class);
 
     @Override
-    public Connection getSpringConn() {
-        return DBInfoUtil.getSpringConn();
-    }
-
-    @Override
-    public String getDb() {
-        return DBInfoUtil.getDBProps().get("dbName").toString();
+    public DBInfo getSpringDBConfig() {
+        return DBInfoUtil.getDBProps();
     }
 
     @Override
     public List<BeanField> getTableBeanFieldList(TableConfig config, Connection connection) {
         String tableName = config.getTableName();
-        List<ColumnsBean> res = DBInfoUtil.findColumns(connection,config.getConfig().getDb(),tableName);
+        List<ColumnsBean> res = DBInfoUtil.findColumns(connection,config.getConfig().getDbInfo().getDb(),tableName);
         return res.stream().map(e -> {
             PgsqlDBColumn pgsqlDBColumn = new PgsqlDBColumn();
             pgsqlDBColumn.setName(e.getColumn_name());
@@ -49,7 +46,7 @@ public class PgsqlDBSupport implements DBSupport {
 
     @Override
     public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
-        ColumnsBean pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDb(),config.getTableName());
+        ColumnsBean pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDbInfo().getDb(),config.getTableName());
         switch (pk.getUdt_name()){
             case "int2":
             case "int4": {

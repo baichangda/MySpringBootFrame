@@ -5,6 +5,7 @@ import com.bcd.rdb.code.DBSupport;
 import com.bcd.rdb.code.TableConfig;
 import com.bcd.rdb.code.data.BeanField;
 import com.bcd.rdb.code.CodeConst;
+import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import org.slf4j.Logger;
@@ -19,19 +20,14 @@ public class MysqlDBSupport implements DBSupport {
     Logger logger= LoggerFactory.getLogger(MysqlDBSupport.class);
 
     @Override
-    public Connection getSpringConn() {
-        return DBInfoUtil.getSpringConn();
-    }
-
-    @Override
-    public String getDb() {
-        return DBInfoUtil.getDBProps().get("dbName").toString();
+    public DBInfo getSpringDBConfig() {
+        return DBInfoUtil.getDBProps();
     }
 
     @Override
     public List<BeanField> getTableBeanFieldList(TableConfig config, Connection connection) {
         String tableName = config.getTableName();
-        List<ColumnsBean> res = DBInfoUtil.findColumns(connection,config.getConfig().getDb(),tableName);
+        List<ColumnsBean> res = DBInfoUtil.findColumns(connection,config.getConfig().getDbInfo().getDb(),tableName);
         return res.stream().map(e -> {
             MysqlDBColumn mysqlDbColumn = new MysqlDBColumn();
             mysqlDbColumn.setName(e.getColumn_name());
@@ -49,8 +45,8 @@ public class MysqlDBSupport implements DBSupport {
 
     @Override
     public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
-        ColumnsBean pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDb(),config.getTableName());
-        switch (pk.getColumn_type()){
+        ColumnsBean pk= DBInfoUtil.findPKColumn(connection,config.getConfig().getDbInfo().getDb(),config.getTableName());
+        switch (pk.getData_type()){
             case "int":{
                 return CodeConst.PkType.Integer;
             }

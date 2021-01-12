@@ -1,9 +1,10 @@
 package com.bcd.rdb.dbinfo.mysql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -34,9 +35,9 @@ public class DBInfoUtil {
      *
      * @return
      */
-    public static Map<String, Object> getDBProps() {
+    public static DBInfo getDBProps() {
         try {
-            Map<String, Object> props = new HashMap<>();
+            Map<String, String> props = new HashMap<>();
             Yaml yaml = new Yaml();
             //1、加载spring配置
             LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
@@ -67,11 +68,7 @@ public class DBInfoUtil {
             }
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
-            props.put("url", dbInfoUrl);
-            props.put("dbName", propDbName);
-            props.put("username", username);
-            props.put("password", password);
-            return props;
+            return new DBInfo(dbInfoUrl,username,password,propDbName);
         } catch (FileNotFoundException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -83,12 +80,9 @@ public class DBInfoUtil {
      * @return
      */
     public static Connection getSpringConn() {
-        Map<String, Object> dbProps = getDBProps();
-        String url = dbProps.get("url").toString();
-        String username = dbProps.get("username").toString();
-        String password = dbProps.get("password").toString();
+        DBInfo dbInfo = getDBProps();
         try {
-            return DriverManager.getConnection(url, username, password);
+            return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
