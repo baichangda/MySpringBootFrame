@@ -32,7 +32,7 @@ public class SqlUtil {
                 "    username LIKE ? AND (sex = ? OR status=?) AND type in (?,?,?) AND phone in (?,?)";
         List<Object> paramList1 = new ArrayList<>();
         //username
-        paramList1.add("%z%");
+        paramList1.add(null);
         //sex
         paramList1.add(1);
         //status

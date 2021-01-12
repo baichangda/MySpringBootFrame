@@ -29,7 +29,6 @@ public class LocalCache<K,V> implements Cache<K,V> {
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(Duration.ofSeconds(timeoutInSecond))
                 .softValues()
-                .refreshAfterWrite(Duration.ofSeconds(timeoutInSecond))
                 .build();
     }
 

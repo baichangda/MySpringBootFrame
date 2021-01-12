@@ -109,7 +109,8 @@ public class UserController extends BaseController {
                 new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success().withData(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+//        return JsonMessage.success().withData(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success().withData(userService.pageBySql("select * from t_sys_user where id=?",PageRequest.of(pageNum-1,pageSize),UserBean.class,id));
     }
 
     /**

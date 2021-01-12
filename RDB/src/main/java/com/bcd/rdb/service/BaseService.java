@@ -178,7 +178,7 @@ public class BaseService<T, K extends Serializable> {
     }
 
     /**
-     * 批量新增/更新、根据主键是否有值来区分新增还是更新
+     * 批量新增/更新、不做唯一校验、根据主键是否有值来区分新增还是更新
      * @param list
      * @param ignoreFields
      */
@@ -319,12 +319,22 @@ public class BaseService<T, K extends Serializable> {
      */
     public Page<Map<String, Object>> pageBySql(String sql, Pageable pageable, Object... params) {
         SqlListResult countSql= SqlUtil.replace_nullParam_count(sql,params);
-        Integer count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList());
+        Integer count ;
+        if(countSql.getParamList().isEmpty()){
+            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
+        }else{
+            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
+        }
         if (count == 0) {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         } else {
             SqlListResult dataSql= SqlUtil.replace_nullParam_limit(sql,pageable.getPageNumber(),pageable.getPageSize(),params);
-            List<Map<String, Object>> dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER , dataSql,dataSql.getParamList().toArray(new Object[0]));
+            List<Map<String, Object>> dataList;
+            if(dataSql.getParamList().isEmpty()){
+                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER);
+            }else {
+                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER, dataSql.getParamList().toArray(new Object[0]));
+            }
             return new PageImpl<>(dataList, pageable, count);
         }
     }
@@ -339,12 +349,22 @@ public class BaseService<T, K extends Serializable> {
      */
     public Page<T> pageBySql(String sql, Pageable pageable, Class<T> clazz, Object... params) {
         SqlListResult countSql= SqlUtil.replace_nullParam_count(sql,params);
-        Integer count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList());
+        Integer count ;
+        if(countSql.getParamList().isEmpty()){
+            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
+        }else{
+            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
+        }
         if (count == 0) {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         } else {
             SqlListResult dataSql= SqlUtil.replace_nullParam_limit(sql,pageable.getPageNumber(),pageable.getPageSize(),params);
-            List<T> dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz), dataSql,dataSql.getParamList().toArray(new Object[0]));
+            List<T> dataList;
+            if(dataSql.getParamList().isEmpty()){
+                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz));
+            }else {
+                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz), dataSql.getParamList().toArray(new Object[0]));
+            }
             return new PageImpl<>(dataList, pageable, count);
         }
     }

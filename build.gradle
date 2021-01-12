@@ -146,19 +146,19 @@ apply plugin: 'org.flywaydb.flyway'
 flyway {
     def subLocations=[]
     //mysql
-//    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
-//    user = 'root'
-//    password = '123456'
-//    for(project in subprojects){
-//        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/mysql')
-//    }
-    //pgsql
-    url = 'jdbc:postgresql://db.hbluewhale.com:12921/test_bcd'
-    user = 'dbuser'
-    password = 'hlxpassword'
+    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
+    user = 'root'
+    password = '123456'
     for(project in subprojects){
-        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
+        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/mysql')
     }
+    //pgsql
+//    url = 'jdbc:postgresql://db.hbluewhale.com:12921/test_bcd'
+//    user = 'dbuser'
+//    password = 'hlxpassword'
+//    for(project in subprojects){
+//        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
+//    }
 
     flyway.locations =subLocations
 }

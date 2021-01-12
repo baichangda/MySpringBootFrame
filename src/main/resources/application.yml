@@ -71,9 +71,9 @@ spring:
        hibernate:
          format_sql: true
          #mysql
-#         dialect: org.hibernate.dialect.MySQL8Dialect
+         dialect: org.hibernate.dialect.MySQL8Dialect
          #pgsql
-         dialect: org.hibernate.dialect.PostgreSQL95Dialect
+#         dialect: org.hibernate.dialect.PostgreSQL95Dialect
          current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
 
 
@@ -101,9 +101,9 @@ spring:
    redis:
       #公用配置
       ssl: false
-      database: 11
+      database: 0
       timeout: 10000
-      password: redis-dev
+      password:
       #同步jedis连接池
 #      jedis:
 #        pool:
@@ -135,8 +135,8 @@ spring:
 #           - 114.115.141.139:7006
 
       #单机配置
-      host: redis.hbluewhale.com
-      port: 16379
+      host: 127.0.0.1
+      port: 6379
 
 #  kafka配置
    kafka:

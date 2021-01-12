@@ -54,7 +54,7 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
 
     private List<Object> newParamList=new ArrayList<>();
 
-
+    private PlainSelect selectBody;
 
     //记录每个条件对应的合并符
     Map<Expression,BinaryExpression> expressionToConcat=new HashMap<>();
@@ -79,9 +79,9 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
 
     @Override
     public Statement parse() {
-        SelectBody selectBody=((Select)statement).getSelectBody();
+        selectBody=(PlainSelect)((Select)statement).getSelectBody();
         if(selectBody!=null){
-            ((PlainSelect)selectBody).getWhere().accept(this);
+            selectBody.getWhere().accept(this);
         }
         return statement;
     }
@@ -207,17 +207,22 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
             }
             if(param==null){
                 BinaryExpression concat= expressionToConcat.get(binaryExpression);
-                if (concat instanceof AndExpression) {
-                    if (concat.getRightExpression() == binaryExpression) {
-                        concat.setRightExpression(trueExpression);
+                if(concat==null){
+                    //此时说明是where后面只有一个条件、此时直接设置where为null
+                    selectBody.setWhere(null);
+                }else {
+                    if (concat instanceof AndExpression) {
+                        if (concat.getRightExpression() == binaryExpression) {
+                            concat.setRightExpression(trueExpression);
+                        } else {
+                            concat.setLeftExpression(trueExpression);
+                        }
                     } else {
-                        concat.setLeftExpression(trueExpression);
-                    }
-                } else {
-                    if (concat.getRightExpression() == binaryExpression) {
-                        concat.setRightExpression(falseExpression);
-                    } else {
-                        concat.setLeftExpression(falseExpression);
+                        if (concat.getRightExpression() == binaryExpression) {
+                            concat.setRightExpression(falseExpression);
+                        } else {
+                            concat.setLeftExpression(falseExpression);
+                        }
                     }
                 }
             }else{
@@ -238,17 +243,22 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
 
             if(param==null){
                 BinaryExpression concat= expressionToConcat.get(binaryExpression);
-                if (concat instanceof AndExpression) {
-                    if (concat.getRightExpression() == binaryExpression) {
-                        concat.setRightExpression(trueExpression);
+                if(concat==null){
+                    //此时说明是where后面只有一个条件、此时直接设置where为null
+                    selectBody.setWhere(null);
+                }else {
+                    if (concat instanceof AndExpression) {
+                        if (concat.getRightExpression() == binaryExpression) {
+                            concat.setRightExpression(trueExpression);
+                        } else {
+                            concat.setLeftExpression(trueExpression);
+                        }
                     } else {
-                        concat.setLeftExpression(trueExpression);
-                    }
-                } else {
-                    if (concat.getRightExpression() == binaryExpression) {
-                        concat.setRightExpression(falseExpression);
-                    } else {
-                        concat.setLeftExpression(falseExpression);
+                        if (concat.getRightExpression() == binaryExpression) {
+                            concat.setRightExpression(falseExpression);
+                        } else {
+                            concat.setLeftExpression(falseExpression);
+                        }
                     }
                 }
             }else{
