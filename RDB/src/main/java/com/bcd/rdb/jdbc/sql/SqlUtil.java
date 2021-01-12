@@ -32,7 +32,7 @@ public class SqlUtil {
                 "    username LIKE ? AND (sex = ? OR status=?) AND type in (?,?,?) AND phone in (?,?)";
         List<Object> paramList1 = new ArrayList<>();
         //username
-        paramList1.add(null);
+        paramList1.add("%abc%");
         //sex
         paramList1.add(1);
         //status
@@ -77,14 +77,18 @@ public class SqlUtil {
 
 //        long t1=System.currentTimeMillis();
 //        for(int i=1;i<=100000;i++){
-//            replace_nullParam(sql1, paramList1.toArray());
+//            replace_nullParam_count_limit(sql1,true,1,20, paramList1.toArray());
 //        }
 //        long t2=System.currentTimeMillis();
 //        for(int i=1;i<=100000;i++){
-//            replace_nullParam(sql2, paramMap2);
+//            replace_nullParam_count_limit(sql2,true,1,20, paramMap2);
 //        }
 //        long t3=System.currentTimeMillis();
-//        System.out.printf("\n%dms,%dms",t2-t1,t3-t2);
+//        for(int i=1;i<=100000;i++){
+//            CCJSqlParserUtil.parse(sql1);
+//        }
+//        long t4=System.currentTimeMillis();
+//        System.out.printf("\n%dms,%dms,%dms",t2-t1,t3-t2,t4-t3);
     }
 
     public static SqlListResult replace_nullParam(String sql, Object... params){
@@ -138,8 +142,11 @@ public class SqlUtil {
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
      *
-     * 性能测试:
-     * 采用main方法中例子测试10w次，耗时7638ms
+     * 性能表现:
+     * 以main方法例子{@link #main(String[])}
+     * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
+     * 单线程、测试10w次，耗时6555ms
+     * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
      *
      * @param sql
      * @param paramMap 不会改变
@@ -218,8 +225,11 @@ public class SqlUtil {
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
      *
-     * 性能测试:
-     * 采用main方法中例子测试10w次，耗时7080ms
+     * 性能表现:
+     * 以main方法例子{@link #main(String[])}
+     * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
+     * 单线程、测试10w次，耗时6903ms
+     * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
      *
      * @param sql
      * @param count 是否开启count(*)替换
