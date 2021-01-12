@@ -66,10 +66,12 @@ public class ScheduleUtil {
      * 取消一个任务
      * @return
      */
-    public static void cancel(String id,boolean mayInterruptIfRunning){
+    public static boolean cancel(String id,boolean mayInterruptIfRunning){
         ScheduledFuture future= ID_TO_FUTURE.remove(id);
-        if(future!=null){
-            future.cancel(mayInterruptIfRunning);
+        if(future==null){
+            return true;
+        }else{
+            return future.cancel(mayInterruptIfRunning);
         }
     }
 
