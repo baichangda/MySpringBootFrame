@@ -25,12 +25,16 @@ public class ConditionImplConverter implements Converter<ConditionImpl,Predicate
         CriteriaQuery query=(CriteriaQuery)exts[1];
         CriteriaBuilder cb=(CriteriaBuilder)exts[2];
         Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(Objects::nonNull).toArray(len->new Predicate[len]);
-        if(ConditionImpl.ConcatWay.AND.equals(concatWay)){
-            return cb.and(predicates);
-        }else if(ConditionImpl.ConcatWay.OR.equals(concatWay)){
-            return cb.or(predicates);
-        }else{
-            return null;
+        switch (concatWay){
+            case AND:{
+                return cb.and(predicates);
+            }
+            case OR:{
+                return cb.or(predicates);
+            }
+            default:{
+                return null;
+            }
         }
     }
 }

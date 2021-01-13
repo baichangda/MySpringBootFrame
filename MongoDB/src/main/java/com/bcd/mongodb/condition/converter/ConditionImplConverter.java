@@ -23,12 +23,16 @@ public class ConditionImplConverter implements Converter<ConditionImpl,Criteria>
         if(criterias==null||criterias.length==0){
             return null;
         }
-        if(ConditionImpl.ConcatWay.AND.equals(concatWay)){
-            return new Criteria().andOperator(criterias);
-        }else if(ConditionImpl.ConcatWay.OR.equals(concatWay)){
-            return new Criteria().orOperator(criterias);
-        }else{
-            return null;
+        switch (concatWay){
+            case AND:{
+                return new Criteria().andOperator(criterias);
+            }
+            case OR:{
+                return new Criteria().orOperator(criterias);
+            }
+            default:{
+                return null;
+            }
         }
     }
 }
