@@ -42,8 +42,7 @@ public class ExceptionInitListener implements ApplicationListener<ContextRefresh
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         ExceptionResponseHandler exceptionResponseHandler=contextRefreshedEvent.getApplicationContext().getBean(ExceptionResponseHandler.class);
         HandlerExceptionResolverComposite handlerExceptionResolverComposite=(HandlerExceptionResolverComposite)contextRefreshedEvent.getApplicationContext().getBean("handlerExceptionResolverComposite");
-        List<HandlerExceptionResolver> resolvers=new ArrayList<>();
-        resolvers.addAll(handlerExceptionResolverComposite.getExceptionResolvers().subList(0,handlerExceptionResolverComposite.getExceptionResolvers().size()-1));
+        List<HandlerExceptionResolver> resolvers = new ArrayList<>(handlerExceptionResolverComposite.getExceptionResolvers().subList(0, handlerExceptionResolverComposite.getExceptionResolvers().size() - 1));
         resolvers.add(new CustomExceptionHandler(exceptionResponseHandler));
         handlerExceptionResolverComposite.setExceptionResolvers(Collections.unmodifiableList(resolvers));
     }
