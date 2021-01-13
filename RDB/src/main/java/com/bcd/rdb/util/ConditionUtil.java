@@ -18,11 +18,11 @@ import java.util.Map;
 public class ConditionUtil {
     private final static Map<Class,Converter> JPA_CONDITION_CONVERTER_MAP=new HashMap<>();
     static{
-        JPA_CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new ConditionImplConverter());
-        JPA_CONDITION_CONVERTER_MAP.put(DateCondition.class,new DateConditionConverter());
-        JPA_CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(NumberCondition.class,new NumberConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(StringCondition.class,new StringConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(DateCondition.class,new DateConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(NullCondition.class,new NullConditionConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(ConditionImpl.class,new ConditionImplConverter());
     }
 
     public static <T>Path parseRootPath(Root<T> root, String attrName){
