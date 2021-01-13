@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PgsqlDBSupport implements DBSupport {
@@ -38,10 +39,10 @@ public class PgsqlDBSupport implements DBSupport {
             pgsqlDBColumn.setStrLen(e.getCharacter_maximum_length());
             BeanField beanField= pgsqlDBColumn.toBeanField();
             if(beanField==null){
-                logger.info("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!",config.getTableName(),pgsqlDBColumn.getName(),pgsqlDBColumn.getType());
+                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!",config.getTableName(),pgsqlDBColumn.getName(),pgsqlDBColumn.getType());
             }
             return beanField;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override

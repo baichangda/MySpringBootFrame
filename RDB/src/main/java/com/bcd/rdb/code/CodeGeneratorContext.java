@@ -48,9 +48,6 @@ public class CodeGeneratorContext {
     public List<BeanField> getDeclaredBeanFields(){
         if(declaredBeanFields ==null){
             declaredBeanFields =getAllBeanFields().stream().filter(e->{
-                if(e==null){
-                    return false;
-                }
                 if("id".equals(e.getName())){
                     return false;
                 }else {

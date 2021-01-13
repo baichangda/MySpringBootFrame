@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MysqlDBSupport implements DBSupport {
@@ -37,10 +38,10 @@ public class MysqlDBSupport implements DBSupport {
             mysqlDbColumn.setStrLen(e.getCharacter_maximum_length().intValue());
             BeanField beanField= mysqlDbColumn.toBeanField();
             if(beanField==null){
-                logger.info("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!",config.getTableName(),mysqlDbColumn.getName(),mysqlDbColumn.getType());
+                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!",config.getTableName(),mysqlDbColumn.getName(),mysqlDbColumn.getType());
             }
             return beanField;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
