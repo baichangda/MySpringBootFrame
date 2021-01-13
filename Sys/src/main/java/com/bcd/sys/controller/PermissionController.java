@@ -1,22 +1,26 @@
 package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.condition.impl.*;
+import com.bcd.base.condition.impl.NumberCondition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
-import io.swagger.annotations.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-import java.util.Date;
-import java.util.List;
-import org.springframework.validation.annotation.Validated;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.service.PermissionService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @SuppressWarnings(value = "unchecked")
 @RestController

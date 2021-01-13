@@ -2,7 +2,6 @@ package com.bcd.mongodb.test.bean;
 
 import com.bcd.mongodb.bean.SuperBaseBean;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
