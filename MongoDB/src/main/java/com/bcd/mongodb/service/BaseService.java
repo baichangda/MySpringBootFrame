@@ -185,7 +185,9 @@ public class BaseService<T,K extends Serializable>{
     }
 
     public void deleteById(K[] ids){
-        Query query=new Query(Criteria.where(getBeanInfo().pkFieldName).in(ids));
+        Object[] newIds=new Object[ids.length];
+        System.arraycopy(ids,0,newIds,0,ids.length);
+        Query query=new Query(Criteria.where(getBeanInfo().pkFieldName).in(newIds));
         mongoTemplate.remove(query,getBeanInfo().clazz);
 //        for(int i=0;i<=ids.length-1;i++){
 //            repository.deleteById(ids[i]);
