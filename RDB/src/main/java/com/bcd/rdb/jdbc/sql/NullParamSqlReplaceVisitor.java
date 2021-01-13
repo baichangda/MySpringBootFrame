@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @SuppressWarnings("unchecked")
-public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter implements StatementParser{
+public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter{
 
     private final static Expression trueExpression=getSqlExpressionForTrue();
     private final static Expression falseExpression=getSqlExpressionForFalse();
@@ -77,7 +77,6 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter impleme
         this.paramMap=null;
     }
 
-    @Override
     public Statement parse() {
         selectBody=(PlainSelect)((Select)statement).getSelectBody();
         if(selectBody!=null){

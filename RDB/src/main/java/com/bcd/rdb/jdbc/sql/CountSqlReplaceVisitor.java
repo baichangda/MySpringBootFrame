@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Sql 查询字段替换为count(*) 访问器
  */
-public class CountSqlReplaceVisitor extends SelectVisitorAdapter implements StatementParser{
+public class CountSqlReplaceVisitor extends SelectVisitorAdapter{
 
     private final static List<SelectItem> countSelectItems= Collections.singletonList(getCountExpressionItem());
 
@@ -22,7 +22,6 @@ public class CountSqlReplaceVisitor extends SelectVisitorAdapter implements Stat
         this.statement=statement;
     }
 
-    @Override
     public Statement parse(){
         SelectBody selectBody=((Select)statement).getSelectBody();
         selectBody.accept(this);

@@ -9,7 +9,7 @@ import net.sf.jsqlparser.statement.select.*;
 /**
  * Sql limit关键字添加 访问器
  */
-public class LimitSqlReplaceVisitor extends SelectVisitorAdapter implements StatementParser{
+public class LimitSqlReplaceVisitor extends SelectVisitorAdapter{
 
     private Statement statement;
     /**
@@ -24,7 +24,6 @@ public class LimitSqlReplaceVisitor extends SelectVisitorAdapter implements Stat
         this.pageSize = pageSize;
     }
 
-    @Override
     public Statement parse() {
         SelectBody selectBody=((Select)statement).getSelectBody();
         selectBody.accept(this);
