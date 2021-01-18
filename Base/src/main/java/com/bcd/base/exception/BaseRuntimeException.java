@@ -35,7 +35,6 @@ public class BaseRuntimeException extends RuntimeException {
 
     /**
      * 将异常信息转换为格式化
-     * 会自动将'替换为''、因为其为转义字符
      * val表达式从{0}开始
      * @param message 注意'为转义字符
      * @param params
@@ -44,7 +43,8 @@ public class BaseRuntimeException extends RuntimeException {
     public static BaseRuntimeException getException(String message, Object ... params){
         return new BaseRuntimeException(MessageFormat.format(
                 //转义特殊字符'为''
-                message.replaceAll("'","''")
+//                message.replaceAll("'","''")
+                message
                 //去除null
                 ,Arrays.stream(params).map(e->e==null?"":e.toString()).toArray())
         );
