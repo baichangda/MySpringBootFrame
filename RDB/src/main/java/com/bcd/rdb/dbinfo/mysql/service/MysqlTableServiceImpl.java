@@ -1,6 +1,10 @@
 package com.bcd.rdb.dbinfo.mysql.service;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.event.AnalysisEventListener;
+import com.alibaba.excel.metadata.Cell;
+import com.alibaba.excel.read.metadata.holder.ReadRowHolder;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
@@ -21,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="com.mysql.cj.jdbc.Driver")
@@ -112,7 +117,24 @@ public class MysqlTableServiceImpl extends TablesService {
     }
 
     public static void main(String[] args) {
-        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
-        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
+//        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
+//        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
+
+        List<Map<String,Object>> dataList= EasyExcel.read(Paths.get("/Users/baichangda/msbf.xlsx").toFile(), new AnalysisEventListener<Map<String,Object>>(){
+            @Override
+            public void invoke(Map<String,Object> data, AnalysisContext context) {
+                ReadRowHolder readRowHolder= context.readRowHolder();
+                Map<Integer, Cell> cellDataMap=readRowHolder.getCellMap();
+                cellDataMap.forEach((k,v)->{
+                    System.out.print(v+" ");
+                });
+                System.out.println();
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext context) {
+
+            }
+        }).excelType(ExcelTypeEnum.XLSX).headRowNumber(0).doReadAllSync();
     }
 }
