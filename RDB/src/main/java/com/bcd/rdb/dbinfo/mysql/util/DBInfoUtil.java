@@ -124,18 +124,12 @@ public class DBInfoUtil {
                             val = rs.getInt(i);
                             break;
                         }
-                        case Types.VARCHAR: {
-                            val = rs.getString(i);
-                            break;
-                        }
+                        case Types.VARCHAR:
                         case Types.LONGVARCHAR: {
                             val = rs.getString(i);
                             break;
                         }
-                        case Types.DATE: {
-                            val = rs.getDate(i);
-                            break;
-                        }
+                        case Types.DATE:
                         case Types.TIMESTAMP: {
                             val = rs.getDate(i);
                             break;
@@ -188,7 +182,7 @@ public class DBInfoUtil {
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
                 List<TablesBean> dataList = parseResult(rs,TablesBean.class);
-                if (dataList == null || dataList.isEmpty()) {
+                if (dataList.isEmpty()) {
                     return null;
                 }
                 res = dataList.get(0);

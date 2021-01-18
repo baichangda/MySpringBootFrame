@@ -2,16 +2,13 @@ package com.bcd.rdb.jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import lombok.Getter;
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -44,15 +41,15 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter{
     ItemsListVisitorAdapterForList itemsListVisitorAdapterForList=new ItemsListVisitorAdapterForList();
 
 
-    private Statement statement;
+    private final Statement statement;
 
-    private Map<String,Object> paramMap;
+    private final Map<String,Object> paramMap;
 
-    private Map<String,Object> newParamMap=new LinkedHashMap<>();
+    private final Map<String,Object> newParamMap=new LinkedHashMap<>();
 
-    private List<Object> paramList;
+    private final List<Object> paramList;
 
-    private List<Object> newParamList=new ArrayList<>();
+    private final List<Object> newParamList=new ArrayList<>();
 
     private PlainSelect selectBody;
 
@@ -190,6 +187,7 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter{
      * 如果条件左边是and,则用1=1替代此条件
      * 如果条件左边是or,则用1=0替代此条件
      * @param binaryExpression
+     * @param runnable
      */
     private void replaceOrElse(BinaryExpression binaryExpression,Runnable runnable){
         Expression leftExpression= binaryExpression.getLeftExpression();
@@ -297,44 +295,42 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter{
     class ItemsListVisitorAdapterForMap extends ItemsListVisitorAdapter{
         @Override
         public void visit(ExpressionList expressionList) {
-            expressionList.getExpressions().forEach(expression->{
-                expression.accept(new ExpressionVisitorAdapter(){
-                    @Override
-                    public void visit(JdbcNamedParameter parameter) {
-                        //根据参数名称从map中取出参数,如果为null,则标记参数为空
-                        String paramName=parameter.getName();
-                        Object param=paramMap.get(paramName);
-                        if(param!=null){
-                            //此模式下遇到集合参数,排除掉集合中所有为Null的参数,再判断是否为空
-                            if(param instanceof List){
-                                int size=((List) param).size();
-                                if(size!=0){
-                                    List validList= (List) ((List) param).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                                    if(!validList.isEmpty()){
-                                        newParamMap.put(paramName,validList);
-                                    }
-
+            expressionList.getExpressions().forEach(expression-> expression.accept(new ExpressionVisitorAdapter(){
+                @Override
+                public void visit(JdbcNamedParameter parameter) {
+                    //根据参数名称从map中取出参数,如果为null,则标记参数为空
+                    String paramName=parameter.getName();
+                    Object param=paramMap.get(paramName);
+                    if(param!=null){
+                        //此模式下遇到集合参数,排除掉集合中所有为Null的参数,再判断是否为空
+                        if(param instanceof List){
+                            int size=((List) param).size();
+                            if(size!=0){
+                                List validList= (List) ((List) param).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                                if(!validList.isEmpty()){
+                                    newParamMap.put(paramName,validList);
                                 }
-                            }else if(param.getClass().isArray()){
-                                //此模式下遇到数组,排除掉数组中所有为Null的参数,再判断是否为空
-                                int len= Array.getLength(param);
-                                if(len!=0){
-                                    List<Object> validList=new ArrayList<>();
-                                    for(int i=0;i<len;i++){
-                                        Object val=Array.get(param,i);
-                                        if(val!=null){
-                                            validList.add(val);
-                                        }
+
+                            }
+                        }else if(param.getClass().isArray()){
+                            //此模式下遇到数组,排除掉数组中所有为Null的参数,再判断是否为空
+                            int len= Array.getLength(param);
+                            if(len!=0){
+                                List<Object> validList=new ArrayList<>();
+                                for(int i=0;i<len;i++){
+                                    Object val=Array.get(param,i);
+                                    if(val!=null){
+                                        validList.add(val);
                                     }
-                                    if(!validList.isEmpty()){
-                                        newParamMap.put(paramName,validList);
-                                    }
+                                }
+                                if(!validList.isEmpty()){
+                                    newParamMap.put(paramName,validList);
                                 }
                             }
                         }
                     }
-                });
-            });
+                }
+            }));
         }
     }
 }
