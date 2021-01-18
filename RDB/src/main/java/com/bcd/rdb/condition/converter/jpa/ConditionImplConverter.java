@@ -24,7 +24,7 @@ public class ConditionImplConverter implements Converter<ConditionImpl,Predicate
         Root root=(Root)exts[0];
         CriteriaQuery query=(CriteriaQuery)exts[1];
         CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(Objects::nonNull).toArray(len->new Predicate[len]);
+        Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(Objects::nonNull).toArray(Predicate[]::new);
         switch (concatWay){
             case AND:{
                 return cb.and(predicates);

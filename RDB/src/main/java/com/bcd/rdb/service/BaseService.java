@@ -1,18 +1,17 @@
 package com.bcd.rdb.service;
 
+import com.bcd.base.condition.Condition;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.i18n.I18NData;
 import com.bcd.rdb.anno.Unique;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.condition.Condition;
 import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.bcd.rdb.jdbc.sql.BatchCreateSqlResult;
 import com.bcd.rdb.jdbc.sql.BatchUpdateSqlResult;
 import com.bcd.rdb.jdbc.sql.SqlListResult;
 import com.bcd.rdb.jdbc.sql.SqlUtil;
-import com.bcd.rdb.util.ConditionUtil;
 import com.bcd.rdb.repository.BaseRepository;
-import org.apache.commons.lang3.ClassUtils;
+import com.bcd.rdb.util.ConditionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
@@ -22,19 +21,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.Id;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -281,9 +279,7 @@ public class BaseService<T, K extends Serializable> {
         CriteriaUpdate criteriaUpdate = criteriaBuilder.createCriteriaUpdate(getBeanInfo().clazz);
         Predicate predicate = specification.toPredicate(criteriaUpdate.from(getBeanInfo().clazz), criteriaQuery, criteriaBuilder);
         criteriaUpdate.where(predicate);
-        Iterator<Map.Entry<String, Object>> it = attrMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> entry = it.next();
+        for (Map.Entry<String, Object> entry : attrMap.entrySet()) {
             criteriaUpdate.set(entry.getKey(), entry.getValue());
         }
         return em.createQuery(criteriaUpdate).executeUpdate();
