@@ -6,7 +6,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
-@EnableScheduling
 @SpringBootApplication(scanBasePackages= {"com.bcd"})
 @EnableAspectJAutoProxy(proxyTargetClass = true,exposeProxy = true)
 public class Application{
