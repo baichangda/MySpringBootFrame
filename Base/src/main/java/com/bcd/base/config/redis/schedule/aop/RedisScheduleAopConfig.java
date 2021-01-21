@@ -1,7 +1,8 @@
 package com.bcd.base.config.redis.schedule.aop;
 
-import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.base.config.redis.schedule.handler.impl.SingleFailedScheduleHandler;
+import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
+import com.bcd.base.config.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,6 +14,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by bcd on 2018/2/12.
@@ -20,21 +23,24 @@ import java.lang.reflect.Method;
 @ConditionalOnProperty("my.enableScheduleFailedAnnotation")
 @Aspect
 @Component
-public class SingleFailedScheduleAopConfig {
+public class ClusterFailedScheduleAopConfig {
 
-    private final static Logger logger= LoggerFactory.getLogger(SingleFailedScheduleAopConfig.class);
+    private final static Map<Method, RedisScheduleHandler> METHOD_TO_HANDLER=new ConcurrentHashMap<>();
+
+    private final static Logger logger= LoggerFactory.getLogger(ClusterFailedScheduleAopConfig.class);
 
     private ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier;
 
-    public SingleFailedScheduleAopConfig(ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier) {
+    public ClusterFailedScheduleAopConfig(ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier) {
         this.scheduleAopRedisConnectionFactorySupplier=scheduleAopRedisConnectionFactorySupplier;
     }
 
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule) || @annotation(com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule)")
     public void methodSchedule(){
+
     }
 
     /**
@@ -43,22 +49,24 @@ public class SingleFailedScheduleAopConfig {
     @Around("methodSchedule()")
     public void doAroundSchedule(ProceedingJoinPoint joinPoint){
         //1、获取aop执行的方法
-        SingleFailedScheduleHandler handler=null;
+        RedisScheduleHandler handler=null;
         try {
             Method method=getAopMethod(joinPoint);
-            SingleFailedSchedule anno= method.getAnnotation(SingleFailedSchedule.class);
-            handler= new SingleFailedScheduleHandler(anno,scheduleAopRedisConnectionFactorySupplier.getRedisConnectionFactory());
+            handler=METHOD_TO_HANDLER.computeIfAbsent(method,k->{
+                ClusterFailedSchedule anno= k.getAnnotation(ClusterFailedSchedule.class);
+                return new ClusterFailedScheduleHandler(anno,scheduleAopRedisConnectionFactorySupplier.getRedisConnectionFactory());
+            });
             boolean flag=handler.doBeforeStart();
             if(flag){
                 Object[] args = joinPoint.getArgs();
                 joinPoint.proceed(args);
+                handler.doOnSuccess();
             }
-            handler.doOnSuccess();
         } catch (Throwable throwable) {
             if(handler!=null){
                 handler.doOnFailed();
             }
-            logger.error("Single Schedule Error",throwable);
+            logger.error("Cluster Schedule Error",throwable);
         }
     }
 
