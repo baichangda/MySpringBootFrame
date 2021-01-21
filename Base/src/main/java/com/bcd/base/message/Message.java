@@ -1,10 +1,9 @@
 package com.bcd.base.message;
 
 import com.bcd.base.i18n.I18NData;
-import com.bcd.base.util.StringUtil;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 
 /**
  * Created by Administrator on 2017/7/26.
@@ -28,6 +27,15 @@ public class Message implements Serializable {
         return new JsonMessage(result).withMessage(getValue(params)).withCode(code);
     }
 
+    /**
+     * 存在两种情况信息展示:
+     * 1、i18n数据模式
+     *    此时params为i18n的占位符参数
+     * 2、普通文本模式
+     *    此时params为普通文本中的占位符参数、使用方式类似 {@link org.slf4j.Logger#info(String, Object...)}
+     * @param params
+     * @return
+     */
     public String getValue(Object... params) {
         if (msg == null) {
             if (i18NData == null) {
@@ -36,7 +44,11 @@ public class Message implements Serializable {
                 return i18NData.getValue(params);
             }
         } else {
-            return MessageFormat.format(msg,params);
+            if(params==null||params.length==0){
+                return msg;
+            }else {
+                return MessageFormatter.arrayFormat(msg, params, null).getMessage();
+            }
         }
     }
 
