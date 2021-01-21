@@ -10,7 +10,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +25,7 @@ import java.util.concurrent.TimeUnit;
  * 所以:
  * timeOut必须大于 任务成功执行时间,否则会出现任务被执行多次
  * aliveTime必须大于 cycleInterval,否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
+ *
  */
 @SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
@@ -47,7 +47,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     private long aliveTime;
 
     /**
-     * 锁失败循环间隔时间(此参数在 单机失败模式下无效 )
+     * 锁失败循环间隔时间
      * 获取锁失败时候,循环检测执行结果并重新处理的循环时间间隔
      * 单位(毫秒)
      */
@@ -56,8 +56,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     /**
      * 根据随机数生成的各种val
      */
-    protected String executingVal;
-    protected String successVal;
+    protected String executingVal="0";
+    protected String successVal="1";
 
 
     public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut, long aliveTime, long cycleInterval) {
@@ -65,9 +65,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
         this.timeOut = timeOut;
         this.aliveTime = aliveTime;
         this.cycleInterval = cycleInterval;
-        String randomVal = UUID.randomUUID().toString();
-        this.executingVal = "0-" + randomVal;
-        this.successVal = "1-" + randomVal;
+
     }
 
     public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut) {
@@ -88,60 +86,32 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      */
     public boolean doBeforeStart() {
         try {
-            //1、获取锁
+            //获取锁
             boolean isLock = getLock();
             if (isLock) {
-                //2、获取成功则执行过期时间设置
+                //获取成功则执行任务
                 return true;
             } else {
-                //3、获取锁失败
-                /**
-                 * 死循环检测修复机制:
-                 * 如果当前循环的总时间大于超时时间,则判断锁是否有设置过期时间;如果没有,则直接删除
-                 */
-                int num = 0;
-                int maxNum = (int) (timeOut / cycleInterval);
-                while (true) {
-                    num++;
+                while(true){
                     Thread.sleep(cycleInterval);
-                    //3.1、获取执行的结果
                     /**
                      * null:执行时间超过超时时间 或者 执行失败
                      * 0:执行中
                      * 1:执行成功
                      */
-                    String[] res = parseValue(redisTemplate.opsForValue().get(lockId));
-                    if (res[0] == null) {
-                        //3.2、如果执行超时或执行失败,此时重新获取锁
+                    String val=redisTemplate.opsForValue().get(lockId);
+                    if(val==null){
+                        //如果执行超时或执行失败,此时重新获取锁
                         isLock = getLock();
                         if (isLock) {
-                            //3.2.1、获取成功则执行过期时间设置
+                            //获取成功则执行任务
                             return true;
-                        } else {
-                            //3.2.2、获取失败则进入下一轮循环等待执行结果
-                            continue;
                         }
-                    } else if ("0".equals(res[0])) {
-                        //3.3、如果正在执行中,判断循环的总时间是否大于设置的超时时间
-                        if (num > maxNum) {
-                            //3.3.1、如果大于,检测当前key的剩余过期时间,避免未设置过期时间死循环
-                            Long ttl = redisTemplate.getExpire(lockId, TimeUnit.MILLISECONDS);
-                            if (ttl == -1) {
-                                redisTemplate.delete(lockId);
-                            } else {
-                                //3.3.2、进入下一轮循环
-                                continue;
-                            }
-                        } else {
-                            //3.3.2、否则继续循环
-                            continue;
+                    }else{
+                        if(val.equals("1")){
+                            //如果执行完成,则当前机器不执行本次任务
+                            return false;
                         }
-                    } else if ("1".equals(res[0])) {
-                        //3.4、如果执行完成,则当前机器不执行本次任务
-                        return false;
-                    } else {
-                        //3.5、如果出现其他未知的结果,则直接不允许执行
-                        return false;
                     }
                 }
             }
@@ -158,8 +128,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * @return
      */
     private boolean getLock() {
-        return (boolean) redisTemplate.execute((RedisConnection connection) ->
-                connection.set(redisTemplate.getKeySerializer().serialize(lockId), redisTemplate.getValueSerializer().serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT)
+        return redisTemplate.execute((RedisConnection connection) ->
+                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT)
         );
     }
 
@@ -179,13 +149,13 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * 在catch中抛出运行时异常
      */
     public void doOnSuccess() {
-        //1、先判断是否还持有当前锁
+        //先判断是否还持有当前锁
         Object res = redisTemplate.opsForValue().get(lockId);
         if (executingVal.equals(res)) {
-            //1.1、如果持有当前锁,则设置成功标志并设置存活时间
+            //如果持有当前锁,则设置成功标志并设置存活时间
             redisTemplate.opsForValue().set(lockId, successVal, aliveTime, TimeUnit.MILLISECONDS);
         } else {
-            //1.2、如果当前锁已经被释放(说明可能有其他终端执行了定时任务),此时抛出异常,让定时任务执行失败
+            //如果当前锁已经被释放(说明可能有其他终端执行了定时任务),此时抛出异常,让定时任务执行失败
             throw BaseRuntimeException.getException("Other Thread Maybe Execute Task!");
         }
     }
@@ -195,29 +165,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * 1、执行失败时清除锁,供其他终端执行
      */
     public void doOnFailed() {
-        //1、即使删除失败,也没有任何影响,只是会有冗余数据在redis
+        //即使删除失败,也没有任何影响,只是会有冗余数据在redis
         redisTemplate.delete(lockId);
     }
 
-    /**
-     * 解析redis value结果
-     * 第一位
-     * 0:执行中
-     * 1:执行成功
-     * 2:执行失败
-     * <p>
-     * 第二位
-     * 随机数
-     *
-     * @param val
-     * @return
-     */
-    private String[] parseValue(Object val) {
-        if (val == null) {
-            return new String[]{null, null};
-        }
-        String flag = val.toString().substring(0, 1);
-        String randomVal = val.toString().substring(2);
-        return new String[]{flag, randomVal};
-    }
 }

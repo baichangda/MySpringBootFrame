@@ -10,7 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -20,19 +20,18 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by bcd on 2018/2/12.
  */
-@ConditionalOnProperty("my.enableScheduleFailedAnnotation")
 @Aspect
 @Component
-public class ClusterFailedScheduleAopConfig {
+public class RedisScheduleAopConfig {
 
     private final static Map<Method, RedisScheduleHandler> METHOD_TO_HANDLER=new ConcurrentHashMap<>();
 
-    private final static Logger logger= LoggerFactory.getLogger(ClusterFailedScheduleAopConfig.class);
+    private final static Logger logger= LoggerFactory.getLogger(RedisScheduleAopConfig.class);
 
-    private ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier;
+    private RedisConnectionFactory redisConnectionFactory;
 
-    public ClusterFailedScheduleAopConfig(ScheduleAopRedisConnectionFactorySupplier scheduleAopRedisConnectionFactorySupplier) {
-        this.scheduleAopRedisConnectionFactorySupplier=scheduleAopRedisConnectionFactorySupplier;
+    public RedisScheduleAopConfig(RedisConnectionFactory redisConnectionFactory) {
+        this.redisConnectionFactory=redisConnectionFactory;
     }
 
     /**
@@ -54,7 +53,7 @@ public class ClusterFailedScheduleAopConfig {
             Method method=getAopMethod(joinPoint);
             handler=METHOD_TO_HANDLER.computeIfAbsent(method,k->{
                 ClusterFailedSchedule anno= k.getAnnotation(ClusterFailedSchedule.class);
-                return new ClusterFailedScheduleHandler(anno,scheduleAopRedisConnectionFactorySupplier.getRedisConnectionFactory());
+                return new ClusterFailedScheduleHandler(anno,redisConnectionFactory);
             });
             boolean flag=handler.doBeforeStart();
             if(flag){

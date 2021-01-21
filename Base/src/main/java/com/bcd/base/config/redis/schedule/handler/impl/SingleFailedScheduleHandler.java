@@ -24,6 +24,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
 
     private final static Long DEFAULT_ALIVE_TIME = 2000L;
 
+
     /**
      * 锁获取后存活时间
      * 单位(毫秒)
@@ -53,8 +54,8 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     public boolean doBeforeStart() {
         try {
             //1、获取锁
-            boolean isLock = (boolean) redisTemplate.execute((RedisConnection connection) ->
-                    connection.set(redisTemplate.getKeySerializer().serialize(lockId), redisTemplate.getValueSerializer().serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
+            boolean isLock = redisTemplate.execute((RedisConnection connection) ->
+                    connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
             );
             return isLock;
         } catch (Exception e) {

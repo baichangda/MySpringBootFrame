@@ -164,7 +164,3 @@ spring:
   #注意如果使用druid数据源、脚本中不能带 . 字符、否则会导致启动执行脚本失败
 #   flyway:
 #     enabled: true
-
-my:
-  #是否启用集群定时任务失败注解
-  enableScheduleFailedAnnotation: true
