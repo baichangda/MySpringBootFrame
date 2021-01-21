@@ -16,15 +16,15 @@ import java.util.concurrent.TimeUnit;
  * 集群失败执行模式,如果一个终端执行定时任务失败,会有其他终端执行;直到所有的终端执行失败,定时任务才算失败
  * <p>
  * 原理:
- * 1、到达任务时间点,集群中多个实例开始争夺redis锁,锁具有超时时间为timeOut
- * 2、获取到redis锁的实例开始执行任务,其他未获取到锁的实例循环等待,循环的间隔为cycleInterval
+ * 1、到达任务时间点,集群中多个实例开始争夺redis锁,锁具有超时时间为 {@link #timeOut}
+ * 2、获取到redis锁的实例开始执行任务,其他未获取到锁的实例循环等待,循环的间隔为 {@link #cycleInterval}
  * 3、如果执行成功,将成功标记设置到redis中,其他实例检测到成功的结果,结束循环
  * 4、如果执行失败,清除redis锁,此实例不再参与锁竞争,其他等待的实例进行锁竞争
  * 5、如果执行超时,此时锁会被redis自动清除,其他实例会进行锁竞争
  * <p>
  * 所以:
- * timeOut必须大于 任务成功执行时间,否则会出现任务被执行多次
- * aliveTime必须大于 cycleInterval,否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
+ * {@link #timeOut} 必须大于 任务成功执行时间,否则会出现任务被执行多次
+ * {@link #aliveTime} 必须大于 {@link #cycleInterval},否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
  *
  */
 @SuppressWarnings("unchecked")
