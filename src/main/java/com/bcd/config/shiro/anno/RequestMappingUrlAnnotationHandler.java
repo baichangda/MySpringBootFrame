@@ -1,6 +1,6 @@
 package com.bcd.config.shiro.anno;
 
-import com.bcd.base.config.shiro.anno.RequiresUrlPermission;
+import com.bcd.base.config.shiro.anno.RequiresRequestMappingUrl;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 import org.apache.shiro.subject.Subject;
@@ -11,7 +11,7 @@ import java.util.Set;
 public class UrlPermissionAnnotationHandler extends AuthorizingAnnotationHandler {
 
     public UrlPermissionAnnotationHandler() {
-        super(RequiresUrlPermission.class);
+        super(RequiresRequestMappingUrl.class);
     }
 
     private ThreadLocal<Set<String>>  actionPermission = new ThreadLocal<>();
