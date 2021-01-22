@@ -5,9 +5,13 @@ import com.bcd.base.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 /**
@@ -26,7 +30,7 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("unchecked")
 public class ExpireCallBackMap<V> {
     private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackMap.class);
-    private final Map<String, ExpireCallBackValue<V>> dataMap = new HashMap<>();
+    private final Map<String, Value<V>> dataMap = new HashMap<>();
 
     /**
      * 用于从map中检索出过期key并移除 定时任务线程池
@@ -49,11 +53,11 @@ public class ExpireCallBackMap<V> {
      * 会触发回调
      */
     public void scanAndClearExpired(){
-        Iterator<Map.Entry<String, ExpireCallBackValue<V>>> it=dataMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Value<V>>> it=dataMap.entrySet().iterator();
         while(it.hasNext()){
-            Map.Entry<String, ExpireCallBackValue<V>> cur=it.next();
+            Map.Entry<String, Value<V>> cur=it.next();
             synchronized (cur.getKey().intern()) {
-                ExpireCallBackValue<V> expireValue = cur.getValue();
+                Value<V> expireValue = cur.getValue();
                 if (expireValue.isExpired()) {
                     it.remove();
                     callback(cur.getKey(), expireValue.getVal(), expireValue.getCallback());
@@ -122,7 +126,7 @@ public class ExpireCallBackMap<V> {
      * @param triggerCallback
      * @return
      */
-    private V getVal(ExpireCallBackValue<V> expireValue, String k,boolean triggerCallback){
+    private V getVal(Value<V> expireValue, String k,boolean triggerCallback){
         if (expireValue == null) {
             return null;
         } else {
@@ -150,7 +154,7 @@ public class ExpireCallBackMap<V> {
      */
     public V get(String k) {
         synchronized (k.intern()){
-            ExpireCallBackValue<V> expireValue= dataMap.get(k);
+            Value<V> expireValue= dataMap.get(k);
             return getVal(expireValue,k,true);
         }
     }
@@ -175,9 +179,9 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V put(String k, V v, long aliveTime, BiConsumer<String, V> callback) {
-        ExpireCallBackValue<V> expireValue = new ExpireCallBackValue<>(System.currentTimeMillis() + aliveTime, v, callback);
+        Value<V> expireValue = new Value<>(System.currentTimeMillis() + aliveTime, v, callback);
         synchronized (k.intern()) {
-            ExpireCallBackValue<V> oldVal = dataMap.put(k, expireValue);
+            Value<V> oldVal = dataMap.put(k, expireValue);
             return getVal(oldVal, k, false);
         }
     }
@@ -189,7 +193,7 @@ public class ExpireCallBackMap<V> {
      */
     public V remove(String k) {
         synchronized (k.intern()) {
-            ExpireCallBackValue<V> oldVal = dataMap.remove(k);
+            Value<V> oldVal = dataMap.remove(k);
             return getVal(oldVal, k, false);
         }
     }
@@ -201,6 +205,34 @@ public class ExpireCallBackMap<V> {
     public void removeAll(){
         for (String k : dataMap.keySet()) {
             remove(k);
+        }
+    }
+
+    private final static class Value<T>{
+        private Long expireTime;
+        private T val;
+        private BiConsumer callback;
+
+        public Value(Long expireTime, T val, BiConsumer callback) {
+            this.expireTime = expireTime;
+            this.val = val;
+            this.callback = callback;
+        }
+
+        public T getVal() {
+            return val;
+        }
+
+        public BiConsumer getCallback() {
+            return callback;
+        }
+
+        public Long getExpireTime() {
+            return expireTime;
+        }
+
+        public boolean isExpired() {
+            return expireTime < System.currentTimeMillis();
         }
     }
 
