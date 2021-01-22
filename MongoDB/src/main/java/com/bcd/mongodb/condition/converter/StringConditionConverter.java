@@ -77,15 +77,15 @@ public class StringConditionConverter implements Converter<StringCondition,Crite
                             break;
                         }
                         case ALL_LIKE: {
-                            criteria.regex(".*" + val.toString() + ".*");
+                            criteria.regex(".*(" + val.toString() + ").*");
                             break;
                         }
                         case LEFT_LIKE: {
-                            criteria.regex("^(" + val.toString() + ").*");
+                            criteria.regex("^(" + val.toString() + ")");
                             break;
                         }
                         case RIGHT_LIKE: {
-                            criteria.regex(".*(" + val.toString() + ")$");
+                            criteria.regex("(" + val.toString() + ")$");
                             break;
                         }
                         default: {
