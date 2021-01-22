@@ -1,6 +1,7 @@
 package com.bcd.mongodb.test.controller;
 
 import com.bcd.base.condition.Condition;
+import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings(value = "unchecked")
@@ -38,13 +40,15 @@ public class TestController extends BaseController {
     @ApiOperation(value="查询测试列表",notes = "查询测试列表")
     @ApiResponse(code = 200,message = "测试列表")
     public JsonMessage<List<TestBean>> list(
-        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) String postlinecode,
-        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) String postlinename,
+        @ApiParam(value = "vin") @RequestParam(required = false) String vin,
+        @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
+        @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
         @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id
     ){
         Condition condition= Condition.and(
-           new StringCondition("postlinecode",postlinecode),
-           new StringCondition("postlinename",postlinename),
+           new StringCondition("vin",vin),
+           new DateCondition("time",timeBegin, DateCondition.Handler.GE),
+           new DateCondition("time",timeEnd, DateCondition.Handler.LE),
            new StringCondition("id",id)
         );
         return JsonMessage.success().withData(testService.findAll(condition));
@@ -58,15 +62,17 @@ public class TestController extends BaseController {
     @ApiOperation(value="查询测试分页",notes = "查询测试分页")
     @ApiResponse(code = 200,message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
-        @ApiParam(value = "班线code(长度20)") @RequestParam(required = false) String postlinecode,
-        @ApiParam(value = "班线名称(长度30)") @RequestParam(required = false) String postlinename,
+        @ApiParam(value = "vin") @RequestParam(required = false) String vin,
+        @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
+        @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
         @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id,
         @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
         @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
-           new StringCondition("postlinecode",postlinecode),
-           new StringCondition("postlinename",postlinename),
+           new StringCondition("vin",vin),
+           new DateCondition("time",timeBegin, DateCondition.Handler.GE),
+           new DateCondition("time",timeEnd, DateCondition.Handler.LE),
            new StringCondition("id",id)
         );
         return JsonMessage.success().withData(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));

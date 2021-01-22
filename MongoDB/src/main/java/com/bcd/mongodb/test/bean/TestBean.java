@@ -7,14 +7,16 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Accessors(chain = true)
 @Getter
 @Setter
-@Document(collection = "departure")
+@Document(collection = "test")
 //测试类
 public class TestBean extends SuperBaseBean<String>{
-    @ApiModelProperty(value = "班线code(长度20)")
-    private String postlinecode;
-    @ApiModelProperty(value = "班线名称(长度30)")
-    private String postlinename;
+    @ApiModelProperty(value = "vin")
+    private String vin;
+    @ApiModelProperty(value = "时间")
+    private Date time;
 }

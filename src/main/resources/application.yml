@@ -86,7 +86,7 @@ spring:
 
 
 #  mongodb配置
-   data.mongodb.uri: mongodb://test:test@10.0.14.155:27017/test
+   data.mongodb.uri: mongodb://test:test@127.0.0.1:27017/test
 
 
 #  i18n资源文件配置
