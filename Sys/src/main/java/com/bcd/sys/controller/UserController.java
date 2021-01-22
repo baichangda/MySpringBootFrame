@@ -1,25 +1,31 @@
 package com.bcd.sys.controller;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.condition.impl.*;
+import com.bcd.base.condition.impl.DateCondition;
+import com.bcd.base.condition.impl.NumberCondition;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.MessageDefine;
+import com.bcd.sys.service.UserService;
 import com.bcd.sys.shiro.ShiroUtil;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Date;
 import java.util.List;
-import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.service.UserService;
 
 @SuppressWarnings(value = "unchecked")
 @RestController
@@ -44,7 +50,6 @@ public class UserController extends BaseController {
             @ApiParam(value = "身份证号") @RequestParam(value = "cardNumber", required = false) String cardNumber,
             @ApiParam(value = "邮箱") @RequestParam(value = "email", required = false) String email,
             @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(value = "密码") @RequestParam(value = "password", required = false) String password,
             @ApiParam(value = "手机号") @RequestParam(value = "phone", required = false) String phone,
             @ApiParam(value = "真实姓名") @RequestParam(value = "realName", required = false) String realName,
@@ -59,7 +64,6 @@ public class UserController extends BaseController {
                 new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
@@ -85,7 +89,6 @@ public class UserController extends BaseController {
             @ApiParam(value = "身份证号") @RequestParam(value = "cardNumber", required = false) String cardNumber,
             @ApiParam(value = "邮箱") @RequestParam(value = "email", required = false) String email,
             @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
             @ApiParam(value = "密码") @RequestParam(value = "password", required = false) String password,
             @ApiParam(value = "手机号") @RequestParam(value = "phone", required = false) String phone,
             @ApiParam(value = "真实姓名") @RequestParam(value = "realName", required = false) String realName,
@@ -101,7 +104,6 @@ public class UserController extends BaseController {
                 new StringCondition("cardNumber",cardNumber, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("email",email, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("id",id, NumberCondition.Handler.EQUAL),
-                new StringCondition("orgCode",orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("password",password, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("phone",phone, StringCondition.Handler.ALL_LIKE),
                 new StringCondition("realName",realName, StringCondition.Handler.ALL_LIKE),
@@ -109,8 +111,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status",status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username",username, StringCondition.Handler.ALL_LIKE)
         );
-//        return JsonMessage.success().withData(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
-        return JsonMessage.success().withData(userService.pageBySql("select * from t_sys_user where id=?",PageRequest.of(pageNum-1,pageSize),UserBean.class,id));
+        return JsonMessage.success().withData(userService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
