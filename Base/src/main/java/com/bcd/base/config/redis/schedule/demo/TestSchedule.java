@@ -16,7 +16,7 @@ public class TestSchedule {
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
-    @ClusterFailedSchedule(lockId = "bcd-test1",timeOut = 2000L)
+    @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test1(){
 //        String a=null;
 //        System.out.println(Thread.currentThread().getId()+" exception===========test1 "+sdf.format(new Date()));
@@ -26,7 +26,7 @@ public class TestSchedule {
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
-    @ClusterFailedSchedule(lockId = "bcd-test2",timeOut = 2000L)
+    @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test2(){
 //        String a=null;
 //        System.out.println(Thread.currentThread().getId()+" exception===========test2 "+sdf.format(new Date()));
@@ -36,7 +36,7 @@ public class TestSchedule {
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
-    @ClusterFailedSchedule(lockId = "bcd-test3",timeOut = 2000L)
+    @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test3(){
 //        String a=null;
 //        System.out.println(Thread.currentThread().getId()+" exception===========test3 "+sdf.format(new Date()));
@@ -46,7 +46,7 @@ public class TestSchedule {
 
     @Scheduled(cron = "*/3 * * * * ?")
     @Transactional(rollbackFor = Exception.class)
-    @ClusterFailedSchedule(lockId = "bcd-test4",timeOut = 2000L)
+    @ClusterFailedSchedule(lockId = "bcd-test",timeOut = 2000L)
     public void test4(){
         System.out.println(Thread.currentThread().getId()+"===========test4 "+sdf.format(new Date()));
     }
