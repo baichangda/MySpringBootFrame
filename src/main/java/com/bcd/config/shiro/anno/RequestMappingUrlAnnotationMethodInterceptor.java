@@ -16,18 +16,18 @@ import java.util.Set;
  * Created by Administrator on 2017/8/16.
  */
 @SuppressWarnings("unchecked")
-public class UrlPermissionAnnotationMethodInterceptor extends AuthorizingAnnotationMethodInterceptor{
-    public UrlPermissionAnnotationMethodInterceptor(AnnotationResolver resolver) {
-        super(new UrlPermissionAnnotationHandler(),resolver);
+public class RequestMappingUrlAnnotationMethodInterceptor extends AuthorizingAnnotationMethodInterceptor{
+    public RequestMappingUrlAnnotationMethodInterceptor(AnnotationResolver resolver) {
+        super(new RequestMappingUrlAnnotationHandler(),resolver);
     }
-    public UrlPermissionAnnotationMethodInterceptor() {
-        super(new UrlPermissionAnnotationHandler());
+    public RequestMappingUrlAnnotationMethodInterceptor() {
+        super(new RequestMappingUrlAnnotationHandler());
     }
 
     @Override
     public void assertAuthorized(MethodInvocation mi) throws AuthorizationException {
         try {
-            UrlPermissionAnnotationHandler handler= (UrlPermissionAnnotationHandler)getHandler();
+            RequestMappingUrlAnnotationHandler handler= (RequestMappingUrlAnnotationHandler)getHandler();
             Method method= mi.getMethod();
             Class clazz= method.getDeclaringClass();
             RequestMapping classRequestMapping=(RequestMapping)clazz.getAnnotation(RequestMapping.class);

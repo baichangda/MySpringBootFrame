@@ -1,9 +1,8 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
 import com.bcd.config.shiro.anno.NotePermissionAnnotationMethodInterceptor;
-import com.bcd.config.shiro.anno.UrlPermissionAnnotationMethodInterceptor;
+import com.bcd.config.shiro.anno.RequestMappingUrlAnnotationMethodInterceptor;
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -20,7 +19,7 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
         this.authorizationHandler=authorizationHandler;
         //自定义注解拦截器配置
         this.methodInterceptors.add(new ActionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
-        this.methodInterceptors.add(new UrlPermissionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
+        this.methodInterceptors.add(new RequestMappingUrlAnnotationMethodInterceptor(new SpringAnnotationResolver()));
         this.methodInterceptors.add(new NotePermissionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
     }
 
