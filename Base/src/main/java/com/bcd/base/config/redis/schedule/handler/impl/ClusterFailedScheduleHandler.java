@@ -2,9 +2,6 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 
 import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
-import com.bcd.base.exception.BaseRuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
@@ -29,8 +26,6 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
-
-    private final static Logger logger = LoggerFactory.getLogger(ClusterFailedScheduleHandler.class);
 
     /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
@@ -116,7 +111,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                 }
             }
         } catch (InterruptedException e) {
-            logger.error("Cluster Schedule Interrupted", e);
+            logger.error("cluster schedule interrupted", e);
             Thread.currentThread().interrupt();
             return false;
         }
@@ -155,8 +150,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
             //如果持有当前锁,则设置成功标志并设置存活时间
             redisTemplate.opsForValue().set(lockId, successVal, aliveTime, TimeUnit.MILLISECONDS);
         } else {
-            //如果当前锁已经被释放(说明可能有其他终端执行了定时任务),此时抛出异常,让定时任务执行失败
-            throw BaseRuntimeException.getException("Other Thread Maybe Execute Task!");
+            //如果当前锁已经被释放(说明可能有其他终端执行了定时任务)
+            logger.warn("schedule lockId[{}] doOnSuccess res[{}],other thread maybe execute task",lockId,res);
         }
     }
 

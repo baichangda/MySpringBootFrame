@@ -1,6 +1,8 @@
 package com.bcd.base.config.redis.schedule.handler;
 
 import com.bcd.base.config.redis.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -19,6 +21,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 public abstract class RedisScheduleHandler {
 
+    protected Logger logger= LoggerFactory.getLogger(this.getClass());
 
     protected RedisSerializer<String> keySerializer;
     protected RedisSerializer<String> valueSerializer;

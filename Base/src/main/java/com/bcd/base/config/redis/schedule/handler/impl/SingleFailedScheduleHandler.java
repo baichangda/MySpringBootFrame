@@ -20,8 +20,6 @@ import org.springframework.data.redis.core.types.Expiration;
 @SuppressWarnings("unchecked")
 public class SingleFailedScheduleHandler extends RedisScheduleHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(SingleFailedScheduleHandler.class);
-
     private final static Long DEFAULT_ALIVE_TIME = 2000L;
 
 
@@ -52,16 +50,11 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
      */
     @Override
     public boolean doBeforeStart() {
-        try {
-            //1、获取锁
-            boolean isLock = redisTemplate.execute((RedisConnection connection) ->
-                    connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
-            );
-            return isLock;
-        } catch (Exception e) {
-            logger.error("Error", e);
-            return false;
-        }
+        //1、获取锁
+        boolean isLock = redisTemplate.execute((RedisConnection connection) ->
+                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
+        );
+        return isLock;
     }
 
     /**

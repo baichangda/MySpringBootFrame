@@ -1,8 +1,11 @@
 package com.bcd.base.config.redis.schedule.aop;
 
 import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
 import com.bcd.base.config.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
+import com.bcd.base.config.redis.schedule.handler.impl.SingleFailedScheduleHandler;
+import com.bcd.base.exception.BaseRuntimeException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -24,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RedisScheduleAopConfig {
 
-    private final static Map<Method, RedisScheduleHandler> METHOD_TO_HANDLER=new ConcurrentHashMap<>();
+    private final static Map<String, RedisScheduleHandler> LOCK_ID_TO_HANDLER =new ConcurrentHashMap<>();
 
     private final static Logger logger= LoggerFactory.getLogger(RedisScheduleAopConfig.class);
 
@@ -48,37 +51,41 @@ public class RedisScheduleAopConfig {
     @Around("methodSchedule()")
     public void doAroundSchedule(ProceedingJoinPoint joinPoint){
         //1、获取aop执行的方法
-        RedisScheduleHandler handler=null;
-        try {
-            Method method=getAopMethod(joinPoint);
-            handler=METHOD_TO_HANDLER.computeIfAbsent(method,k->{
-                ClusterFailedSchedule anno= k.getAnnotation(ClusterFailedSchedule.class);
-                return new ClusterFailedScheduleHandler(anno,redisConnectionFactory);
-            });
-            boolean flag=handler.doBeforeStart();
-            if(flag){
-                Object[] args = joinPoint.getArgs();
+        Method method = getAopMethod(joinPoint);
+        SingleFailedSchedule anno1= method.getAnnotation(SingleFailedSchedule.class);
+        RedisScheduleHandler handler;
+        if(anno1==null){
+            ClusterFailedSchedule anno2= method.getAnnotation(ClusterFailedSchedule.class);
+            handler= LOCK_ID_TO_HANDLER.computeIfAbsent(anno2.lockId(), k-> new ClusterFailedScheduleHandler(anno2,redisConnectionFactory));
+        }else{
+            handler= LOCK_ID_TO_HANDLER.computeIfAbsent(anno1.lockId(), k-> new SingleFailedScheduleHandler(anno1,redisConnectionFactory));
+        }
+        boolean flag=handler.doBeforeStart();
+        if(flag){
+            Object[] args = joinPoint.getArgs();
+            try {
                 joinPoint.proceed(args);
-                handler.doOnSuccess();
-            }
-        } catch (Throwable throwable) {
-            if(handler!=null){
+            } catch (Throwable throwable) {
                 handler.doOnFailed();
+                logger.error("schedule error",throwable);
             }
-            logger.error("Cluster Schedule Error",throwable);
+            handler.doOnSuccess();
         }
     }
 
 
-    private Method getAopMethod(ProceedingJoinPoint joinPoint) throws Exception{
+    private Method getAopMethod(ProceedingJoinPoint joinPoint){
         //拦截的实体类
         Object target = joinPoint.getTarget();
         //拦截的方法名称
         String methodName = joinPoint.getSignature().getName();
         //拦截的放参数类型
         Class[] parameterTypes = ((MethodSignature)joinPoint.getSignature()).getMethod().getParameterTypes();
-        return target.getClass().getMethod(methodName, parameterTypes);
-
+        try {
+            return target.getClass().getMethod(methodName, parameterTypes);
+        }catch (NoSuchMethodException ex){
+            throw BaseRuntimeException.getException(ex);
+        }
     }
 
 
