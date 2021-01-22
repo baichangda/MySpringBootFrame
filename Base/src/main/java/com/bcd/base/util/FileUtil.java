@@ -37,26 +37,10 @@ public class FileUtil {
             return;
         }
         try {
-            if (path.toFile().exists()) {
+            if (Files.exists(path)) {
                 return;
             }
             Files.createFile(path);
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-    /**
-     * 如果文件夹已存在则不创建
-     *
-     * @param path
-     */
-    public static void createDirectories(Path path) {
-        if (path == null) {
-            return;
-        }
-        try {
-            Files.createDirectories(path);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }

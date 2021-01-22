@@ -3,7 +3,6 @@ package com.bcd.mongodb.code.freemarker;
 import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
-import com.bcd.base.util.FileUtil;
 import com.bcd.mongodb.bean.BaseBean;
 import com.bcd.mongodb.bean.SuperBaseBean;
 import com.bcd.mongodb.code.freemarker.data.*;
@@ -23,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,9 +42,13 @@ public class CodeGenerator {
      */
     public static void generateRepository(RepositoryData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
-        String beanDir = destDir + "/repository";
-        FileUtil.createDirectories(Paths.get(beanDir));
-        String destBeanPath=beanDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
+        String fileDir = destDir + "/repository";
+        try {
+            Files.createDirectories(Paths.get(fileDir));
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+        String destBeanPath=fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath)){
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("TemplateRepository.txt");
@@ -63,9 +67,13 @@ public class CodeGenerator {
      */
     public static void generateService(ServiceData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
-        String beanDir = destDir + "/service";
-        FileUtil.createDirectories(Paths.get(beanDir));
-        String destBeanPath=beanDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
+        String fileDir = destDir + "/service";
+        try {
+            Files.createDirectories(Paths.get(fileDir));
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+        String destBeanPath=fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath)){
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("TemplateService.txt");
@@ -84,9 +92,13 @@ public class CodeGenerator {
      */
     public static void generateController(ControllerData data, String templateDir, String destDir){
         Configuration configuration=new Configuration(CodeConst.FREEMARKER_VERSION);
-        String beanDir = destDir + "/controller";
-        FileUtil.createDirectories(Paths.get(beanDir));
-        String destBeanPath=beanDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
+        String fileDir = destDir + "/controller";
+        try {
+            Files.createDirectories(Paths.get(fileDir));
+        } catch (IOException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+        String destBeanPath=fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath)){
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("TemplateController.txt");
