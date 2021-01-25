@@ -153,9 +153,9 @@ flyway {
         subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/mysql')
     }
     //pgsql
-//    url = 'jdbc:postgresql://db.hbluewhale.com:12921/test_bcd'
-//    user = 'dbuser'
-//    password = 'hlxpassword'
+//    url = 'jdbc:postgresql://127.0.0.1:5432/msbf'
+//    user = 'root'
+//    password = '123456'
 //    for(project in subprojects){
 //        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
 //    }
