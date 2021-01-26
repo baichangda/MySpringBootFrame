@@ -63,10 +63,4 @@ public class UserBean extends BaseBean<Long>{
     @NotNull(message = "[是否可用]不能为空")
     @ApiModelProperty(value = "是否可用(0:禁用,1:可用)(不能为空)")
     private Integer status;
-
-    //"+8"
-    @ApiModelProperty(hidden = true)
-    @Transient
-    private String offsetId;
-
 }

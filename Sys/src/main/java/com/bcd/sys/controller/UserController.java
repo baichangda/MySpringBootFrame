@@ -147,7 +147,6 @@ public class UserController extends BaseController {
      * 登录
      * @param username
      * @param password
-     * @param offsetId
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -157,10 +156,8 @@ public class UserController extends BaseController {
             @ApiParam(value = "用户名")
             @RequestParam(value = "username",required = true) String username,
             @ApiParam(value = "密码")
-            @RequestParam(value = "password",required = true) String password,
-            @ApiParam(value = "时区偏移量")
-            @RequestParam(value="offsetId",required = false,defaultValue = "+8")String offsetId){
-        UserBean user= userService.login(username,password,offsetId);
+            @RequestParam(value = "password",required = true) String password){
+        UserBean user= userService.login(username,password);
         return JsonMessage.success().withData(user);
     }
 

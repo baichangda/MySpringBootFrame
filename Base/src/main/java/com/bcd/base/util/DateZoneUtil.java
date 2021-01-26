@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -17,31 +17,53 @@ import java.util.List;
 public class DateZoneUtil {
     public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
+    public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
+    public final static DateTimeFormatter DATE_TIME_FORMATTER_SECOND=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+
     /**
      * @param dateStr
-     * @param format
      * @return
-     * @see DateUtil#stringToDate(String, String, ZoneOffset)
      */
-    public static Date stringToDate(String dateStr, String format) {
-        if (dateStr == null || format == null) {
+    public static Date stringToDate_day(String dateStr) {
+        if (dateStr == null) {
             return null;
         }
-        return DateUtil.stringToDate(dateStr, format, ZONE_OFFSET);
+        return Date.from(LocalDate.from(DATE_TIME_FORMATTER_DAY.parse(dateStr)).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
+    }
+
+    /**
+     * @param dateStr
+     * @return
+     */
+    public static Date stringToDate_second(String dateStr) {
+        if (dateStr == null) {
+            return null;
+        }
+        return Date.from(LocalDate.from(DATE_TIME_FORMATTER_SECOND.parse(dateStr)).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
     }
 
     /**
      * @param date
-     * @param format
      * @return
-     * @see DateUtil#dateToString(Date, String, ZoneOffset)
      */
-    public static String dateToString(Date date, String format) {
-        if (date == null || format == null) {
+    public static String dateToString_day(Date date) {
+        if (date == null) {
             return null;
         }
-        return DateUtil.dateToString(date, format, ZONE_OFFSET);
+        return DATE_TIME_FORMATTER_DAY.format(date.toInstant());
     }
+
+    /**
+     * @param date
+     * @return
+     */
+    public static String dateToString_second(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return DATE_TIME_FORMATTER_SECOND.format(date.toInstant());
+    }
+
 
     /**
      * @param date
@@ -91,5 +113,19 @@ public class DateZoneUtil {
      */
     public static Long getDateNum(Date date, ChronoUnit unit) {
         return DateUtil.getDateNum(date, unit, ZONE_OFFSET);
+    }
+
+
+    public static void main(String[] args) {
+        Date time=stringToDate_day("20111111");
+        System.out.println(time);
+        System.out.println(dateToString_day(time));
+        System.out.println(dateToString_second(time));
+
+
+        DateTimeFormatter formatter1=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
+        DateTimeFormatter formatter2=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+        System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli()/1000);
+        System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli()/1000);
     }
 }

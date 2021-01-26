@@ -86,9 +86,9 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
      * @param phoneCode
      * @return
      */
-    public UserBean login(String phone,String phoneCode){
+    public UserBean login_phone(String phone,String phoneCode){
         PhoneCodeToken token=new PhoneCodeToken(phone,phoneCode);
-        return login(token, DateZoneUtil.ZONE_OFFSET.getId(),()->{
+        return login(token,()->{
             return findOne(new StringCondition("phone",phone));
         });
     }
@@ -127,10 +127,9 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
      * 用户名、密码登陆
      * @param username
      * @param encryptPassword 使用公钥加密后的密码
-     * @param offsetId
      * @return
      */
-    public UserBean login(String username,String encryptPassword,String offsetId){
+    public UserBean login(String username,String encryptPassword){
         UsernamePasswordToken token;
         //根据是否加密处理选择不同处理方式
         if(CommonConst.IS_PASSWORD_ENCODED){
@@ -142,19 +141,18 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
         }else{
             token = new UsernamePasswordToken(username, encryptPassword);
         }
-        return login(token,offsetId,()->{
+        return login(token,()->{
             return findOne(new StringCondition("username",username));
         });
     }
 
-    private UserBean login(AuthenticationToken token,String offsetId, Supplier<UserBean> supplier){
+    private UserBean login(AuthenticationToken token, Supplier<UserBean> supplier){
         //获取当前subject
         Subject subject = SecurityUtils.getSubject();
         //进行登录操作
         subject.login(token);
         //设置用户信息到session中
         UserBean user=supplier.get();
-        user.setOffsetId(offsetId);
         subject.getSession().setAttribute("user",user);
         return user;
     }

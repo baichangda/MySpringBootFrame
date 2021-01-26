@@ -21,41 +21,8 @@ public class DateUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
-    public final static String DATE_FORMAT_DAY = "yyyy-MM-dd";
-    public final static String PARAM_DATE_FORMAT_DAY = "yyyyMMdd";
-    public final static String DATE_FORMAT_SECOND = "yyyy-MM-dd HH:mm:ss";
-    public final static String PARAM_DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
-
-    /**
-     * 将日期转换为字符串
-     *
-     * @param date
-     * @param format
-     * @param zoneOffset
-     * @return
-     */
-    public static String dateToString(Date date, String format, ZoneOffset zoneOffset) {
-        if (date == null || format == null || zoneOffset == null) {
-            return null;
-        }
-        return DateTimeFormatter.ofPattern(format).withZone(zoneOffset).format(date.toInstant());
-    }
-
-
-    /**
-     * 将日期字符串转换为 时间类型
-     *
-     * @param dateStr
-     * @param format
-     * @param zoneOffset
-     * @return
-     */
-    public static Date stringToDate(String dateStr, String format, ZoneOffset zoneOffset) {
-        if (dateStr == null || format == null || zoneOffset == null) {
-            return null;
-        }
-        return Date.from(Instant.from(DateTimeFormatter.ofPattern(format).withZone(zoneOffset).parse(dateStr)));
-    }
+    public final static String DATE_FORMAT_DAY = "yyyyMMdd";
+    public final static String DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
 
 
     /**
