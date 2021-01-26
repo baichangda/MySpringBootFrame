@@ -1,5 +1,7 @@
 package com.bcd.base.util;
 
+import com.bcd.base.exception.BaseRuntimeException;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -19,6 +21,27 @@ public class DateZoneUtil {
 
     public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
     public final static DateTimeFormatter DATE_TIME_FORMATTER_SECOND=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+
+    /**
+     * 根据dateStr长度转换成不同的时间
+     * {@link DateUtil#DATE_FORMAT_DAY} 长度8
+     * {@link DateUtil#DATE_FORMAT_SECOND} 长度14
+     * @param dateStr
+     * @return
+     */
+    public static Date stringToDate(String dateStr){
+        if (dateStr == null) {
+            return null;
+        }
+        int len=dateStr.length();
+        if(len==DateUtil.DATE_FORMAT_DAY.length()){
+            return DateZoneUtil.stringToDate_day(dateStr);
+        }else if(len==DateUtil.DATE_FORMAT_SECOND.length()){
+            return DateZoneUtil.stringToDate_second(dateStr);
+        }else{
+            throw BaseRuntimeException.getException("dateStr[{}] not support",dateStr);
+        }
+    }
 
     /**
      * @param dateStr

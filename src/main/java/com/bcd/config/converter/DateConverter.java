@@ -30,14 +30,7 @@ public class DateConverter implements Converter<String,Date> {
             char first=source.charAt(0);
             if(first=='s'){
                 String val=source.substring(1);
-                int sourceLen=val.length();
-                if(sourceLen==DateUtil.DATE_FORMAT_DAY.length()){
-                    return DateZoneUtil.stringToDate_day(val);
-                }else if(sourceLen==DateUtil.DATE_FORMAT_SECOND.length()){
-                    return DateZoneUtil.stringToDate_second(val);
-                }else{
-                    throw MessageDefine.ERROR_DATE_CONVERT_FAILED.toRuntimeException(source);
-                }
+                return DateZoneUtil.stringToDate(val);
             }else{
                 long t = Long.parseLong(source);
                 return new Date(t);
