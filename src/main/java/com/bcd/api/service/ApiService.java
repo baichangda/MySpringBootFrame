@@ -38,8 +38,8 @@ public class ApiService {
      * 获取方法下面所有方法名称和注释的map
      *
      * 规则:
-     * 1、先获取所有 RequestParam和RequestBody 注解的参数名称
-     * 2、根据参数名称从 ApiImplicitParams、ApiParam 获取参数对应注释
+     * 1、先获取所有 {@link RequestParam}和{@link RequestBody}注解的参数名称
+     * 2、根据参数名称从 {@link ApiImplicitParam}、{@link ApiParam} 获取参数对应注释
      *
      * @param method
      * @return
