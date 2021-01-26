@@ -5,6 +5,7 @@ import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
+import com.alibaba.excel.write.handler.WorkbookWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
@@ -14,6 +15,7 @@ import com.bcd.base.util.SpringUtil;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +24,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
 @SuppressWarnings("unchecked")
 public class ApiService {
 
-    MySheetWriteHandler sheetWriteHandler=new MySheetWriteHandler();
-    MyCellWriteHandler cellWriteHandler=new MyCellWriteHandler();
+    MyWorkbookWriteHandler workbookWriteHandler=new MyWorkbookWriteHandler();
 
     /**
      * 获取方法下面所有方法名称和注释的map
@@ -231,29 +234,38 @@ public class ApiService {
 
         //4、生成excel
         //4.1、准备样式
+        MyCellWriteHandler cellWriteHandler=new MyCellWriteHandler();
         EasyExcel.write(os).sheet("接口设计")
-                .registerWriteHandler(sheetWriteHandler)
+                .registerWriteHandler(workbookWriteHandler)
                 .registerWriteHandler(cellWriteHandler)
                 .doWrite(excelList);
     }
 
-
-    class MySheetWriteHandler implements SheetWriteHandler {
+    class MyWorkbookWriteHandler implements WorkbookWriteHandler{
         @Override
-        public void beforeSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
+        public void beforeWorkbookCreate() {
 
         }
 
         @Override
-        public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
-            writeSheetHolder.getCachedSheet().setColumnWidth(0,256*15+184);
-            writeSheetHolder.getCachedSheet().setColumnWidth(1,256*100+184);
+        public void afterWorkbookCreate(WriteWorkbookHolder writeWorkbookHolder) {
+
+        }
+
+        @Override
+        public void afterWorkbookDispose(WriteWorkbookHolder writeWorkbookHolder) {
+            int sheetNum= writeWorkbookHolder.getCachedWorkbook().getNumberOfSheets();
+            for (int i = 0; i < sheetNum; i++) {
+                Sheet sheet= writeWorkbookHolder.getCachedWorkbook().getSheetAt(i);
+                sheet.setColumnWidth(0,256*15+184);
+                sheet.setColumnWidth(1,256*100+184);
+            }
         }
     }
 
     class MyCellWriteHandler implements CellWriteHandler {
-        CellStyle cellStyle1=null;
-        CellStyle cellStyle2=null;
+        CellStyle cellStyle1;
+        CellStyle cellStyle2;
 
         @Override
         public void beforeCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Row row, Head head, Integer columnIndex, Integer relativeRowIndex, Boolean isHead) {
@@ -262,6 +274,16 @@ public class ApiService {
 
         @Override
         public void afterCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
             int y=cell.getColumnIndex();
             if(y==0){
                 //设置标头列样式
@@ -290,16 +312,6 @@ public class ApiService {
                 }
                 cell.setCellStyle(cellStyle2);
             }
-        }
-
-        @Override
-        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
-
-        }
-
-        @Override
-        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
-
         }
     }
 }

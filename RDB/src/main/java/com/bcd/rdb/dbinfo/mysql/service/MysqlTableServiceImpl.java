@@ -30,7 +30,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="com.mysql.cj.jdbc.Driver")
 @Service
-public class MysqlTableServiceImpl extends TablesService {
+public class MysqlTableServiceImpl implements TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
@@ -94,7 +94,10 @@ public class MysqlTableServiceImpl extends TablesService {
             doBeforeWrite.run();
         }
 
-        EasyExcel.write(os).excelType(ExcelTypeEnum.XLSX).sheet(dbName).doWrite(dataList);
+        EasyExcel.write(os)
+                .excelType(ExcelTypeEnum.XLSX)
+                .registerWriteHandler(workbookWriteHandler)
+                .sheet(dbName).doWrite(dataList);
     }
 
     /**

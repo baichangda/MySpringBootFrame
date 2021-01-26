@@ -1,13 +1,19 @@
 package com.bcd.rdb.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.metadata.CellData;
+import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.handler.CellWriteHandler;
+import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
+import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +31,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="org.postgresql.Driver")
 @Service
-public class PgsqlTableServiceImpl extends TablesService {
+public class PgsqlTableServiceImpl implements TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
@@ -89,7 +95,10 @@ public class PgsqlTableServiceImpl extends TablesService {
             doBeforeWrite.run();
         }
 
-        EasyExcel.write(os).excelType(ExcelTypeEnum.XLSX).sheet(dbName).doWrite(dataList);
+        EasyExcel.write(os)
+                .excelType(ExcelTypeEnum.XLSX)
+                .registerWriteHandler(workbookWriteHandler)
+                .sheet(dbName).doWrite(dataList);
     }
 
     /**
@@ -108,6 +117,58 @@ public class PgsqlTableServiceImpl extends TablesService {
             exportDBDesignerExcel(connection,dbName,os,null);
         }catch (IOException|SQLException e){
             throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    class MyCellWriteHandler implements CellWriteHandler {
+        CellStyle cellStyle1;
+        CellStyle cellStyle2;
+
+        @Override
+        public void beforeCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Row row, Head head, Integer columnIndex, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellCreate(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellDataConverted(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, CellData cellData, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+
+        }
+
+        @Override
+        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+            int y=cell.getColumnIndex();
+            if(y==0){
+                //设置标头列样式
+                if(cellStyle1==null){
+                    cellStyle1=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle1.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                    cellStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle1.setBorderLeft(BorderStyle.THIN);
+                    cellStyle1.setBorderBottom(BorderStyle.THIN);
+                    cellStyle1.setBorderTop(BorderStyle.THIN);
+                    cellStyle1.setBorderRight(BorderStyle.THIN);
+                    cellStyle1.setWrapText(true);
+                    cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+                }
+                cell.setCellStyle(cellStyle1);
+            }else{
+                //设置内容列样式
+                if(cellStyle2==null){
+                    cellStyle2=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2.setBorderLeft(BorderStyle.THIN);
+                    cellStyle2.setBorderBottom(BorderStyle.THIN);
+                    cellStyle2.setBorderTop(BorderStyle.THIN);
+                    cellStyle2.setBorderRight(BorderStyle.THIN);
+                    cellStyle2.setWrapText(true);
+
+                }
+                cell.setCellStyle(cellStyle2);
+            }
         }
     }
 
