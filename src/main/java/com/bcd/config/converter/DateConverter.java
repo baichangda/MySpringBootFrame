@@ -2,7 +2,6 @@ package com.bcd.config.converter;
 
 import com.bcd.base.util.DateUtil;
 import com.bcd.base.util.DateZoneUtil;
-import com.bcd.define.MessageDefine;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
