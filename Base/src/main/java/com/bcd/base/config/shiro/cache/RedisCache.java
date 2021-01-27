@@ -1,5 +1,6 @@
 package com.bcd.base.config.shiro.cache;
 
+import com.bcd.base.config.redis.RedisUtil;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -49,7 +50,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
      */
     public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeoutInSecond) {
         this.redisTemplate = redisTemplate;
-        this.boundHashOperations=redisTemplate.boundHashOps(key);
+        this.boundHashOperations=redisTemplate.boundHashOps(RedisUtil.doWithKey(key));
         this.key=key;
         this.localTimeout=localTimeoutInSecond;
         this.cache= CacheBuilder.newBuilder()

@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +41,7 @@ public class UserController extends BaseController {
      * 查询用户列表
      * @return
      */
+    @Cacheable
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @ApiOperation(value="查询用户列表",notes = "查询用户列表")

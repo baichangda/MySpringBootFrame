@@ -81,7 +81,7 @@ public class KeysConst {
     /**
      * redis 存储公钥私钥redis key名(仅在集群环境有效)
      */
-    public static final String REDIS_KEY_NAME= RedisUtil.SYSTEM_REDIS_KEY_PRE+"publicPrivateKeys";
+    public static final String REDIS_KEY_NAME= RedisUtil.doWithKey("publicPrivateKeys");
 
 
 }

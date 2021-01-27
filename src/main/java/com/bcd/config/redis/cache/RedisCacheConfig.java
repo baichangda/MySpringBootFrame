@@ -2,6 +2,7 @@ package com.bcd.config.redis.cache;
 
 import com.bcd.base.cache.LocalCache;
 import com.bcd.base.cache.MultiLevelCache;
+import com.bcd.base.config.redis.RedisUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cache.Cache;
@@ -22,11 +23,6 @@ import java.time.Duration;
 @EnableCaching
 @Configuration
 public class RedisCacheConfig {
-    @Bean("redisCacheSerializer")
-    public RedisSerializer<String> redisSerializer(){
-        return new Jackson2JsonRedisSerializer(Object.class);
-    }
-
     /**
      * 定义两级缓存
      * 一级:google guava缓存(过期时间5s);  key: myCache_1::${key}
@@ -35,12 +31,13 @@ public class RedisCacheConfig {
      */
     @ConditionalOnClass(RedisConnectionFactory.class)
     @Bean("myCache")
-    public Cache myCache(RedisConnectionFactory factory,@Qualifier("redisCacheSerializer")RedisSerializer<String> redisSerializer){
+    public Cache myCache(RedisConnectionFactory factory){
         RedisCacheManager redisCacheManager=new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()
-                        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
+                        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisUtil.STRING_SERIALIZER))
                         .entryTtl(Duration.ofMillis(15*1000L))
+                        .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         MultiLevelCache cache= new MultiLevelCache("myCache",
                 new LocalCache("myCache_1",5L),

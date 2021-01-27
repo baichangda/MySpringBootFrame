@@ -104,13 +104,6 @@ spring:
       database: 0
       timeout: 10000
       password:
-      #同步jedis连接池
-#      jedis:
-#        pool:
-#          maxIdle: 8
-#          minIdle: 0
-#          maxActive: 8
-#          maxWait: -1
       #异步lettuce连接池(默认)
       lettuce:
         pool:

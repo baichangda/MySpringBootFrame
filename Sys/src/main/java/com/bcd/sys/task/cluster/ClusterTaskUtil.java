@@ -21,18 +21,18 @@ public class ClusterTaskUtil {
     /**
      * 集群模式中redis任务队列名称
      */
-    public final static String SYS_TASK_LIST_NAME= RedisUtil.SYSTEM_REDIS_KEY_PRE+"sysTask";
+    public final static String SYS_TASK_LIST_NAME= RedisUtil.doWithKey("sysTask");
 
 
     /**
      * 用来接收 停止系统任务 通道名
      */
-    public final static String STOP_SYS_TASK_CHANNEL=RedisUtil.SYSTEM_REDIS_KEY_PRE+"stopSysTaskChannel";
+    public final static String STOP_SYS_TASK_CHANNEL=RedisUtil.doWithKey("stopSysTaskChannel");
 
     /**
      * 用来接收 停止系统任务结果 通道名
      */
-    public final static String STOP_SYS_TASK_RESULT_CHANNEL=RedisUtil.SYSTEM_REDIS_KEY_PRE+"stopSysTaskResultChannel";
+    public final static String STOP_SYS_TASK_RESULT_CHANNEL=RedisUtil.doWithKey("stopSysTaskResultChannel");
 
     /**
      * 用来唤醒请求线程

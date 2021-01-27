@@ -11,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -32,11 +34,13 @@ public class RedisQueueMQ<V> {
 
     protected RedisSerializer<V> redisSerializer;
 
-    protected RedisTemplate<String, byte[]> redisTemplate;
+    protected BoundListOperations<String, byte[]> boundListOperations;
 
     protected ThreadPoolExecutor consumePool;
 
     protected ExecutorService workPool;
+
+    protected RedisTemplate<String,byte[]> redisTemplate;
 
     private volatile boolean stop;
 
@@ -47,7 +51,8 @@ public class RedisQueueMQ<V> {
     public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializerType, ThreadPoolExecutor consumePool, ExecutorService workPool) {
         this.name = name;
         this.stop = false;
-        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
+        this.redisTemplate=RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
+        this.boundListOperations = redisTemplate.boundListOps(name);
         this.redisSerializer=getDefaultRedisSerializer(valueSerializerType);
         this.consumePool = consumePool;
         this.workPool = workPool;
@@ -105,12 +110,12 @@ public class RedisQueueMQ<V> {
     }
 
     public void send(V data) {
-        redisTemplate.opsForList().leftPush(name, compress(redisSerializer.serialize(data)));
+        boundListOperations.leftPush(compress(redisSerializer.serialize(data)));
     }
 
     public void sendBatch(List<V> dataList) {
-        List<byte[]> byteList= dataList.stream().map(e->compress(redisSerializer.serialize(e))).collect(Collectors.toList());
-        redisTemplate.opsForList().leftPushAll(name, byteList);
+        byte[][] bytesArr= dataList.stream().map(e->compress(redisSerializer.serialize(e))).toArray(byte[][]::new);
+        boundListOperations.leftPushAll(bytesArr);
     }
 
     public void watch() {
@@ -133,11 +138,10 @@ public class RedisQueueMQ<V> {
     protected void start() {
         while (consumePool.getPoolSize() < consumePool.getMaximumPoolSize()) {
             consumePool.execute(() -> {
-                ListOperations<String, byte[]> listOperations = redisTemplate.opsForList();
-                long timeout = ((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout();
+                long popTimeout=((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout()/2;
                 while (!stop) {
                     try {
-                        byte[] data = listOperations.rightPop(name, timeout / 2, TimeUnit.MILLISECONDS);
+                        byte[] data = boundListOperations.rightPop(popTimeout, TimeUnit.MILLISECONDS);
                         if (data != null) {
                             workPool.execute(() -> {
                                 try {
@@ -161,6 +165,7 @@ public class RedisQueueMQ<V> {
                         }
                     }
                 }
+                logger.info("redisQueueMQ queue[{}] stop",name);
             });
         }
     }

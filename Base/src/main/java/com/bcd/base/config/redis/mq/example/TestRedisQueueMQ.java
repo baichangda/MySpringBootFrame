@@ -7,15 +7,22 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 //@Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInitializable {
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
-        super("test",redisConnectionFactory, ValueSerializerType.STRING);
+        super("a",redisConnectionFactory, ValueSerializerType.STRING);
     }
 
     @Override
     public void init(ContextRefreshedEvent event) {
         watch();
+//        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
+//            sendBatch(Arrays.asList("1","2"));
+//        },1,5, TimeUnit.SECONDS);
     }
 
     @Override
