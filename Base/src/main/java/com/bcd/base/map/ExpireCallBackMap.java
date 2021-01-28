@@ -36,7 +36,7 @@ public class ExpireCallBackMap<V> {
      * 用于从map中检索出过期key并移除 定时任务线程池
      */
     private ScheduledExecutorService expireScanPool;
-    private Long delay;
+    private Integer delayInSecond;
 
     /**
      * 用于执行过期的回调方法线程池
@@ -45,7 +45,7 @@ public class ExpireCallBackMap<V> {
     private ExecutorService expireWorkPool;
 
     private void startExpireSchedule() {
-        expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delay, delay, TimeUnit.MILLISECONDS);
+        expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delayInSecond, delayInSecond, TimeUnit.SECONDS);
     }
 
     /**
@@ -74,23 +74,23 @@ public class ExpireCallBackMap<V> {
     }
 
     /**
-     * @param delay 扫描计划执行间隔,为null表示不开启扫描
+     * @param delayInSecond 扫描计划执行间隔,为null表示不开启扫描
      */
-    public ExpireCallBackMap(Long delay) {
-        this(delay,null);
+    public ExpireCallBackMap(Integer delayInSecond) {
+        this(delayInSecond,null);
     }
 
     /**
-     * @param delay          扫描计划执行间隔,为null则表示不进行扫描
+     * @param delayInSecond          扫描计划执行间隔,为null则表示不进行扫描
      * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
      */
-    public ExpireCallBackMap(Long delay, ExecutorService expireWorkPool) {
-        this.delay = delay;
+    public ExpireCallBackMap(Integer delayInSecond, ExecutorService expireWorkPool) {
+        this.delayInSecond = delayInSecond;
         this.expireWorkPool = expireWorkPool;
     }
 
     public void init(){
-        if(delay!=null){
+        if(delayInSecond !=null){
             expireScanPool=Executors.newSingleThreadScheduledExecutor();
             startExpireSchedule();
         }
@@ -237,7 +237,7 @@ public class ExpireCallBackMap<V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1*1000L,Executors.newSingleThreadExecutor());
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1,Executors.newSingleThreadExecutor());
         map.init();
         map.put("1","2",1000L,(k,v)->{
             System.out.println(map.get("1"));

@@ -28,7 +28,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
     public BaseJsonWebSocketClient(String url) {
         super(url);
         //扫描间隔为1s
-        this.sn_to_callBack_map =new ExpireCallBackMap<>(1000L);
+        this.sn_to_callBack_map =new ExpireCallBackMap<>(1);
         this.sn_to_callBack_map.init();
     }
 

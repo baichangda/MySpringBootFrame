@@ -1,14 +1,15 @@
 package com.bcd.base.config.shiro.cache;
 
-import com.google.common.cache.CacheBuilder;
+import com.bcd.base.map.MyCache;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 缓存对一致性要求并不高、保证最终一致性、所以没有加锁
@@ -19,55 +20,46 @@ public class LocalCache<K,V> implements Cache<K,V> {
 
     Logger logger= LoggerFactory.getLogger(LocalCache.class);
 
-    public com.google.common.cache.Cache<K,V> cache;
+    MyCache<K,V> cache;
 
-    //s
-    long timeoutInSecond;
-
-    public LocalCache(long timeoutInSecond) {
-        this.timeoutInSecond = timeoutInSecond;
-        this.cache = CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofSeconds(timeoutInSecond))
-                .softValues()
-                .build();
+    public LocalCache(long expiredInMills) {
+        this.cache = new MyCache<K,V>()
+                .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60,TimeUnit.MINUTES);
     }
 
     @Override
     public V get(K k) throws CacheException {
-        return cache.getIfPresent(k);
+        return cache.get(k);
     }
 
     @Override
     public V put(K k, V v) throws CacheException {
-        V old= get(k);
-        cache.put(k,v);
-        return old;
+        return cache.put(k,v);
     }
 
     @Override
     public V remove(K k) throws CacheException {
-        V old= get(k);
-        cache.invalidate(k);
-        return old;
+        return cache.remove(k);
     }
 
     @Override
     public void clear() throws CacheException {
-        cache.invalidateAll();
+        cache.clear();
     }
 
     @Override
     public int size() {
-        return (int) cache.size();
+        return cache.size();
     }
 
     @Override
     public Set<K> keys() {
-        return cache.asMap().keySet();
+        return cache.keySet();
     }
 
     @Override
     public Collection<V> values() {
-        return cache.asMap().values();
+        return cache.values();
     }
 }

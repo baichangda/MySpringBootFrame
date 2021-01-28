@@ -1,10 +1,7 @@
 package com.bcd.base.config.shiro.cache;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.bcd.base.map.MyCache;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -12,11 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * redis缓存管理器
@@ -32,69 +28,57 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     Logger logger= LoggerFactory.getLogger(RedisCache.class);
 
-    long localTimeout;
-
-    LoadingCache<K,V> cache;
-
     String key;
 
     RedisTemplate<String, String> redisTemplate;
 
     BoundHashOperations<String, K, V> boundHashOperations;
 
+    MyCache<K,V> cache;
+
     /**
      *
      * @param redisTemplate
      * @param key
-     * @param localTimeoutInSecond 本地缓存失效时间
+     * @param localExpiredInMills 本地缓存失效时间
      */
-    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localTimeoutInSecond) {
+    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localExpiredInMills) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations=redisTemplate.boundHashOps(RedisUtil.doWithKey(key));
         this.key=key;
-        this.localTimeout=localTimeoutInSecond;
-        this.cache= CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofSeconds(localTimeoutInSecond))
-                .softValues()
-                .refreshAfterWrite(Duration.ofSeconds(localTimeoutInSecond))
-                .build(new CacheLoader<K, V>() {
-                    @Override
-                    public V load(K key) {
-                        logger.info("redis cache load [{}]",key);
-                        return boundHashOperations.get(key);
-                    }
-                });
+        this.cache= new MyCache<K,V>()
+                .expiredAfter(localExpiredInMills, TimeUnit.MILLISECONDS)
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.MINUTES);
     }
 
     @Override
     public V get(K k) throws CacheException {
-        try {
-            return cache.get(k);
-        } catch (ExecutionException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        return cache.computeIfAbsent(k,e->{
+            logger.info("load from redis name[{}] key[{}]",key,e);
+            return boundHashOperations.get(e);
+        });
     }
 
     @Override
     public V put(K k, V v) throws CacheException {
-        V old = get(k);
+        V old= boundHashOperations.get(k);
         boundHashOperations.put(k, v);
-        cache.put(k, v);
+        cache.put(k,v);
         return old;
     }
 
     @Override
     public V remove(K k) throws CacheException {
-        V old=get(k);
+        V old= boundHashOperations.get(k);
         boundHashOperations.delete(k);
-        cache.invalidate(k);
+        cache.remove(k);
         return old;
     }
 
     @Override
     public void clear() throws CacheException {
         redisTemplate.delete(key);
-        cache.invalidateAll();
+        cache.clear();
     }
 
     @Override

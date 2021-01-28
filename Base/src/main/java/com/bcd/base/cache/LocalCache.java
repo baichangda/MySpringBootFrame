@@ -1,47 +1,38 @@
 package com.bcd.base.cache;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.bcd.base.map.MyCache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.lang.Nullable;
 
-import java.time.Duration;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-/**
- * 缓存对一致性要求并不高、保证最终一致性、所以没有加锁
- */
 @SuppressWarnings("unchecked")
 public class LocalCache extends AbstractValueAdaptingCache {
 
-    Logger logger= LoggerFactory.getLogger(LocalCache.class);
-
     private String name;
-    private Cache<Object, Object> cache;
+    private MyCache<Object,Object> cache;
 
 
-    public LocalCache(String name, Long aliveTimeInSecond) {
-        this(name,aliveTimeInSecond,true);
+    public LocalCache(String name, Long expiredInMills) {
+        this(name, expiredInMills,true);
     }
 
-    public LocalCache(String name, Long aliveTimeInSecond, boolean allowNullValues) {
+    public LocalCache(String name, Long expiredInMills, boolean allowNullValues) {
         super(allowNullValues);
-        this.cache= CacheBuilder.newBuilder()
-                .expireAfterAccess(Duration.ofSeconds(aliveTimeInSecond))
-                .softValues()
-                .build();
         this.name = name;
+        this.cache =new MyCache<>()
+                .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
+                .withSoftReferenceValue()
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.SECONDS);
+
     }
 
     @Nullable
     @Override
     protected Object lookup(Object key) {
-        return this.cache.getIfPresent(doWithKey(key));
+        return this.cache.get(doWithKey(key));
     }
 
     @Override
@@ -54,21 +45,17 @@ public class LocalCache extends AbstractValueAdaptingCache {
         return this.cache;
     }
 
-    /**
-     * @param key
-     * @param valueLoader 如果此对象返回null、会导致异常
-     * @param <T>
-     * @return
-     */
     @Nullable
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
-        try {
-            return (T)fromStoreValue(cache.get(doWithKey(key), ()->toStoreValue(valueLoader.call())));
-        } catch (ExecutionException e) {
-            logger.error("local cache get error",e);
-            return null;
-        }
+        return (T) fromStoreValue(this.cache.computeIfAbsent(doWithKey(key), r -> {
+            try {
+                return toStoreValue(valueLoader.call());
+            }
+            catch (Exception ex) {
+                throw new ValueRetrievalException(key, valueLoader, ex);
+            }
+        }));
     }
 
     @Override
@@ -76,14 +63,20 @@ public class LocalCache extends AbstractValueAdaptingCache {
         this.cache.put(doWithKey(key),value);
     }
 
+    @Nullable
+    @Override
+    public ValueWrapper putIfAbsent(Object key, @Nullable Object value) {
+        return toValueWrapper(this.cache.putIfAbsent(doWithKey(key),value));
+    }
+
     @Override
     public void evict(Object key) {
-        this.cache.invalidate(doWithKey(key));
+        this.cache.remove(doWithKey(key));
     }
 
     @Override
     public void clear() {
-        this.cache.invalidateAll();
+        this.cache.clear();
     }
 
     private String doWithKey(Object key){
