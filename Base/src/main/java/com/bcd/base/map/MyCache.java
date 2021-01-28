@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 
 /**
- * 
+ *
  * @param <K>
  * @param <V>
  */
@@ -130,7 +130,7 @@ public class MyCache<K,V> {
     }
 
     public synchronized void destroy(){
-            this.stop = false;
+            this.stop = true;
             this.clearExpiredValueExecutor.shutdown();
             this.referenceQueueExecutor.shutdown();
             this.referenceQueueFuture.cancel(true);
