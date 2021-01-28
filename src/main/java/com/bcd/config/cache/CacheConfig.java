@@ -19,7 +19,7 @@ public class CacheConfig {
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.RedisConnectionFactory")
     @Bean("myCache")
     public Cache myCache(){
-        return new LocalCache("myCache_1",5L);
+        return new LocalCache("myCache_1",5000L);
     }
 
     @Bean("mySimpleKeyGenerator")

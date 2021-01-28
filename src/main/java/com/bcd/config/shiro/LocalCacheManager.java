@@ -7,16 +7,16 @@ import org.apache.shiro.cache.CacheException;
 
 @SuppressWarnings("unchecked")
 public class LocalCacheManager extends AbstractCacheManager{
-    long timeoutInSecond;
+    long expiredInMills;
 
     /**
-     * @param timeoutInSecond key过期时间
+     * @param expiredInMills key过期时间
      */
-    public LocalCacheManager(long timeoutInSecond) {
-        this.timeoutInSecond = timeoutInSecond;
+    public LocalCacheManager(long expiredInMills) {
+        this.expiredInMills = expiredInMills;
     }
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new LocalCache(timeoutInSecond);
+        return new LocalCache(expiredInMills);
     }
 }

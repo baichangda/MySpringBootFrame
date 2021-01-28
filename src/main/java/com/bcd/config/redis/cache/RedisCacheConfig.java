@@ -40,7 +40,7 @@ public class RedisCacheConfig {
                         .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         MultiLevelCache cache= new MultiLevelCache("myCache",
-                new LocalCache("myCache_1",5L),
+                new LocalCache("myCache_1",5000L),
                 redisCacheManager.getCache("myCache_2")
         );
         return cache;

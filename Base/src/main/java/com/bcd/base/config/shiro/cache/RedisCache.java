@@ -54,7 +54,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
     @Override
     public V get(K k) throws CacheException {
         return cache.computeIfAbsent(k,e->{
-            logger.info("load from redis name[{}] key[{}]",key,e);
+            logger.info("load from redis cache name[{}] key[{}]",key,e);
             return boundHashOperations.get(e);
         });
     }
