@@ -61,6 +61,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     @Override
     public V put(K k, V v) throws CacheException {
+        logger.info("put name[{}] key[{}]",key,k);
         V old= boundHashOperations.get(k);
         boundHashOperations.put(k, v);
         cache.put(k,v);
@@ -69,6 +70,7 @@ public class RedisCache<K,V> implements Cache<K,V> {
 
     @Override
     public V remove(K k) throws CacheException {
+        logger.info("remove name[{}] key[{}]",key,k);
         V old= boundHashOperations.get(k);
         boundHashOperations.delete(k);
         cache.remove(k);
