@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<NotifyCommand> {
@@ -67,7 +68,7 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
     public WebSocketData<JsonMessage<String>> register(String sn, NotifyEvent event, String paramJson){
         NotifyCommand command= new NotifyCommand(sn, NotifyCommandType.REGISTER, event, paramJson);
         logger.debug("Register Listener:\n"+ JsonUtil.toJson(command));
-        return blockingRequest(command, 30 * 1000, JsonMessage.class, String.class);
+        return blockingRequest(command, 30, TimeUnit.SECONDS, JsonMessage.class, String.class);
     }
 
     /**
@@ -80,7 +81,7 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
             return null;
         }
         logger.debug("Cancel Listener:\n"+JsonUtil.toJson(notifyInfo));
-        WebSocketData<JsonMessage<String>> webSocketData = blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL, notifyInfo.getEvent(), notifyInfo.getParamJson()), 30 * 1000, JsonMessage.class, String.class);
+        WebSocketData<JsonMessage<String>> webSocketData = blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL, notifyInfo.getEvent(), notifyInfo.getParamJson()), 30 ,TimeUnit.SECONDS, JsonMessage.class, String.class);
         if (webSocketData == null) {
             logger.error("Cancel Listener Request SN["+sn+"] Timeout");
         } else {

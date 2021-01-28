@@ -36,13 +36,14 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
     /**
      * @param param 参数
      * @param consumer webSocket回调(json字符串参数)
-     * @param timeOutMills 超时时间(毫秒)
+     * @param timeout 超时时间(毫秒)
+     * @param unit 
      * @param timeOutCallBack  webSocket超时回调
      * @param clazzs 结果泛型类型数组
      * @param <R>
      * @return 返回null表示发送失败;正常情况下返回发送过去的数据
      */
-    public <R>WebSocketData<T> sendMessage(T param, Consumer<WebSocketData<R>> consumer, long timeOutMills, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs){
+    public <R>WebSocketData<T> sendMessage(T param, Consumer<WebSocketData<R>> consumer, long timeout,TimeUnit unit, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs){
         //1、开始
         WebSocketData<T> paramWebSocketData=new WebSocketData<>(RandomStringUtils.randomAlphabetic(32),param);
         logger.debug("Start WebSocket SN["+paramWebSocketData.getSn()+"]");
@@ -68,7 +69,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
-        }, timeOutMills,TimeUnit.MILLISECONDS, (k, v) -> {
+        }, timeout,unit, (k, v) -> {
             logger.info("TimeOut WebSocket SN[" + paramWebSocketData.getSn() + "]");
             timeOutCallBack.accept(k, consumer);
         });
@@ -122,18 +123,19 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
     /**
      * 阻塞调用webSocket请求
      * @param paramData
-     * @param timeOut
+     * @param timeout
+     * @param unit
      * @param clazzs 返回参数泛型类型数组,只支持类型单泛型,例如:
      *               <WebData<VehicleBean>> 传参数 WebData.class,VehicleBean.class
      * @return 返回null表示发送超时
      */
-    public <R>WebSocketData<R> blockingRequest(T paramData, long timeOut, Class ... clazzs){
+    public <R>WebSocketData<R> blockingRequest(T paramData, long timeout,TimeUnit unit, Class ... clazzs){
         CountDownLatch countDownLatch=new CountDownLatch(1);
         WebSocketData<R>[] resData=new WebSocketData[1];
         WebSocketData<T> sendWebSocketData=sendMessage(paramData,(WebSocketData<R> res)->{
                 resData[0]=res;
                 countDownLatch.countDown();
-        }, timeOut,(k, v)->{
+        }, timeout,unit,(k, v)->{
             countDownLatch.countDown();
         },clazzs);
         if(sendWebSocketData==null){
