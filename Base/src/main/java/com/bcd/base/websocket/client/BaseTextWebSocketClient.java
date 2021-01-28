@@ -101,9 +101,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
     public BaseTextWebSocketClient(String url) {
         this.url=url;
         StandardWebSocketClient client=new StandardWebSocketClient();
-        manager=new MyWebSocketConnectionManager(client,this,url,(throwable)->{
-            onConnectFailed(throwable);
-        });
+        manager=new MyWebSocketConnectionManager(client,this,url, this::onConnectFailed);
         manager.start();
     }
 
@@ -117,7 +115,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
         if(isReConnect){
             logger.error("Connect to [" + this.url + "] Failed,Will ReOpen After 10 Seconds", throwable);
             try {
-                Thread.sleep(10 * 1000L);
+                TimeUnit.SECONDS.sleep(10);
             } catch (InterruptedException e) {
                 throw BaseRuntimeException.getException(e);
             }
