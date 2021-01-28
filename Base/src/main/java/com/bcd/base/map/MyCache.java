@@ -59,7 +59,7 @@ public class MyCache<K,V> {
     private ScheduledFuture<?> clearExpiredValueScheduledFuture;
 
 
-    private volatile boolean stop=false;
+    private boolean stop=false;
 
     public synchronized MyCache<K,V> withSoftReferenceValue(){
             this.valueType = 2;
