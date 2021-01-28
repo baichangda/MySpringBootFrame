@@ -68,7 +68,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
-        }, timeOutMills,TimeUnit.MICROSECONDS, (k, v) -> {
+        }, timeOutMills,TimeUnit.MILLISECONDS, (k, v) -> {
             logger.info("TimeOut WebSocket SN[" + paramWebSocketData.getSn() + "]");
             timeOutCallBack.accept(k, consumer);
         });
