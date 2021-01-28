@@ -22,9 +22,9 @@ public class LocalCache<K,V> implements Cache<K,V> {
 
     MyCache<K,V> cache;
 
-    public LocalCache(long expiredInMills) {
+    public LocalCache(long expired,TimeUnit unit) {
         this.cache = new MyCache<K,V>()
-                .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
+                .expiredAfter(expired, unit)
                 .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60,TimeUnit.MINUTES)
                 .init();
     }

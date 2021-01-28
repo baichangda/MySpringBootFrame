@@ -6,10 +6,10 @@ import java.lang.ref.ReferenceQueue;
 
 public abstract class ExpiredValue<K,V>{
 
-    protected long expireTimeInMills;
+    protected long expireTimeInMillis;
 
-    public ExpiredValue(K k, V v, long expireTimeInMills) {
-        this.expireTimeInMills = expireTimeInMills;
+    public ExpiredValue(K k, V v, long expireTimeInMillis) {
+        this.expireTimeInMillis = expireTimeInMillis;
     }
 
     public abstract V getValue();
@@ -17,10 +17,10 @@ public abstract class ExpiredValue<K,V>{
     public abstract K getKey();
 
     public boolean isExpired() {
-        if(expireTimeInMills==-1){
+        if(expireTimeInMillis ==-1){
             return false;
         }else {
-            return expireTimeInMills < System.currentTimeMillis();
+            return expireTimeInMillis < System.currentTimeMillis();
         }
     }
 

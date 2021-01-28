@@ -8,7 +8,6 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.websocket.SendHandler;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Executors;
@@ -30,7 +29,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
     protected WebSocketConnectionManager manager;
 
     //最后发送时间,当连接断开时候,如果最后发送时间距离当前时间超过1分钟,则不进行重连
-    protected volatile long lastSendTime;
+    protected volatile long lastSendTimeInMillis;
     protected long maxReConnectTimeInMillis=60*1000;
 
     //是否停止连接
@@ -135,7 +134,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
      * @return
      */
     protected boolean checkIsReConnectAfterDisConnect(){
-        return (System.currentTimeMillis()-lastSendTime)<maxReConnectTimeInMillis;
+        return (System.currentTimeMillis()- lastSendTimeInMillis)<maxReConnectTimeInMillis;
     }
 
     /**
@@ -233,7 +232,7 @@ public abstract class BaseTextWebSocketClient extends TextWebSocketHandler {
      */
     protected boolean sendMessage(String data){
         //1、更新最后发送时间
-        lastSendTime=System.currentTimeMillis();
+        lastSendTimeInMillis =System.currentTimeMillis();
         //2、检测客户端是否已经停止,是则重启客户端并等待10s
         if(isStop.compareAndSet(true,false)) {
             reConnectAndWaitOnSendMessage();

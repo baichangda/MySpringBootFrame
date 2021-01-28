@@ -8,13 +8,17 @@ import org.apache.shiro.cache.CacheException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.concurrent.TimeUnit;
+
 @SuppressWarnings("unchecked")
 public class RedisCacheManager extends AbstractCacheManager{
     RedisTemplate<String, String> redisTemplate;
 
-    long localTimeoutInMills;
+    long localExpired;
 
-    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory,long localTimeoutInMills) {
+    TimeUnit unit;
+
+    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory,long localExpired,TimeUnit unit) {
         this.redisTemplate = new RedisTemplate<>();
         this.redisTemplate.setConnectionFactory(redisConnectionFactory);
         this.redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
@@ -22,12 +26,13 @@ public class RedisCacheManager extends AbstractCacheManager{
         this.redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
         this.redisTemplate.setHashValueSerializer(RedisUtil.JDK_SERIALIZATION_SERIALIZER);
         this.redisTemplate.afterPropertiesSet();
-        this.localTimeoutInMills = localTimeoutInMills;
+        this.localExpired = localExpired;
+        this.unit=unit;
     }
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new RedisCache(redisTemplate,s, localTimeoutInMills);
+        return new RedisCache(redisTemplate,s, localExpired,unit);
     }
 
 }

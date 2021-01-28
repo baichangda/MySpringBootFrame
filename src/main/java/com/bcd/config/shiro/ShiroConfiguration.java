@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -68,7 +69,7 @@ public class ShiroConfiguration{
      */
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
-        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory,5000);
+        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory,5,TimeUnit.SECONDS);
         return cacheManager;
     }
 
@@ -78,7 +79,7 @@ public class ShiroConfiguration{
      */
     @Bean
     public LocalCacheManager expireMapCacheManager(){
-        LocalCacheManager cacheManager = new LocalCacheManager(3000);
+        LocalCacheManager cacheManager = new LocalCacheManager(3, TimeUnit.SECONDS);
         return cacheManager;
     }
 

@@ -15,15 +15,15 @@ public class LocalCache extends AbstractValueAdaptingCache {
     private MyCache<Object,Object> cache;
 
 
-    public LocalCache(String name, Long expiredInMills) {
-        this(name, expiredInMills,true);
+    public LocalCache(String name, Long expired,TimeUnit unit) {
+        this(name, expired,unit,true);
     }
 
-    public LocalCache(String name, Long expiredInMills, boolean allowNullValues) {
+    public LocalCache(String name, Long expired,TimeUnit unit, boolean allowNullValues) {
         super(allowNullValues);
         this.name = name;
         this.cache =new MyCache<>()
-                .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
+                .expiredAfter(expired, unit)
                 .withSoftReferenceValue()
                 .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.SECONDS)
                 .init();

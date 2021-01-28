@@ -8,10 +8,10 @@ public class SoftReferenceExpireValue<K,V> extends ExpiredValue<K,V> {
 
     private SoftReference<ReferenceData<K,V>> reference;
 
-    public SoftReferenceExpireValue(K k, V v, long expireTimeInMills, ReferenceQueue<ReferenceData<K,V>> referenceQueue){
-        super(k, v, expireTimeInMills);
+    public SoftReferenceExpireValue(K k, V v, long expireTimeInMillis, ReferenceQueue<ReferenceData<K,V>> referenceQueue){
+        super(k, v, expireTimeInMillis);
         this.reference =new SoftReference<>(new ReferenceData<>(k, v),referenceQueue);
-        this.expireTimeInMills=expireTimeInMills;
+        this.expireTimeInMillis =expireTimeInMillis;
     }
 
     @Override

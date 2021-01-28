@@ -36,7 +36,8 @@ public class ExpireCallBackMap<V> {
      * 用于从map中检索出过期key并移除 定时任务线程池
      */
     private ScheduledExecutorService expireScanPool;
-    private Integer delayInSecond;
+    private Long delay;
+    private TimeUnit unit;
 
     /**
      * 用于执行过期的回调方法线程池
@@ -44,8 +45,9 @@ public class ExpireCallBackMap<V> {
      */
     private ExecutorService expireWorkPool;
 
-    private void startExpireSchedule() {
-        expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delayInSecond, delayInSecond, TimeUnit.SECONDS);
+    private void initExpiredSchedule() {
+        expireScanPool=Executors.newSingleThreadScheduledExecutor();
+        expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delay, delay, unit);
     }
 
     /**
@@ -74,25 +76,26 @@ public class ExpireCallBackMap<V> {
     }
 
     /**
-     * @param delayInSecond 扫描计划执行间隔,为null表示不开启扫描
+     * @param delay 扫描计划执行间隔,为null表示不开启扫描
      */
-    public ExpireCallBackMap(Integer delayInSecond) {
-        this(delayInSecond,null);
+    public ExpireCallBackMap(Long delay,TimeUnit unit) {
+        this(delay,unit,null);
     }
 
     /**
-     * @param delayInSecond          扫描计划执行间隔,为null则表示不进行扫描
+     * @param delay          扫描计划执行间隔,为null则表示不进行扫描
+     * @param unit          扫描计划执行间隔,为null则表示不进行扫描
      * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
      */
-    public ExpireCallBackMap(Integer delayInSecond, ExecutorService expireWorkPool) {
-        this.delayInSecond = delayInSecond;
+    public ExpireCallBackMap(Long delay,TimeUnit unit, ExecutorService expireWorkPool) {
+        this.delay = delay;
+        this.unit = unit;
         this.expireWorkPool = expireWorkPool;
     }
 
     public void init(){
-        if(delayInSecond !=null){
-            expireScanPool=Executors.newSingleThreadScheduledExecutor();
-            startExpireSchedule();
+        if(delay !=null&&unit!=null){
+            initExpiredSchedule();
         }
     }
 
@@ -163,23 +166,23 @@ public class ExpireCallBackMap<V> {
      * put元素、不会过期检查触发回调
      * @param k
      * @param v
-     * @param aliveTime
+     * @param expiredTime
      * @return
      */
-    public V put(String k, V v, long aliveTime) {
-        return put(k, v, aliveTime, null);
+    public V put(String k, V v, long expiredTime,TimeUnit unit) {
+        return put(k, v, expiredTime,unit, null);
     }
 
     /**
      * put元素、不会过期检查触发回调
      * @param k
      * @param v
-     * @param aliveTime
+     * @param expiredTime
      * @param callback
      * @return
      */
-    public V put(String k, V v, long aliveTime, BiConsumer<String, V> callback) {
-        Value<V> expireValue = new Value<>(System.currentTimeMillis() + aliveTime, v, callback);
+    public V put(String k, V v, long expiredTime,TimeUnit unit, BiConsumer<String, V> callback) {
+        Value<V> expireValue = new Value<>(System.currentTimeMillis() + unit.toMillis(expiredTime), v, callback);
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.put(k, expireValue);
             return getVal(oldVal, k, false);
@@ -209,12 +212,12 @@ public class ExpireCallBackMap<V> {
     }
 
     private final static class Value<T>{
-        private Long expireTime;
+        private Long expiredTimeInMillis;
         private T val;
         private BiConsumer callback;
 
-        public Value(Long expireTime, T val, BiConsumer callback) {
-            this.expireTime = expireTime;
+        public Value(Long expiredTimeInMillis, T val, BiConsumer callback) {
+            this.expiredTimeInMillis = expiredTimeInMillis;
             this.val = val;
             this.callback = callback;
         }
@@ -227,23 +230,23 @@ public class ExpireCallBackMap<V> {
             return callback;
         }
 
-        public Long getExpireTime() {
-            return expireTime;
+        public Long getExpiredTimeInMillis() {
+            return expiredTimeInMillis;
         }
 
         public boolean isExpired() {
-            return expireTime < System.currentTimeMillis();
+            return expiredTimeInMillis < System.currentTimeMillis();
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1,Executors.newSingleThreadExecutor());
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1L,TimeUnit.SECONDS,Executors.newSingleThreadExecutor());
         map.init();
-        map.put("1","2",1000L,(k,v)->{
+        map.put("1","2",1,TimeUnit.SECONDS,(k,v)->{
             System.out.println(map.get("1"));
             System.out.println(map.get("2"));
         });
-        map.put("2","3",10000L,(k,v)->{
+        map.put("2","3",10,TimeUnit.SECONDS,(k,v)->{
             System.out.println(map.get("1"));
             System.out.println(map.get("2"));
         });

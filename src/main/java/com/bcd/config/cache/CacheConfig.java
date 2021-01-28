@@ -8,6 +8,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.TimeUnit;
+
 @EnableCaching
 @Configuration
 public class CacheConfig {
@@ -19,7 +21,7 @@ public class CacheConfig {
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.RedisConnectionFactory")
     @Bean("myCache")
     public Cache myCache(){
-        return new LocalCache("myCache_1",5000L);
+        return new LocalCache("myCache_1",5L, TimeUnit.SECONDS);
     }
 
     @Bean("mySimpleKeyGenerator")

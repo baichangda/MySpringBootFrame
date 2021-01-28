@@ -60,7 +60,7 @@ public class MyCache<K, V> {
      * -1:代表不过期
      * >=0:代表过期时间(毫秒)
      */
-    private long expiredInMills = -1;
+    private long expiredInMillis = -1;
 
     /**
      * 过期值移除触发回调
@@ -105,7 +105,7 @@ public class MyCache<K, V> {
     }
 
     public synchronized MyCache<K, V> expiredAfter(long expired, TimeUnit unit) {
-        this.expiredInMills = unit.toMillis(expired);
+        this.expiredInMillis = unit.toMillis(expired);
         return this;
     }
 
@@ -198,7 +198,7 @@ public class MyCache<K, V> {
     }
 
     public synchronized V put(K k, V v) {
-        ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMills, valueType, referenceQueue);
+        ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMillis, valueType, referenceQueue);
         ExpiredValue<K, V> oldExpiredValue = dataMap.put(k, expiredValue);
         if (oldExpiredValue == null) {
             return null;
@@ -215,12 +215,12 @@ public class MyCache<K, V> {
     public synchronized V putIfAbsent(K k, V v) {
         ExpiredValue<K, V> oldExpiredValue = dataMap.get(k);
         if (oldExpiredValue == null) {
-            ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMills, valueType, referenceQueue);
+            ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMillis, valueType, referenceQueue);
             dataMap.put(k, expiredValue);
             return null;
         } else {
             if (oldExpiredValue.isExpired()) {
-                ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMills, valueType, referenceQueue);
+                ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMillis, valueType, referenceQueue);
                 dataMap.put(k, expiredValue);
                 triggerExpiredListener(oldExpiredValue.getKey(), oldExpiredValue.getValue());
                 return null;
@@ -234,13 +234,13 @@ public class MyCache<K, V> {
         ExpiredValue<K, V> oldExpiredValue = dataMap.get(k);
         if (oldExpiredValue == null) {
             V v = mappingFunction.apply(k);
-            ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMills, valueType, referenceQueue);
+            ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMillis, valueType, referenceQueue);
             dataMap.put(k, expiredValue);
             return v;
         } else {
             if (oldExpiredValue.isExpired()) {
                 V v = mappingFunction.apply(k);
-                ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMills, valueType, referenceQueue);
+                ExpiredValue<K, V> expiredValue = ExpiredValue.newExpiredValue(k, v, expiredInMillis, valueType, referenceQueue);
                 dataMap.put(k, expiredValue);
                 triggerExpiredListener(oldExpiredValue.getKey(), oldExpiredValue.getValue());
                 return v;

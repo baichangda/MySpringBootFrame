@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class PhoneCodeRealm extends MyAuthorizingRealm {
@@ -49,7 +50,7 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
                 if(s.equals(getAuthorizationCacheName())){
-                    return new RedisCache<>(redisTemplate,s,5000);
+                    return new RedisCache<>(redisTemplate,s,5, TimeUnit.SECONDS);
                 }else{
                     return null;
                 }

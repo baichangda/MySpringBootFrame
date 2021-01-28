@@ -12,6 +12,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -28,7 +29,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
     public BaseJsonWebSocketClient(String url) {
         super(url);
         //扫描间隔为1s
-        this.sn_to_callBack_map =new ExpireCallBackMap<>(1);
+        this.sn_to_callBack_map =new ExpireCallBackMap<>(1L,TimeUnit.SECONDS);
         this.sn_to_callBack_map.init();
     }
 
@@ -67,7 +68,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
-        }, timeOutMills, (k, v) -> {
+        }, timeOutMills,TimeUnit.MICROSECONDS, (k, v) -> {
             logger.info("TimeOut WebSocket SN[" + paramWebSocketData.getSn() + "]");
             timeOutCallBack.accept(k, consumer);
         });

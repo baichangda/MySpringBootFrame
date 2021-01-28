@@ -40,14 +40,14 @@ public class RedisCache<K,V> implements Cache<K,V> {
      *
      * @param redisTemplate
      * @param key
-     * @param localExpiredInMills 本地缓存失效时间
+     * @param localExpired 本地缓存失效时间
      */
-    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localExpiredInMills) {
+    public RedisCache(RedisTemplate<String, String> redisTemplate,String key,long localExpired,TimeUnit unit) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations=redisTemplate.boundHashOps(RedisUtil.doWithKey(key));
         this.key=key;
         this.cache= new MyCache<K,V>()
-                .expiredAfter(localExpiredInMills, TimeUnit.MILLISECONDS)
+                .expiredAfter(localExpired, unit)
                 .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.MINUTES)
                 .init();
     }

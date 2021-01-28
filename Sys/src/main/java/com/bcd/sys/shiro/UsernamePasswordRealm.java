@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class UsernamePasswordRealm extends MyAuthorizingRealm {
@@ -60,7 +61,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
                 if(s.equals(getAuthorizationCacheName())){
-                    return new RedisCache<>(redisTemplate,s,5000);
+                    return new RedisCache<>(redisTemplate,s,5, TimeUnit.SECONDS);
                 }else{
                     return null;
                 }

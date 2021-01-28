@@ -18,6 +18,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 @EnableCaching
@@ -40,7 +41,7 @@ public class RedisCacheConfig {
                         .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         MultiLevelCache cache= new MultiLevelCache("myCache",
-                new LocalCache("myCache_1",5000L),
+                new LocalCache("myCache_1",5L, TimeUnit.SECONDS),
                 redisCacheManager.getCache("myCache_2")
         );
         return cache;
