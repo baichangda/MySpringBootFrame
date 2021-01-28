@@ -25,7 +25,8 @@ public class LocalCache extends AbstractValueAdaptingCache {
         this.cache =new MyCache<>()
                 .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
                 .withSoftReferenceValue()
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.SECONDS);
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.SECONDS)
+                .init();
 
     }
 

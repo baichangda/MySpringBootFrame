@@ -25,7 +25,8 @@ public class LocalCache<K,V> implements Cache<K,V> {
     public LocalCache(long expiredInMills) {
         this.cache = new MyCache<K,V>()
                 .expiredAfter(expiredInMills, TimeUnit.MILLISECONDS)
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60,TimeUnit.MINUTES);
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60,TimeUnit.MINUTES)
+                .init();
     }
 
     @Override

@@ -88,11 +88,10 @@ public class MyCache<K, V> {
     private ScheduledFuture<?> clearExpiredValueExecutor_scheduledFuture;
 
 
-    public void init() {
+    public synchronized MyCache<K, V> init() {
         initReferenceQueue();
         initClearExpiredValue();
-
-
+        return this;
     }
 
     public synchronized MyCache<K, V> withSoftReferenceValue() {

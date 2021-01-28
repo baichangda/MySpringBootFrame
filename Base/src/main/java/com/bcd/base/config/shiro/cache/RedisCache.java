@@ -48,7 +48,8 @@ public class RedisCache<K,V> implements Cache<K,V> {
         this.key=key;
         this.cache= new MyCache<K,V>()
                 .expiredAfter(localExpiredInMills, TimeUnit.MILLISECONDS)
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.MINUTES);
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60, TimeUnit.MINUTES)
+                .init();
     }
 
     @Override
