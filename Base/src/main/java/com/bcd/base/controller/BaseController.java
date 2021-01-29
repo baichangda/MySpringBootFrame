@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -41,7 +42,7 @@ public class BaseController {
      */
     protected String toDateFileName(String fileName) {
         int index = fileName.lastIndexOf('.');
-        long dateNum = DateZoneUtil.getDateNum(new Date(), ChronoUnit.SECONDS);
+        long dateNum = Long.parseLong(DateZoneUtil.dateToString_second(new Date()));
         if (index == -1) {
             return fileName + "-" + dateNum;
         } else {

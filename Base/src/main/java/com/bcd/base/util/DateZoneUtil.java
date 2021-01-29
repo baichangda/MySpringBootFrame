@@ -128,17 +128,6 @@ public class DateZoneUtil {
         DateUtil.formatDateParam(startDate, endDate, ZONE_OFFSET);
     }
 
-    /**
-     * @param date
-     * @param unit
-     * @return
-     * @see DateUtil#getDateNum(Date, ChronoUnit, ZoneOffset)
-     */
-    public static Long getDateNum(Date date, ChronoUnit unit) {
-        return DateUtil.getDateNum(date, unit, ZONE_OFFSET);
-    }
-
-
     public static void main(String[] args) {
         Date time=stringToDate_day("20111111");
         System.out.println(time);
@@ -150,5 +139,16 @@ public class DateZoneUtil {
         DateTimeFormatter formatter2=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
         System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli()/1000);
         System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli()/1000);
+
+        Date d1=new Date();
+        Date d2=new Date();
+        formatDateParam(d1,d2);
+        System.out.println(d1);
+        System.out.println(d2);
+
+        Date newD1= getFloorDate(d1,ChronoUnit.HOURS);
+        System.out.println(d1.getTime());
+        System.out.println(newD1.getTime());
+        System.out.println(DateUtil.getDiff(d1,newD1,ChronoUnit.SECONDS,true));
     }
 }
