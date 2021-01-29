@@ -24,6 +24,8 @@ public class DateUtil {
     public final static String DATE_FORMAT_DAY = "yyyyMMdd";
     public final static String DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
 
+    private final static ChronoField[] equal_fields = new ChronoField[]{ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
+
     /**
      * 获取最近在当前日期之前的最后一个日期单位
      *
@@ -60,7 +62,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    break;
+                    throw BaseRuntimeException.getException("[DateUtil.getFloorDate],unit[{}}] Not Support!",unit.toString());
                 }
             }
         }
@@ -106,7 +108,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    break;
+                    throw BaseRuntimeException.getException("[DateUtil.getCeilDate],unit[{}}] Not Support!",unit.toString());
                 }
             }
         }
@@ -124,7 +126,10 @@ public class DateUtil {
      *
      * @param startDate
      * @param endDate
-     * @param unit      支持 ChronoUnit.DAYS,ChronoUnit.WEEKS,ChronoUnit.MONTHS
+     * @param unit   支持
+     *               {@link ChronoUnit#DAYS}
+     *               {@link ChronoUnit#WEEKS}
+     *               {@link ChronoUnit#MONTHS}
      * @param zoneOffset    时区
      * @return 每一个数组第一个为开始时间, 第二个为结束时间;开始时间为当天0.0.0,结束时间为当天0.0.0
      */
@@ -191,7 +196,7 @@ public class DateUtil {
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.rangeDate],ChronoUnit[" + unit.toString() + "] Not Support!");
+                throw BaseRuntimeException.getException("[DateUtil.rangeDate],unit[{}}] Not Support!",unit.toString());
             }
         }
         return returnList;
@@ -236,7 +241,7 @@ public class DateUtil {
                 return d2.getTime()- d1.getTime();
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.getDiff],ChronoUnit[" + unit.toString() + "] Not Support!");
+                throw BaseRuntimeException.getException("[DateUtil.getDiff],unit[{}] Not Support!",unit.toString());
             }
         }
         long begin = d1.getTime();
@@ -291,18 +296,24 @@ public class DateUtil {
      *
      * @param d1
      * @param d2
-     * @param field 对比的最小日期单位 支持 ChronoField.YEAR,ChronoField.MONTH_OF_YEAR,ChronoField.DAY_OF_MONTH,ChronoField.HOUR_OF_DAY,ChronoField.MINUTE_OF_HOUR,ChronoField.SECOND_OF_MINUTE,ChronoField.MILLI_OF_SECOND
+     * @param field 对比的最小日期单位、支持
+     *              {@link ChronoField#YEAR}
+     *              {@link ChronoField#MONTH_OF_YEAR}
+     *              {@link ChronoField#DAY_OF_MONTH}
+     *              {@link ChronoField#HOUR_OF_DAY}
+     *              {@link ChronoField#MINUTE_OF_HOUR}
+     *              {@link ChronoField#SECOND_OF_MINUTE}
+     *              {@link ChronoField#MILLI_OF_SECOND}
      * @return
      */
     public static boolean isEqual(Date d1, Date d2, ChronoField field) {
-        ChronoField[] fields = new ChronoField[]{ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
-        if (Arrays.stream(fields).noneMatch(e -> e == field)) {
-            throw BaseRuntimeException.getException("[DateUtil.isEqual],ChronoField[" + field.toString() + "] Not Support!");
+        if (Arrays.stream(equal_fields).noneMatch(e -> e == field)) {
+            throw BaseRuntimeException.getException("[DateUtil.isEqual],field[{}] Not Support!",field.toString());
         }
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime ldt1 = LocalDateTime.ofInstant(d1.toInstant(), zoneId);
         LocalDateTime ldt2 = LocalDateTime.ofInstant(d2.toInstant(), zoneId);
-        for (ChronoField curField : fields) {
+        for (ChronoField curField : equal_fields) {
             int curVal1 = ldt1.get(curField);
             int curVal2 = ldt2.get(curField);
             if (curVal1 != curVal2) {
