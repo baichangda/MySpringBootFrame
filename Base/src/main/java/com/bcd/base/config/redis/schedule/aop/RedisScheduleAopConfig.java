@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RedisScheduleAopConfig {
 
-    private final static Map<String, RedisScheduleHandler> LOCK_ID_TO_HANDLER =new ConcurrentHashMap<>();
+    private final static Map<Method, RedisScheduleHandler> METHOD_TO_HANDLER =new ConcurrentHashMap<>();
 
     private final static Logger logger= LoggerFactory.getLogger(RedisScheduleAopConfig.class);
 
@@ -40,7 +40,8 @@ public class RedisScheduleAopConfig {
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule) || @annotation(com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule) " +
+            "|| @annotation(com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule)")
     public void methodSchedule(){
 
     }
@@ -52,14 +53,15 @@ public class RedisScheduleAopConfig {
     public void doAroundSchedule(ProceedingJoinPoint joinPoint){
         //1、获取aop执行的方法
         Method method = getAopMethod(joinPoint);
-        SingleFailedSchedule anno1= method.getAnnotation(SingleFailedSchedule.class);
-        RedisScheduleHandler handler;
-        if(anno1==null){
-            ClusterFailedSchedule anno2= method.getAnnotation(ClusterFailedSchedule.class);
-            handler= LOCK_ID_TO_HANDLER.computeIfAbsent(anno2.lockId(), k-> new ClusterFailedScheduleHandler(anno2,redisConnectionFactory));
-        }else{
-            handler= LOCK_ID_TO_HANDLER.computeIfAbsent(anno1.lockId(), k-> new SingleFailedScheduleHandler(anno1,redisConnectionFactory));
-        }
+        RedisScheduleHandler handler= METHOD_TO_HANDLER.computeIfAbsent(method,k->{
+            SingleFailedSchedule anno1= method.getAnnotation(SingleFailedSchedule.class);
+            if(anno1==null){
+                ClusterFailedSchedule anno2= method.getAnnotation(ClusterFailedSchedule.class);
+                return new ClusterFailedScheduleHandler(anno2,redisConnectionFactory);
+            }else{
+                return new SingleFailedScheduleHandler(anno1,redisConnectionFactory);
+            }
+        });
         boolean flag=handler.doBeforeStart();
         if(flag){
             Object[] args = joinPoint.getArgs();

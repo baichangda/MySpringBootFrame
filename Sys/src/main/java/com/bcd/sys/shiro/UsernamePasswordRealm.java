@@ -3,7 +3,7 @@ package com.bcd.sys.shiro;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.shiro.ShiroMessageDefine;
+import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.base.config.shiro.cache.RedisCache;
 import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;

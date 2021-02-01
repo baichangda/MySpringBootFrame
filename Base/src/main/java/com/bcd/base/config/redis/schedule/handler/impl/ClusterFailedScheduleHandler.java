@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
  * 集群失败执行模式,如果一个终端执行定时任务失败,会有其他终端执行;直到所有的终端执行失败,定时任务才算失败
  * <p>
  * 原理:
- * 1、到达任务时间点,集群中多个实例开始争夺redis锁,锁具有超时时间为 {@link #timeOut}
- * 2、获取到redis锁的实例开始执行任务,其他未获取到锁的实例循环等待,循环的间隔为 {@link #cycleInterval}
+ * 1、到达任务时间点,集群中多个实例开始争夺redis锁,锁具有超时时间为 {@link #timeoutInMillis}
+ * 2、获取到redis锁的实例开始执行任务,其他未获取到锁的实例循环等待,循环的间隔为 {@link #cycleIntervalInMillis}
  * 3、如果执行成功,将成功标记设置到redis中,其他实例检测到成功的结果,结束循环
  * 4、如果执行失败,清除redis锁,此实例不再参与锁竞争,其他等待的实例进行锁竞争
  * 5、如果执行超时,此时锁会被redis自动清除,其他实例会进行锁竞争
  * <p>
  * 所以:
- * {@link #timeOut} 必须大于 任务成功执行时间,否则会出现任务被执行多次
- * {@link #aliveTime} 必须大于 {@link #cycleInterval},否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
+ * {@link #timeoutInMillis} 必须大于 任务成功执行时间,否则会出现任务被执行多次
+ * {@link #aliveTimeInMillis} 必须大于 {@link #cycleIntervalInMillis},否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
  *
  */
 @SuppressWarnings("unchecked")
@@ -32,21 +32,21 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
      * 单位(毫秒)
      */
-    private long timeOut;
+    private long timeoutInMillis;
 
     /**
      * 任务执行后锁存活时间
      * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
      * 单位(毫秒)
      */
-    private long aliveTime;
+    private long aliveTimeInMillis;
 
     /**
      * 锁失败循环间隔时间
      * 获取锁失败时候,循环检测执行结果并重新处理的循环时间间隔
      * 单位(毫秒)
      */
-    private long cycleInterval;
+    private long cycleIntervalInMillis;
 
     /**
      * 根据随机数生成的各种val
@@ -55,20 +55,40 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     protected String successVal="1";
 
 
-    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut, long aliveTime, long cycleInterval) {
+    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory,
+                                        long timeout,
+                                        TimeUnit timeoutUnit,
+                                        long aliveTime,
+                                        TimeUnit aliveTimeUnit,
+                                        long cycleInterval,
+                                        TimeUnit cycleIntervalUnit) {
         super(lockId,redisConnectionFactory);
-        this.timeOut = timeOut;
-        this.aliveTime = aliveTime;
-        this.cycleInterval = cycleInterval;
+        this.timeoutInMillis = timeoutUnit.toMillis(timeout);
+        this.aliveTimeInMillis = aliveTimeUnit.toMillis(aliveTime);
+        this.cycleIntervalInMillis = cycleIntervalUnit.toMillis(cycleInterval);
 
     }
 
-    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeOut) {
-        this(lockId,redisConnectionFactory, timeOut, timeOut / 2, timeOut / 10);
+    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeout,TimeUnit timeoutUnit) {
+        super(lockId,redisConnectionFactory);
+        this.timeoutInMillis = timeoutUnit.toMillis(timeout);
+        this.aliveTimeInMillis= timeoutInMillis/3;
+        this.cycleIntervalInMillis=timeoutInMillis/10;
     }
 
     public ClusterFailedScheduleHandler(ClusterFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
-        this(anno.lockId(),redisConnectionFactory, anno.timeOut(), anno.aliveTime() == 0L ? anno.timeOut() / 2 : anno.aliveTime(), anno.cycleInterval() == 0L ? anno.timeOut() / 10 : anno.cycleInterval());
+        super(anno.lockId(),redisConnectionFactory);
+        this.timeoutInMillis = anno.timeoutUnit().toMillis(anno.timeout());
+        if(anno.aliveTime()==0L){
+            this.aliveTimeInMillis= timeoutInMillis/3;
+        }else{
+            this.aliveTimeInMillis= anno.aliveTimeUnit().toMillis(anno.aliveTime());;
+        }
+        if(anno.cycleInterval()==0L){
+            this.cycleIntervalInMillis= timeoutInMillis/10;
+        }else{
+            this.cycleIntervalInMillis= anno.cycleIntervalUnit().toMillis(anno.cycleInterval());;
+        }
     }
 
     /**
@@ -88,7 +108,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                 return true;
             } else {
                 while(true){
-                    Thread.sleep(cycleInterval);
+                    Thread.sleep(cycleIntervalInMillis);
                     /**
                      * null:执行时间超过超时时间 或者 执行失败
                      * 0:执行中
@@ -124,7 +144,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      */
     private boolean getLock() {
         return redisTemplate.execute((RedisConnection connection) ->
-                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize(executingVal), Expiration.milliseconds(timeOut), RedisStringCommands.SetOption.SET_IF_ABSENT)
+                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize(executingVal), Expiration.milliseconds(timeoutInMillis), RedisStringCommands.SetOption.SET_IF_ABSENT)
         );
     }
 
@@ -148,7 +168,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
         Object res = redisTemplate.opsForValue().get(lockId);
         if (executingVal.equals(res)) {
             //如果持有当前锁,则设置成功标志并设置存活时间
-            redisTemplate.opsForValue().set(lockId, successVal, aliveTime, TimeUnit.MILLISECONDS);
+            redisTemplate.opsForValue().set(lockId, successVal, aliveTimeInMillis, TimeUnit.MILLISECONDS);
         } else {
             //如果当前锁已经被释放(说明可能有其他终端执行了定时任务)
             logger.warn("schedule lockId[{}] doOnSuccess res[{}],other thread maybe execute task",lockId,res);

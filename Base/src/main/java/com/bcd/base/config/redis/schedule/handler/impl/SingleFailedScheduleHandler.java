@@ -2,12 +2,12 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 
 import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 单机失败执行模式,只会有一个终端执行定时任务,结果取决于这个终端执行结果
@@ -20,26 +20,32 @@ import org.springframework.data.redis.core.types.Expiration;
 @SuppressWarnings("unchecked")
 public class SingleFailedScheduleHandler extends RedisScheduleHandler {
 
-    private final static Long DEFAULT_ALIVE_TIME = 2000L;
+    private final static Long DEFAULT_ALIVE_TIME = 3000L;
 
 
     /**
      * 锁获取后存活时间
      * 单位(毫秒)
      */
-    private long aliveTime;
+    private long aliveTimeInMillis;
 
-    public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long aliveTime) {
+    public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long aliveTime, TimeUnit aliveTimeUnit) {
         super(lockId,redisConnectionFactory);
-        this.aliveTime = aliveTime;
+        this.aliveTimeInMillis = aliveTimeUnit.toMillis(aliveTime);
     }
 
     public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory) {
-        this(lockId,redisConnectionFactory, DEFAULT_ALIVE_TIME);
+        super(lockId,redisConnectionFactory);
+        this.aliveTimeInMillis=DEFAULT_ALIVE_TIME;
     }
 
     public SingleFailedScheduleHandler(SingleFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
-        this(anno.lockId(),redisConnectionFactory, anno.aliveTime() == 0L ? DEFAULT_ALIVE_TIME : anno.aliveTime());
+        super(anno.lockId(),redisConnectionFactory);
+        if(anno.aliveTime()==0L){
+            this.aliveTimeInMillis=DEFAULT_ALIVE_TIME;
+        }else{
+            this.aliveTimeInMillis = anno.aliveTimeUnit().toMillis(anno.aliveTime());
+        }
     }
 
     /**
@@ -52,7 +58,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     public boolean doBeforeStart() {
         //1、获取锁
         boolean isLock = redisTemplate.execute((RedisConnection connection) ->
-                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTime), RedisStringCommands.SetOption.SET_IF_ABSENT)
+                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTimeInMillis), RedisStringCommands.SetOption.SET_IF_ABSENT)
         );
         return isLock;
     }
