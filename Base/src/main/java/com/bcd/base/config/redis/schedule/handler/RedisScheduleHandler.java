@@ -23,9 +23,6 @@ public abstract class RedisScheduleHandler {
 
     protected Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    protected RedisSerializer<String> keySerializer;
-    protected RedisSerializer<String> valueSerializer;
-
     protected RedisTemplate<String,String> redisTemplate;
     /**
      * 定时任务的锁表示字符串,确保每一个定时任务设置不同的锁id
@@ -35,8 +32,6 @@ public abstract class RedisScheduleHandler {
     public RedisScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory) {
         this.lockId = lockId;
         this.redisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
-        this.keySerializer=(RedisSerializer<String>)redisTemplate.getKeySerializer();
-        this.valueSerializer=(RedisSerializer<String>)redisTemplate.getValueSerializer();
     }
 
 

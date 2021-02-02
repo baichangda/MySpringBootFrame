@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -143,9 +144,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * @return
      */
     private boolean getLock() {
-        return redisTemplate.execute((RedisConnection connection) ->
-                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize(executingVal), Expiration.milliseconds(timeoutInMillis), RedisStringCommands.SetOption.SET_IF_ABSENT)
-        );
+        return redisTemplate.opsForValue().setIfAbsent(lockId,executingVal, Duration.ofMillis(timeoutInMillis));
     }
 
     /**

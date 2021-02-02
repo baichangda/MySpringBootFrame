@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,10 +58,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     @Override
     public boolean doBeforeStart() {
         //1、获取锁
-        boolean isLock = redisTemplate.execute((RedisConnection connection) ->
-                connection.set(keySerializer.serialize(lockId), valueSerializer.serialize("0"), Expiration.milliseconds(aliveTimeInMillis), RedisStringCommands.SetOption.SET_IF_ABSENT)
-        );
-        return isLock;
+        return redisTemplate.opsForValue().setIfAbsent(lockId,"0", Duration.ofMillis(aliveTimeInMillis));
     }
 
     /**
