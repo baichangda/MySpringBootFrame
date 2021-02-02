@@ -12,10 +12,8 @@ import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,7 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class RedisQueueMQ<V> {
@@ -32,7 +29,7 @@ public class RedisQueueMQ<V> {
 
     protected String name;
 
-    protected RedisSerializer<V> redisSerializer;
+    protected RedisSerializer<V> valueSerializer;
 
     protected BoundListOperations<String, byte[]> boundListOperations;
 
@@ -53,7 +50,7 @@ public class RedisQueueMQ<V> {
         this.stop = false;
         this.redisTemplate=RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
         this.boundListOperations = redisTemplate.boundListOps(name);
-        this.redisSerializer=getDefaultRedisSerializer(valueSerializerType);
+        this.valueSerializer =getDefaultRedisSerializer(valueSerializerType);
         this.consumePool = consumePool;
         this.workPool = workPool;
     }
@@ -74,7 +71,7 @@ public class RedisQueueMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default: {
-                throw BaseRuntimeException.getException("Not Support");
+                throw BaseRuntimeException.getException("valueSerializerType [{}] not support",valueSerializerType);
             }
         }
     }
@@ -82,23 +79,6 @@ public class RedisQueueMQ<V> {
     private JavaType parseValueJavaType() {
         Type parentType = ClassUtil.getParentUntil(getClass(), RedisQueueMQ.class);
         return JsonUtil.getJavaType(((ParameterizedType) parentType).getActualTypeArguments()[0]);
-    }
-
-    private RedisTemplate getDefaultRedisTemplate(RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializer) {
-        switch (valueSerializer) {
-            case STRING: {
-                return RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
-            }
-            case SERIALIZABLE: {
-                return RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory);
-            }
-            case JACKSON: {
-                return RedisUtil.newString_JacksonBeanRedisTemplate(redisConnectionFactory, parseValueJavaType());
-            }
-            default: {
-                throw BaseRuntimeException.getException("Not Support");
-            }
-        }
     }
 
     protected byte[] compress(byte[] data){
@@ -110,11 +90,11 @@ public class RedisQueueMQ<V> {
     }
 
     public void send(V data) {
-        boundListOperations.leftPush(compress(redisSerializer.serialize(data)));
+        boundListOperations.leftPush(compress(valueSerializer.serialize(data)));
     }
 
     public void sendBatch(List<V> dataList) {
-        byte[][] bytesArr= dataList.stream().map(e->compress(redisSerializer.serialize(e))).toArray(byte[][]::new);
+        byte[][] bytesArr= dataList.stream().map(e->compress(valueSerializer.serialize(e))).toArray(byte[][]::new);
         boundListOperations.leftPushAll(bytesArr);
     }
 
@@ -132,7 +112,7 @@ public class RedisQueueMQ<V> {
     }
 
     protected void onMessageFromRedis(byte[] data) {
-        onMessage(redisSerializer.deserialize(unCompress(data)));
+        onMessage(valueSerializer.deserialize(unCompress(data)));
     }
 
     protected void start() {

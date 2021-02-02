@@ -20,6 +20,7 @@ public interface AuthorizationHandler {
      * 此方法用于spring拦截器的权限认证
      * 用于:
      * MyAopAllianceAnnotationsAuthorizingMethodInterceptor
+     * {@link org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthorizingMethodInterceptor#assertAuthorized(MethodInvocation)}
      * @param methodInvocation 当前需要验证权限的方法
      * @return
      */
@@ -31,6 +32,7 @@ public interface AuthorizationHandler {
      * 此方法用于filter过滤器权限认证
      * 用于:
      * MyAuthorizationFilter
+     * {@link org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter#isAccessAllowed(ServletRequest, ServletResponse, Object)}
      * @param request
      * @param response
      * @param mappedValue
