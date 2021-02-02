@@ -1,11 +1,8 @@
 package com.bcd.config.exception;
 
-import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.ExceptionUtil;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
@@ -32,19 +29,19 @@ public class CustomExceptionHandler extends AbstractHandlerExceptionResolver {
 
     @Override
     public ModelAndView doResolveException(HttpServletRequest request,
-                                         HttpServletResponse response, Object object, Exception exception) {
+                                           HttpServletResponse response, Object object, Exception exception) {
         //1、判断response
-        if(response.isCommitted()){
+        if (response.isCommitted()) {
             return new ModelAndView();
         }
         //2、打印异常
-        logger.error("Error",exception);
+        logger.error("Error", exception);
 
         //3、使用异常handler处理异常
         try {
-            handler.handle(response,exception);
+            handler.handle(response, exception);
         } catch (IOException e) {
-            logger.error("Error",e);
+            logger.error("Error", e);
         }
         return new ModelAndView();
     }

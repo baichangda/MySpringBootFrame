@@ -87,7 +87,7 @@ public class UserService extends BaseService<UserBean,Long>  implements SpringIn
      * @return
      */
     public UserBean login_phone(String phone,String phoneCode){
-        PhoneCodeToken token=new PhoneCodeToken(phone,phoneCode);
+        PhoneCodeToken token= new PhoneCodeToken(phone,phoneCode);
         return login(token,()->{
             return findOne(new StringCondition("phone",phone));
         });
