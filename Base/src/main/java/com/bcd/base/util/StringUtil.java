@@ -59,21 +59,6 @@ public class StringUtil {
     }
 
     /**
-     * 替换字符串中的${*}格式的变量
-     *
-     * @param str
-     * @param dataMap
-     * @return
-     */
-    public static String replaceStrs(String str, Map<String, String> dataMap) {
-        String[] newStr = new String[]{str};
-        dataMap.forEach((k, v) ->
-                newStr[0] = newStr[0].replaceAll("\\$\\{" + escapeExprSpecialWord(k) + "\\}", escapeExprSpecialWord(v))
-        );
-        return newStr[0];
-    }
-
-    /**
      * 转义正则特殊字符 $()*+.[]?\^{},|
      *
      * @param str
