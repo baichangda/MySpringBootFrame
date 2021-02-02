@@ -16,8 +16,8 @@ import java.io.Serializable;
 public class RedisConfig{
 
     /**
-     * key 用 StringRedisSerializer
-     * value 用 JdkSerializationRedisSerializer
+     * key 用 {@link RedisUtil#STRING_SERIALIZER}
+     * value 用 {@link RedisUtil#JDK_SERIALIZATION_SERIALIZER}
      * 的 RedisTemplate
      * @return
      */
@@ -27,8 +27,8 @@ public class RedisConfig{
     }
 
     /**
-     * key 用 StringRedisSerializer
-     * value 用 StringRedisSerializer
+     * key 用 {@link RedisUtil#STRING_SERIALIZER}
+     * value 用 {@link RedisUtil#STRING_SERIALIZER}
      * 的 RedisTemplate
      * @return
      */

@@ -19,8 +19,8 @@ public class ConditionImplConverter implements Converter<ConditionImpl,Criteria>
     public Criteria convert(ConditionImpl condition, Object... exts) {
         List<Condition> conditionList= condition.childrenList;
         ConditionImpl.ConcatWay concatWay=condition.concatWay;
-        Criteria[] criterias= conditionList.stream().map(c-> ConditionUtil.convertCondition(c)).filter(Objects::nonNull).toArray(len->new Criteria[len]);
-        if(criterias==null||criterias.length==0){
+        Criteria[] criterias= conditionList.stream().map(ConditionUtil::convertCondition).filter(Objects::nonNull).toArray(Criteria[]::new);
+        if(criterias.length == 0){
             return null;
         }
         switch (concatWay){

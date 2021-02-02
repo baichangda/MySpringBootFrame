@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
     /**
      * 定义一级缓存(在非redis情况)
-     * 一级:google guava缓存(过期时间5s);  key: myCache_1::${key}
+     * 一级:本地缓存{@link com.bcd.base.map.MyCache};  key: myCache_1::${key}
      * @return
      */
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.RedisConnectionFactory")

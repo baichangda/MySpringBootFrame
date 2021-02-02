@@ -18,8 +18,9 @@ public class SpringInitListener implements ApplicationListener<ContextRefreshedE
             beanMap.values().forEach(e -> {
                 try{
                     e.init(event);
+                    logger.info("SpringInitListener[{}] init succeed",e.getClass());
                 }catch (Exception ex){
-                    logger.error("SpringInitListener["+e.getClass()+"] init failed,shutdown...",ex);
+                    logger.error("SpringInitListener[{}] init failed,shutdown...",e.getClass(),ex);
                     e.destroy();
                 }
             });
