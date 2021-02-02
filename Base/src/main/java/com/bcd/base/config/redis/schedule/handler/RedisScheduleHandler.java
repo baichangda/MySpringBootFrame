@@ -36,7 +36,7 @@ public abstract class RedisScheduleHandler {
         this.lockId = lockId;
         this.redisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
         this.keySerializer=(RedisSerializer<String>)redisTemplate.getKeySerializer();
-        this.valueSerializer=(RedisSerializer<String>)redisTemplate.getKeySerializer();
+        this.valueSerializer=(RedisSerializer<String>)redisTemplate.getValueSerializer();
     }
 
 
