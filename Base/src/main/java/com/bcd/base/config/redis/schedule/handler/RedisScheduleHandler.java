@@ -21,9 +21,9 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 public abstract class RedisScheduleHandler {
 
-    protected Logger logger= LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected RedisTemplate<String,String> redisTemplate;
+    protected RedisTemplate<String, String> redisTemplate;
     /**
      * 定时任务的锁表示字符串,确保每一个定时任务设置不同的锁id
      */

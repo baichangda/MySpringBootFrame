@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
  * 所以:
  * {@link #timeoutInMillis} 必须大于 任务成功执行时间,否则会出现任务被执行多次
  * {@link #aliveTimeInMillis} 必须大于 {@link #cycleIntervalInMillis},否则会出现即使执行成功其他实例也检测不到结果,出现执行多次
- *
  */
 @SuppressWarnings("unchecked")
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
@@ -52,8 +51,8 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     /**
      * 根据随机数生成的各种val
      */
-    protected String executingVal="0";
-    protected String successVal="1";
+    protected String executingVal = "0";
+    protected String successVal = "1";
 
 
     public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory,
@@ -63,32 +62,34 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                                         TimeUnit aliveTimeUnit,
                                         long cycleInterval,
                                         TimeUnit cycleIntervalUnit) {
-        super(lockId,redisConnectionFactory);
+        super(lockId, redisConnectionFactory);
         this.timeoutInMillis = timeoutUnit.toMillis(timeout);
         this.aliveTimeInMillis = aliveTimeUnit.toMillis(aliveTime);
         this.cycleIntervalInMillis = cycleIntervalUnit.toMillis(cycleInterval);
 
     }
 
-    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeout,TimeUnit timeoutUnit) {
-        super(lockId,redisConnectionFactory);
+    public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long timeout, TimeUnit timeoutUnit) {
+        super(lockId, redisConnectionFactory);
         this.timeoutInMillis = timeoutUnit.toMillis(timeout);
-        this.aliveTimeInMillis= timeoutInMillis/3;
-        this.cycleIntervalInMillis=timeoutInMillis/10;
+        this.aliveTimeInMillis = timeoutInMillis / 3;
+        this.cycleIntervalInMillis = timeoutInMillis / 10;
     }
 
     public ClusterFailedScheduleHandler(ClusterFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
-        super(anno.lockId(),redisConnectionFactory);
+        super(anno.lockId(), redisConnectionFactory);
         this.timeoutInMillis = anno.timeoutUnit().toMillis(anno.timeout());
-        if(anno.aliveTime()==0L){
-            this.aliveTimeInMillis= timeoutInMillis/3;
-        }else{
-            this.aliveTimeInMillis= anno.aliveTimeUnit().toMillis(anno.aliveTime());;
+        if (anno.aliveTime() == 0L) {
+            this.aliveTimeInMillis = timeoutInMillis / 3;
+        } else {
+            this.aliveTimeInMillis = anno.aliveTimeUnit().toMillis(anno.aliveTime());
+            ;
         }
-        if(anno.cycleInterval()==0L){
-            this.cycleIntervalInMillis= timeoutInMillis/10;
-        }else{
-            this.cycleIntervalInMillis= anno.cycleIntervalUnit().toMillis(anno.cycleInterval());;
+        if (anno.cycleInterval() == 0L) {
+            this.cycleIntervalInMillis = timeoutInMillis / 10;
+        } else {
+            this.cycleIntervalInMillis = anno.cycleIntervalUnit().toMillis(anno.cycleInterval());
+            ;
         }
     }
 
@@ -101,41 +102,42 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * @return
      */
     public boolean doBeforeStart() {
-        try {
-            //获取锁
-            boolean isLock = getLock();
-            if (isLock) {
-                //获取成功则执行任务
-                return true;
-            } else {
-                while(true){
+        //获取锁
+        boolean isLock = getLock();
+        if (isLock) {
+            //获取成功则执行任务
+            return true;
+        } else {
+            try {
+                while (true) {
                     Thread.sleep(cycleIntervalInMillis);
                     /**
                      * null:执行时间超过超时时间 或者 执行失败
                      * 0:执行中
                      * 1:执行成功
                      */
-                    String val=redisTemplate.opsForValue().get(lockId);
-                    if(val==null){
+                    String val = redisTemplate.opsForValue().get(lockId);
+                    if (val == null) {
                         //如果执行超时或执行失败,此时重新获取锁
                         isLock = getLock();
                         if (isLock) {
                             //获取成功则执行任务
                             return true;
                         }
-                    }else{
-                        if(val.equals("1")){
+                    } else {
+                        if (val.equals("1")) {
                             //如果执行完成,则当前机器不执行本次任务
                             return false;
                         }
                     }
                 }
+            } catch (InterruptedException e) {
+                logger.error("cluster schedule interrupted", e);
+                Thread.currentThread().interrupt();
+                return false;
             }
-        } catch (InterruptedException e) {
-            logger.error("cluster schedule interrupted", e);
-            Thread.currentThread().interrupt();
-            return false;
         }
+
     }
 
     /**
@@ -144,7 +146,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
      * @return
      */
     private boolean getLock() {
-        return redisTemplate.opsForValue().setIfAbsent(lockId,executingVal, Duration.ofMillis(timeoutInMillis));
+        return redisTemplate.opsForValue().setIfAbsent(lockId, executingVal, Duration.ofMillis(timeoutInMillis));
     }
 
     /**
@@ -170,7 +172,7 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
             redisTemplate.opsForValue().set(lockId, successVal, aliveTimeInMillis, TimeUnit.MILLISECONDS);
         } else {
             //如果当前锁已经被释放(说明可能有其他终端执行了定时任务)
-            logger.warn("schedule lockId[{}] doOnSuccess res[{}],other thread maybe execute task",lockId,res);
+            logger.warn("schedule lockId[{}] doOnSuccess res[{}],other thread maybe execute task", lockId, res);
         }
     }
 

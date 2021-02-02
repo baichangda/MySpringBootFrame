@@ -31,20 +31,20 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     private long aliveTimeInMillis;
 
     public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long aliveTime, TimeUnit aliveTimeUnit) {
-        super(lockId,redisConnectionFactory);
+        super(lockId, redisConnectionFactory);
         this.aliveTimeInMillis = aliveTimeUnit.toMillis(aliveTime);
     }
 
     public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory) {
-        super(lockId,redisConnectionFactory);
-        this.aliveTimeInMillis=DEFAULT_ALIVE_TIME;
+        super(lockId, redisConnectionFactory);
+        this.aliveTimeInMillis = DEFAULT_ALIVE_TIME;
     }
 
     public SingleFailedScheduleHandler(SingleFailedSchedule anno, RedisConnectionFactory redisConnectionFactory) {
-        super(anno.lockId(),redisConnectionFactory);
-        if(anno.aliveTime()==0L){
-            this.aliveTimeInMillis=DEFAULT_ALIVE_TIME;
-        }else{
+        super(anno.lockId(), redisConnectionFactory);
+        if (anno.aliveTime() == 0L) {
+            this.aliveTimeInMillis = DEFAULT_ALIVE_TIME;
+        } else {
             this.aliveTimeInMillis = anno.aliveTimeUnit().toMillis(anno.aliveTime());
         }
     }
@@ -58,7 +58,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
     @Override
     public boolean doBeforeStart() {
         //1、获取锁
-        return redisTemplate.opsForValue().setIfAbsent(lockId,"0", Duration.ofMillis(aliveTimeInMillis));
+        return redisTemplate.opsForValue().setIfAbsent(lockId, "0", Duration.ofMillis(aliveTimeInMillis));
     }
 
     /**
