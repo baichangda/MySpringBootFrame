@@ -101,14 +101,14 @@ public class StringUtil {
      * @param str 字符串值
      * @return
      */
-    public static List<String> findStrInParenthesis(String str, String leftStr, String rightStr) {
+    public static Set<String> findStrInParenthesis(String str, String leftStr, String rightStr) {
         Pattern pattern = Pattern.compile(escapeExprSpecialWord(leftStr) + "(.*?)" + escapeExprSpecialWord(rightStr));
         Matcher matcher = pattern.matcher(str);
-        List<String> returnList = new ArrayList();
+        Set<String> res = new HashSet<>();
         while (matcher.find()) {
-            returnList.add(matcher.group(1));
+            res.add(matcher.group(1));
         }
-        return returnList;
+        return res;
     }
 
 }
