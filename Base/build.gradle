@@ -32,6 +32,9 @@ dependencies {
     //apache commons lang3
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
 
+    //apache commons compress
+    compile("org.apache.commons:commons-compress:${commonsCompressVersion}")
+
     //swagger集成
     /**
      * 排除swagger-models原因是因为
@@ -63,6 +66,7 @@ buildscript {
         easyexcelVersion = '+'
         commonsCodecVersion='+'
         commonsLangVersion='+'
+        commonsCompressVersion='+'
         swaggerVersion='2.9.2'
         swaggerModelVersion='1.6.1'
 //        swaggerModelVersion='1.5.24'

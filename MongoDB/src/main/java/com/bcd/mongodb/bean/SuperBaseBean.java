@@ -24,14 +24,6 @@ public abstract class SuperBaseBean<K extends Serializable> implements Serializa
     //主键
     public K id;
 
-    public K getId() {
-        return id;
-    }
-
-    public void setId(K id) {
-        this.id = id;
-    }
-
     @Override
     public int hashCode() {
         return id==null?0:id.hashCode();
