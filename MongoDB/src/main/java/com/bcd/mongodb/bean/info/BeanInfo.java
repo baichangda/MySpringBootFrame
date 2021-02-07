@@ -1,7 +1,6 @@
 package com.bcd.mongodb.bean.info;
 
 import com.bcd.mongodb.anno.Unique;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -40,28 +39,28 @@ public class BeanInfo {
     public String collection;
 
 
-    public BeanInfo(Class clazz){
+    public BeanInfo(Class clazz) {
         this.clazz = clazz;
         init();
     }
 
-    private void init(){
+    private void init() {
         initPkField();
         initUnique();
         initCollection();
     }
 
-    public void initCollection(){
-        collection= ((Document)clazz.getAnnotation(Document.class)).collection();
+    public void initCollection() {
+        collection = ((Document) clazz.getAnnotation(Document.class)).collection();
     }
 
-    public void initUnique(){
-        uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
-        uniqueFieldList.forEach(e->e.setAccessible(true));
-        if(uniqueFieldList.isEmpty()){
-            isCheckUnique =false;
-        }else{
-            isCheckUnique =true;
+    public void initUnique() {
+        uniqueFieldList = Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
+        uniqueFieldList.forEach(e -> e.setAccessible(true));
+        if (uniqueFieldList.isEmpty()) {
+            isCheckUnique = false;
+        } else {
+            isCheckUnique = true;
         }
     }
 
@@ -69,10 +68,10 @@ public class BeanInfo {
     /**
      * 初始化主键字段
      */
-    public void initPkField(){
-        pkField= FieldUtils.getFieldsWithAnnotation(clazz,Id.class)[0];
+    public void initPkField() {
+        pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
-        pkFieldName=pkField.getName();
+        pkFieldName = pkField.getName();
     }
 
 }

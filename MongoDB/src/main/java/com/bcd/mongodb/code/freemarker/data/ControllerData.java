@@ -1,18 +1,9 @@
 package com.bcd.mongodb.code.freemarker.data;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 @Accessors(chain = true)
@@ -47,7 +38,7 @@ public class ControllerData {
     /**
      * 是否需要保存方法验证
      */
-    private boolean validateSaveParam=true;
+    private boolean validateSaveParam = true;
 
     /**
      * 主键类型

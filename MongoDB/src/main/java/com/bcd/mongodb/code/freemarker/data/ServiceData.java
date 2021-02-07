@@ -1,6 +1,5 @@
 package com.bcd.mongodb.code.freemarker.data;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

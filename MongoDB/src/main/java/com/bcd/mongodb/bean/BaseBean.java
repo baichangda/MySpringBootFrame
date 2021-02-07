@@ -2,8 +2,6 @@ package com.bcd.mongodb.bean;
 
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -18,14 +16,14 @@ import java.util.Date;
 @Accessors(chain = true)
 @Getter
 @Setter
-public class BaseBean<K extends Serializable> extends SuperBaseBean<K>{
+public class BaseBean<K extends Serializable> extends SuperBaseBean<K> {
     @ApiModelProperty(value = "创建时间(不需要赋值)")
     protected Date createTime;
 
     @ApiModelProperty(value = "创建人id(不需要赋值)")
     protected K createUserId;
 
-    @Length(max = 50,message = "[创建人姓名]长度不能超过50")
+    @Length(max = 50, message = "[创建人姓名]长度不能超过50")
     @ApiModelProperty(value = "创建人姓名(长度不能超过50)(不需要赋值)")
     protected String createUserName;
 
@@ -35,15 +33,15 @@ public class BaseBean<K extends Serializable> extends SuperBaseBean<K>{
     @ApiModelProperty(value = "更新人id(不需要赋值)")
     protected K updateUserId;
 
-    @Length(max = 50,message = "[更新人姓名]长度不能超过50")
+    @Length(max = 50, message = "[更新人姓名]长度不能超过50")
     @ApiModelProperty(value = "更新人姓名(长度不能超过50)(不需要赋值)")
     protected String updateUserName;
 
-    @Length(max = 50,message = "[创建ip地址]长度不能超过50")
+    @Length(max = 50, message = "[创建ip地址]长度不能超过50")
     @ApiModelProperty(value = "创建ip地址(长度不能超过50)(不需要赋值)")
     protected String createIp;
 
-    @Length(max = 50,message = "[更新ip地址]长度不能超过50")
+    @Length(max = 50, message = "[更新ip地址]长度不能超过50")
     @ApiModelProperty(value = "更新ip地址(长度不能超过50)(不需要赋值)")
     protected String updateIp;
 

@@ -31,62 +31,64 @@ public class TestController extends BaseController {
     private TestService testService;
 
 
-
     /**
      * 查询测试列表
+     *
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value="查询测试列表",notes = "查询测试列表")
-    @ApiResponse(code = 200,message = "测试列表")
+    @ApiOperation(value = "查询测试列表", notes = "查询测试列表")
+    @ApiResponse(code = 200, message = "测试列表")
     public JsonMessage<List<TestBean>> list(
-        @ApiParam(value = "vin") @RequestParam(required = false) String vin,
-        @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
-        @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
-        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id
-    ){
-        Condition condition= Condition.and(
-           new StringCondition("vin",vin),
-           new DateCondition("time",timeBegin, DateCondition.Handler.GE),
-           new DateCondition("time",timeEnd, DateCondition.Handler.LE),
-           new StringCondition("id",id)
+            @ApiParam(value = "vin") @RequestParam(required = false) String vin,
+            @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
+            @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
+            @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id
+    ) {
+        Condition condition = Condition.and(
+                new StringCondition("vin", vin),
+                new DateCondition("time", timeBegin, DateCondition.Handler.GE),
+                new DateCondition("time", timeEnd, DateCondition.Handler.LE),
+                new StringCondition("id", id)
         );
         return JsonMessage.success().withData(testService.findAll(condition));
     }
 
     /**
      * 查询测试分页
+     *
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询测试分页",notes = "查询测试分页")
-    @ApiResponse(code = 200,message = "测试分页结果集")
+    @ApiOperation(value = "查询测试分页", notes = "查询测试分页")
+    @ApiResponse(code = 200, message = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
-        @ApiParam(value = "vin") @RequestParam(required = false) String vin,
-        @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
-        @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
-        @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id,
-        @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
-        @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(required = false,defaultValue = "20") Integer pageSize
-    ){
-        Condition condition= Condition.and(
-           new StringCondition("vin",vin),
-           new DateCondition("time",timeBegin, DateCondition.Handler.GE),
-           new DateCondition("time",timeEnd, DateCondition.Handler.LE),
-           new StringCondition("id",id)
+            @ApiParam(value = "vin") @RequestParam(required = false) String vin,
+            @ApiParam(value = "时间开始") @RequestParam(required = false) Date timeBegin,
+            @ApiParam(value = "时间结束") @RequestParam(required = false) Date timeEnd,
+            @ApiParam(value = "主键(唯一标识符,自动生成)(不需要赋值)") @RequestParam(required = false) String id,
+            @ApiParam(value = "分页参数(页数)", defaultValue = "1") @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+            @ApiParam(value = "分页参数(页大小)", defaultValue = "20") @RequestParam(required = false, defaultValue = "20") Integer pageSize
+    ) {
+        Condition condition = Condition.and(
+                new StringCondition("vin", vin),
+                new DateCondition("time", timeBegin, DateCondition.Handler.GE),
+                new DateCondition("time", timeEnd, DateCondition.Handler.LE),
+                new StringCondition("id", id)
         );
-        return JsonMessage.success().withData(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success().withData(testService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
      * 保存测试
+     *
      * @param test
      * @return
      */
-    @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ApiOperation(value = "保存测试",notes = "保存测试")
-    @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "测试实体") @Validated @RequestBody TestBean test){
+    @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @ApiOperation(value = "保存测试", notes = "保存测试")
+    @ApiResponse(code = 200, message = "保存结果")
+    public JsonMessage save(@ApiParam(value = "测试实体") @Validated @RequestBody TestBean test) {
         testService.save(test);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -94,13 +96,14 @@ public class TestController extends BaseController {
 
     /**
      * 删除测试
+     *
      * @param ids
      * @return
      */
-    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除测试",notes = "删除测试")
-    @ApiResponse(code = 200,message = "删除结果")
-    public JsonMessage delete(@ApiParam(value = "测试id数组") @RequestParam String[] ids){
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @ApiOperation(value = "删除测试", notes = "删除测试")
+    @ApiResponse(code = 200, message = "删除结果")
+    public JsonMessage delete(@ApiParam(value = "测试id数组") @RequestParam String[] ids) {
         testService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }

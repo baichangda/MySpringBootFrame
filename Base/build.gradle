@@ -46,10 +46,10 @@ dependencies {
      * 注意:
      * 指定google guava时候需要引用高版本
      */
-    compile ("io.springfox:springfox-swagger2:${swaggerVersion}"){
+    compile("io.springfox:springfox-swagger2:${swaggerVersion}") {
         exclude group: 'io.swagger', module: 'swagger-models'
     }
-    compile ("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+    compile("io.springfox:springfox-swagger-ui:${swaggerVersion}")
     compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
     // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
     compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
@@ -58,21 +58,19 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
 
 
-
-
 }
 buildscript {
     ext {
         easyexcelVersion = '+'
-        commonsCodecVersion='+'
-        commonsLangVersion='+'
-        commonsCompressVersion='+'
-        swaggerVersion='2.9.2'
-        swaggerModelVersion='1.6.1'
+        commonsCodecVersion = '+'
+        commonsLangVersion = '+'
+        commonsCompressVersion = '+'
+        swaggerVersion = '2.9.2'
+        swaggerModelVersion = '1.6.1'
 //        swaggerModelVersion='1.5.24'
-        swaggerBootstrapUiVersion='+'
-        commonsPool2='+'
+        swaggerBootstrapUiVersion = '+'
+        commonsPool2 = '+'
         shiroVersion = '+'
-        guavaVersion='+'
+        guavaVersion = '+'
     }
 }

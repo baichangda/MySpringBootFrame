@@ -1,12 +1,12 @@
-CREATE TABLE "public"."t_sys_role_menu" (
-  "role_code" varchar(50) NOT NULL,
-  "menu_id" int8 NOT NULL,
-  CONSTRAINT "t_sys_role_menu_pkey" PRIMARY KEY ("role_code", "menu_id")
-)
-;
+create table "public"."t_sys_role_menu"
+(
+    "role_code" varchar(50) not null,
+    "menu_id"   int8        not null,
+    constraint "t_sys_role_menu_pkey" primary key ("role_code", "menu_id")
+);
 
-COMMENT ON COLUMN "public"."t_sys_role_menu"."role_code" IS '关联角色编码';
+comment on column "public"."t_sys_role_menu"."role_code" is '关联角色编码';
 
-COMMENT ON COLUMN "public"."t_sys_role_menu"."menu_id" IS '关联菜单id';
+comment on column "public"."t_sys_role_menu"."menu_id" is '关联菜单id';
 
-COMMENT ON TABLE "public"."t_sys_role_menu" IS '角色与菜单关联关系表';
+comment on table "public"."t_sys_role_menu" is '角色与菜单关联关系表';

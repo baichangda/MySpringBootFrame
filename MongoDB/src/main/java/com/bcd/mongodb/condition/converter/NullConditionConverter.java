@@ -9,12 +9,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class NullConditionConverter implements Converter<NullCondition,Criteria> {
+public class NullConditionConverter implements Converter<NullCondition, Criteria> {
     @Override
     public Criteria convert(NullCondition condition, Object... exts) {
-        String fieldName=condition.fieldName;
-        NullCondition.Handler handler=condition.handler;
-        Criteria criteria= Criteria.where(fieldName);
+        String fieldName = condition.fieldName;
+        NullCondition.Handler handler = condition.handler;
+        Criteria criteria = Criteria.where(fieldName);
         switch (handler) {
             case NULL: {
                 criteria.exists(false);
@@ -24,8 +24,8 @@ public class NullConditionConverter implements Converter<NullCondition,Criteria>
                 criteria.exists(true).ne(null);
                 break;
             }
-            default :{
-                throw BaseRuntimeException.getException("[NullConditionConverter.convert],Do Not Support ["+handler+"]!");
+            default: {
+                throw BaseRuntimeException.getException("[NullConditionConverter.convert],Do Not Support [" + handler + "]!");
             }
         }
         return criteria;

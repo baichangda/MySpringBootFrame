@@ -10,15 +10,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class DateConditionConverter  implements Converter<DateCondition,Criteria> {
+public class DateConditionConverter implements Converter<DateCondition, Criteria> {
     @Override
     public Criteria convert(DateCondition condition, Object... exts) {
-        String fieldName=condition.fieldName;
-        Object val=condition.val;
-        DateCondition.Handler handler=condition.handler;
-        Criteria criteria= null;
-        if(val!=null) {
-            criteria=Criteria.where(fieldName);
+        String fieldName = condition.fieldName;
+        Object val = condition.val;
+        DateCondition.Handler handler = condition.handler;
+        Criteria criteria = null;
+        if (val != null) {
+            criteria = Criteria.where(fieldName);
             switch (handler) {
                 case EQUAL: {
                     criteria.is(val);
@@ -41,7 +41,7 @@ public class DateConditionConverter  implements Converter<DateCondition,Criteria
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateConditionConverter.convert],Do Not Support ["+handler+"]!");
+                    throw BaseRuntimeException.getException("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

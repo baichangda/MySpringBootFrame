@@ -3,7 +3,6 @@ package com.bcd.mongodb.code.freemarker;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.mongodb.code.freemarker.data.CodeConst;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -25,13 +24,13 @@ public class CollectionConfig {
     //类名
     public Class clazz;
     //是否创建repository文件(默认是)
-    public boolean needCreateRepositoryFile=true;
+    public boolean needCreateRepositoryFile = true;
     //是否创建service文件(默认是)
-    public boolean needCreateServiceFile=true;
+    public boolean needCreateServiceFile = true;
     //是否创建controller文件(默认是)
-    public boolean needCreateControllerFile=true;
+    public boolean needCreateControllerFile = true;
     //是否需要加上controller save方法的验证注解
-    public boolean needValidateSaveParam=false;
+    public boolean needValidateSaveParam = false;
     //当前生成controller requestMapping匹配路径前缀
     public String requestMappingPre;
 
@@ -42,20 +41,20 @@ public class CollectionConfig {
         parseTargetDirPath();
     }
 
-    private void parseTargetDirPath(){
+    private void parseTargetDirPath() {
         //根据class路径找到源文件路径
-        String classFilePath= clazz.getResource("").getFile();
+        String classFilePath = clazz.getResource("").getFile();
         String beanPath;
-        if(classFilePath.contains(CodeConst.CLASS_OUT_DIR_PATH)){
+        if (classFilePath.contains(CodeConst.CLASS_OUT_DIR_PATH)) {
             //替换out目录下
-            beanPath=clazz.getResource("").getFile().replace(CodeConst.CLASS_OUT_DIR_PATH,CodeConst.SOURCE_DIR_PATH);
-        }else if(classFilePath.contains(CodeConst.CLASS_BUILD_DIR_PATH)){
+            beanPath = clazz.getResource("").getFile().replace(CodeConst.CLASS_OUT_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
+        } else if (classFilePath.contains(CodeConst.CLASS_BUILD_DIR_PATH)) {
             //替换build目录下
-            beanPath=clazz.getResource("").getFile().replace(CodeConst.CLASS_BUILD_DIR_PATH,CodeConst.SOURCE_DIR_PATH);
-        }else{
-            throw BaseRuntimeException.getException("parseTargetDirPath failed,class path["+classFilePath+"] not support");
+            beanPath = clazz.getResource("").getFile().replace(CodeConst.CLASS_BUILD_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
+        } else {
+            throw BaseRuntimeException.getException("parseTargetDirPath failed,class path[" + classFilePath + "] not support");
         }
-        targetDirPath= Paths.get(beanPath).getParent().toString();
+        targetDirPath = Paths.get(beanPath).getParent().toString();
     }
 
     public String getModuleName() {

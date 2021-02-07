@@ -1,6 +1,6 @@
 package com.bcd.sys.task.cluster;
 
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

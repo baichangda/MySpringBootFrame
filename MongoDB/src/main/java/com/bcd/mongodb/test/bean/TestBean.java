@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @Document(collection = "test")
 //测试类
-public class TestBean extends SuperBaseBean<String>{
+public class TestBean extends SuperBaseBean<String> {
     @ApiModelProperty(value = "vin")
     private String vin;
     @ApiModelProperty(value = "时间")

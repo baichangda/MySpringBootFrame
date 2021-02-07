@@ -14,15 +14,15 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class NumberConditionConverter  implements Converter<NumberCondition,Criteria> {
+public class NumberConditionConverter implements Converter<NumberCondition, Criteria> {
     @Override
     public Criteria convert(NumberCondition condition, Object... exts) {
-        String fieldName=condition.fieldName;
-        Object val=condition.val;
-        NumberCondition.Handler handler=condition.handler;
-        Criteria criteria= null;
-        if(val!=null) {
-            criteria=Criteria.where(fieldName);
+        String fieldName = condition.fieldName;
+        Object val = condition.val;
+        NumberCondition.Handler handler = condition.handler;
+        Criteria criteria = null;
+        if (val != null) {
+            criteria = Criteria.where(fieldName);
             switch (handler) {
                 case EQUAL: {
                     criteria.is(val);
@@ -49,25 +49,25 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Crit
                     break;
                 }
                 case IN: {
-                    if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    if (val instanceof Collection) {
+                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.in(notEmptyList);
-                    }else{
+                    } else {
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
                     }
                     break;
                 }
                 case NOT_IN: {
-                    if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    if (val instanceof Collection) {
+                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
                         criteria.nin(notEmptyList);
-                    }else{
+                    } else {
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support ["+handler+"]!");
+                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

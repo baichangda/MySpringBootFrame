@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Unique {
     String messageKey() default "Field.value.unique";
+
     String messageValue() default "";
 }

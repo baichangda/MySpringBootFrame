@@ -1,10 +1,7 @@
 package com.bcd.mongodb.bean;
 
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -26,29 +23,29 @@ public abstract class SuperBaseBean<K extends Serializable> implements Serializa
 
     @Override
     public int hashCode() {
-        return id==null?0:id.hashCode();
+        return id == null ? 0 : id.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(this==obj){
+        if (this == obj) {
             return true;
-        }else{
-            if(obj==null){
+        } else {
+            if (obj == null) {
                 return false;
-            }else{
-                if(this.getClass()==obj.getClass()){
-                    Object objId=((SuperBaseBean)obj).getId();
-                    if(id==objId){
+            } else {
+                if (this.getClass() == obj.getClass()) {
+                    Object objId = ((SuperBaseBean) obj).getId();
+                    if (id == objId) {
                         return true;
-                    }else{
-                        if(id==null||objId==null){
+                    } else {
+                        if (id == null || objId == null) {
                             return false;
-                        }else{
+                        } else {
                             return id.equals(objId);
                         }
                     }
-                }else{
+                } else {
                     return false;
                 }
             }

@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 public class ApiHandlerIniter implements SpringInitializable {
     @Override
     public void init(ContextRefreshedEvent event) {
-        ApiHandler.NAME_TO_HANDLER_MAP=event.getApplicationContext().getBeansOfType(WebSocketService.class).values().stream().flatMap(e->{
-            Class clazz= ProxyUtil.getSource(e).getClass();
-            return MethodUtils.getMethodsListWithAnnotation(clazz, WebSocketApi.class).stream().map(w->new Object[]{w,e});
+        ApiHandler.NAME_TO_HANDLER_MAP = event.getApplicationContext().getBeansOfType(WebSocketService.class).values().stream().flatMap(e -> {
+            Class clazz = ProxyUtil.getSource(e).getClass();
+            return MethodUtils.getMethodsListWithAnnotation(clazz, WebSocketApi.class).stream().map(w -> new Object[]{w, e});
         }).collect(Collectors.toMap(
-                e->((Method)e[0]).getAnnotation(WebSocketApi.class).value(),
-                e->new ApiHandler(((Method)e[0]),e[1]),
-                (e1,e2)->e1
+                e -> ((Method) e[0]).getAnnotation(WebSocketApi.class).value(),
+                e -> new ApiHandler(((Method) e[0]), e[1]),
+                (e1, e2) -> e1
         ));
     }
 }
