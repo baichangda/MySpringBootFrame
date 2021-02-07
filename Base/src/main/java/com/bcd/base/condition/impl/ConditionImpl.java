@@ -13,34 +13,34 @@ public class ConditionImpl extends Condition {
     public ConcatWay concatWay;
     public List<Condition> childrenList;
 
-    public ConditionImpl(ConcatWay concatWay, List<Condition> childrenList){
-        this.concatWay=concatWay;
-        this.childrenList=childrenList;
-    }
-
-    public enum ConcatWay{
-        AND,
-        OR
+    public ConditionImpl(ConcatWay concatWay, List<Condition> childrenList) {
+        this.concatWay = concatWay;
+        this.childrenList = childrenList;
     }
 
     @Override
     public String toAnalysis() {
-        List<String> list=new ArrayList<>();
+        List<String> list = new ArrayList<>();
         for (Condition condition : childrenList) {
-            String cur=condition.toAnalysis();
-            if(cur!=null){
+            String cur = condition.toAnalysis();
+            if (cur != null) {
                 list.add(cur);
             }
         }
-        if(list.isEmpty()){
+        if (list.isEmpty()) {
             return null;
-        }else if(list.size()==1){
+        } else if (list.size() == 1) {
             return list.get(0);
-        }else{
+        } else {
             return "(" +
-                    list.stream().reduce((e1, e2) -> e1 +" "+ concatWay.toString() + " "+e2).orElse("") +
+                    list.stream().reduce((e1, e2) -> e1 + " " + concatWay.toString() + " " + e2).orElse("") +
                     ")";
         }
+    }
+
+    public enum ConcatWay {
+        AND,
+        OR
     }
 
 }

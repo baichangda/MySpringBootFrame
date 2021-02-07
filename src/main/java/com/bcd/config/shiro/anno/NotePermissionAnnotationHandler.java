@@ -53,7 +53,7 @@ public class NotePermissionAnnotationHandler extends AuthorizingAnnotationHandle
      */
     protected String[] getAnnotationValue(Annotation a) {
         RequiresNotePermissions rpAnnotation = (RequiresNotePermissions) a;
-        return Arrays.stream(rpAnnotation.value()).map(e->e.getCode()).toArray(len->new String[len]);
+        return Arrays.stream(rpAnnotation.value()).map(e -> e.getCode()).toArray(len -> new String[len]);
     }
 
     /**
@@ -61,9 +61,8 @@ public class NotePermissionAnnotationHandler extends AuthorizingAnnotationHandle
      * <code>AuthorizingException</code> indicating access is denied.
      *
      * @param a the RequiresPermission annotation being inspected to check for one or more permissions
-     * @throws AuthorizationException
-     *          if the calling <code>Subject</code> does not have the permission(s) necessary to
-     *          continue access or execution.
+     * @throws AuthorizationException if the calling <code>Subject</code> does not have the permission(s) necessary to
+     *                                continue access or execution.
      */
     public void assertAuthorized(Annotation a) throws AuthorizationException {
         if (!(a instanceof RequiresNotePermissions)) return;
@@ -86,7 +85,7 @@ public class NotePermissionAnnotationHandler extends AuthorizingAnnotationHandle
             for (String permission : perms) if (getSubject().isPermitted(permission)) hasAtLeastOnePermission = true;
             // Cause the exception if none of the role match, note that the exception message will be a bit misleading
             if (!hasAtLeastOnePermission) getSubject().checkPermission(perms[0]);
-            
+
         }
     }
 }

@@ -37,20 +37,20 @@ public class RedisQueueMQ<V> {
 
     protected ExecutorService workPool;
 
-    protected RedisTemplate<String,byte[]> redisTemplate;
+    protected RedisTemplate<String, byte[]> redisTemplate;
 
     private volatile boolean stop;
 
     public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializer) {
-        this(name, redisConnectionFactory, valueSerializer, (ThreadPoolExecutor) Executors.newFixedThreadPool(1), Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1));
+        this(name, redisConnectionFactory, valueSerializer, (ThreadPoolExecutor) Executors.newFixedThreadPool(1), Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1));
     }
 
     public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializerType, ThreadPoolExecutor consumePool, ExecutorService workPool) {
         this.name = name;
         this.stop = false;
-        this.redisTemplate=RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
+        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
         this.boundListOperations = redisTemplate.boundListOps(name);
-        this.valueSerializer =getDefaultRedisSerializer(valueSerializerType);
+        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
         this.consumePool = consumePool;
         this.workPool = workPool;
     }
@@ -59,8 +59,8 @@ public class RedisQueueMQ<V> {
         return name;
     }
 
-    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType){
-        switch (valueSerializerType){
+    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
+        switch (valueSerializerType) {
             case STRING: {
                 return RedisUtil.STRING_SERIALIZER;
             }
@@ -71,7 +71,7 @@ public class RedisQueueMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default: {
-                throw BaseRuntimeException.getException("valueSerializerType [{}] not support",valueSerializerType);
+                throw BaseRuntimeException.getException("valueSerializerType [{}] not support", valueSerializerType);
             }
         }
     }
@@ -81,11 +81,11 @@ public class RedisQueueMQ<V> {
         return JsonUtil.getJavaType(((ParameterizedType) parentType).getActualTypeArguments()[0]);
     }
 
-    protected byte[] compress(byte[] data){
+    protected byte[] compress(byte[] data) {
         return data;
     }
 
-    protected byte[] unCompress(byte[] data){
+    protected byte[] unCompress(byte[] data) {
         return data;
     }
 
@@ -94,7 +94,7 @@ public class RedisQueueMQ<V> {
     }
 
     public void sendBatch(List<V> dataList) {
-        byte[][] bytesArr= dataList.stream().map(e->compress(valueSerializer.serialize(e))).toArray(byte[][]::new);
+        byte[][] bytesArr = dataList.stream().map(e -> compress(valueSerializer.serialize(e))).toArray(byte[][]::new);
         boundListOperations.leftPushAll(bytesArr);
     }
 
@@ -118,7 +118,7 @@ public class RedisQueueMQ<V> {
     protected void start() {
         while (consumePool.getPoolSize() < consumePool.getMaximumPoolSize()) {
             consumePool.execute(() -> {
-                long popTimeout=((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout()/2;
+                long popTimeout = ((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout() / 2;
                 while (!stop) {
                     try {
                         byte[] data = boundListOperations.rightPop(popTimeout, TimeUnit.MILLISECONDS);
@@ -145,12 +145,12 @@ public class RedisQueueMQ<V> {
                         }
                     }
                 }
-                logger.info("redisQueueMQ queue[{}] stop",name);
+                logger.info("redisQueueMQ queue[{}] stop", name);
             });
         }
     }
 
-    protected void destroy(){
+    protected void destroy() {
         unWatch();
         consumePool.shutdown();
         workPool.shutdown();

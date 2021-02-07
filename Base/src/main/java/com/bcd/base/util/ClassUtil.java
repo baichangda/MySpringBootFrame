@@ -24,7 +24,7 @@ public class ClassUtil {
         Type parentType = startClass.getGenericSuperclass();
         while (true) {
             if (parentType instanceof ParameterizedType) {
-                Class rawType = (Class)((ParameterizedType) parentType).getRawType();
+                Class rawType = (Class) ((ParameterizedType) parentType).getRawType();
                 boolean isMatch = false;
                 for (Class endClass : endClasses) {
                     if (rawType.equals(endClass)) {
@@ -82,6 +82,7 @@ public class ClassUtil {
 
     /**
      * 找出所有带注解的类
+     *
      * @param annoClass
      * @param packageNames
      * @return
@@ -98,20 +99,21 @@ public class ClassUtil {
 
     /**
      * 根据父类找出所有子类,去除接口和抽象类
+     *
      * @param parentClass
      * @param packageNames
      * @return
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class> getClassesByParentClass(Class parentClass, String... packageNames)throws IOException, ClassNotFoundException{
+    public static List<Class> getClassesByParentClass(Class parentClass, String... packageNames) throws IOException, ClassNotFoundException {
         Set<Class> classSet = new HashSet<>();
         for (String packageName : packageNames) {
             classSet.addAll(getClasses(packageName));
         }
         return classSet.stream().filter(e -> {
-            int modifiers= e.getModifiers();
-            return !Modifier.isInterface(modifiers)&&!Modifier.isAbstract(modifiers)&&parentClass.isAssignableFrom(e);
+            int modifiers = e.getModifiers();
+            return !Modifier.isInterface(modifiers) && !Modifier.isAbstract(modifiers) && parentClass.isAssignableFrom(e);
         }).collect(Collectors.toList());
     }
 

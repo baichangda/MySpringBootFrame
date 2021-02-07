@@ -9,17 +9,24 @@ import com.bcd.base.condition.Condition;
 public class NullCondition extends Condition {
     public Handler handler;
 
-    public NullCondition(String fieldName, Handler handler){
-        this.fieldName=fieldName;
-        this.handler=handler;
+    public NullCondition(String fieldName, Handler handler) {
+        this.fieldName = fieldName;
+        this.handler = handler;
     }
 
-    public NullCondition(String fieldName){
-        this(fieldName,Handler.NULL);
+    public NullCondition(String fieldName) {
+        this(fieldName, Handler.NULL);
 
     }
 
-    public enum Handler{
+    @Override
+    public String toAnalysis() {
+        return fieldName +
+                " " +
+                handler.toString();
+    }
+
+    public enum Handler {
         /**
          * 为空
          */
@@ -28,12 +35,5 @@ public class NullCondition extends Condition {
          * 不为空
          */
         NOT_NULL
-    }
-
-    @Override
-    public String toAnalysis() {
-        return fieldName +
-                " " +
-                handler.toString();
     }
 }

@@ -16,8 +16,8 @@ public class ApiParamData {
         this.required = required;
     }
 
-    public String toString(){
-        return name+" : "+desc+ (required?"(必填)":"(非必填)");
+    public String toString() {
+        return name + " : " + desc + (required ? "(必填)" : "(非必填)");
     }
 
 }

@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class StopSysTaskResult {
     private String code;
-    private Map<String,Boolean> result=new ConcurrentHashMap<>();
+    private Map<String, Boolean> result = new ConcurrentHashMap<>();
 
     public String getCode() {
         return code;

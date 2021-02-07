@@ -7,40 +7,42 @@ import org.apache.shiro.subject.Subject;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
+
 @SuppressWarnings("unchecked")
 public class RequestMappingUrlAnnotationHandler extends AuthorizingAnnotationHandler {
+
+    private ThreadLocal<Set<String>> actionPermission = new ThreadLocal<>();
 
     public RequestMappingUrlAnnotationHandler() {
         super(RequiresRequestMappingUrl.class);
     }
 
-    private ThreadLocal<Set<String>>  actionPermission = new ThreadLocal<>();
-
-    public void setActionPermission(Set<String> permission){
-        actionPermission.set(permission);
-    }
-    public Set<String> getActionPermission(){
+    public Set<String> getActionPermission() {
         return actionPermission.get();
     }
 
+    public void setActionPermission(Set<String> permission) {
+        actionPermission.set(permission);
+    }
+
     @Override
-    public void assertAuthorized(Annotation a){
+    public void assertAuthorized(Annotation a) {
         Subject subject = getSubject();
-        Set<String> permissionSet=getActionPermission();
-        if(permissionSet==null||permissionSet.isEmpty()){
+        Set<String> permissionSet = getActionPermission();
+        if (permissionSet == null || permissionSet.isEmpty()) {
             return;
         }
-        boolean flag=false;
+        boolean flag = false;
         for (String e : permissionSet) {
             try {
                 subject.checkPermission(e);
-                flag=true;
+                flag = true;
                 break;
-            }catch (AuthorizationException ex){
+            } catch (AuthorizationException ex) {
                 break;
             }
         }
-        if(!flag){
+        if (!flag) {
             throw new AuthorizationException("No Url Permission!");
         }
     }

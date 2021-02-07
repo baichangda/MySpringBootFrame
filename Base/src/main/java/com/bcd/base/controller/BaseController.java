@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -17,14 +15,15 @@ import java.util.Date;
 @MyCacheClass
 public class BaseController {
 
-    protected Logger logger= LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 响应文件流之前设置response
+     *
      * @param fileName
      * @param response
      */
-    protected void doBeforeResponseFile(String fileName, HttpServletResponse response){
+    protected void doBeforeResponseFile(String fileName, HttpServletResponse response) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType("application/octet-stream");
         response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));

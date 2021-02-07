@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class SqlUtil {
 
-    static Logger logger= LoggerFactory.getLogger(SqlUtil.class);
+    static Logger logger = LoggerFactory.getLogger(SqlUtil.class);
 
     public static void main(String[] args) throws JSQLParserException {
         String sql1 = "SELECT \n" +
@@ -64,7 +64,7 @@ public class SqlUtil {
         paramMap2.put("status", null);
         paramMap2.put("type", Arrays.asList(1, null, 3));
         paramMap2.put("phone", new Object[]{null, null});
-        SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2,true,1,100);
+        SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2, true, 1, 100);
         System.out.println(sqlMapResult.getSql());
         sqlMapResult.getParamMap().forEach((k, v) -> {
             if (v.getClass().isArray()) {
@@ -91,35 +91,35 @@ public class SqlUtil {
 //        System.out.printf("\n%dms,%dms,%dms",t2-t1,t3-t2,t4-t3);
     }
 
-    public static SqlListResult replace_nullParam(String sql, Object... params){
-        return replace_nullParam_count_limit(sql, false,null,null,params);
+    public static SqlListResult replace_nullParam(String sql, Object... params) {
+        return replace_nullParam_count_limit(sql, false, null, null, params);
     }
 
-    public static SqlListResult replace_nullParam_count(String sql, Object... params){
-        return replace_nullParam_count_limit(sql, true,null,null,params);
+    public static SqlListResult replace_nullParam_count(String sql, Object... params) {
+        return replace_nullParam_count_limit(sql, true, null, null, params);
     }
 
-    public static SqlListResult replace_nullParam_limit(String sql, int pageNum, int pageSize, Object... params){
-        return replace_nullParam_count_limit(sql, false,pageNum,pageSize,params);
+    public static SqlListResult replace_nullParam_limit(String sql, int pageNum, int pageSize, Object... params) {
+        return replace_nullParam_count_limit(sql, false, pageNum, pageSize, params);
     }
 
-    public static SqlMapResult replace_nullParam(String sql, Map<String, Object> paramMap){
-        return replace_nullParam_count_limit(sql, paramMap,true,null,null);
+    public static SqlMapResult replace_nullParam(String sql, Map<String, Object> paramMap) {
+        return replace_nullParam_count_limit(sql, paramMap, true, null, null);
     }
 
-    public static SqlMapResult replace_nullParam_count(String sql, Map<String, Object> paramMap){
-        return replace_nullParam_count_limit(sql, paramMap,true,null,null);
+    public static SqlMapResult replace_nullParam_count(String sql, Map<String, Object> paramMap) {
+        return replace_nullParam_count_limit(sql, paramMap, true, null, null);
     }
 
-    public static SqlMapResult replace_nullParam_limit(String sql, Map<String, Object> paramMap,int pageNum, int pageSize){
-        return replace_nullParam_count_limit(sql, paramMap,false,pageNum,pageSize);
+    public static SqlMapResult replace_nullParam_limit(String sql, Map<String, Object> paramMap, int pageNum, int pageSize) {
+        return replace_nullParam_count_limit(sql, paramMap, false, pageNum, pageSize);
     }
 
-    public static String replace_limit(String sql,int pageNum, int pageSize){
+    public static String replace_limit(String sql, int pageNum, int pageSize) {
         Objects.requireNonNull(sql);
         try {
             Statement statement = CCJSqlParserUtil.parse(sql);
-            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum,pageSize);
+            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
             visitor.parse();
             return statement.toString();
         } catch (JSQLParserException e) {
@@ -127,7 +127,7 @@ public class SqlUtil {
         }
     }
 
-    public static String replace_count(String sql){
+    public static String replace_count(String sql) {
         Objects.requireNonNull(sql);
         try {
             Statement statement = CCJSqlParserUtil.parse(sql);
@@ -141,7 +141,7 @@ public class SqlUtil {
 
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
-     *
+     * <p>
      * 性能表现:
      * 以main方法例子{@link #main(String[])}
      * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
@@ -150,8 +150,8 @@ public class SqlUtil {
      *
      * @param sql
      * @param paramMap 不会改变
-     * @param count 是否开启count(*)替换
-     * @param pageNum null代表不开启limit offset添加
+     * @param count    是否开启count(*)替换
+     * @param pageNum  null代表不开启limit offset添加
      * @param pageSize null代表不开启limit offset添加
      * @return 根据paramMap生成的新sql
      */
@@ -159,30 +159,30 @@ public class SqlUtil {
         Objects.requireNonNull(sql);
         Objects.requireNonNull(paramMap);
         try {
-            Statement statement=null;
+            Statement statement = null;
             //如果count不为null、则替换为select count(*)
-            if(count!=null&&count){
+            if (count != null && count) {
                 statement = CCJSqlParserUtil.parse(sql);
-                CountSqlReplaceVisitor visitor=new CountSqlReplaceVisitor(statement);
+                CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
                 visitor.parse();
             }
             //如果pageNum不为null且pageSize不为null、则加上limit offset
-            if(pageNum!=null&&pageSize!=null){
-                if(statement==null){
+            if (pageNum != null && pageSize != null) {
+                if (statement == null) {
                     statement = CCJSqlParserUtil.parse(sql);
                 }
-                LimitSqlReplaceVisitor visitor=new LimitSqlReplaceVisitor(statement,pageNum,pageSize);
+                LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
                 visitor.parse();
             }
 
-            Map<String, Object> newParamMap= new LinkedHashMap<>();
+            Map<String, Object> newParamMap = new LinkedHashMap<>();
             if (!paramMap.isEmpty()) {
                 //循环参数map
                 //检查是否含有Null元素已经其中List、Array中是否有null
-                boolean anyNull= paramMap.values().stream().anyMatch(e->{
-                    if(e==null){
+                boolean anyNull = paramMap.values().stream().anyMatch(e -> {
+                    if (e == null) {
                         return true;
-                    }else{
+                    } else {
                         if (e instanceof List) {
                             return ((List<Object>) e).stream().anyMatch(Objects::isNull);
                         } else if (e.getClass().isArray()) {
@@ -194,28 +194,28 @@ public class SqlUtil {
                                 }
                             }
                             return false;
-                        }else{
+                        } else {
                             return false;
                         }
                     }
                 });
                 //如果全部不为Null,直接返回
-                if(anyNull){
-                    if(statement==null){
+                if (anyNull) {
+                    if (statement == null) {
                         statement = CCJSqlParserUtil.parse(sql);
                     }
                     NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramMap);
                     visitor.parse();
-                    newParamMap=visitor.getNewParamMap();
-                }else{
+                    newParamMap = visitor.getNewParamMap();
+                } else {
                     newParamMap.putAll(paramMap);
                 }
             }
             //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
-            if(statement==null){
-                return new SqlMapResult(sql,newParamMap);
-            }else{
-                return new SqlMapResult(statement.toString(),newParamMap);
+            if (statement == null) {
+                return new SqlMapResult(sql, newParamMap);
+            } else {
+                return new SqlMapResult(statement.toString(), newParamMap);
             }
         } catch (JSQLParserException e) {
             throw BaseRuntimeException.getException(e);
@@ -224,7 +224,7 @@ public class SqlUtil {
 
     /**
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
-     *
+     * <p>
      * 性能表现:
      * 以main方法例子{@link #main(String[])}
      * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
@@ -232,10 +232,10 @@ public class SqlUtil {
      * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
      *
      * @param sql
-     * @param count 是否开启count(*)替换
-     * @param pageNum null代表不开启limit offset添加
+     * @param count    是否开启count(*)替换
+     * @param pageNum  null代表不开启limit offset添加
      * @param pageSize null代表不开启limit offset添加
-     * @param params 不会改变
+     * @param params   不会改变
      * @return
      * @see SqlListResult#getSql()  格式化后的sql
      * @see SqlListResult#getParamList()  去除Null后的paramList,总是生成新的ArrayList
@@ -245,47 +245,47 @@ public class SqlUtil {
         Objects.requireNonNull(params);
 
         try {
-            Statement statement=null;
+            Statement statement = null;
             //如果count不为null、则替换为select count(*)
-            if(count!=null&&count){
+            if (count != null && count) {
                 statement = CCJSqlParserUtil.parse(sql);
-                CountSqlReplaceVisitor visitor=new CountSqlReplaceVisitor(statement);
+                CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
                 visitor.parse();
             }
             //如果pageNum不为null且pageSize不为null、则加上limit offset
-            if(pageNum!=null&&pageSize!=null){
-                if(statement==null){
+            if (pageNum != null && pageSize != null) {
+                if (statement == null) {
                     statement = CCJSqlParserUtil.parse(sql);
                 }
-                LimitSqlReplaceVisitor visitor=new LimitSqlReplaceVisitor(statement,pageNum,pageSize);
+                LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
                 visitor.parse();
             }
 
             //最后替换null条件
-            List<Object> newParamList=new ArrayList<>();
-            List<Object> paramList=new ArrayList<>(Arrays.asList(params));
-            if(!paramList.isEmpty()){
+            List<Object> newParamList = new ArrayList<>();
+            List<Object> paramList = new ArrayList<>(Arrays.asList(params));
+            if (!paramList.isEmpty()) {
                 //判断参数集合是否有Null元素
                 boolean anyNull = paramList.stream().anyMatch(Objects::isNull);
                 //如果有Null,则处理替换
                 if (anyNull) {
-                    if(statement==null){
+                    if (statement == null) {
                         statement = CCJSqlParserUtil.parse(sql);
                     }
                     NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramList);
                     visitor.parse();
                     //设置新的参数集合
-                    newParamList=visitor.getNewParamList();
-                }else{
-                    newParamList=new ArrayList<>(paramList);
+                    newParamList = visitor.getNewParamList();
+                } else {
+                    newParamList = new ArrayList<>(paramList);
                 }
             }
 
             //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
-            if(statement==null){
-                return new SqlListResult(sql,newParamList);
-            }else{
-                return new SqlListResult(statement.toString(),newParamList);
+            if (statement == null) {
+                return new SqlListResult(sql, newParamList);
+            } else {
+                return new SqlListResult(statement.toString(), newParamList);
             }
         } catch (JSQLParserException e) {
             throw BaseRuntimeException.getException(e);
@@ -294,11 +294,12 @@ public class SqlUtil {
 
     /**
      * 生成create sql
+     *
      * @param columnSet
      * @param table
      * @return
      */
-    private static String generateCreateSql(Set<String> columnSet,String table){
+    private static String generateCreateSql(Set<String> columnSet, String table) {
         StringBuilder sql = new StringBuilder("insert into ");
         sql.append(table);
         sql.append("(");
@@ -311,11 +312,12 @@ public class SqlUtil {
 
     /**
      * 生成update sql
+     *
      * @param columnSet
      * @param table
      * @return
      */
-    private static String generateUpdateSql(Set<String> columnSet,Set<String> whereColumnSet,String table){
+    private static String generateUpdateSql(Set<String> columnSet, Set<String> whereColumnSet, String table) {
         StringBuilder sql = new StringBuilder("update ");
         sql.append(table);
         sql.append(" set ");
@@ -329,8 +331,8 @@ public class SqlUtil {
             sql.append(e);
             sql.append("=?");
         });
-        if(whereColumnSet!=null&&!whereColumnSet.isEmpty()) {
-            isFirst[0]=true;
+        if (whereColumnSet != null && !whereColumnSet.isEmpty()) {
+            isFirst[0] = true;
             sql.append(" where ");
             whereColumnSet.forEach(e -> {
                 if (isFirst[0]) {
@@ -346,20 +348,20 @@ public class SqlUtil {
     }
 
 
-
     /**
      * 生成批量中间结果
      * [0]:列名和字段对应map Map<String,Field>
      * [1]:批量参数集合 List<Object[]>
+     *
      * @param dataList
      * @param fieldHandler
      * @param ignoreFields
      * @return
      */
-    private static Object[] toBatchResult(List dataList, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields){
-        Object first= dataList.get(0);
-        Class clazz=first.getClass();
-        Map<String,Field> columnToFieldMap=new LinkedHashMap<>();
+    private static Object[] toBatchResult(List dataList, BiFunction<String, Object, Object> fieldHandler, String... ignoreFields) {
+        Object first = dataList.get(0);
+        Class clazz = first.getClass();
+        Map<String, Field> columnToFieldMap = new LinkedHashMap<>();
         List<Field> fieldList = FieldUtils.getAllFieldsList(clazz);
         Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
         fieldList.forEach(field -> {
@@ -372,16 +374,16 @@ public class SqlUtil {
                 return;
             }
             field.setAccessible(true);
-            columnToFieldMap.put(columnName,field);
+            columnToFieldMap.put(columnName, field);
         });
 
-        List<Object[]> paramList= (List<Object[]>)dataList.stream().map(data->{
-            List param=new ArrayList();
-            columnToFieldMap.forEach((k,v)->{
+        List<Object[]> paramList = (List<Object[]>) dataList.stream().map(data -> {
+            List param = new ArrayList();
+            columnToFieldMap.forEach((k, v) -> {
                 try {
-                    Object val= v.get(data);
-                    if(fieldHandler!=null){
-                        val=fieldHandler.apply(k,val);
+                    Object val = v.get(data);
+                    if (fieldHandler != null) {
+                        val = fieldHandler.apply(k, val);
                     }
                     param.add(val);
                 } catch (IllegalAccessException ex) {
@@ -391,26 +393,27 @@ public class SqlUtil {
             return param.toArray();
         }).collect(Collectors.toList());
 
-        return new Object[]{columnToFieldMap,paramList};
+        return new Object[]{columnToFieldMap, paramList};
     }
 
     /**
      * 生成批量新增结果
-     * @param dataList 数据集合
-     * @param table 表名
+     *
+     * @param dataList     数据集合
+     * @param table        表名
      * @param fieldHandler 字段值二次处理器
      * @param ignoreFields 忽略的新增字段
      * @return
      */
-    public static BatchCreateSqlResult generateBatchCreateResult(List dataList, String table, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
-        if(dataList.isEmpty()){
+    public static BatchCreateSqlResult generateBatchCreateResult(List dataList, String table, BiFunction<String, Object, Object> fieldHandler, String... ignoreFields) {
+        if (dataList.isEmpty()) {
             return null;
-        }else{
-           Object[] res= toBatchResult(dataList, fieldHandler, ignoreFields);
-           Map<String,Field> columnToFieldMap=(Map<String,Field>)res[0];
-           List<Object[]> paramList=(List<Object[]>)res[1];
-           String sql= generateCreateSql(columnToFieldMap.keySet(),table);
-           return new BatchCreateSqlResult(sql,paramList);
+        } else {
+            Object[] res = toBatchResult(dataList, fieldHandler, ignoreFields);
+            Map<String, Field> columnToFieldMap = (Map<String, Field>) res[0];
+            List<Object[]> paramList = (List<Object[]>) res[1];
+            String sql = generateCreateSql(columnToFieldMap.keySet(), table);
+            return new BatchCreateSqlResult(sql, paramList);
         }
     }
 
@@ -419,16 +422,17 @@ public class SqlUtil {
      * [0]:更新列名和字段对应map Map<String,Field>
      * [1]:where条件列名和字段对应map Map<String,Field>(如果存在字段的值为null,会抛出异常)
      * [2]:批量参数集合 List<Object[]>(包括更新字段值和where字段值)
+     *
      * @param dataList
      * @param fieldHandler
      * @param ignoreFields
      * @return
      */
-    private static Object[] toBatchResultWithWhere(List dataList, BiFunction<String,Object,Object> fieldHandler,String[] whereFields, String... ignoreFields){
-        Object first= dataList.get(0);
-        Class clazz=first.getClass();
-        Map<String,Field> columnToFieldMap=new LinkedHashMap<>();
-        Map<String,Field> whereColumnToFieldMap=new LinkedHashMap<>();
+    private static Object[] toBatchResultWithWhere(List dataList, BiFunction<String, Object, Object> fieldHandler, String[] whereFields, String... ignoreFields) {
+        Object first = dataList.get(0);
+        Class clazz = first.getClass();
+        Map<String, Field> columnToFieldMap = new LinkedHashMap<>();
+        Map<String, Field> whereColumnToFieldMap = new LinkedHashMap<>();
         List<Field> fieldList = FieldUtils.getAllFieldsList(clazz);
         Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
         Set<String> whereSet = Arrays.stream(whereFields).collect(Collectors.toSet());
@@ -440,40 +444,40 @@ public class SqlUtil {
             String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
             if (whereSet.contains(fieldName) || whereSet.contains(columnName)) {
                 field.setAccessible(true);
-                whereColumnToFieldMap.put(columnName,field);
+                whereColumnToFieldMap.put(columnName, field);
             }
             if (!(ignoreSet.contains(fieldName) || ignoreSet.contains(columnName))) {
                 field.setAccessible(true);
-                columnToFieldMap.put(columnName,field);
+                columnToFieldMap.put(columnName, field);
             }
 
         });
 
-        List<Object[]> paramList= (List<Object[]>)dataList.stream().map(data->{
-            List param=new ArrayList();
-            columnToFieldMap.forEach((k,v)->{
+        List<Object[]> paramList = (List<Object[]>) dataList.stream().map(data -> {
+            List param = new ArrayList();
+            columnToFieldMap.forEach((k, v) -> {
                 //如果where条件中存在此字段,则不作为更新字段
-                if(whereColumnToFieldMap.keySet().contains(k)){
+                if (whereColumnToFieldMap.keySet().contains(k)) {
                     return;
                 }
                 try {
-                    Object val= v.get(data);
-                    if(fieldHandler!=null){
-                        val=fieldHandler.apply(k,val);
+                    Object val = v.get(data);
+                    if (fieldHandler != null) {
+                        val = fieldHandler.apply(k, val);
                     }
                     param.add(val);
                 } catch (IllegalAccessException ex) {
                     throw BaseRuntimeException.getException(ex);
                 }
             });
-            whereColumnToFieldMap.forEach((k,v)->{
+            whereColumnToFieldMap.forEach((k, v) -> {
                 try {
-                    Object val= v.get(data);
-                    if(fieldHandler!=null){
-                        val=fieldHandler.apply(k,val);
+                    Object val = v.get(data);
+                    if (fieldHandler != null) {
+                        val = fieldHandler.apply(k, val);
                     }
-                    if(val==null){
-                        throw BaseRuntimeException.getException("where field["+k+"] can't be null");
+                    if (val == null) {
+                        throw BaseRuntimeException.getException("where field[" + k + "] can't be null");
                     }
                     param.add(val);
                 } catch (IllegalAccessException ex) {
@@ -482,40 +486,42 @@ public class SqlUtil {
             });
             return param.toArray();
         }).collect(Collectors.toList());
-        return new Object[]{columnToFieldMap,whereColumnToFieldMap,paramList};
+        return new Object[]{columnToFieldMap, whereColumnToFieldMap, paramList};
     }
 
     /**
      * 生成批量更新结果
-     * @param dataList 数据集合
-     * @param table 表名
+     *
+     * @param dataList     数据集合
+     * @param table        表名
      * @param fieldHandler 字段值二次处理器
-     * @param whereFields 作为where条件的字段(若字段值为null,则忽略条件;如果所有的字段值都为null,则异常)
+     * @param whereFields  作为where条件的字段(若字段值为null,则忽略条件;如果所有的字段值都为null,则异常)
      * @param ignoreFields 忽略的更新字段
      * @return
      */
-    public static BatchUpdateSqlResult generateBatchUpdateResult(List dataList, String table, BiFunction<String,Object,Object> fieldHandler,String[] whereFields, String... ignoreFields) {
-        if(dataList.isEmpty()){
+    public static BatchUpdateSqlResult generateBatchUpdateResult(List dataList, String table, BiFunction<String, Object, Object> fieldHandler, String[] whereFields, String... ignoreFields) {
+        if (dataList.isEmpty()) {
             return null;
-        }else{
-            Object[] res= toBatchResultWithWhere(dataList, fieldHandler,whereFields, ignoreFields);
-            Map<String,Field> columnToFieldMap=(Map<String,Field>)res[0];
-            Map<String,Field> whereColumnToFieldMap=(Map<String,Field>)res[1];
-            List<Object[]> paramList=(List<Object[]>)res[2];
-            String sql= generateUpdateSql(columnToFieldMap.keySet(),whereColumnToFieldMap.keySet(),table);
-            return new BatchUpdateSqlResult(sql,paramList);
+        } else {
+            Object[] res = toBatchResultWithWhere(dataList, fieldHandler, whereFields, ignoreFields);
+            Map<String, Field> columnToFieldMap = (Map<String, Field>) res[0];
+            Map<String, Field> whereColumnToFieldMap = (Map<String, Field>) res[1];
+            List<Object[]> paramList = (List<Object[]>) res[2];
+            String sql = generateUpdateSql(columnToFieldMap.keySet(), whereColumnToFieldMap.keySet(), table);
+            return new BatchUpdateSqlResult(sql, paramList);
         }
     }
 
     /**
      * 生成字段和值对应map
+     *
      * @param obj
      * @param includeNullValue
      * @param fieldHandler
      * @param ignoreFields
      * @return
      */
-    private static Map<String, Object> toColumnValueMap(Object obj, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
+    private static Map<String, Object> toColumnValueMap(Object obj, boolean includeNullValue, BiFunction<String, Object, Object> fieldHandler, String... ignoreFields) {
         Map<String, Object> returnMap = new LinkedHashMap<>();
         List<Field> fieldList = FieldUtils.getAllFieldsList(obj.getClass());
         Set<String> ignoreSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
@@ -534,8 +540,8 @@ public class SqlUtil {
                 if (!includeNullValue && val == null) {
                     return;
                 }
-                if(fieldHandler!=null){
-                    val=fieldHandler.apply(fieldName,val);
+                if (fieldHandler != null) {
+                    val = fieldHandler.apply(fieldName, val);
                 }
                 returnMap.put(columnName, val);
             } catch (IllegalAccessException e) {
@@ -550,15 +556,15 @@ public class SqlUtil {
      * @param table            表名
      * @param includeNullValue 是否包含空值的列
      * @param ignoreFields     忽视的字段和者列名
-     * @param fieldHandler 字段处理器,用于处理字段值
+     * @param fieldHandler     字段处理器,用于处理字段值
      * @return
      */
-    public static CreateSqlResult generateCreateResult(Object obj, String table, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
-        Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue,fieldHandler, ignoreFields);
+    public static CreateSqlResult generateCreateResult(Object obj, String table, boolean includeNullValue, BiFunction<String, Object, Object> fieldHandler, String... ignoreFields) {
+        Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue, fieldHandler, ignoreFields);
         if (filterColumnValueMap.size() == 0) {
             throw BaseRuntimeException.getException("no column");
         }
-        String sql=generateCreateSql(filterColumnValueMap.keySet(),table);
+        String sql = generateCreateSql(filterColumnValueMap.keySet(), table);
         return new CreateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
     }
 
@@ -567,15 +573,15 @@ public class SqlUtil {
      * @param table            表名
      * @param includeNullValue 是否包含空值的列
      * @param ignoreFields     忽视的字段和者列名
-     * @param fieldHandler 字段处理器,用于处理字段值
+     * @param fieldHandler     字段处理器,用于处理字段值
      * @return
      */
-    public static UpdateSqlResult generateUpdateResult(Object obj, String table, boolean includeNullValue, BiFunction<String,Object,Object> fieldHandler, String... ignoreFields) {
-        Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue,fieldHandler, ignoreFields);
+    public static UpdateSqlResult generateUpdateResult(Object obj, String table, boolean includeNullValue, BiFunction<String, Object, Object> fieldHandler, String... ignoreFields) {
+        Map<String, Object> filterColumnValueMap = toColumnValueMap(obj, includeNullValue, fieldHandler, ignoreFields);
         if (filterColumnValueMap.size() == 0) {
             throw BaseRuntimeException.getException("no column");
         }
-        String sql=generateUpdateSql(filterColumnValueMap.keySet(),null,table);
+        String sql = generateUpdateSql(filterColumnValueMap.keySet(), null, table);
         return new UpdateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
     }
 

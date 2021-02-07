@@ -26,7 +26,7 @@ public class JsonMessage<T> implements Serializable {
     }
 
     public JsonMessage(boolean result) {
-        this.result=result;
+        this.result = result;
     }
 
     public static <T> JsonMessage<T> success() {
@@ -70,6 +70,6 @@ public class JsonMessage<T> implements Serializable {
 
     public <R> JsonMessage<R> withData(T data) {
         this.data = data;
-        return (JsonMessage<R>)this;
+        return (JsonMessage<R>) this;
     }
 }

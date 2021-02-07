@@ -31,7 +31,7 @@ public class FormatUtil {
     }
 
     public static Double formatToDouble(Number num, String format) {
-        if(num==null){
+        if (num == null) {
             return null;
         }
         String numStr = formatToString(num, format);
@@ -39,7 +39,7 @@ public class FormatUtil {
     }
 
     public static Double formatToString_n(Number num, int len) {
-        if(num==null){
+        if (num == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder("#");
@@ -53,7 +53,7 @@ public class FormatUtil {
     }
 
     public static Double formatToDouble_n(Number num, int len) {
-        if(num==null){
+        if (num == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder("#");
@@ -67,14 +67,14 @@ public class FormatUtil {
     }
 
     public static String formatToString_n_2(Number num) {
-        if(num==null){
+        if (num == null) {
             return null;
         }
         return formatToString(num, "#.##");
     }
 
     public static Double formatToDouble_n_2(Number num) {
-        if(num==null){
+        if (num == null) {
             return null;
         }
         return formatToDouble(num, "#.##");
@@ -82,13 +82,13 @@ public class FormatUtil {
 
 
     public static void main(String[] args) {
-        long t1=System.currentTimeMillis();
-        Map<Integer,Integer> map=new HashMap<>();
-        for(int i=0;i<10000000;i++){
-            map.put(i,i);
+        long t1 = System.currentTimeMillis();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < 10000000; i++) {
+            map.put(i, i);
         }
-        long t2=System.currentTimeMillis();
-        System.out.println(t2-t1);
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1);
     }
 
 }

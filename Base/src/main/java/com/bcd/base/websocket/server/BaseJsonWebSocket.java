@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public abstract class BaseJsonWebSocket<T> extends BaseWebSocket {
 
-    public final static ExecutorService WORK_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()+1);
+    public final static ExecutorService WORK_POOL = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
     protected JavaType paramJavaType;
 

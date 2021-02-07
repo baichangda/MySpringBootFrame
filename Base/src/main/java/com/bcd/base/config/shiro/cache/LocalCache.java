@@ -13,19 +13,20 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 缓存对一致性要求并不高、保证最终一致性、所以没有加锁
+ *
  * @param <K>
  * @param <V>
  */
-public class LocalCache<K,V> implements Cache<K,V> {
+public class LocalCache<K, V> implements Cache<K, V> {
 
-    Logger logger= LoggerFactory.getLogger(LocalCache.class);
+    Logger logger = LoggerFactory.getLogger(LocalCache.class);
 
-    MyCache<K,V> cache;
+    MyCache<K, V> cache;
 
-    public LocalCache(long expired,TimeUnit unit) {
-        this.cache = new MyCache<K,V>()
+    public LocalCache(long expired, TimeUnit unit) {
+        this.cache = new MyCache<K, V>()
                 .expiredAfter(expired, unit)
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(),60,60,TimeUnit.MINUTES)
+                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(), 60, 60, TimeUnit.MINUTES)
                 .init();
     }
 
@@ -36,7 +37,7 @@ public class LocalCache<K,V> implements Cache<K,V> {
 
     @Override
     public V put(K k, V v) throws CacheException {
-        return cache.put(k,v);
+        return cache.put(k, v);
     }
 
     @Override

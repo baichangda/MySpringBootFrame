@@ -20,42 +20,42 @@ public class VoiceUtil {
 
     static ExecutorService windows_pool;
 
-    public static void stopSpeakVoiceText_windows(){
+    public static void stopSpeakVoiceText_windows() {
         //停止线程池
         windows_pool.shutdown();
         //打上停止循环标记
-        windows_run=false;
+        windows_run = false;
         //等待任务结束
         try {
-            while(!windows_pool.awaitTermination(60, TimeUnit.SECONDS)) {
+            while (!windows_pool.awaitTermination(60, TimeUnit.SECONDS)) {
             }
         } catch (InterruptedException e) {
             throw BaseRuntimeException.getException(e);
         }
         //销毁队列
-        windows_blockingQueue=null;
+        windows_blockingQueue = null;
     }
 
     /**
      * 开启单线程执行语音播报
      */
-    public static void startSpeakVoiceText_windows(){
-        windows_run=true;
-        windows_blockingQueue=new LinkedBlockingQueue<>();
-        windows_pool=Executors.newSingleThreadExecutor();
-        windows_pool.execute(()->{
+    public static void startSpeakVoiceText_windows() {
+        windows_run = true;
+        windows_blockingQueue = new LinkedBlockingQueue<>();
+        windows_pool = Executors.newSingleThreadExecutor();
+        windows_pool.execute(() -> {
             try {
                 while (windows_run) {
 
                     //阻塞式调用
                     String text = windows_blockingQueue.take();
-                    ActiveXComponent ax=null;
-                    Dispatch dispatch=null;
+                    ActiveXComponent ax = null;
+                    Dispatch dispatch = null;
                     try {
-                        while(text!=null){
+                        while (text != null) {
                             //当有文本需要播报时候
                             //初始化windows组件
-                            if(ax==null) {
+                            if (ax == null) {
                                 ax = new ActiveXComponent("Sapi.SpVoice");
                                 // 音量 0-100
                                 ax.setProperty("Volume", new Variant(80));
@@ -71,23 +71,23 @@ public class VoiceUtil {
                             //播报完后非阻塞式调用检测queue中是否还有消息需要播报,没有则text=null会导致退出while
                             text = windows_blockingQueue.poll();
                         }
-                    }finally {
+                    } finally {
                         //释放组件
-                        if(dispatch!=null){
+                        if (dispatch != null) {
                             dispatch.safeRelease();
                         }
-                        if(ax!=null){
+                        if (ax != null) {
                             ax.safeRelease();
                         }
                     }
                 }
-            }catch (InterruptedException ex){
+            } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
         });
     }
 
-    public static void addVoiceText_windows(String text){
+    public static void addVoiceText_windows(String text) {
         windows_blockingQueue.add(text);
     }
 
@@ -98,9 +98,9 @@ public class VoiceUtil {
 ////            Thread.sleep(2000L);
 //        }
 //        Thread.sleep(5000);
-        Scanner scanner=new Scanner(System.in);
-        while(scanner.hasNext()){
-            addVoiceText_windows(scanner.next()+"测试");
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            addVoiceText_windows(scanner.next() + "测试");
         }
     }
 

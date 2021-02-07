@@ -4,40 +4,42 @@ import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 日期帮助类
  * 1、所有涉及到时区逻辑,日期转换均转换成 LocalDateTime 运算然后再 转回Date
- *
+ * <p>
  * 不考虑夏令时问题
  * {@link ZoneId#of(String)} 中传入+8和时区英文，前者仅仅是偏移量，后者会导致夏令时
  */
 public class DateUtil {
 
-    private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
-
     public final static String DATE_FORMAT_DAY = "yyyyMMdd";
     public final static String DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
-
+    private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
     private final static ChronoField[] equal_fields = new ChronoField[]{ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
 
     /**
      * 获取最近在当前日期之前的最后一个日期单位
      *
      * @param date
-     * @param unit   支持
-     *               {@link ChronoUnit#MILLIS}
-     *               {@link ChronoUnit#SECONDS}
-     *               {@link ChronoUnit#MINUTES}
-     *               {@link ChronoUnit#HOURS}
-     *               {@link ChronoUnit#DAYS}
-     *               {@link ChronoUnit#MONTHS}
-     *               {@link ChronoUnit#YEARS}
+     * @param unit       支持
+     *                   {@link ChronoUnit#MILLIS}
+     *                   {@link ChronoUnit#SECONDS}
+     *                   {@link ChronoUnit#MINUTES}
+     *                   {@link ChronoUnit#HOURS}
+     *                   {@link ChronoUnit#DAYS}
+     *                   {@link ChronoUnit#MONTHS}
+     *                   {@link ChronoUnit#YEARS}
      * @param zoneOffset 时区
      * @return
      */
@@ -62,7 +64,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getFloorDate],unit[{}}] Not Support!",unit.toString());
+                    throw BaseRuntimeException.getException("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -74,14 +76,14 @@ public class DateUtil {
      * 获取最近在当前日期之后的第一个日期单位
      *
      * @param date
-     * @param unit   支持
-     *               {@link ChronoUnit#MILLIS}
-     *               {@link ChronoUnit#SECONDS}
-     *               {@link ChronoUnit#MINUTES}
-     *               {@link ChronoUnit#HOURS}
-     *               {@link ChronoUnit#DAYS}
-     *               {@link ChronoUnit#MONTHS}
-     *               {@link ChronoUnit#YEARS}
+     * @param unit       支持
+     *                   {@link ChronoUnit#MILLIS}
+     *                   {@link ChronoUnit#SECONDS}
+     *                   {@link ChronoUnit#MINUTES}
+     *                   {@link ChronoUnit#HOURS}
+     *                   {@link ChronoUnit#DAYS}
+     *                   {@link ChronoUnit#MONTHS}
+     *                   {@link ChronoUnit#YEARS}
      * @param zoneOffset 时区
      * @return
      */
@@ -108,7 +110,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getCeilDate],unit[{}}] Not Support!",unit.toString());
+                    throw BaseRuntimeException.getException("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -120,17 +122,17 @@ public class DateUtil {
      * 获取开始时间结束时间按照 日期单位 形成多个日期区间
      * 第一个区间开始时间为传入开始时间
      * 最后一个区间结束时间为传入结束时间
-     *
+     * <p>
      * 注意:
      * 返回的结果包含开头时间、不包含结尾时间
      *
      * @param startDate
      * @param endDate
-     * @param unit   支持
-     *               {@link ChronoUnit#DAYS}
-     *               {@link ChronoUnit#WEEKS}
-     *               {@link ChronoUnit#MONTHS}
-     * @param zoneOffset    时区
+     * @param unit       支持
+     *                   {@link ChronoUnit#DAYS}
+     *                   {@link ChronoUnit#WEEKS}
+     *                   {@link ChronoUnit#MONTHS}
+     * @param zoneOffset 时区
      * @return 每一个数组第一个为开始时间, 第二个为结束时间;开始时间为当天0.0.0,结束时间为当天0.0.0
      */
     public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit, ZoneOffset zoneOffset) {
@@ -196,7 +198,7 @@ public class DateUtil {
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.rangeDate],unit[{}}] Not Support!",unit.toString());
+                throw BaseRuntimeException.getException("[DateUtil.rangeDate],unit[{}}] Not Support!", unit.toString());
             }
         }
         return returnList;
@@ -209,16 +211,16 @@ public class DateUtil {
      *
      * @param d1   开始时间
      * @param d2   结束时间
-     * @param unit   支持
-     *               {@link ChronoUnit#MILLIS}
-     *               {@link ChronoUnit#SECONDS}
-     *               {@link ChronoUnit#MINUTES}
-     *               {@link ChronoUnit#HOURS}
-     *               {@link ChronoUnit#DAYS}
-     * @param up 如果存在小数位,是向上取整还是向下取整;true代表向上;false代表向下
+     * @param unit 支持
+     *             {@link ChronoUnit#MILLIS}
+     *             {@link ChronoUnit#SECONDS}
+     *             {@link ChronoUnit#MINUTES}
+     *             {@link ChronoUnit#HOURS}
+     *             {@link ChronoUnit#DAYS}
+     * @param up   如果存在小数位,是向上取整还是向下取整;true代表向上;false代表向下
      * @return 相差日期单位数
      */
-    public static long getDiff(Date d1, Date d2, ChronoUnit unit,boolean up) {
+    public static long getDiff(Date d1, Date d2, ChronoUnit unit, boolean up) {
         long unitMillis;
         switch (unit) {
             case DAYS: {
@@ -238,30 +240,30 @@ public class DateUtil {
                 break;
             }
             case MILLIS: {
-                return d2.getTime()- d1.getTime();
+                return d2.getTime() - d1.getTime();
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.getDiff],unit[{}] Not Support!",unit.toString());
+                throw BaseRuntimeException.getException("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
             }
         }
         long begin = d1.getTime();
         long end = d2.getTime();
-        long diff=end - begin;
-        if(diff>0){
-            double res =  diff/ ((double) unitMillis);
-            if(up){
+        long diff = end - begin;
+        if (diff > 0) {
+            double res = diff / ((double) unitMillis);
+            if (up) {
                 return (int) Math.ceil(res);
-            }else{
+            } else {
                 return (int) Math.floor(res);
             }
-        }else if(diff<0){
-            double res =  diff/ ((double) unitMillis);
-            if(up){
+        } else if (diff < 0) {
+            double res = diff / ((double) unitMillis);
+            if (up) {
                 return -(int) Math.ceil(-res);
-            }else{
+            } else {
                 return -(int) Math.floor(-res);
             }
-        }else{
+        } else {
             return 0;
         }
 
@@ -276,8 +278,8 @@ public class DateUtil {
      * 开始日期去掉时分秒
      * 结束日期+1天且去掉时分秒
      *
-     * @param startDate 包括
-     * @param endDate 不包括
+     * @param startDate  包括
+     * @param endDate    不包括
      * @param zoneOffset
      */
     public static void formatDateParam(Date startDate, Date endDate, ZoneOffset zoneOffset) {
@@ -308,7 +310,7 @@ public class DateUtil {
      */
     public static boolean isEqual(Date d1, Date d2, ChronoField field) {
         if (Arrays.stream(equal_fields).noneMatch(e -> e == field)) {
-            throw BaseRuntimeException.getException("[DateUtil.isEqual],field[{}] Not Support!",field.toString());
+            throw BaseRuntimeException.getException("[DateUtil.isEqual],field[{}] Not Support!", field.toString());
         }
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime ldt1 = LocalDateTime.ofInstant(d1.toInstant(), zoneId);

@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/5/12.
@@ -50,7 +51,7 @@ public class JsonUtil {
      * 设置所有Number属性的 输出为字符串(Long类型数字传入前端会进行四舍五入导致精度丢失,为了避免这种情况,所有的数字全部采用String格式化)
      * 设置忽略null属性输出
      * 设置在解析json字符串为实体类时候,忽略多余的属性
-     *
+     * <p>
      * 不会生成新的ObjectMapper,只会改变当前传入的ObjectMapper
      *
      * @param t
@@ -86,34 +87,35 @@ public class JsonUtil {
     }
 
     public static void main(String[] args) throws JsonProcessingException {
-        int i=1;
-        System.out.println((++i)+(++i));
-        TestBean t1=new TestBean();
+        int i = 1;
+        System.out.println((++i) + (++i));
+        TestBean t1 = new TestBean();
         t1.setId(1);
         t1.setName("t1");
-        TestBean t2=new TestBean();
+        TestBean t2 = new TestBean();
         t2.setId(2);
         t2.setName("t2");
-        TestBean t3=new TestBean();
+        TestBean t3 = new TestBean();
         t2.setId(3);
         t2.setName("t3");
-        t1.setDataList(Arrays.asList(t2,t3));
-        ObjectMapper objectMapper=JsonUtil.withConfig(new ObjectMapper());
-        SimpleModule simpleModule=new SimpleModule();
+        t1.setDataList(Arrays.asList(t2, t3));
+        ObjectMapper objectMapper = JsonUtil.withConfig(new ObjectMapper());
+        SimpleModule simpleModule = new SimpleModule();
         simpleModule.addDeserializer(TestBean.class, new StdDeserializer<TestBean>(TestBean.class) {
             @Override
             public TestBean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-                String field=p.nextFieldName();
-                JsonToken token= p.nextToken();
+                String field = p.nextFieldName();
+                JsonToken token = p.nextToken();
                 return null;
             }
         });
         objectMapper.registerModule(simpleModule);
-        TestBean res= objectMapper.readValue(JsonUtil.toJson(t1),TestBean.class);
+        TestBean res = objectMapper.readValue(JsonUtil.toJson(t1), TestBean.class);
     }
 
 }
-class TestBean{
+
+class TestBean {
     private Integer id;
     private String name;
     private List<TestBean> dataList;

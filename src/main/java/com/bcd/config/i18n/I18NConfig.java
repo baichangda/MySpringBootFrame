@@ -4,13 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 
 /**
  * Created by Administrator on 2017/7/12.
- *
  */
 @Configuration
 public class I18NConfig {
@@ -20,6 +18,7 @@ public class I18NConfig {
      * zh:中文
      * en:英文
      * 来切换
+     *
      * @return
      */
     @Bean

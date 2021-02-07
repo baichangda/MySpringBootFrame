@@ -1,7 +1,6 @@
 package com.bcd.base.websocket.data.nofity;
 
 import com.bcd.base.util.JsonUtil;
-import org.springframework.web.socket.WebSocketSession;
 
 @SuppressWarnings("unchecked")
 public class CommonNotifyHandler<T> extends NotifyHandler<T, String> {

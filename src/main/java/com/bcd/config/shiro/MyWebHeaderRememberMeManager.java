@@ -15,20 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
+    public static final String DEFAULT_REMEMBER_ME_HEADER_KEY_NAME = "rememberMe";
+    public static final String DEFAULT_AES_BASE64_KEY = "s2SE9y32PvLeYo+VGFpcKA==";
     private static transient final Logger log = LoggerFactory.getLogger(MyWebHeaderRememberMeManager.class);
-
-    public static final String DEFAULT_REMEMBER_ME_HEADER_KEY_NAME ="rememberMe";
-    public static final String DEFAULT_AES_BASE64_KEY ="s2SE9y32PvLeYo+VGFpcKA==";
-
     private String rememberMeHeaderKeyName;
-
-    public String getRememberMeHeaderKeyName() {
-        return rememberMeHeaderKeyName;
-    }
-
-    public void setRememberMeHeaderKeyName(String rememberMeHeaderKeyName) {
-        this.rememberMeHeaderKeyName = rememberMeHeaderKeyName;
-    }
 
     public MyWebHeaderRememberMeManager(String rememberMeHeaderKeyName) {
         this.rememberMeHeaderKeyName = rememberMeHeaderKeyName;
@@ -40,13 +30,21 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
         this(DEFAULT_REMEMBER_ME_HEADER_KEY_NAME);
     }
 
+    public String getRememberMeHeaderKeyName() {
+        return rememberMeHeaderKeyName;
+    }
+
+    public void setRememberMeHeaderKeyName(String rememberMeHeaderKeyName) {
+        this.rememberMeHeaderKeyName = rememberMeHeaderKeyName;
+    }
+
     @Override
     protected void forgetIdentity(Subject subject) {
         //需要遗忘时候删除掉response中的header
         if (WebUtils.isHttp(subject)) {
             HttpServletRequest request = WebUtils.getHttpRequest(subject);
             HttpServletResponse response = WebUtils.getHttpResponse(subject);
-            response.setHeader(rememberMeHeaderKeyName,null);
+            response.setHeader(rememberMeHeaderKeyName, null);
         }
     }
 
@@ -70,7 +68,7 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
         String base64 = Base64.encodeToString(serialized);
 
         //在最后,将header写入response中
-        response.setHeader(rememberMeHeaderKeyName,base64);
+        response.setHeader(rememberMeHeaderKeyName, base64);
     }
 
     @Override
@@ -106,7 +104,7 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
             }
 
             //在最后,将header写入response中
-            response.setHeader(rememberMeHeaderKeyName,base64);
+            response.setHeader(rememberMeHeaderKeyName, base64);
 
             return decoded;
         } else {
@@ -123,7 +121,7 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
         if (WebUtils.isHttp(subjectContext)) {
             HttpServletRequest request = WebUtils.getHttpRequest(subjectContext);
             HttpServletResponse response = WebUtils.getHttpResponse(subjectContext);
-            response.setHeader(rememberMeHeaderKeyName,null);
+            response.setHeader(rememberMeHeaderKeyName, null);
         }
     }
 

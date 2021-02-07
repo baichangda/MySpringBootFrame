@@ -4,7 +4,7 @@ import com.bcd.base.util.JsonUtil;
 
 import java.io.Serializable;
 
-public class MySimpleKey implements Serializable{
+public class MySimpleKey implements Serializable {
     private String className;
     private String methodName;
     private Object[] args;

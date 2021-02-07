@@ -8,7 +8,7 @@ import org.apache.shiro.web.util.WebUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-public class MyUserFilter extends UserFilter{
+public class MyUserFilter extends UserFilter {
     private ExceptionResponseHandler handler;
 
     public MyUserFilter(ExceptionResponseHandler handler) {

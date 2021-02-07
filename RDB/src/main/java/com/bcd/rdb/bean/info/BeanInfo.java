@@ -1,13 +1,13 @@
 package com.bcd.rdb.bean.info;
 
 import com.bcd.rdb.anno.Unique;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-import javax.persistence.*;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @SuppressWarnings("unchecked")
-public class BeanInfo{
+public class BeanInfo {
     /**
      * service的实体类
      */
@@ -39,37 +39,37 @@ public class BeanInfo{
     public Field pkField;
 
 
-    public BeanInfo(Class clazz){
+    public BeanInfo(Class clazz) {
         this.clazz = clazz;
         init();
     }
 
-    private void init(){
+    private void init() {
         initTableName();
         initPkField();
         initUnique();
     }
 
-    public void initTableName(){
-        Table table= ((Table)clazz.getAnnotation(Table.class));
-        this.tableName= table==null?null:table.name();
+    public void initTableName() {
+        Table table = ((Table) clazz.getAnnotation(Table.class));
+        this.tableName = table == null ? null : table.name();
     }
 
-    public void initUnique(){
-        uniqueFieldList= Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
-        uniqueFieldList.forEach(e->e.setAccessible(true));
-        if(uniqueFieldList.isEmpty()){
-            isCheckUnique =false;
-        }else{
-            isCheckUnique =true;
+    public void initUnique() {
+        uniqueFieldList = Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
+        uniqueFieldList.forEach(e -> e.setAccessible(true));
+        if (uniqueFieldList.isEmpty()) {
+            isCheckUnique = false;
+        } else {
+            isCheckUnique = true;
         }
     }
 
     /**
      * 初始化主键字段
      */
-    public void initPkField(){
-        pkField= FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
+    public void initPkField() {
+        pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
     }
 

@@ -13,12 +13,12 @@ public class NotifyInfo {
 
     private String url;
 
-    public NotifyInfo(String sn, NotifyEvent event, String paramJson, Consumer<String> consumer,String url) {
+    public NotifyInfo(String sn, NotifyEvent event, String paramJson, Consumer<String> consumer, String url) {
         this.sn = sn;
         this.event = event;
-        this.paramJson=paramJson;
-        this.consumer=consumer;
-        this.url=url;
+        this.paramJson = paramJson;
+        this.consumer = consumer;
+        this.url = url;
     }
 
     public NotifyInfo() {

@@ -22,21 +22,21 @@ public class FirstSupportStrategy implements AuthenticationStrategy {
     @Override
     public AuthenticationInfo beforeAttempt(Realm realm, AuthenticationToken token, AuthenticationInfo aggregate) throws AuthenticationException {
         //如果检测到已经有结果则打断循环
-        if(aggregate==null){
+        if (aggregate == null) {
             return null;
-        }else{
+        } else {
             throw new ShortCircuitIterationException();
         }
     }
 
     @Override
     public AuthenticationInfo afterAttempt(Realm realm, AuthenticationToken token, AuthenticationInfo singleRealmInfo, AuthenticationInfo aggregateInfo, Throwable t) throws AuthenticationException {
-        if(t==null){
+        if (t == null) {
             return singleRealmInfo;
-        }else{
-            if(t instanceof AuthenticationException){
-                throw (AuthenticationException)t;
-            }else {
+        } else {
+            if (t instanceof AuthenticationException) {
+                throw (AuthenticationException) t;
+            } else {
                 throw BaseRuntimeException.getException(t);
             }
         }

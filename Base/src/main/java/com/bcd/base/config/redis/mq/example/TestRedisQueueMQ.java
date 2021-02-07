@@ -5,16 +5,11 @@ import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.config.redis.mq.queue.RedisQueueMQ;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 //@Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInitializable {
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
-        super("a",redisConnectionFactory, ValueSerializerType.STRING);
+        super("a", redisConnectionFactory, ValueSerializerType.STRING);
     }
 
     @Override

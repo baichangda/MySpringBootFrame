@@ -1,4 +1,5 @@
 package com.bcd.config.swagger;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -21,7 +22,7 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    private List<Parameter> globalOperationParameters(){
+    private List<Parameter> globalOperationParameters() {
         ParameterBuilder ticketPar = new ParameterBuilder();
         List<Parameter> pars = new ArrayList<>();
         ticketPar.name("jsessionid").description("用户登陆sessionId")

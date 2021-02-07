@@ -21,26 +21,26 @@ public enum NotifyEvent {
 
     int flag;
 
-    @JsonValue
-    public int getFlag() {
-        return flag;
+    NotifyEvent(int flag) {
+        this.flag = flag;
     }
 
     @JsonCreator
     public static NotifyEvent toEvent(int flag) {
-        for(NotifyEvent e:values()){
-            if(e.getFlag()==flag){
+        for (NotifyEvent e : values()) {
+            if (e.getFlag() == flag) {
                 return e;
             }
         }
         return null;
     }
 
-    public void setFlag(int flag) {
-        this.flag = flag;
+    @JsonValue
+    public int getFlag() {
+        return flag;
     }
 
-    NotifyEvent(int flag){
-        this.flag=flag;
+    public void setFlag(int flag) {
+        this.flag = flag;
     }
 }

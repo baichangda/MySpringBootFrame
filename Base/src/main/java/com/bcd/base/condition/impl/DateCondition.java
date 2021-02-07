@@ -5,26 +5,25 @@ import com.bcd.base.condition.Condition;
 /**
  * 日期类型条件
  * 当val==null时候忽略此条件
- *
  */
 @SuppressWarnings("unchecked")
 public class DateCondition extends Condition {
     public Handler handler;
 
-    public DateCondition(String fieldName, Object val, Handler handler){
-        this.fieldName=fieldName;
-        this.val=val;
-        this.handler=handler;
+    public DateCondition(String fieldName, Object val, Handler handler) {
+        this.fieldName = fieldName;
+        this.val = val;
+        this.handler = handler;
     }
 
     @Override
     public String toAnalysis() {
-        return val==null?null:fieldName +
+        return val == null ? null : fieldName +
                 " " +
                 handler.toString();
     }
 
-    public enum Handler{
+    public enum Handler {
         /**
          * 等于
          */

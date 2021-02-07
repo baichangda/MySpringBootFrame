@@ -4,7 +4,10 @@ import com.bcd.base.controller.BaseController;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.dbinfo.service.TablesService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequestMapping("/api/tables")
 @Api(tags = "数据库设计/TablesController")
 public class TablesController extends BaseController {
 
-    Logger logger= LoggerFactory.getLogger(TablesController.class);
+    Logger logger = LoggerFactory.getLogger(TablesController.class);
 
     @Autowired
     private TablesService tablesService;
@@ -35,9 +37,9 @@ public class TablesController extends BaseController {
             @ApiParam(value = "数据库名称") @RequestParam(value = "dbName", required = true) String dbName,
             HttpServletResponse response) {
         try {
-            tablesService.exportSpringDBDesignerExcel(dbName,response.getOutputStream(),()->{
+            tablesService.exportSpringDBDesignerExcel(dbName, response.getOutputStream(), () -> {
                 String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
-                doBeforeResponseFile(fileName,response);
+                doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
@@ -55,9 +57,9 @@ public class TablesController extends BaseController {
             @ApiParam(value = "数据库名称") @RequestParam(value = "dbName", required = true) String dbName,
             HttpServletResponse response) {
         try {
-            tablesService.exportDBDesignerExcel(url,username,password,dbName,response.getOutputStream(),()->{
+            tablesService.exportDBDesignerExcel(url, username, password, dbName, response.getOutputStream(), () -> {
                 String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
-                doBeforeResponseFile(fileName,response);
+                doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);

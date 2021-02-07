@@ -9,26 +9,26 @@ public enum NotifyCommandType {
 
     int flag;
 
-    @JsonValue
-    public int getFlag() {
-        return flag;
+    NotifyCommandType(int flag) {
+        this.flag = flag;
     }
 
     @JsonCreator
     public static NotifyCommandType toCommandType(int flag) {
-        for(NotifyCommandType e:values()){
-            if(e.getFlag()==flag){
+        for (NotifyCommandType e : values()) {
+            if (e.getFlag() == flag) {
                 return e;
             }
         }
         return null;
     }
 
-    public void setFlag(int flag) {
-        this.flag = flag;
+    @JsonValue
+    public int getFlag() {
+        return flag;
     }
 
-    NotifyCommandType(int flag){
-        this.flag=flag;
+    public void setFlag(int flag) {
+        this.flag = flag;
     }
 }

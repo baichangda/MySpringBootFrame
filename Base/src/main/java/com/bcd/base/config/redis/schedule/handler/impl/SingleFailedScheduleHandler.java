@@ -2,10 +2,7 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 
 import com.bcd.base.config.redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.core.types.Expiration;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

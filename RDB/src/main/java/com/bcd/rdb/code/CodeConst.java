@@ -3,21 +3,20 @@ package com.bcd.rdb.code;
 import freemarker.template.Configuration;
 import freemarker.template.Version;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Created by Administrator on 2017/8/14.
  */
 public class CodeConst {
-    public final static Version FREEMARKER_VERSION= Configuration.VERSION_2_3_30;
+    public final static Version FREEMARKER_VERSION = Configuration.VERSION_2_3_30;
 
     public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/RDB/src/main/resources/template";
 
-    public final static Set<String> CREATE_INFO_FIELD_NAME =new HashSet<>();
-    static{
+    public final static Set<String> CREATE_INFO_FIELD_NAME = new HashSet<>();
+
+    static {
         CREATE_INFO_FIELD_NAME.add("createTime");
         CREATE_INFO_FIELD_NAME.add("updateTime");
         CREATE_INFO_FIELD_NAME.add("createUserId");
@@ -28,7 +27,7 @@ public class CodeConst {
         CREATE_INFO_FIELD_NAME.add("updateIp");
     }
 
-    public enum PkType{
+    public enum PkType {
         Integer,
         Long,
         String

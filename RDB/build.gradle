@@ -23,9 +23,9 @@ buildscript {
     ext {
         mysqlVersion = '8.+'
         pgsqlVersion = '42.2.+'
-        jsqlparserVersion='+'
+        jsqlparserVersion = '+'
         freemarkerVersion = '+'
-        druidVersion= '+'
+        druidVersion = '+'
     }
 }
 

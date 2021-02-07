@@ -22,23 +22,24 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
      * 忽略的请求结尾的url
      */
     private Set<String> ignoreExt;
-  
-    public MyShiroFilterFactoryBean(){  
-        super();  
+
+    public MyShiroFilterFactoryBean() {
+        super();
         ignoreExt = new HashSet<>();
-        ignoreExt.add(".jpg");  
-        ignoreExt.add(".png");  
-        ignoreExt.add(".gif");  
-        ignoreExt.add(".bmp");  
-        ignoreExt.add(".js");  
-        ignoreExt.add(".css");  
+        ignoreExt.add(".jpg");
+        ignoreExt.add(".png");
+        ignoreExt.add(".gif");
+        ignoreExt.add(".bmp");
+        ignoreExt.add(".js");
+        ignoreExt.add(".css");
         ignoreExt.add(".html");
     }
-    /**  
+
+    /**
      * 启动时加载
      * 重写此方法,构造自己的过滤器
-     */  
-    @Override  
+     */
+    @Override
     protected AbstractShiroFilter createInstance() throws Exception {
         SecurityManager securityManager = getSecurityManager();
         if (securityManager == null) {
@@ -64,45 +65,46 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
         //here - we're just using it because it is a concrete AbstractShiroFilter instance that accepts
         //injection of the SecurityManager and FilterChainResolver:
         return new MySpringShiroFilter((WebSecurityManager) securityManager, chainResolver);
-    }  
-  
-    /**  
-     * 启动时加载  
-     */  
-    private class MySpringShiroFilter extends AbstractShiroFilter {  
-        public MySpringShiroFilter(  
-                WebSecurityManager securityManager, PathMatchingFilterChainResolver chainResolver) {  
-            super();  
-            if (securityManager == null){  
-                throw new IllegalArgumentException("WebSecurityManager property cannot be null.");  
-            }  
-            setSecurityManager(securityManager);  
-            if (chainResolver != null){  
-                setFilterChainResolver(chainResolver);  
-            }  
-        }  
-        /**  
-         * 页面上传输的url先进入此方法验证  
-         */  
-        @Override  
+    }
+
+    /**
+     * 启动时加载
+     */
+    private class MySpringShiroFilter extends AbstractShiroFilter {
+        public MySpringShiroFilter(
+                WebSecurityManager securityManager, PathMatchingFilterChainResolver chainResolver) {
+            super();
+            if (securityManager == null) {
+                throw new IllegalArgumentException("WebSecurityManager property cannot be null.");
+            }
+            setSecurityManager(securityManager);
+            if (chainResolver != null) {
+                setFilterChainResolver(chainResolver);
+            }
+        }
+
+        /**
+         * 页面上传输的url先进入此方法验证
+         */
+        @Override
         protected void doFilterInternal(ServletRequest servletRequest, ServletResponse servletResponse,
                                         FilterChain chain)
                 throws ServletException, IOException {
-            HttpServletRequest request = (HttpServletRequest)servletRequest;
-            String str = request.getRequestURI().toLowerCase();  
-            boolean flag = true;  
+            HttpServletRequest request = (HttpServletRequest) servletRequest;
+            String str = request.getRequestURI().toLowerCase();
+            boolean flag = true;
             int idx;
-            if ((idx = str.lastIndexOf('.')) > 0){
-                str = str.substring(idx);  
-                if (ignoreExt.contains(str.toLowerCase())){  
-                    flag = false;  
-                }  
+            if ((idx = str.lastIndexOf('.')) > 0) {
+                str = str.substring(idx);
+                if (ignoreExt.contains(str.toLowerCase())) {
+                    flag = false;
+                }
             }
-            if (flag){  
-                super.doFilterInternal(servletRequest, servletResponse, chain);  
-            } else {  
-                chain.doFilter(servletRequest, servletResponse);  
-            }  
-        }  
-    }  
+            if (flag) {
+                super.doFilterInternal(servletRequest, servletResponse, chain);
+            } else {
+                chain.doFilter(servletRequest, servletResponse);
+            }
+        }
+    }
 }  

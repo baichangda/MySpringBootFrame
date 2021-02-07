@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class SqlMapResult {
     private String sql;
-    private Map<String,Object> paramMap;
+    private Map<String, Object> paramMap;
 
     public SqlMapResult(String sql, Map<String, Object> paramMap) {
         this.sql = sql;

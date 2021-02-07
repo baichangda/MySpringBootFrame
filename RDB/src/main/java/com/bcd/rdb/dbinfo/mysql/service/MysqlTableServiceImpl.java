@@ -28,35 +28,57 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-@ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="com.mysql.cj.jdbc.Driver")
+@ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
 @Service
 public class MysqlTableServiceImpl implements TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
-    public void exportSpringDBDesignerExcel(String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
-        try(Connection connection= DBInfoUtil.getSpringConn()){
-            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
+    public static void main(String[] args) {
+//        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
+//        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
+
+        List<Map<String, Object>> dataList = EasyExcel.read(Paths.get("/Users/baichangda/msbf.xlsx").toFile(), new AnalysisEventListener<Map<String, Object>>() {
+            @Override
+            public void invoke(Map<String, Object> data, AnalysisContext context) {
+                ReadRowHolder readRowHolder = context.readRowHolder();
+                Map<Integer, Cell> cellDataMap = readRowHolder.getCellMap();
+                cellDataMap.forEach((k, v) -> {
+                    System.out.print(v + " ");
+                });
+                System.out.println();
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext context) {
+
+            }
+        }).excelType(ExcelTypeEnum.XLSX).headRowNumber(0).doReadAllSync();
+    }
+
+    public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
+        try (Connection connection = DBInfoUtil.getSpringConn()) {
+            exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     @Override
-    public void exportDBDesignerExcel(String url, String username, String password, String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
-        try(Connection connection= DBInfoUtil.getConn(url, username, password)){
-            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
+    public void exportDBDesignerExcel(String url, String username, String password, String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
+        try (Connection connection = DBInfoUtil.getConn(url, username, password)) {
+            exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os,Runnable doBeforeWrite) throws IOException {
+    public void exportDBDesignerExcel(Connection connection, String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
             emptyList.add("");
         }
-        List<TablesBean> tablesList = DBInfoUtil.findTables(connection,dbName);
+        List<TablesBean> tablesList = DBInfoUtil.findTables(connection, dbName);
         for (TablesBean table : tablesList) {
             String tableName = table.getTable_name();
             //如果是flyway的版本信息表,则跳过
@@ -73,7 +95,7 @@ public class MysqlTableServiceImpl implements TablesService {
             head.addAll(Arrays.asList(headArr));
 
             List<ColumnsBean> columnsList = DBInfoUtil.findColumns(
-                    connection,dbName, tableName
+                    connection, dbName, tableName
             );
 
             dataList.add(define);
@@ -90,7 +112,7 @@ public class MysqlTableServiceImpl implements TablesService {
             dataList.add(emptyList);
         }
 
-        if(doBeforeWrite!=null){
+        if (doBeforeWrite != null) {
             doBeforeWrite.run();
         }
 
@@ -102,42 +124,21 @@ public class MysqlTableServiceImpl implements TablesService {
 
     /**
      * 导出数据库设计到本地
+     *
      * @param url
      * @param username
      * @param password
      * @param dbName
-     * @param file 如果不存在,则创建
+     * @param file     如果不存在,则创建
      */
-    public void exportDBDesignerExcelToDisk(String url,String username,String password,String dbName,String file){
-        Path p= Paths.get(file);
+    public void exportDBDesignerExcelToDisk(String url, String username, String password, String dbName, String file) {
+        Path p = Paths.get(file);
         FileUtil.createFileIfNotExists(p);
-        try(OutputStream os=Files.newOutputStream(p);
-            Connection connection=DBInfoUtil.getConn(url, username, password)){
-            exportDBDesignerExcel(connection,dbName,os,null);
-        }catch (IOException|SQLException e){
+        try (OutputStream os = Files.newOutputStream(p);
+             Connection connection = DBInfoUtil.getConn(url, username, password)) {
+            exportDBDesignerExcel(connection, dbName, os, null);
+        } catch (IOException | SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
-    }
-
-    public static void main(String[] args) {
-//        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
-//        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
-
-        List<Map<String,Object>> dataList= EasyExcel.read(Paths.get("/Users/baichangda/msbf.xlsx").toFile(), new AnalysisEventListener<Map<String,Object>>(){
-            @Override
-            public void invoke(Map<String,Object> data, AnalysisContext context) {
-                ReadRowHolder readRowHolder= context.readRowHolder();
-                Map<Integer, Cell> cellDataMap=readRowHolder.getCellMap();
-                cellDataMap.forEach((k,v)->{
-                    System.out.print(v+" ");
-                });
-                System.out.println();
-            }
-
-            @Override
-            public void doAfterAllAnalysed(AnalysisContext context) {
-
-            }
-        }).excelType(ExcelTypeEnum.XLSX).headRowNumber(0).doReadAllSync();
     }
 }

@@ -21,16 +21,16 @@
     -->
     <!-- 如果没有自定义缓存,则使用默认缓存 -->
     <defaultCache
-        maxElementsInMemory="10000"
-        maxElementsOnDisk="0"
-        eternal="true"
-        overflowToDisk="true"
-        diskPersistent="false"
-        timeToIdleSeconds="0"
-        timeToLiveSeconds="0"
-        diskSpoolBufferSizeMB="50"
-        diskExpiryThreadIntervalSeconds="120"
-        memoryStoreEvictionPolicy="LFU"
+            maxElementsInMemory="10000"
+            maxElementsOnDisk="0"
+            eternal="true"
+            overflowToDisk="true"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="0"
+            diskSpoolBufferSizeMB="50"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
     />
     <!-- 权限的缓存(设置权限缓存不过期,也就是如果需要刷新权限,必须重新登录) -->
     <cache

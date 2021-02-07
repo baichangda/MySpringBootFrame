@@ -1,9 +1,9 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.AuthorizationHandler;
+import com.bcd.base.config.shiro.anno.RequiresAction;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.anno.RequiresRequestMappingUrl;
-import com.bcd.base.config.shiro.anno.RequiresAction;
-import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
 import org.slf4j.Logger;
@@ -22,10 +22,10 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
     private static final Logger logger = LoggerFactory.getLogger(MyAuthorizationAttributeSourceAdvisor.class);
 
     private static final Class<? extends Annotation>[] AUTHZ_ANNOTATION_CLASSES =
-            new Class[] {
+            new Class[]{
                     RequiresPermissions.class, RequiresRoles.class,
                     RequiresUser.class, RequiresGuest.class, RequiresAuthentication.class,
-                    RequiresAction.class , RequiresRequestMappingUrl.class, RequiresNotePermissions.class
+                    RequiresAction.class, RequiresRequestMappingUrl.class, RequiresNotePermissions.class
             };
 
     protected SecurityManager securityManager = null;
@@ -64,13 +64,13 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
     public boolean matches(Method method, Class targetClass) {
         Method m = method;
 
-        if ( isAuthzAnnotationPresent(m) ) {
+        if (isAuthzAnnotationPresent(m)) {
             return true;
         }
 
         //The 'method' parameter could be from an interface that doesn't have the annotation.
         //Check to see if the implementation has it.
-        if ( targetClass != null) {
+        if (targetClass != null) {
             try {
                 m = targetClass.getMethod(m.getName(), m.getParameterTypes());
                 return isAuthzAnnotationPresent(m) || isAuthzAnnotationPresent(targetClass);
@@ -84,9 +84,9 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
     }
 
     private boolean isAuthzAnnotationPresent(Class<?> targetClazz) {
-        for( Class<? extends Annotation> annClass : AUTHZ_ANNOTATION_CLASSES ) {
+        for (Class<? extends Annotation> annClass : AUTHZ_ANNOTATION_CLASSES) {
             Annotation a = AnnotationUtils.findAnnotation(targetClazz, annClass);
-            if ( a != null ) {
+            if (a != null) {
                 return true;
             }
         }
@@ -94,9 +94,9 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
     }
 
     private boolean isAuthzAnnotationPresent(Method method) {
-        for( Class<? extends Annotation> annClass : AUTHZ_ANNOTATION_CLASSES ) {
+        for (Class<? extends Annotation> annClass : AUTHZ_ANNOTATION_CLASSES) {
             Annotation a = AnnotationUtils.findAnnotation(method, annClass);
-            if ( a != null ) {
+            if (a != null) {
                 return true;
             }
         }

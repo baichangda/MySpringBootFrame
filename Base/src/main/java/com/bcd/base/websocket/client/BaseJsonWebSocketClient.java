@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 /**
  * webSocket客户端,存在如下机制
  * 1、断线重连机制(当连接断开以后会过10s后自动连接 (如果检测到发送时间距离当前时间1分钟之内) )
+ *
  * @param <T>
  */
 @SuppressWarnings("unchecked")
@@ -29,32 +30,32 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
     public BaseJsonWebSocketClient(String url) {
         super(url);
         //扫描间隔为1s
-        this.sn_to_callBack_map =new ExpireCallBackMap<>(1L,TimeUnit.SECONDS);
+        this.sn_to_callBack_map = new ExpireCallBackMap<>(1L, TimeUnit.SECONDS);
         this.sn_to_callBack_map.init();
     }
 
     /**
-     * @param param 参数
-     * @param consumer webSocket回调(json字符串参数)
-     * @param timeout 超时时间(毫秒)
-     * @param unit 
-     * @param timeOutCallBack  webSocket超时回调
-     * @param clazzs 结果泛型类型数组
+     * @param param           参数
+     * @param consumer        webSocket回调(json字符串参数)
+     * @param timeout         超时时间(毫秒)
+     * @param unit
+     * @param timeOutCallBack webSocket超时回调
+     * @param clazzs          结果泛型类型数组
      * @param <R>
      * @return 返回null表示发送失败;正常情况下返回发送过去的数据
      */
-    public <R>WebSocketData<T> sendMessage(T param, Consumer<WebSocketData<R>> consumer, long timeout,TimeUnit unit, BiConsumer<String,Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs){
+    public <R> WebSocketData<T> sendMessage(T param, Consumer<WebSocketData<R>> consumer, long timeout, TimeUnit unit, BiConsumer<String, Consumer<WebSocketData<R>>> timeOutCallBack, Class... clazzs) {
         //1、开始
-        WebSocketData<T> paramWebSocketData=new WebSocketData<>(RandomStringUtils.randomAlphabetic(32),param);
-        logger.debug("Start WebSocket SN["+paramWebSocketData.getSn()+"]");
+        WebSocketData<T> paramWebSocketData = new WebSocketData<>(RandomStringUtils.randomAlphabetic(32), param);
+        logger.debug("Start WebSocket SN[" + paramWebSocketData.getSn() + "]");
         //1.1、绑定回调
         sn_to_callBack_map.put(paramWebSocketData.getSn(), (v) -> {
             try {
                 JavaType resType;
-                if(clazzs.length==1){
-                    resType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,clazzs);
-                }else {
-                    JavaType tempType=null;
+                if (clazzs.length == 1) {
+                    resType = TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, clazzs);
+                } else {
+                    JavaType tempType = null;
                     for (int i = clazzs.length - 2; i >= 0; i--) {
                         if (tempType == null) {
                             tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], clazzs[i + 1]);
@@ -62,23 +63,23 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
                             tempType = TypeFactory.defaultInstance().constructParametricType(clazzs[i], tempType);
                         }
                     }
-                    resType= TypeFactory.defaultInstance().constructParametricType(WebSocketData.class,tempType);
+                    resType = TypeFactory.defaultInstance().constructParametricType(WebSocketData.class, tempType);
                 }
                 WebSocketData<R> webSocketData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(v, resType);
                 consumer.accept(webSocketData);
             } catch (IOException e) {
                 throw BaseRuntimeException.getException(e);
             }
-        }, timeout,unit, (k, v) -> {
+        }, timeout, unit, (k, v) -> {
             logger.info("TimeOut WebSocket SN[" + paramWebSocketData.getSn() + "]");
             timeOutCallBack.accept(k, consumer);
         });
         //2、发送信息
-        boolean sendRes= sendMessage(paramWebSocketData);
+        boolean sendRes = sendMessage(paramWebSocketData);
         //3、如果发送失败,则移除回调
-        if(sendRes){
+        if (sendRes) {
             return paramWebSocketData;
-        }else{
+        } else {
             sn_to_callBack_map.remove(paramWebSocketData.getSn());
             return null;
         }
@@ -86,13 +87,14 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
 
     /**
      * 发送数据
+     *
      * @param param
      * @return
      */
-    protected boolean sendMessage(WebSocketData<T> param){
+    protected boolean sendMessage(WebSocketData<T> param) {
         String message = JsonUtil.toJson(param);
-        boolean res= sendMessage(message);
-        if(res){
+        boolean res = sendMessage(message);
+        if (res) {
             logger.debug("Send WebSocket SN[" + param.getSn() + "]");
         }
         return res;
@@ -100,12 +102,13 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
 
     /**
      * 当收到数据时候触发
+     *
      * @param data
      */
-    public void onMessage(String data){
+    public void onMessage(String data) {
         try {
             JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(data);
-            String sn=jsonNode.get("sn").asText();
+            String sn = jsonNode.get("sn").asText();
             logger.info("Receive WebSocket SN[" + sn + "]");
             //1、取出流水号
             Consumer<String> consumer = sn_to_callBack_map.remove(sn);
@@ -115,32 +118,33 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
             } else {
                 consumer.accept(data);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.printException(e);
         }
     }
 
     /**
      * 阻塞调用webSocket请求
+     *
      * @param paramData
      * @param timeout
      * @param unit
-     * @param clazzs 返回参数泛型类型数组,只支持类型单泛型,例如:
-     *               <WebData<VehicleBean>> 传参数 WebData.class,VehicleBean.class
+     * @param clazzs    返回参数泛型类型数组,只支持类型单泛型,例如:
+     *                  <WebData<VehicleBean>> 传参数 WebData.class,VehicleBean.class
      * @return 返回null表示发送超时
      */
-    public <R>WebSocketData<R> blockingRequest(T paramData, long timeout,TimeUnit unit, Class ... clazzs){
-        CountDownLatch countDownLatch=new CountDownLatch(1);
-        WebSocketData<R>[] resData=new WebSocketData[1];
-        WebSocketData<T> sendWebSocketData=sendMessage(paramData,(WebSocketData<R> res)->{
-                resData[0]=res;
-                countDownLatch.countDown();
-        }, timeout,unit,(k, v)->{
+    public <R> WebSocketData<R> blockingRequest(T paramData, long timeout, TimeUnit unit, Class... clazzs) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        WebSocketData<R>[] resData = new WebSocketData[1];
+        WebSocketData<T> sendWebSocketData = sendMessage(paramData, (WebSocketData<R> res) -> {
+            resData[0] = res;
             countDownLatch.countDown();
-        },clazzs);
-        if(sendWebSocketData==null){
+        }, timeout, unit, (k, v) -> {
+            countDownLatch.countDown();
+        }, clazzs);
+        if (sendWebSocketData == null) {
             throw BaseRuntimeException.getException("Session Closed,WebSocket Send Failed");
-        }else{
+        } else {
             try {
                 countDownLatch.await();
                 return resData[0];
@@ -152,6 +156,7 @@ public abstract class BaseJsonWebSocketClient<T> extends BaseTextWebSocketClient
 
     /**
      * 是否支持分片信息
+     *
      * @return
      */
     @Override

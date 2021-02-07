@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 @EnableScheduling
 @Component
-public class ScheduleConfig implements SchedulingConfigurer{
+public class ScheduleConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         //开启多线程执行定时任务,默认只有单线程执行

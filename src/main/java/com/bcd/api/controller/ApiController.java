@@ -23,17 +23,17 @@ public class ApiController extends BaseController {
     ApiService apiService;
 
     @SuppressWarnings("unchecked")
-    @RequestMapping(value = "/exportApi",method = RequestMethod.GET)
-    @ApiOperation(value = "导出所有Api",notes = "导出所有Api")
-    @ApiResponse(code = 200,message = "导入的Excel")
-    public void exportApi(HttpServletResponse response){
+    @RequestMapping(value = "/exportApi", method = RequestMethod.GET)
+    @ApiOperation(value = "导出所有Api", notes = "导出所有Api")
+    @ApiResponse(code = 200, message = "导入的Excel")
+    public void exportApi(HttpServletResponse response) {
         try {
-            apiService.exportApi(response.getOutputStream(),()->{
+            apiService.exportApi(response.getOutputStream(), () -> {
                 String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
                 doBeforeResponseFile(toDateFileName(fileName), response);
             });
         } catch (IOException e) {
-            logger.error("export error",e);
+            logger.error("export error", e);
         }
     }
 }

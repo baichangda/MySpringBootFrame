@@ -2,7 +2,10 @@ package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -19,27 +22,28 @@ import java.util.List;
 public class DateZoneUtil {
     public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
-    public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
-    public final static DateTimeFormatter DATE_TIME_FORMATTER_SECOND=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+    public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
+    public final static DateTimeFormatter DATE_TIME_FORMATTER_SECOND = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
 
     /**
      * 根据dateStr长度转换成不同的时间
      * {@link DateUtil#DATE_FORMAT_DAY} 长度8
      * {@link DateUtil#DATE_FORMAT_SECOND} 长度14
+     *
      * @param dateStr
      * @return
      */
-    public static Date stringToDate(String dateStr){
+    public static Date stringToDate(String dateStr) {
         if (dateStr == null) {
             return null;
         }
-        int len=dateStr.length();
-        if(len==DateUtil.DATE_FORMAT_DAY.length()){
+        int len = dateStr.length();
+        if (len == DateUtil.DATE_FORMAT_DAY.length()) {
             return DateZoneUtil.stringToDate_day(dateStr);
-        }else if(len==DateUtil.DATE_FORMAT_SECOND.length()){
+        } else if (len == DateUtil.DATE_FORMAT_SECOND.length()) {
             return DateZoneUtil.stringToDate_second(dateStr);
-        }else{
-            throw BaseRuntimeException.getException("dateStr[{}] not support",dateStr);
+        } else {
+            throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
         }
     }
 
@@ -129,26 +133,26 @@ public class DateZoneUtil {
     }
 
     public static void main(String[] args) {
-        Date time=stringToDate_day("20111111");
+        Date time = stringToDate_day("20111111");
         System.out.println(time);
         System.out.println(dateToString_day(time));
         System.out.println(dateToString_second(time));
 
 
-        DateTimeFormatter formatter1=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
-        DateTimeFormatter formatter2=DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
-        System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli()/1000);
-        System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli()/1000);
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+        System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli() / 1000);
+        System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli() / 1000);
 
-        Date d1=new Date();
-        Date d2=new Date();
-        formatDateParam(d1,d2);
+        Date d1 = new Date();
+        Date d2 = new Date();
+        formatDateParam(d1, d2);
         System.out.println(d1);
         System.out.println(d2);
 
-        Date newD1= getFloorDate(d1,ChronoUnit.HOURS);
+        Date newD1 = getFloorDate(d1, ChronoUnit.HOURS);
         System.out.println(d1.getTime());
         System.out.println(newD1.getTime());
-        System.out.println(DateUtil.getDiff(d1,newD1,ChronoUnit.SECONDS,true));
+        System.out.println(DateUtil.getDiff(d1, newD1, ChronoUnit.SECONDS, true));
     }
 }

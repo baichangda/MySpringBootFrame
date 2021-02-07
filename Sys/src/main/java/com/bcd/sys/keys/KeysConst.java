@@ -12,17 +12,34 @@ import java.security.interfaces.RSAPublicKey;
 
 public class KeysConst {
     /**
+     * 是否是集群环境
+     */
+    public static final boolean IS_CLUSTER = false;
+    /**
+     * 是否在启动时候重新生成 公钥私钥(仅在单机环境有效)
+     */
+    public static final boolean IS_GENERATE_KEY_ON_STARTUP = false;
+    /**
+     * redis 存储公钥私钥redis key名(仅在集群环境有效)
+     */
+    public static final String REDIS_KEY_NAME = RedisUtil.doWithKey("publicPrivateKeys");
+    /**
      * 公钥
      */
-    public static String PUBLIC_KEY_BASE64="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCsvr4c0hE5irw5Ye6Kn" +
+    public static String PUBLIC_KEY_BASE64 = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCsvr4c0hE5irw5Ye6Kn" +
             "yyHmUgPv5bYGx5cYRDhyyK1NuACXzvW2CFwNmh65LoaPChE/R31MKuKkud4izjR6qCBMaaOg9YQmN" +
             "wIQpqWU4MOIcaBW30ylccjaYoXzumXG34CibBam/RyYF5k+FTDyrD+fCJXpBK9er/pAE1em/kkBQI" +
             "DAQAB";
     public static PublicKey PUBLIC_KEY;
+
+
+    /**
+     * 单机环境参数
+     */
     /**
      * 私钥
      */
-    public static String PRIVATE_KEY_BASE64 ="MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKy+vhzS" +
+    public static String PRIVATE_KEY_BASE64 = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKy+vhzS" +
             "ETmKvDlh7oqfLIeZSA+/ltgbHlxhEOHLIrU24AJfO9bYIXA2aHrkuho8KET9HfUwq4qS53iLONHqo" +
             "IExpo6D1hCY3AhCmpZTgw4hxoFbfTKVxyNpihfO6ZcbfgKJsFqb9HJgXmT4VMPKsP58IlekEr16v+" +
             "kATV6b+SQFAgMBAAECgYBPK4xOASjLyn3BftSoy5LJAsM4FIK5wJQFmqb2FPdvPhskeykdqiiJGSa" +
@@ -38,25 +55,16 @@ public class KeysConst {
 
 
     /**
-     * 是否是集群环境
+     * 集群环境参数
+     * 初始化见
+     * @see RedisKeysInit#onApplicationEvent(ContextRefreshedEvent)
      */
-    public static final boolean IS_CLUSTER=false;
-
-
-    /**
-     * 单机环境参数
-     */
-
-    /**
-     * 是否在启动时候重新生成 公钥私钥(仅在单机环境有效)
-     */
-    public static final boolean IS_GENERATE_KEY_ON_STARTUP=false;
 
     /**
      * 单机环境初始化
      */
-    static{
-        if(!IS_CLUSTER) {
+    static {
+        if (!IS_CLUSTER) {
             if (IS_GENERATE_KEY_ON_STARTUP) {
                 Object[] keys = RSASecurity.generateKey(1024);
                 KeysConst.PUBLIC_KEY = (RSAPublicKey) keys[0];
@@ -69,19 +77,6 @@ public class KeysConst {
             }
         }
     }
-
-
-
-    /**
-     * 集群环境参数
-     * 初始化见
-     * @see RedisKeysInit#onApplicationEvent(ContextRefreshedEvent)
-     */
-
-    /**
-     * redis 存储公钥私钥redis key名(仅在集群环境有效)
-     */
-    public static final String REDIS_KEY_NAME= RedisUtil.doWithKey("publicPrivateKeys");
 
 
 }

@@ -26,7 +26,7 @@ public class DBInfoUtil {
 
     /**
      * 获取spring配置文件中的数据库信息,并将获取到的url转换成information_schema
-     *
+     * <p>
      * 获取配置文件中
      * spring.datasource.url
      * spring.datasource.username
@@ -59,16 +59,16 @@ public class DBInfoUtil {
             String url = dataSourceMap.get("url").toString();
             String username = dataSourceMap.get("username").toString();
             String password = dataSourceMap.get("password").toString();
-            int index=url.indexOf('?');
+            int index = url.indexOf('?');
             String pre;
-            if(index==-1){
+            if (index == -1) {
                 pre = url;
-            }else{
+            } else {
                 pre = url.substring(0, index);
             }
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
-            return new DBInfo(dbInfoUrl,username,password,propDbName);
+            return new DBInfo(dbInfoUrl, username, password, propDbName);
         } catch (FileNotFoundException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -91,26 +91,27 @@ public class DBInfoUtil {
     /**
      * 获取对应ip:port的information_schema的数据库连接
      * jdbc:mysql://127.0.0.1:3306/information_schema
-     * @param url 127.0.0.1:3306
+     *
+     * @param url      127.0.0.1:3306
      * @param username root
      * @param password root
      * @return
      */
-    public static Connection getConn(String url,String username,String password) {
+    public static Connection getConn(String url, String username, String password) {
         try {
-            return DriverManager.getConnection("jdbc:mysql://"+url+"/"+DB_INFO_SCHEMA, username, password);
+            return DriverManager.getConnection("jdbc:mysql://" + url + "/" + DB_INFO_SCHEMA, username, password);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
-    public static <T>List<T> parseResult(ResultSet rs,Class<T> resultType) {
+    public static <T> List<T> parseResult(ResultSet rs, Class<T> resultType) {
         try {
             ResultSetMetaData headData = rs.getMetaData();
             int columnCount = headData.getColumnCount();
             List<T> res = new ArrayList<>();
             while (rs.next()) {
-                T t= resultType.newInstance();
+                T t = resultType.newInstance();
                 for (int i = 1; i <= columnCount; i++) {
                     Object val = null;
                     int columnType = headData.getColumnType(i);
@@ -135,9 +136,9 @@ public class DBInfoUtil {
                             break;
                         }
                     }
-                    Field field=resultType.getDeclaredField(columnName.toLowerCase());
+                    Field field = resultType.getDeclaredField(columnName.toLowerCase());
                     field.setAccessible(true);
-                    field.set(t,val);
+                    field.set(t, val);
                 }
                 res.add(t);
             }
@@ -154,7 +155,7 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static List<TablesBean> findTables(Connection conn,String dbName) {
+    public static List<TablesBean> findTables(Connection conn, String dbName) {
         List<TablesBean> res;
         String sql = "select * from tables where table_schema=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
@@ -174,14 +175,14 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static TablesBean findTable(Connection conn,String dbName, String tableName) {
+    public static TablesBean findTable(Connection conn, String dbName, String tableName) {
         TablesBean res;
         String sql = "select * from tables where table_schema=? and table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<TablesBean> dataList = parseResult(rs,TablesBean.class);
+                List<TablesBean> dataList = parseResult(rs, TablesBean.class);
                 if (dataList.isEmpty()) {
                     return null;
                 }
@@ -207,7 +208,7 @@ public class DBInfoUtil {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                res = parseResult(rs,ColumnsBean.class);
+                res = parseResult(rs, ColumnsBean.class);
             }
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
@@ -218,7 +219,7 @@ public class DBInfoUtil {
     /**
      * 获取指定数据库表的主键
      */
-    public static ColumnsBean findPKColumn(Connection conn,String dbName, String tableName) {
+    public static ColumnsBean findPKColumn(Connection conn, String dbName, String tableName) {
         String sql = "select a.* from " +
                 "(select * from columns where table_schema=? and table_name=?) a inner join" +
                 "(select COLUMN_NAME from STATISTICS where table_schema=? and table_name=? and index_name='PRIMARY') b on a.COLUMN_NAME=b.COLUMN_NAME";
@@ -228,7 +229,7 @@ public class DBInfoUtil {
             pstsm.setString(3, dbName);
             pstsm.setString(4, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<ColumnsBean> res = parseResult(rs,ColumnsBean.class);
+                List<ColumnsBean> res = parseResult(rs, ColumnsBean.class);
                 if (res.isEmpty()) {
                     return null;
                 } else {

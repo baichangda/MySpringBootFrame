@@ -1,7 +1,8 @@
 package com.bcd.base.util;
 
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,10 +23,10 @@ public class StringUtil {
             return str;
         }
         StringBuilder result = new StringBuilder();
-        char[] arr= str.toCharArray();
+        char[] arr = str.toCharArray();
         boolean nextIsUpper = false;
         result.append(Character.toLowerCase(arr[0]));
-        for (int i = 1; i <= arr.length-1; i++) {
+        for (int i = 1; i <= arr.length - 1; i++) {
             char c = arr[i];
             if (c == splitStr) {
                 nextIsUpper = true;
@@ -46,10 +47,10 @@ public class StringUtil {
             return str;
         }
         StringBuilder result = new StringBuilder();
-        char[] arr= str.toCharArray();
+        char[] arr = str.toCharArray();
         result.append(Character.toLowerCase(str.charAt(0)));
-        for (int i=1;i<=arr.length-1;i++) {
-            char c=arr[i];
+        for (int i = 1; i <= arr.length - 1; i++) {
+            char c = arr[i];
             if (Character.isUpperCase(c)) {
                 result.append(splitStr);
             }

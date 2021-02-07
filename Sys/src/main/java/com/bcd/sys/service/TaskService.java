@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  */
 @Service
-public class TaskService extends BaseService<TaskBean,Long> implements TaskDAO<Long,TaskBean>{
+public class TaskService extends BaseService<TaskBean, Long> implements TaskDAO<Long, TaskBean> {
     @Override
     public Serializable doCreate(TaskBean task) {
         return save(task).getId();

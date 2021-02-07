@@ -16,23 +16,23 @@ import java.util.Objects;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class ConditionImplConverter implements Converter<ConditionImpl,Predicate> {
+public class ConditionImplConverter implements Converter<ConditionImpl, Predicate> {
     @Override
     public Predicate convert(ConditionImpl condition, Object... exts) {
-        List<Condition> childrenList=condition.childrenList;
-        ConditionImpl.ConcatWay concatWay=condition.concatWay;
-        Root root=(Root)exts[0];
-        CriteriaQuery query=(CriteriaQuery)exts[1];
-        CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        Predicate[] predicates= childrenList.stream().map(c->ConditionUtil.convertCondition(c,root,query,cb)).filter(Objects::nonNull).toArray(Predicate[]::new);
-        switch (concatWay){
-            case AND:{
+        List<Condition> childrenList = condition.childrenList;
+        ConditionImpl.ConcatWay concatWay = condition.concatWay;
+        Root root = (Root) exts[0];
+        CriteriaQuery query = (CriteriaQuery) exts[1];
+        CriteriaBuilder cb = (CriteriaBuilder) exts[2];
+        Predicate[] predicates = childrenList.stream().map(c -> ConditionUtil.convertCondition(c, root, query, cb)).filter(Objects::nonNull).toArray(Predicate[]::new);
+        switch (concatWay) {
+            case AND: {
                 return cb.and(predicates);
             }
-            case OR:{
+            case OR: {
                 return cb.or(predicates);
             }
-            default:{
+            default: {
                 return null;
             }
         }

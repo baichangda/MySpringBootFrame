@@ -31,7 +31,7 @@ public class BeanData {
      * 1: #{@link com.bcd.rdb.bean.BaseBean}
      * 2: #{@link com.bcd.rdb.bean.SuperBaseBean}
      */
-    private int superBeanType=2;
+    private int superBeanType = 2;
 
     /**
      * 主键类型

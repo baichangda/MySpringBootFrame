@@ -1,8 +1,8 @@
 package com.bcd.sys.shiro;
 
+import com.bcd.base.config.shiro.AuthorizationHandler;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.aop.MethodInvocation;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +23,14 @@ public class DefaultAuthorizationHandler implements AuthorizationHandler {
 
     /**
      * 配置管理员用户跳过权限认证
+     *
      * @return
      */
-    private boolean skip(){
-        UserBean user= ShiroUtil.getCurrentUser();
-        if(user!=null&& CommonConst.ADMIN_ID==user.getId()){
+    private boolean skip() {
+        UserBean user = ShiroUtil.getCurrentUser();
+        if (user != null && CommonConst.ADMIN_ID == user.getId()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StopSysTaskContext {
     private String code;
     private String[] ids;
-    private Map<String,Boolean> result=new ConcurrentHashMap<>();
+    private Map<String, Boolean> result = new ConcurrentHashMap<>();
 
     public String getCode() {
         return code;

@@ -10,15 +10,23 @@ public abstract class TaskContext<T extends Task> implements Serializable {
 
     protected Object[] params;
 
-    protected volatile boolean stop=false;
+    protected volatile boolean stop = false;
 
     public TaskContext(T task) {
-        this(task,null);
+        this(task, null);
     }
 
     public TaskContext(T task, Object[] params) {
         this.task = task;
         this.params = params;
+    }
+
+    public final static <T extends Task> TaskContext<T> newTaskContext(T task, TaskFunction<T> function, Serializable... params) {
+        return new SingleTaskContext<>(task, function, params);
+    }
+
+    public final static <T extends Task> ClusterTaskContext<T> newClusterTaskContext(T task, NamedTaskFunction<T> function, Serializable... params) {
+        return new ClusterTaskContext<>(task, function, params);
     }
 
     public T getTask() {
@@ -37,14 +45,6 @@ public abstract class TaskContext<T extends Task> implements Serializable {
 
     public void setStop(boolean stop) {
         this.stop = stop;
-    }
-
-    public final static <T extends Task>TaskContext<T> newTaskContext(T task,TaskFunction<T> function,Serializable... params){
-        return new SingleTaskContext<>(task,function,params);
-    }
-
-    public final static <T extends Task>ClusterTaskContext<T> newClusterTaskContext(T task,NamedTaskFunction<T> function,Serializable ... params){
-        return new ClusterTaskContext<>(task,function,params);
     }
 
 

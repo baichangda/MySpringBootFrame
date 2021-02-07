@@ -1,7 +1,6 @@
 package com.bcd.rdb.code;
 
 import com.bcd.rdb.dbinfo.data.DBInfo;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -19,7 +18,7 @@ public class Config {
     //模版文件夹路径
     private String templateDirPath;
     //表配置
-    private List<TableConfig> tableConfigs=new ArrayList<>();
+    private List<TableConfig> tableConfigs = new ArrayList<>();
     //数据库
     private DBInfo dbInfo;
 
@@ -27,15 +26,15 @@ public class Config {
         this.targetDirPath = targetDirPath;
     }
 
-    public static Config newConfig(String targetDirPath,DBInfo dbInfo){
+    public static Config newConfig(String targetDirPath, DBInfo dbInfo) {
         return new Config(targetDirPath);
     }
 
-    public static Config newConfig(String targetDirPath){
+    public static Config newConfig(String targetDirPath) {
         return new Config(targetDirPath);
     }
 
-    public Config addTableConfig(TableConfig ... tableConfigs){
+    public Config addTableConfig(TableConfig... tableConfigs) {
         this.tableConfigs.addAll(Arrays.asList(tableConfigs));
         for (TableConfig tableConfig : tableConfigs) {
             tableConfig.setConfig(this);
@@ -43,7 +42,7 @@ public class Config {
         return this;
     }
 
-    public Config addTableConfig(List<TableConfig> tableConfigs){
+    public Config addTableConfig(List<TableConfig> tableConfigs) {
         this.tableConfigs.addAll(tableConfigs);
         for (TableConfig tableConfig : tableConfigs) {
             tableConfig.setConfig(this);

@@ -3,7 +3,6 @@ package com.bcd.sys.shiro;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.base.config.shiro.cache.RedisCache;
 import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
@@ -33,10 +32,9 @@ import java.util.concurrent.TimeUnit;
 public class UsernamePasswordRealm extends MyAuthorizingRealm {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     PermissionService permissionService;
+    @Autowired
+    private UserService userService;
 
     public UsernamePasswordRealm(RedisConnectionFactory redisConnectionFactory) {
         if (CommonConst.IS_PASSWORD_ENCODED) {
@@ -60,9 +58,9 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
         setCacheManager(new CacheManager() {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
-                if(s.equals(getAuthorizationCacheName())){
-                    return new RedisCache<>(redisTemplate,s,5, TimeUnit.SECONDS);
-                }else{
+                if (s.equals(getAuthorizationCacheName())) {
+                    return new RedisCache<>(redisTemplate, s, 5, TimeUnit.SECONDS);
+                } else {
                     return null;
                 }
             }
@@ -110,7 +108,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        if(principals.getRealmNames().contains(getName())) {
+        if (principals.getRealmNames().contains(getName())) {
             Object userName = super.getAvailablePrincipal(principals);
             if (userName != null) {
                 UserBean user = userService.findOne(new StringCondition("username", userName));

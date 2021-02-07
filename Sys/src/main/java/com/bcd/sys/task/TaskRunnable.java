@@ -7,17 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("unchecked")
-public class TaskRunnable<T extends Task> implements Runnable{
-    private final static Logger logger= LoggerFactory.getLogger(TaskRunnable.class);
-
-    private final TaskContext<T> context;
-
-    private final T task;
-
-    private final TaskFunction<T> function;
-
-    private boolean supportShutdownRunning;
-
+public class TaskRunnable<T extends Task> implements Runnable {
+    private final static Logger logger = LoggerFactory.getLogger(TaskRunnable.class);
     /**
      * 1:等待中
      * 2:执行中
@@ -27,27 +18,30 @@ public class TaskRunnable<T extends Task> implements Runnable{
      * 6:停止中
      * 7:已停止
      * 8:异常终止
-     *
+     * <p>
      * 状态变更可能性:
      * 0->1
-     *
+     * <p>
      * 1->2 //开始执行
      * 1->5 //还在等待中时调用停止方法取消
-     *
+     * <p>
      * 2->3 //执行成功
      * 2->4 //执行失败
      * 2->6 //执行中时调用停止方法
-     *
+     * <p>
      * 6->7 //任务停止
-     *
      */
-    final AtomicInteger status=new AtomicInteger(0);
+    final AtomicInteger status = new AtomicInteger(0);
+    private final TaskContext<T> context;
+    private final T task;
+    private final TaskFunction<T> function;
+    private boolean supportShutdownRunning;
 
     public TaskRunnable(TaskContext<T> context) {
-        this.context=context;
-        this.task=context.getTask();
-        this.function=context.getFunction();
-        this.supportShutdownRunning =context.getFunction().supportShutdown(context);
+        this.context = context;
+        this.task = context.getTask();
+        this.function = context.getFunction();
+        this.supportShutdownRunning = context.getFunction().supportShutdown(context);
         this.status.set(1);
     }
 
@@ -62,7 +56,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
     /**
      * 1、先尝试从队列中移除
      * 2、然后尝试停止正在执行的任务
-     *
+     * <p>
      * 如果当前任务不支持supportShutdownRunning,则返回false
      * 如果支持supportShutdownRunning,此时任务状态可能为
      * 1:等待中
@@ -72,25 +66,25 @@ public class TaskRunnable<T extends Task> implements Runnable{
      * 6:停止中
      * 7:已停止
      * 8:异常终止
-     *
+     * <p>
      * 1,2直接变更为6
      * 3,4,8直接返回失败
      * 6,7直接返回成功
      */
-    public boolean shutdown(){
-        boolean removed=CommonConst.SYS_TASK_POOL.remove(this);
-        if(removed){
+    public boolean shutdown() {
+        boolean removed = CommonConst.SYS_TASK_POOL.remove(this);
+        if (removed) {
             //如果移除成功了,则状态一定是1
-            boolean curRes=status.compareAndSet(1,5);
-            if(curRes){
+            boolean curRes = status.compareAndSet(1, 5);
+            if (curRes) {
                 TaskUtil.onCanceled(task);
                 return true;
-            }else{
+            } else {
                 logger.error("try change task status[1->5] failed,now is [{}]", status.get());
                 TaskUtil.onException(task);
                 return false;
             }
-        }else {
+        } else {
             if (supportShutdownRunning) {
                 int curStatus = status.get();
                 if (curStatus == 3 || curStatus == 4 || curStatus == 8) {
@@ -117,7 +111,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
                         }
                     }
                 }
-            }else{
+            } else {
                 return false;
             }
         }
@@ -128,12 +122,12 @@ public class TaskRunnable<T extends Task> implements Runnable{
     public void run() {
         try {
             //尝试设置状态等待中->执行中(1->2)
-            if(!status.compareAndSet(1,2)){
+            if (!status.compareAndSet(1, 2)) {
                 //尝试设置停止中->已停止(6->7)
-                if(status.compareAndSet(6,7)){
+                if (status.compareAndSet(6, 7)) {
                     TaskUtil.onStopped(task);
                     return;
-                }else{
+                } else {
                     logger.error("try change task status[1->2],[6->7] failed,now is [{}]", status.get());
                     status.set(8);
                     TaskUtil.onException(task);
@@ -144,20 +138,20 @@ public class TaskRunnable<T extends Task> implements Runnable{
             //执行任务
             function.apply(context);
             //尝试设置状态执行中->执行成功(2->3)
-            if(status.compareAndSet(2,3)){
+            if (status.compareAndSet(2, 3)) {
                 TaskUtil.onSucceed(task);
-            }else{
+            } else {
                 //尝试设置状态停止中->已停止(6->7)
                 //即时此时任务可能已经正常完成,但是还是标记为已停止
-                if(status.compareAndSet(6,7)){
+                if (status.compareAndSet(6, 7)) {
                     TaskUtil.onStopped(task);
-                }else{
-                    logger.error("try change task status[2->3],[6->7] failed,now is [{}]",status.get());
+                } else {
+                    logger.error("try change task status[2->3],[6->7] failed,now is [{}]", status.get());
                     status.set(8);
                     TaskUtil.onException(task);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("execute task[" + task.getId() + "] failed", e);
             //尝试设置状态执行中->执行失败(2->4)
             if (status.compareAndSet(2, 4)) {
@@ -167,7 +161,7 @@ public class TaskRunnable<T extends Task> implements Runnable{
                 if (status.compareAndSet(6, 7)) {
                     TaskUtil.onStopped(task);
                 } else {
-                    logger.error("try change task status[2->4],[6-7] failed,now is [{}]",status.get());
+                    logger.error("try change task status[2->4],[6-7] failed,now is [{}]", status.get());
                     status.set(8);
                     TaskUtil.onException(task);
                 }
@@ -177,8 +171,6 @@ public class TaskRunnable<T extends Task> implements Runnable{
             CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.remove(task.getId().toString());
         }
     }
-
-
 
 
 }

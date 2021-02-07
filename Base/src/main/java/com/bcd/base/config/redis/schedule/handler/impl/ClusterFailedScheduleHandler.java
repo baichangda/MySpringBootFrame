@@ -2,10 +2,7 @@ package com.bcd.base.config.redis.schedule.handler.impl;
 
 import com.bcd.base.config.redis.schedule.anno.ClusterFailedSchedule;
 import com.bcd.base.config.redis.schedule.handler.RedisScheduleHandler;
-import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStringCommands;
-import org.springframework.data.redis.core.types.Expiration;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -28,31 +25,28 @@ import java.util.concurrent.TimeUnit;
 public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
 
     /**
+     * 根据随机数生成的各种val
+     */
+    protected String executingVal = "0";
+    protected String successVal = "1";
+    /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
      * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
      * 单位(毫秒)
      */
     private long timeoutInMillis;
-
     /**
      * 任务执行后锁存活时间
      * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
      * 单位(毫秒)
      */
     private long aliveTimeInMillis;
-
     /**
      * 锁失败循环间隔时间
      * 获取锁失败时候,循环检测执行结果并重新处理的循环时间间隔
      * 单位(毫秒)
      */
     private long cycleIntervalInMillis;
-
-    /**
-     * 根据随机数生成的各种val
-     */
-    protected String executingVal = "0";
-    protected String successVal = "1";
 
 
     public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory,

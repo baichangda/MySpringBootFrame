@@ -12,18 +12,33 @@ import java.util.List;
 /**
  * Sql 查询字段替换为count(*) 访问器
  */
-public class CountSqlReplaceVisitor extends SelectVisitorAdapter{
+public class CountSqlReplaceVisitor extends SelectVisitorAdapter {
 
-    private final static List<SelectItem> countSelectItems= Collections.singletonList(getCountExpressionItem());
+    private final static List<SelectItem> countSelectItems = Collections.singletonList(getCountExpressionItem());
 
     private Statement statement;
 
     public CountSqlReplaceVisitor(Statement statement) {
-        this.statement=statement;
+        this.statement = statement;
     }
 
-    public Statement parse(){
-        SelectBody selectBody=((Select)statement).getSelectBody();
+    public static void main(String[] args) throws JSQLParserException {
+        Statement statement = CCJSqlParserUtil.parse("select count(*),a.id,b.name from A a inner join B b on a.id=b.id");
+        new CountSqlReplaceVisitor(statement).parse();
+        System.out.println(statement.toString());
+    }
+
+    private static SelectExpressionItem getCountExpressionItem() {
+        Function function = new Function();
+        function.setName("count");
+        function.setAllColumns(true);
+        SelectExpressionItem item = new SelectExpressionItem();
+        item.setExpression(function);
+        return item;
+    }
+
+    public Statement parse() {
+        SelectBody selectBody = ((Select) statement).getSelectBody();
         selectBody.accept(this);
         return statement;
     }
@@ -32,20 +47,5 @@ public class CountSqlReplaceVisitor extends SelectVisitorAdapter{
     public void visit(PlainSelect plainSelect) {
         plainSelect.setSelectItems(countSelectItems);
         super.visit(plainSelect);
-    }
-
-    public static void main(String[] args) throws JSQLParserException {
-        Statement statement =CCJSqlParserUtil.parse("select count(*),a.id,b.name from A a inner join B b on a.id=b.id");
-        new CountSqlReplaceVisitor(statement).parse();
-        System.out.println(statement.toString());
-    }
-
-    private static SelectExpressionItem getCountExpressionItem(){
-        Function function= new Function();
-        function.setName("count");
-        function.setAllColumns(true);
-        SelectExpressionItem item=new SelectExpressionItem();
-        item.setExpression(function);
-        return item;
     }
 }

@@ -12,8 +12,8 @@ public class NotifyChannel {
 
     public NotifyChannel(String sn, NotifyEvent event, BaseWebSocket webSocket, WebSocketSession session) {
         this.sn = sn;
-        this.event=event;
-        this.webSocket=webSocket;
+        this.event = event;
+        this.webSocket = webSocket;
         this.session = session;
     }
 
@@ -51,9 +51,10 @@ public class NotifyChannel {
 
     /**
      * 向通道的客户端发送数据
+     *
      * @param data
      */
-    public void sendMessage(String data){
-        this.webSocket.sendMessage(this.session,data);
+    public void sendMessage(String data) {
+        this.webSocket.sendMessage(this.session, data);
     }
 }

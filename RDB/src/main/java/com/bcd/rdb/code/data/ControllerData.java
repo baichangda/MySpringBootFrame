@@ -38,7 +38,7 @@ public class ControllerData {
     /**
      * 是否需要保存方法验证
      */
-    private boolean validateSaveParam=true;
+    private boolean validateSaveParam = true;
 
     /**
      * 主键类型

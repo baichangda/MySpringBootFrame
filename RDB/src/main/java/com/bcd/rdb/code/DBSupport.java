@@ -13,6 +13,7 @@ public interface DBSupport {
 
     /**
      * 获取指定表的列名
+     *
      * @param config
      * @param connection
      * @return
@@ -22,7 +23,7 @@ public interface DBSupport {
 
     /**
      * 获取指定表的列名
-     *
+     * <p>
      * 支持如下几种主键类型
      * Byte、Short、Integer、Long、String
      *
@@ -30,8 +31,7 @@ public interface DBSupport {
      * @param connection
      * @return
      */
-    CodeConst.PkType getTablePkType(TableConfig config,Connection connection);
-
+    CodeConst.PkType getTablePkType(TableConfig config, Connection connection);
 
 
 }

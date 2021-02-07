@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
  * 1、懒汉模式: 在调用get时候检查,如果过期则移除
  * 2、定期检查模式: 启动计划任务执行器周期性的检查所有此类的实例,检查并移除里面过期的key
  * 在过期被移除后,会调用设置的过期回调方法
- *
+ * <p>
  * 适用于绑定过期回调
  * 如果作为缓存可能会导致内存溢出
  *
@@ -45,8 +45,46 @@ public class ExpireCallBackMap<V> {
      */
     private ExecutorService expireWorkPool;
 
+    /**
+     * 不开启扫描和回调
+     */
+    public ExpireCallBackMap() {
+        this(null, null);
+    }
+
+    /**
+     * @param delay 扫描计划执行间隔,为null表示不开启扫描
+     */
+    public ExpireCallBackMap(Long delay, TimeUnit unit) {
+        this(delay, unit, null);
+    }
+
+    /**
+     * @param delay          扫描计划执行间隔,为null则表示不进行扫描
+     * @param unit           扫描计划执行间隔,为null则表示不进行扫描
+     * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
+     */
+    public ExpireCallBackMap(Long delay, TimeUnit unit, ExecutorService expireWorkPool) {
+        this.delay = delay;
+        this.unit = unit;
+        this.expireWorkPool = expireWorkPool;
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1L, TimeUnit.SECONDS, Executors.newSingleThreadExecutor());
+        map.init();
+        map.put("1", "2", 1, TimeUnit.SECONDS, (k, v) -> {
+            System.out.println(map.get("1"));
+            System.out.println(map.get("2"));
+        });
+        map.put("2", "3", 10, TimeUnit.SECONDS, (k, v) -> {
+            System.out.println(map.get("1"));
+            System.out.println(map.get("2"));
+        });
+    }
+
     private void initExpiredSchedule() {
-        expireScanPool=Executors.newSingleThreadScheduledExecutor();
+        expireScanPool = Executors.newSingleThreadScheduledExecutor();
         expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delay, delay, unit);
     }
 
@@ -54,10 +92,10 @@ public class ExpireCallBackMap<V> {
      * 扫描并且清除过期值
      * 会触发回调
      */
-    public void scanAndClearExpired(){
-        Iterator<Map.Entry<String, Value<V>>> it=dataMap.entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry<String, Value<V>> cur=it.next();
+    public void scanAndClearExpired() {
+        Iterator<Map.Entry<String, Value<V>>> it = dataMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Value<V>> cur = it.next();
             synchronized (cur.getKey().intern()) {
                 Value<V> expireValue = cur.getValue();
                 if (expireValue.isExpired()) {
@@ -68,47 +106,20 @@ public class ExpireCallBackMap<V> {
         }
     }
 
-    /**
-     * 不开启扫描和回调
-     */
-    public ExpireCallBackMap(){
-        this(null,null);
-    }
-
-    /**
-     * @param delay 扫描计划执行间隔,为null表示不开启扫描
-     */
-    public ExpireCallBackMap(Long delay,TimeUnit unit) {
-        this(delay,unit,null);
-    }
-
-    /**
-     * @param delay          扫描计划执行间隔,为null则表示不进行扫描
-     * @param unit          扫描计划执行间隔,为null则表示不进行扫描
-     * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
-     */
-    public ExpireCallBackMap(Long delay,TimeUnit unit, ExecutorService expireWorkPool) {
-        this.delay = delay;
-        this.unit = unit;
-        this.expireWorkPool = expireWorkPool;
-    }
-
-    public void init(){
-        if(delay !=null&&unit!=null){
+    public void init() {
+        if (delay != null && unit != null) {
             initExpiredSchedule();
         }
     }
 
-    public void destroy(){
-        if(expireScanPool!=null){
+    public void destroy() {
+        if (expireScanPool != null) {
             expireScanPool.shutdown();
         }
     }
 
-
-
-    private void callback(String k, V v,BiConsumer callBack) {
-        if(expireWorkPool!=null) {
+    private void callback(String k, V v, BiConsumer callBack) {
+        if (expireWorkPool != null) {
             if (callBack != null) {
                 expireWorkPool.execute(() -> {
                     try {
@@ -121,15 +132,15 @@ public class ExpireCallBackMap<V> {
         }
     }
 
-
     /**
      * 获取值
+     *
      * @param expireValue
      * @param k
      * @param triggerCallback
      * @return
      */
-    private V getVal(Value<V> expireValue, String k,boolean triggerCallback){
+    private V getVal(Value<V> expireValue, String k, boolean triggerCallback) {
         if (expireValue == null) {
             return null;
         } else {
@@ -137,7 +148,7 @@ public class ExpireCallBackMap<V> {
                 //移除元素、标记
                 dataMap.remove(k);
                 //触发回调
-                if(triggerCallback){
+                if (triggerCallback) {
                     V v = expireValue.getVal();
                     BiConsumer callBack = expireValue.getCallback();
                     callback(k, v, callBack);
@@ -149,39 +160,41 @@ public class ExpireCallBackMap<V> {
         }
     }
 
-
     /**
      * 过期检查且触发回调
+     *
      * @param k
      * @return
      */
     public V get(String k) {
-        synchronized (k.intern()){
-            Value<V> expireValue= dataMap.get(k);
-            return getVal(expireValue,k,true);
+        synchronized (k.intern()) {
+            Value<V> expireValue = dataMap.get(k);
+            return getVal(expireValue, k, true);
         }
     }
 
     /**
      * put元素、不会过期检查触发回调
+     *
      * @param k
      * @param v
      * @param expiredTime
      * @return
      */
-    public V put(String k, V v, long expiredTime,TimeUnit unit) {
-        return put(k, v, expiredTime,unit, null);
+    public V put(String k, V v, long expiredTime, TimeUnit unit) {
+        return put(k, v, expiredTime, unit, null);
     }
 
     /**
      * put元素、不会过期检查触发回调
+     *
      * @param k
      * @param v
      * @param expiredTime
      * @param callback
      * @return
      */
-    public V put(String k, V v, long expiredTime,TimeUnit unit, BiConsumer<String, V> callback) {
+    public V put(String k, V v, long expiredTime, TimeUnit unit, BiConsumer<String, V> callback) {
         Value<V> expireValue = new Value<>(System.currentTimeMillis() + unit.toMillis(expiredTime), v, callback);
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.put(k, expireValue);
@@ -191,6 +204,7 @@ public class ExpireCallBackMap<V> {
 
     /**
      * remove元素、不会过期检查触发回调
+     *
      * @param k
      * @return
      */
@@ -203,15 +217,16 @@ public class ExpireCallBackMap<V> {
 
     /**
      * removeAll、不会过期检查触发回调
+     *
      * @return
      */
-    public void removeAll(){
+    public void removeAll() {
         for (String k : dataMap.keySet()) {
             remove(k);
         }
     }
 
-    private final static class Value<T>{
+    private final static class Value<T> {
         private Long expiredTimeInMillis;
         private T val;
         private BiConsumer callback;
@@ -237,19 +252,6 @@ public class ExpireCallBackMap<V> {
         public boolean isExpired() {
             return expiredTimeInMillis < System.currentTimeMillis();
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1L,TimeUnit.SECONDS,Executors.newSingleThreadExecutor());
-        map.init();
-        map.put("1","2",1,TimeUnit.SECONDS,(k,v)->{
-            System.out.println(map.get("1"));
-            System.out.println(map.get("2"));
-        });
-        map.put("2","3",10,TimeUnit.SECONDS,(k,v)->{
-            System.out.println(map.get("1"));
-            System.out.println(map.get("2"));
-        });
     }
 
 }

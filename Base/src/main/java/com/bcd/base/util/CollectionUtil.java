@@ -1,10 +1,9 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
-
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 /**
  * Created by Administrator on 2017/8/3.
@@ -19,7 +18,7 @@ public class CollectionUtil {
      * @param predicate
      * @param maps
      * @param <K>
-     * @param <V>s
+     * @param <V>
      * @return
      */
     public static <K, V> void removeIfMaps(BiPredicate<K, V> predicate, Map<K, V>... maps) {
@@ -53,13 +52,14 @@ public class CollectionUtil {
      * @param <U>         第二个集合元素类型
      * @return
      */
-    public static <T, U> CompareListResult<T,U> compareList(List<T> list1, List<U> list2, BiFunction<T, U, Boolean> compareFunc) {
+    public static <T, U> CompareListResult<T, U> compareList(List<T> list1, List<U> list2, BiFunction<T, U, Boolean> compareFunc) {
         Objects.requireNonNull(list1);
         Objects.requireNonNull(list2);
         Objects.requireNonNull(compareFunc);
-        CompareListResult<T,U> result=new CompareListResult<>();
-        int [] equalIndexArr2=new int[list2.size()];
-        A:for (T e1 : list1) {
+        CompareListResult<T, U> result = new CompareListResult<>();
+        int[] equalIndexArr2 = new int[list2.size()];
+        A:
+        for (T e1 : list1) {
             for (int j = 0; j < list2.size(); j++) {
                 U e2 = list2.get(j);
                 if (compareFunc.apply(e1, e2)) {
@@ -71,25 +71,36 @@ public class CollectionUtil {
             result.add1(e1);
         }
         for (int i = 0; i < equalIndexArr2.length; i++) {
-            if(equalIndexArr2[i]==0){
+            if (equalIndexArr2[i] == 0) {
                 result.add3(list2.get(i));
             }
         }
         return result;
     }
 
-    public static class CompareListResult<T,U>{
-        private final List<T> list1=new ArrayList<>();
-        private final List<EqualData<T,U>> list2=new ArrayList<>();
-        private final List<U> list3=new ArrayList<>();
+    public static void main(String[] args) {
+        CollectionUtil.CompareListResult<Integer, Integer> result = CollectionUtil.compareList(Arrays.asList(1, 2, 3), Arrays.asList(3, 5, 7), Integer::equals);
+        result.getList1().forEach(e -> System.out.print(e + " "));
+        System.out.println();
+        result.getList2().forEach(e -> System.out.print(e.getE1() + ":" + e.getE2() + " "));
+        System.out.println();
+        result.getList3().forEach(e -> System.out.print(e + " "));
+    }
 
-        private void add1(T t){
+    public static class CompareListResult<T, U> {
+        private final List<T> list1 = new ArrayList<>();
+        private final List<EqualData<T, U>> list2 = new ArrayList<>();
+        private final List<U> list3 = new ArrayList<>();
+
+        private void add1(T t) {
             list1.add(t);
         }
-        private void add2(T t,U u){
-            list2.add(new EqualData<>(t,u));
+
+        private void add2(T t, U u) {
+            list2.add(new EqualData<>(t, u));
         }
-        private void add3(U u){
+
+        private void add3(U u) {
             list3.add(u);
         }
 
@@ -106,7 +117,7 @@ public class CollectionUtil {
         }
     }
 
-    public static class EqualData<T,U>{
+    public static class EqualData<T, U> {
         private final T e1;
         private final U e2;
 
@@ -122,15 +133,6 @@ public class CollectionUtil {
         public U getE2() {
             return e2;
         }
-    }
-
-    public static void main(String[] args) {
-        CollectionUtil.CompareListResult<Integer, Integer> result = CollectionUtil.compareList(Arrays.asList(1, 2, 3), Arrays.asList(3, 5, 7), Integer::equals);
-        result.getList1().forEach(e-> System.out.print(e+" "));
-        System.out.println();
-        result.getList2().forEach(e-> System.out.print(e.getE1()+":"+e.getE2()+" "));
-        System.out.println();
-        result.getList3().forEach(e-> System.out.print(e+" "));
     }
 
 }

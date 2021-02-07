@@ -1,9 +1,9 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.AuthorizationHandler;
 import com.bcd.config.shiro.anno.ActionAnnotationMethodInterceptor;
 import com.bcd.config.shiro.anno.NotePermissionAnnotationMethodInterceptor;
 import com.bcd.config.shiro.anno.RequestMappingUrlAnnotationMethodInterceptor;
-import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.spring.aop.SpringAnnotationResolver;
@@ -14,9 +14,10 @@ import org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthor
  */
 public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAllianceAnnotationsAuthorizingMethodInterceptor {
     private AuthorizationHandler authorizationHandler;
-    public MyAopAllianceAnnotationsAuthorizingMethodInterceptor(AuthorizationHandler authorizationHandler){
+
+    public MyAopAllianceAnnotationsAuthorizingMethodInterceptor(AuthorizationHandler authorizationHandler) {
         super();
-        this.authorizationHandler=authorizationHandler;
+        this.authorizationHandler = authorizationHandler;
         //自定义注解拦截器配置
         this.methodInterceptors.add(new ActionAnnotationMethodInterceptor(new SpringAnnotationResolver()));
         this.methodInterceptors.add(new RequestMappingUrlAnnotationMethodInterceptor(new SpringAnnotationResolver()));
@@ -25,12 +26,13 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
 
     /**
      * 跳过admin的权限验证
+     *
      * @param methodInvocation
      * @throws AuthorizationException
      */
     @Override
-    protected void assertAuthorized(MethodInvocation methodInvocation){
-        if(authorizationHandler.skip(methodInvocation)){
+    protected void assertAuthorized(MethodInvocation methodInvocation) {
+        if (authorizationHandler.skip(methodInvocation)) {
             return;
         }
         super.assertAuthorized(methodInvocation);

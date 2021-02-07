@@ -16,7 +16,8 @@ public enum NotePermission {
     permission_edit("permission:edit", "权限维护"),
 
     sysTask_search("sysTask:search", "系统任务查询"),
-    sysTask_stop("sysTask:stop", "系统任务停止"),;
+    sysTask_stop("sysTask:stop", "系统任务停止"),
+    ;
 
     private String code;
     private String note;

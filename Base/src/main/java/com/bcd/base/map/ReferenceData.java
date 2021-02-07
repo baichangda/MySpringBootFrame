@@ -1,6 +1,6 @@
 package com.bcd.base.map;
 
-public class ReferenceData<K,V> {
+public class ReferenceData<K, V> {
     private final K k;
     private final V v;
 

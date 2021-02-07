@@ -32,6 +32,14 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class PhoneCodeRealm extends MyAuthorizingRealm {
+    @Autowired
+    UserService userService;
+    @Autowired
+    PermissionService permissionService;
+    @Autowired
+    @Qualifier("string_string_redisTemplate")
+    private RedisTemplate<String, String> redisTemplate;
+
     public PhoneCodeRealm(RedisConnectionFactory redisConnectionFactory) {
         setAuthenticationTokenClass(PhoneCodeToken.class);
         //关闭登陆缓存
@@ -49,26 +57,14 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
         setCacheManager(new CacheManager() {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
-                if(s.equals(getAuthorizationCacheName())){
-                    return new RedisCache<>(redisTemplate,s,5, TimeUnit.SECONDS);
-                }else{
+                if (s.equals(getAuthorizationCacheName())) {
+                    return new RedisCache<>(redisTemplate, s, 5, TimeUnit.SECONDS);
+                } else {
                     return null;
                 }
             }
         });
     }
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    PermissionService permissionService;
-
-    @Autowired
-    @Qualifier("string_string_redisTemplate")
-    private RedisTemplate<String,String> redisTemplate;
-
-
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
@@ -83,8 +79,8 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
                 throw ShiroMessageDefine.ERROR_SHIRO_DISABLED_ACCOUNT.toRuntimeException();
             }
             // 若存在，将此用户存放到登录认证info中
-            String code=redisTemplate.opsForValue().get("phoneCode:"+token.getPhone());
-            if(code==null){
+            String code = redisTemplate.opsForValue().get("phoneCode:" + token.getPhone());
+            if (code == null) {
                 throw BaseRuntimeException.getException("验证码已过期,请重新获取");
             }
             SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getPhone(), code, getName());
@@ -97,7 +93,7 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        if(principals.getRealmNames().contains(getName())) {
+        if (principals.getRealmNames().contains(getName())) {
             Object phone = super.getAvailablePrincipal(principals);
             if (phone != null) {
                 UserBean user = userService.findOne(new StringCondition("phone", phone));

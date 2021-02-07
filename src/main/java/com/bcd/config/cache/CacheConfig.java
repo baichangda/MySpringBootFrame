@@ -16,16 +16,17 @@ public class CacheConfig {
     /**
      * 定义一级缓存(在非redis情况)
      * 一级:本地缓存{@link com.bcd.base.map.MyCache};  key: myCache_1::${key}
+     *
      * @return
      */
     @ConditionalOnMissingClass("org.springframework.data.redis.connection.RedisConnectionFactory")
     @Bean("myCache")
-    public Cache myCache(){
-        return new LocalCache("myCache_1",5L, TimeUnit.SECONDS);
+    public Cache myCache() {
+        return new LocalCache("myCache_1", 5L, TimeUnit.SECONDS);
     }
 
     @Bean("mySimpleKeyGenerator")
-    public MySimpleKeyGenerator mySimpleKeyGenerator(){
+    public MySimpleKeyGenerator mySimpleKeyGenerator() {
         return new MySimpleKeyGenerator();
     }
 }

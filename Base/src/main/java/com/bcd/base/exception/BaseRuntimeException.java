@@ -15,10 +15,6 @@ import org.slf4j.helpers.MessageFormatter;
 public class BaseRuntimeException extends RuntimeException {
     protected String code;
 
-    public String getCode() {
-        return code;
-    }
-
     private BaseRuntimeException(String message) {
         super(message);
     }
@@ -35,12 +31,13 @@ public class BaseRuntimeException extends RuntimeException {
      * 将异常信息转换为格式化
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
+     *
      * @param message
      * @param params
      * @return
      */
-    public static BaseRuntimeException getException(String message, Object ... params){
-        return new BaseRuntimeException(MessageFormatter.arrayFormat(message,params,null).getMessage());
+    public static BaseRuntimeException getException(String message, Object... params) {
+        return new BaseRuntimeException(MessageFormatter.arrayFormat(message, params, null).getMessage());
     }
 
     public static BaseRuntimeException getException(Throwable e) {
@@ -51,6 +48,14 @@ public class BaseRuntimeException extends RuntimeException {
         return new BaseRuntimeException(e).withCode(code);
     }
 
+    public static void main(String[] args) {
+        throw BaseRuntimeException.getException("[{}]-[{}]", null, 100000);
+    }
+
+    public String getCode() {
+        return code;
+    }
+
     public JsonMessage toJsonMessage() {
         return ExceptionUtil.toJsonMessage(this);
     }
@@ -58,9 +63,5 @@ public class BaseRuntimeException extends RuntimeException {
     public BaseRuntimeException withCode(String code) {
         this.code = code;
         return this;
-    }
-
-    public static void main(String[] args) {
-        throw BaseRuntimeException.getException("[{}]-[{}]",null,100000);
     }
 }

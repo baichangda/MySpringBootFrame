@@ -11,30 +11,35 @@ import java.util.concurrent.TimeUnit;
 public @interface ClusterFailedSchedule {
     /**
      * 锁id
+     *
      * @return
      */
     String lockId();
 
     /**
      * 超时时间
+     *
      * @return
      */
     long timeout();
 
     /**
      * 时间单位
+     *
      * @return
      */
     TimeUnit timeoutUnit() default TimeUnit.SECONDS;
 
     /**
      * 任务执行完毕key存活时间
+     *
      * @return
      */
     long aliveTime() default 0L;
 
     /**
      * 时间单位
+     *
      * @return
      */
     TimeUnit aliveTimeUnit() default TimeUnit.SECONDS;
@@ -42,12 +47,14 @@ public @interface ClusterFailedSchedule {
     /**
      * 获取key失败循环周期
      * 单位(毫秒)
+     *
      * @return
      */
     long cycleInterval() default 0L;
 
     /**
      * 时间单位
+     *
      * @return
      */
     TimeUnit cycleIntervalUnit() default TimeUnit.SECONDS;

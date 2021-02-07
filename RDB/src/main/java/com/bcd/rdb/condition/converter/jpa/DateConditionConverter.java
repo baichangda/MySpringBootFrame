@@ -12,17 +12,17 @@ import java.util.Date;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class DateConditionConverter  implements Converter<DateCondition,Predicate> {
+public class DateConditionConverter implements Converter<DateCondition, Predicate> {
     @Override
     public Predicate convert(DateCondition condition, Object... exts) {
-        Predicate predicate=null;
-        DateCondition.Handler handler= condition.handler;
-        Object val=condition.val;
-        String fieldName=condition.fieldName;
-        Root root=(Root)exts[0];
-        CriteriaQuery query=(CriteriaQuery)exts[1];
-        CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        if(val!=null) {
+        Predicate predicate = null;
+        DateCondition.Handler handler = condition.handler;
+        Object val = condition.val;
+        String fieldName = condition.fieldName;
+        Root root = (Root) exts[0];
+        CriteriaQuery query = (CriteriaQuery) exts[1];
+        CriteriaBuilder cb = (CriteriaBuilder) exts[2];
+        if (val != null) {
             Path path = ConditionUtil.parseRootPath(root, fieldName);
             switch (handler) {
                 case EQUAL: {
@@ -45,8 +45,8 @@ public class DateConditionConverter  implements Converter<DateCondition,Predicat
                     predicate = cb.greaterThan(path, (Date) val);
                     break;
                 }
-                default :{
-                    throw BaseRuntimeException.getException("[DateConditionConverter.convert],Do Not Support ["+handler+"]!");
+                default: {
+                    throw BaseRuntimeException.getException("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

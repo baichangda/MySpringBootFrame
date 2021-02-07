@@ -20,34 +20,35 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<NotifyCommand> {
-    public final static Set<BaseNotifyWebSocketClient> ALL=new HashSet<>();
+    public final static Set<BaseNotifyWebSocketClient> ALL = new HashSet<>();
 
-    public final Map<String,NotifyInfo> sn_to_notify_info_map = new ConcurrentHashMap<>();
+    public final Map<String, NotifyInfo> sn_to_notify_info_map = new ConcurrentHashMap<>();
 
     public final ExecutorService reconnect_register_pool = Executors.newSingleThreadExecutor();
 
     protected boolean autoRegisterOnConnected;
 
     public BaseNotifyWebSocketClient(String url) {
-        this(url,true);
+        this(url, true);
     }
 
     public BaseNotifyWebSocketClient(String url, boolean autoRegisterOnConnected) {
         super(url);
-        this.autoRegisterOnConnected=autoRegisterOnConnected;
+        this.autoRegisterOnConnected = autoRegisterOnConnected;
     }
 
     /**
      * 注册监听
+     *
      * @param event
      * @param paramJson
      */
-    public String register(NotifyEvent event, String paramJson, Consumer<String> consumer){
+    public String register(NotifyEvent event, String paramJson, Consumer<String> consumer) {
         String sn = RandomStringUtils.randomAlphanumeric(32);
         WebSocketData<JsonMessage<String>> webSocketData = register(sn, event, paramJson);
         if (webSocketData == null) {
             throw BaseRuntimeException.getException("Register Listener Timeout");
-        } else{
+        } else {
             JsonMessage<String> jsonMessage = webSocketData.getData();
             if (jsonMessage.isResult()) {
                 sn_to_notify_info_map.put(sn, new NotifyInfo(sn, event, paramJson, consumer, url));
@@ -60,37 +61,39 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
 
     /**
      * 发送注册webSocket请求
+     *
      * @param sn
      * @param event
      * @param paramJson
      * @return
      */
-    public WebSocketData<JsonMessage<String>> register(String sn, NotifyEvent event, String paramJson){
-        NotifyCommand command= new NotifyCommand(sn, NotifyCommandType.REGISTER, event, paramJson);
-        logger.debug("Register Listener:\n"+ JsonUtil.toJson(command));
+    public WebSocketData<JsonMessage<String>> register(String sn, NotifyEvent event, String paramJson) {
+        NotifyCommand command = new NotifyCommand(sn, NotifyCommandType.REGISTER, event, paramJson);
+        logger.debug("Register Listener:\n" + JsonUtil.toJson(command));
         return blockingRequest(command, 30, TimeUnit.SECONDS, JsonMessage.class, String.class);
     }
 
     /**
      * 取消监听
+     *
      * @param sn
      */
-    public NotifyInfo cancel(String sn){
-        NotifyInfo notifyInfo= sn_to_notify_info_map.remove(sn);
-        if (notifyInfo==null) {
+    public NotifyInfo cancel(String sn) {
+        NotifyInfo notifyInfo = sn_to_notify_info_map.remove(sn);
+        if (notifyInfo == null) {
             return null;
         }
-        logger.debug("Cancel Listener:\n"+JsonUtil.toJson(notifyInfo));
-        WebSocketData<JsonMessage<String>> webSocketData = blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL, notifyInfo.getEvent(), notifyInfo.getParamJson()), 30 ,TimeUnit.SECONDS, JsonMessage.class, String.class);
+        logger.debug("Cancel Listener:\n" + JsonUtil.toJson(notifyInfo));
+        WebSocketData<JsonMessage<String>> webSocketData = blockingRequest(new NotifyCommand(sn, NotifyCommandType.CANCEL, notifyInfo.getEvent(), notifyInfo.getParamJson()), 30, TimeUnit.SECONDS, JsonMessage.class, String.class);
         if (webSocketData == null) {
-            logger.error("Cancel Listener Request SN["+sn+"] Timeout");
+            logger.error("Cancel Listener Request SN[" + sn + "] Timeout");
         } else {
             JsonMessage<String> jsonMessage = webSocketData.getData();
             if (jsonMessage.isResult()) {
                 sn_to_notify_info_map.remove(sn);
                 return sn_to_notify_info_map.remove(sn);
             } else {
-                logger.error("Cancel Listener Request SN["+sn+"] Error",jsonMessage.getMessage());
+                logger.error("Cancel Listener Request SN[" + sn + "] Error", jsonMessage.getMessage());
             }
         }
         return notifyInfo;
@@ -102,20 +105,20 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
             //1、转换结果集
             JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(data);
             //2、判断是命令或者通知数据
-            if(jsonNode.hasNonNull("flag")){
+            if (jsonNode.hasNonNull("flag")) {
                 //2.1、如果是通知数据
-                NotifyData notifyData= JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data,NotifyData.class);
-                logger.debug("Receive Notify SN["+notifyData.getSn()+"] ");
+                NotifyData notifyData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, NotifyData.class);
+                logger.debug("Receive Notify SN[" + notifyData.getSn() + "] ");
                 NotifyInfo notifyInfo = sn_to_notify_info_map.get(notifyData.getSn());
-                if(notifyInfo==null){
-                    logger.warn("No NotifyInfo With SN["+notifyData.getSn()+"]");
-                }else{
+                if (notifyInfo == null) {
+                    logger.warn("No NotifyInfo With SN[" + notifyData.getSn() + "]");
+                } else {
                     notifyInfo.getConsumer().accept(notifyData.getDataJson());
                 }
-            }else{
+            } else {
                 super.onMessage(data);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             ExceptionUtil.printException(e);
         }
     }
@@ -146,19 +149,19 @@ public abstract class BaseNotifyWebSocketClient extends BaseJsonWebSocketClient<
         return !sn_to_notify_info_map.isEmpty();
     }
 
-    protected void autoRegister(){
+    protected void autoRegister() {
         if (autoRegisterOnConnected) {
             reconnect_register_pool.execute(() -> {
-                Set<String> failedSnSet=new HashSet<>();
-                sn_to_notify_info_map.forEach((k,v)->{
-                    WebSocketData<JsonMessage<String>> res=register(k,v.getEvent(), v.getParamJson());
-                    if(res==null||!res.getData().isResult()){
+                Set<String> failedSnSet = new HashSet<>();
+                sn_to_notify_info_map.forEach((k, v) -> {
+                    WebSocketData<JsonMessage<String>> res = register(k, v.getEvent(), v.getParamJson());
+                    if (res == null || !res.getData().isResult()) {
                         failedSnSet.add(k);
                     }
                 });
                 //1.1、重新注册失败的则移除注册
-                failedSnSet.forEach(e->{
-                    logger.error("Register["+e+"] After ReConnected Failed,Remove It");
+                failedSnSet.forEach(e -> {
+                    logger.error("Register[" + e + "] After ReConnected Failed,Remove It");
                     sn_to_notify_info_map.remove(e);
                 });
             });

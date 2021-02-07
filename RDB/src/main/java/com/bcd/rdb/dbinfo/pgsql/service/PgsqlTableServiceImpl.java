@@ -29,35 +29,40 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-@ConditionalOnProperty(value = "spring.datasource.driver-class-name",havingValue ="org.postgresql.Driver")
+@ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "org.postgresql.Driver")
 @Service
 public class PgsqlTableServiceImpl implements TablesService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
-    public void exportSpringDBDesignerExcel(String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
-        try(Connection connection= DBInfoUtil.getSpringConn()){
-            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
+    public static void main(String[] args) {
+        PgsqlTableServiceImpl tableService = new PgsqlTableServiceImpl();
+        tableService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921", "dbuser", "hlxpassword", "test_bcd", "d:\\msbf.xlsx");
+    }
+
+    public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
+        try (Connection connection = DBInfoUtil.getSpringConn()) {
+            exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
     @Override
-    public void exportDBDesignerExcel(String url, String username, String password, String dbName, OutputStream os,Runnable doBeforeWrite) throws IOException {
-        try(Connection connection= DBInfoUtil.getConn(url,username,password,dbName)){
-            exportDBDesignerExcel(connection,dbName,os,doBeforeWrite);
+    public void exportDBDesignerExcel(String url, String username, String password, String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
+        try (Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
+            exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection,String dbName,OutputStream os,Runnable doBeforeWrite){
+    public void exportDBDesignerExcel(Connection connection, String dbName, OutputStream os, Runnable doBeforeWrite) {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
             emptyList.add("");
         }
-        List<TablesBean> tablesList = DBInfoUtil.findTables(connection,dbName);
+        List<TablesBean> tablesList = DBInfoUtil.findTables(connection, dbName);
         for (TablesBean table : tablesList) {
             String tableName = table.getTable_name();
             //如果是flyway的版本信息表,则跳过
@@ -74,7 +79,7 @@ public class PgsqlTableServiceImpl implements TablesService {
             head.addAll(Arrays.asList(headArr));
 
             List<ColumnsBean> columnsList = DBInfoUtil.findColumns(
-                    connection,dbName, tableName
+                    connection, dbName, tableName
             );
 
             dataList.add(define);
@@ -91,7 +96,7 @@ public class PgsqlTableServiceImpl implements TablesService {
             dataList.add(emptyList);
         }
 
-        if(doBeforeWrite!=null){
+        if (doBeforeWrite != null) {
             doBeforeWrite.run();
         }
 
@@ -103,19 +108,20 @@ public class PgsqlTableServiceImpl implements TablesService {
 
     /**
      * 导出数据库设计到本地
+     *
      * @param url
      * @param username
      * @param password
      * @param dbName
-     * @param file 如果不存在,则创建
+     * @param file     如果不存在,则创建
      */
-    public void exportDBDesignerExcelToDisk(String url,String username,String password,String dbName,String file){
-        Path p= Paths.get(file);
+    public void exportDBDesignerExcelToDisk(String url, String username, String password, String dbName, String file) {
+        Path p = Paths.get(file);
         FileUtil.createFileIfNotExists(p);
-        try(OutputStream os=Files.newOutputStream(p);
-            Connection connection=DBInfoUtil.getConn(url, username, password,dbName)){
-            exportDBDesignerExcel(connection,dbName,os,null);
-        }catch (IOException|SQLException e){
+        try (OutputStream os = Files.newOutputStream(p);
+             Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
+            exportDBDesignerExcel(connection, dbName, os, null);
+        } catch (IOException | SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
@@ -141,11 +147,11 @@ public class PgsqlTableServiceImpl implements TablesService {
 
         @Override
         public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<CellData> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
-            int y=cell.getColumnIndex();
-            if(y==0){
+            int y = cell.getColumnIndex();
+            if (y == 0) {
                 //设置标头列样式
-                if(cellStyle1==null){
-                    cellStyle1=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                if (cellStyle1 == null) {
+                    cellStyle1 = cell.getRow().getSheet().getWorkbook().createCellStyle();
                     cellStyle1.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
                     cellStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
                     cellStyle1.setBorderLeft(BorderStyle.THIN);
@@ -156,10 +162,10 @@ public class PgsqlTableServiceImpl implements TablesService {
                     cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
                 }
                 cell.setCellStyle(cellStyle1);
-            }else{
+            } else {
                 //设置内容列样式
-                if(cellStyle2==null){
-                    cellStyle2=cell.getRow().getSheet().getWorkbook().createCellStyle();
+                if (cellStyle2 == null) {
+                    cellStyle2 = cell.getRow().getSheet().getWorkbook().createCellStyle();
                     cellStyle2.setBorderLeft(BorderStyle.THIN);
                     cellStyle2.setBorderBottom(BorderStyle.THIN);
                     cellStyle2.setBorderTop(BorderStyle.THIN);
@@ -170,10 +176,5 @@ public class PgsqlTableServiceImpl implements TablesService {
                 cell.setCellStyle(cellStyle2);
             }
         }
-    }
-
-    public static void main(String[] args) {
-        PgsqlTableServiceImpl tableService=new PgsqlTableServiceImpl();
-        tableService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921","dbuser","hlxpassword","test_bcd","d:\\msbf.xlsx");
     }
 }

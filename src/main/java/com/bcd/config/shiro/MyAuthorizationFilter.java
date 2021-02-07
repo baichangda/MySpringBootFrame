@@ -1,8 +1,8 @@
 package com.bcd.config.shiro;
 
+import com.bcd.base.config.shiro.AuthorizationHandler;
 import com.bcd.base.config.shiro.ShiroMessageDefine;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
-import com.bcd.base.config.shiro.AuthorizationHandler;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.StringUtils;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
@@ -17,12 +17,13 @@ import java.io.IOException;
  * 继承此类重写 验证不通过的方法,是为了处理失败时候返回的结果集
  * 流程如下:
  * spring容器内发生异常逻辑如下:
+ *
  * @RequiresPermissions 注解发生异常->spring的CustomExceptionHandler拦截转换为结果集->.....
  * 在spring中发生异常后,异常会在spring容器内就转换为结果集,而不会抛出到过滤器链来,所以是不会触发onAccessDenied方法
- *
+ * <p>
  * 非spring容器发生异常逻辑如下
  * 配置的过滤器链发生异常->调用过滤器的onAccessDenied方法处理
- *
+ * <p>
  * 如下此应用场景:
  * Map<String, String> filterChainMap = new LinkedHashMap<String, String>();
  * filterChainMap.put("/api/**","authc, roles[admin,user], perms[file:edit]");
@@ -32,22 +33,20 @@ import java.io.IOException;
  * 必须走authc过滤器(验证用户登陆)
  * 必须走roles过滤器(验证有角色 admin,user)
  * 必须走perms过滤器(验证有权限 file:edit)
- *
- *
  */
 @SuppressWarnings("unchecked")
-public class MyAuthorizationFilter extends PermissionsAuthorizationFilter{
+public class MyAuthorizationFilter extends PermissionsAuthorizationFilter {
     private ExceptionResponseHandler handler;
     private AuthorizationHandler authorizationHandler;
 
-    public MyAuthorizationFilter(ExceptionResponseHandler handler,AuthorizationHandler authorizationHandler) {
-        this.handler=handler;
-        this.authorizationHandler=authorizationHandler;
+    public MyAuthorizationFilter(ExceptionResponseHandler handler, AuthorizationHandler authorizationHandler) {
+        this.handler = handler;
+        this.authorizationHandler = authorizationHandler;
     }
 
     @Override
     public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
-        if(authorizationHandler.skip(request, response, mappedValue)){
+        if (authorizationHandler.skip(request, response, mappedValue)) {
             return true;
         }
         return super.isAccessAllowed(request, response, mappedValue);

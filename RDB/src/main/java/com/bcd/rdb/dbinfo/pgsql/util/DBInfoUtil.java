@@ -24,7 +24,7 @@ public class DBInfoUtil {
      * @return
      */
     public static Connection getSpringConn() {
-        DBInfo dbInfo=getDBProps();
+        DBInfo dbInfo = getDBProps();
         try {
             return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
         } catch (SQLException e) {
@@ -34,7 +34,6 @@ public class DBInfoUtil {
 
 
     /**
-     *
      * 获取配置文件中
      * spring.datasource.url
      * spring.datasource.username
@@ -67,15 +66,15 @@ public class DBInfoUtil {
             String url = dataSourceMap.get("url").toString();
             String username = dataSourceMap.get("username").toString();
             String password = dataSourceMap.get("password").toString();
-            int index=url.indexOf('?');
+            int index = url.indexOf('?');
             String pre;
-            if(index==-1){
+            if (index == -1) {
                 pre = url;
-            }else{
+            } else {
                 pre = url.substring(0, index);
             }
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
-            return new DBInfo(url,username,password,propDbName);
+            return new DBInfo(url, username, password, propDbName);
         } catch (FileNotFoundException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -84,15 +83,16 @@ public class DBInfoUtil {
     /**
      * 获取对应ip:port的information_schema的数据库连接
      * jdbc:postgresql://db.hbluewhale.com:12921/test_bcd
-     * @param url 127.0.0.1:3306
+     *
+     * @param url      127.0.0.1:3306
      * @param username root
      * @param password root
-     * @param db test
+     * @param db       test
      * @return
      */
-    public static Connection getConn(String url,String username,String password,String db) {
+    public static Connection getConn(String url, String username, String password, String db) {
         try {
-            return DriverManager.getConnection("jdbc:postgresql://"+url+"/"+db, username, password);
+            return DriverManager.getConnection("jdbc:postgresql://" + url + "/" + db, username, password);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -125,14 +125,14 @@ public class DBInfoUtil {
      * @param dbName
      * @return
      */
-    public static TablesBean findTable(Connection conn,String dbName, String tableName) {
+    public static TablesBean findTable(Connection conn, String dbName, String tableName) {
         TablesBean res;
         String sql = "select relname as table_name,cast(obj_description(relfilenode,'pg_class') as varchar) as table_comment from pg_class c\n" +
                 "where relname in (select tablename from pg_tables where schemaname='public' and tablename=? and position('_2' in tablename)=0);";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<TablesBean> dataList = parseResult(rs,TablesBean.class);
+                List<TablesBean> dataList = parseResult(rs, TablesBean.class);
                 if (dataList == null || dataList.isEmpty()) {
                     return null;
                 }
@@ -169,7 +169,7 @@ public class DBInfoUtil {
             pstsm.setString(2, dbName);
             pstsm.setString(3, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                res = parseResult(rs,ColumnsBean.class);
+                res = parseResult(rs, ColumnsBean.class);
             }
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
@@ -200,7 +200,7 @@ public class DBInfoUtil {
             pstsm.setString(2, dbName);
             pstsm.setString(3, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
-                List<ColumnsBean> res = parseResult(rs,ColumnsBean.class);
+                List<ColumnsBean> res = parseResult(rs, ColumnsBean.class);
                 if (res.isEmpty()) {
                     return null;
                 } else {
@@ -212,13 +212,13 @@ public class DBInfoUtil {
         }
     }
 
-    public static <T>List<T> parseResult(ResultSet rs,Class<T> resultType) {
+    public static <T> List<T> parseResult(ResultSet rs, Class<T> resultType) {
         try {
             ResultSetMetaData headData = rs.getMetaData();
             int columnCount = headData.getColumnCount();
             List<T> res = new ArrayList<>();
             while (rs.next()) {
-                T t= resultType.newInstance();
+                T t = resultType.newInstance();
                 for (int i = 1; i <= columnCount; i++) {
                     Object val = null;
                     int columnType = headData.getColumnType(i);
@@ -249,9 +249,9 @@ public class DBInfoUtil {
                             break;
                         }
                     }
-                    Field field=resultType.getDeclaredField(columnName.toLowerCase());
+                    Field field = resultType.getDeclaredField(columnName.toLowerCase());
                     field.setAccessible(true);
-                    field.set(t,val);
+                    field.set(t, val);
                 }
                 res.add(t);
             }

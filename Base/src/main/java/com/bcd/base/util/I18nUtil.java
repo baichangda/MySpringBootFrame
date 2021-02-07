@@ -15,11 +15,6 @@ public class I18nUtil {
 
     private static MessageSource messageSource;
 
-    @Autowired
-    public void setMessageSource(MessageSource messageSource) {
-        I18nUtil.messageSource = messageSource;
-    }
-
     /**
      * @param key
      * @return
@@ -54,5 +49,10 @@ public class I18nUtil {
      */
     public static String getMessage(String key, Object[] params) {
         return getMessage(key, params, LocaleContextHolder.getLocale());
+    }
+
+    @Autowired
+    public void setMessageSource(MessageSource messageSource) {
+        I18nUtil.messageSource = messageSource;
     }
 }

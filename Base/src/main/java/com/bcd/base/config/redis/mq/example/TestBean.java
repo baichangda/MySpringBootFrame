@@ -1,6 +1,6 @@
 package com.bcd.base.config.redis.mq.example;
 
-class TestBean{
+class TestBean {
     private Integer id;
     private String name;
 

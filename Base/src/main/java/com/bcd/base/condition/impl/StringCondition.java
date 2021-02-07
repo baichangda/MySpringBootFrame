@@ -11,24 +11,24 @@ import com.bcd.base.condition.Condition;
 public class StringCondition extends Condition {
     public Handler handler;
 
-    public StringCondition(String fieldName, Object val, Handler handler){
-        this.fieldName=fieldName;
-        this.val=val;
-        this.handler=handler;
+    public StringCondition(String fieldName, Object val, Handler handler) {
+        this.fieldName = fieldName;
+        this.val = val;
+        this.handler = handler;
     }
 
-    public StringCondition(String fieldName, Object val){
-        this(fieldName,val,Handler.EQUAL);
+    public StringCondition(String fieldName, Object val) {
+        this(fieldName, val, Handler.EQUAL);
     }
 
     @Override
     public String toAnalysis() {
-        return val==null||"".equals(val)?null:fieldName +
+        return val == null || "".equals(val) ? null : fieldName +
                 " " +
                 handler.toString();
     }
 
-    public enum Handler{
+    public enum Handler {
         /**
          * 等于
          */

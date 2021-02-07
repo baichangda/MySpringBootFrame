@@ -23,6 +23,14 @@ public class Message implements Serializable {
         this.i18NData = i18NData;
     }
 
+    public static Message getMessage(String msg) {
+        return new Message(msg);
+    }
+
+    public static Message getMessage(I18NData i18NData) {
+        return new Message(i18NData);
+    }
+
     public JsonMessage toJsonMessage(boolean result, Object... params) {
         return new JsonMessage(result).withMessage(getValue(params)).withCode(code);
     }
@@ -30,9 +38,10 @@ public class Message implements Serializable {
     /**
      * 存在两种情况信息展示:
      * 1、i18n数据模式
-     *    此时params为i18n的占位符参数
+     * 此时params为i18n的占位符参数
      * 2、普通文本模式
-     *    此时params为普通文本中的占位符参数、使用方式类似 {@link org.slf4j.Logger#info(String, Object...)}
+     * 此时params为普通文本中的占位符参数、使用方式类似 {@link org.slf4j.Logger#info(String, Object...)}
+     *
      * @param params
      * @return
      */
@@ -44,20 +53,12 @@ public class Message implements Serializable {
                 return i18NData.getValue(params);
             }
         } else {
-            if(params==null||params.length==0){
+            if (params == null || params.length == 0) {
                 return msg;
-            }else {
+            } else {
                 return MessageFormatter.arrayFormat(msg, params, null).getMessage();
             }
         }
-    }
-
-    public static Message getMessage(String msg) {
-        return new Message(msg);
-    }
-
-    public static Message getMessage(I18NData i18NData) {
-        return new Message(i18NData);
     }
 
     public String getCode() {

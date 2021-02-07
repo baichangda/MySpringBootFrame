@@ -35,9 +35,9 @@ public class CodeGeneratorContext {
     /**
      * 初始化主键类型
      */
-    public String getPkType(){
-        if(pkType==null){
-            pkType=dbSupport.getTablePkType(tableConfig,connection).toString();
+    public String getPkType() {
+        if (pkType == null) {
+            pkType = dbSupport.getTablePkType(tableConfig, connection).toString();
         }
         return pkType;
     }
@@ -45,12 +45,12 @@ public class CodeGeneratorContext {
     /**
      * 获取实体类定义字段信息(排除公用信息 id/create/update信息)
      */
-    public List<BeanField> getDeclaredBeanFields(){
-        if(declaredBeanFields ==null){
-            declaredBeanFields =getAllBeanFields().stream().filter(e->{
-                if("id".equals(e.getName())){
+    public List<BeanField> getDeclaredBeanFields() {
+        if (declaredBeanFields == null) {
+            declaredBeanFields = getAllBeanFields().stream().filter(e -> {
+                if ("id".equals(e.getName())) {
                     return false;
-                }else {
+                } else {
                     if (tableConfig.isNeedCreateInfo()) {
                         if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.getName())) {
                             return false;
@@ -68,15 +68,15 @@ public class CodeGeneratorContext {
 
     /**
      * 获取所有字段信息
+     *
      * @return
      */
-    public List<BeanField> getAllBeanFields(){
-        if(allBeanFields ==null){
-            allBeanFields =dbSupport.getTableBeanFieldList(tableConfig,connection);
+    public List<BeanField> getAllBeanFields() {
+        if (allBeanFields == null) {
+            allBeanFields = dbSupport.getTableBeanFieldList(tableConfig, connection);
         }
         return allBeanFields;
     }
-
 
 
     /**
@@ -84,8 +84,8 @@ public class CodeGeneratorContext {
      * 初始化当前表生成代码目录父包名
      */
     public String getPackagePre() {
-        if(packagePre==null){
-            StringBuilder springSrcPathSb=new StringBuilder();
+        if (packagePre == null) {
+            StringBuilder springSrcPathSb = new StringBuilder();
             springSrcPathSb.append("src");
             springSrcPathSb.append(File.separatorChar);
             springSrcPathSb.append("main");
@@ -93,11 +93,11 @@ public class CodeGeneratorContext {
             springSrcPathSb.append("java");
             springSrcPathSb.append(File.separatorChar);
             String springSrcPath = springSrcPathSb.toString();
-            String targetDirPath=tableConfig.getConfig().getTargetDirPath();
+            String targetDirPath = tableConfig.getConfig().getTargetDirPath();
             if (targetDirPath.contains(springSrcPath)) {
-                packagePre= targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
-            }else{
-                throw BaseRuntimeException.getException("targetDirPath["+targetDirPath+"] must contains ["+springSrcPath+"]");
+                packagePre = targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
+            } else {
+                throw BaseRuntimeException.getException("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
             }
         }
         return packagePre;
@@ -105,9 +105,10 @@ public class CodeGeneratorContext {
 
     /**
      * 初始化request mapping
+     *
      * @return
      */
-    public String getRequestMappingPre(){
-        return "/"+getPackagePre().substring(getPackagePre().lastIndexOf('.')+1);
+    public String getRequestMappingPre() {
+        return "/" + getPackagePre().substring(getPackagePre().lastIndexOf('.') + 1);
     }
 }

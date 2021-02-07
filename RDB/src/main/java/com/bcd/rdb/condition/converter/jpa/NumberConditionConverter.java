@@ -15,17 +15,17 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class NumberConditionConverter  implements Converter<NumberCondition,Predicate> {
+public class NumberConditionConverter implements Converter<NumberCondition, Predicate> {
     @Override
     public Predicate convert(NumberCondition condition, Object... exts) {
-        Predicate predicate=null;
-        NumberCondition.Handler handler= condition.handler;
-        Object val=condition.val;
-        String fieldName=condition.fieldName;
-        Root root=(Root)exts[0];
-        CriteriaQuery query=(CriteriaQuery)exts[1];
-        CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        if(val!=null) {
+        Predicate predicate = null;
+        NumberCondition.Handler handler = condition.handler;
+        Object val = condition.val;
+        String fieldName = condition.fieldName;
+        Root root = (Root) exts[0];
+        CriteriaQuery query = (CriteriaQuery) exts[1];
+        CriteriaBuilder cb = (CriteriaBuilder) exts[2];
+        if (val != null) {
             Path path = ConditionUtil.parseRootPath(root, fieldName);
             switch (handler) {
                 case EQUAL: {
@@ -53,25 +53,25 @@ public class NumberConditionConverter  implements Converter<NumberCondition,Pred
                     break;
                 }
                 case IN: {
-                    if(val instanceof Collection){
-                       List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                        predicate=path.in(notEmptyList);
-                    }else{
+                    if (val instanceof Collection) {
+                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                        predicate = path.in(notEmptyList);
+                    } else {
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
                     }
                     break;
                 }
                 case NOT_IN: {
-                    if(val instanceof Collection){
-                        List notEmptyList= (List)((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                        predicate=cb.not(path.in(notEmptyList));
-                    }else{
+                    if (val instanceof Collection) {
+                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                        predicate = cb.not(path.in(notEmptyList));
+                    } else {
                         throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support ["+handler+"]!");
+                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

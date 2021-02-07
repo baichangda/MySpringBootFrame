@@ -26,26 +26,26 @@ public class SingleTaskContext<T extends Task> extends TaskContext<T> {
 
     @Override
     public boolean equals(Object targetContext) {
-        if(this.getClass()!=targetContext.getClass()){
+        if (this.getClass() != targetContext.getClass()) {
             return false;
         }
-        SingleTaskContext<T> target= ((SingleTaskContext<T>)targetContext);
-        if(function!=target.getFunction()){
+        SingleTaskContext<T> target = ((SingleTaskContext<T>) targetContext);
+        if (function != target.getFunction()) {
             return false;
         }
-        if(!task.equals(target.getTask())){
+        if (!task.equals(target.getTask())) {
             return false;
         }
-        if(params.length!=target.params.length){
+        if (params.length != target.params.length) {
             return false;
         }
-        Object[] targetParams= target.getParams();
-        for(int i=0,end=params.length;i<end;i++){
-            if(params[i]!=targetParams[i]){
-                if(params[i]==null||targetParams[i]==null){
+        Object[] targetParams = target.getParams();
+        for (int i = 0, end = params.length; i < end; i++) {
+            if (params[i] != targetParams[i]) {
+                if (params[i] == null || targetParams[i] == null) {
                     return false;
-                }else{
-                    if(!params[i].equals(targetParams[i])){
+                } else {
+                    if (!params[i].equals(targetParams[i])) {
                         return false;
                     }
                 }

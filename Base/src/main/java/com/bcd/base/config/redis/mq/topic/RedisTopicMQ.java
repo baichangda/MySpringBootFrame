@@ -14,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -40,7 +39,7 @@ public class RedisTopicMQ<V> {
         this.names = names;
         this.redisMessageListenerContainer = redisMessageListenerContainer;
         this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
-        this.redisSerializer=getDefaultRedisSerializer(valueSerializerType);
+        this.redisSerializer = getDefaultRedisSerializer(valueSerializerType);
         this.messageListener = getMessageListener();
     }
 
@@ -49,8 +48,8 @@ public class RedisTopicMQ<V> {
     }
 
 
-    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType){
-        switch (valueSerializerType){
+    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
+        switch (valueSerializerType) {
             case STRING: {
                 return RedisUtil.STRING_SERIALIZER;
             }
@@ -87,7 +86,7 @@ public class RedisTopicMQ<V> {
     }
 
     public void send(V data, String... names) {
-        byte[] bytes=compress(redisSerializer.serialize(data));
+        byte[] bytes = compress(redisSerializer.serialize(data));
         if (names == null || names.length == 0) {
             if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], bytes);
@@ -101,11 +100,11 @@ public class RedisTopicMQ<V> {
         }
     }
 
-    protected byte[] compress(byte[] data){
+    protected byte[] compress(byte[] data) {
         return data;
     }
 
-    protected byte[] unCompress(byte[] data){
+    protected byte[] unCompress(byte[] data) {
         return data;
     }
 

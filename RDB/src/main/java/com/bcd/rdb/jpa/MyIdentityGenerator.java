@@ -12,14 +12,14 @@ import java.io.Serializable;
 public class MyIdentityGenerator extends IdentityGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor s, Object obj) {
-        if(obj instanceof SuperBaseBean){
-            Serializable id= ((SuperBaseBean) obj).getId();
-            if(id==null){
+        if (obj instanceof SuperBaseBean) {
+            Serializable id = ((SuperBaseBean) obj).getId();
+            if (id == null) {
                 return super.generate(s, obj);
-            }else{
+            } else {
                 return id;
             }
-        }else {
+        } else {
             return super.generate(s, obj);
         }
     }

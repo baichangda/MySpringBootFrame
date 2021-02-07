@@ -1,8 +1,6 @@
 package com.bcd.config.websocket;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 //@Configuration
@@ -12,7 +10,7 @@ public class WebSocketConfig {
     public ServletServerContainerFactoryBean createWebSocketContainer() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
         container.setMaxBinaryMessageBufferSize(1024000);
-        container.setAsyncSendTimeout(30*1000L);
+        container.setAsyncSendTimeout(30 * 1000L);
         return container;
     }
 }

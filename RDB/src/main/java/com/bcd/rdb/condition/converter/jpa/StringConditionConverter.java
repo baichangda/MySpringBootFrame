@@ -16,59 +16,59 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class StringConditionConverter implements Converter<StringCondition,Predicate> {
+public class StringConditionConverter implements Converter<StringCondition, Predicate> {
     @Override
     public Predicate convert(StringCondition condition, Object... exts) {
-        StringCondition.Handler handler= condition.handler;
-        Object val=condition.val;
-        String fieldName=condition.fieldName;
-        Root root=(Root)exts[0];
-        CriteriaQuery query=(CriteriaQuery)exts[1];
-        CriteriaBuilder cb=(CriteriaBuilder)exts[2];
-        Predicate predicate=null;
-        if(val!=null){
-            Path path = ConditionUtil.parseRootPath(root,fieldName);
-            if(val instanceof Collection){
-                List notEmptyList= (List)((Collection) val).stream().filter(e->e!=null&&!e.toString().isEmpty()).collect(Collectors.toList());
-                switch (handler){
-                    case IN:{
-                        predicate=path.in(notEmptyList);
+        StringCondition.Handler handler = condition.handler;
+        Object val = condition.val;
+        String fieldName = condition.fieldName;
+        Root root = (Root) exts[0];
+        CriteriaQuery query = (CriteriaQuery) exts[1];
+        CriteriaBuilder cb = (CriteriaBuilder) exts[2];
+        Predicate predicate = null;
+        if (val != null) {
+            Path path = ConditionUtil.parseRootPath(root, fieldName);
+            if (val instanceof Collection) {
+                List notEmptyList = (List) ((Collection) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
+                switch (handler) {
+                    case IN: {
+                        predicate = path.in(notEmptyList);
                         break;
                     }
-                    case NOT_IN:{
-                        predicate=cb.not(path.in(notEmptyList));
+                    case NOT_IN: {
+                        predicate = cb.not(path.in(notEmptyList));
                         break;
                     }
-                    default:{
+                    default: {
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");
                     }
                 }
-            }else if(val.getClass().isArray()){
-                List notEmptyList=new ArrayList();
-                int len= Array.getLength(val);
-                if(len!=0){
-                    for(int i=0;i<=len-1;i++){
-                        Object o=Array.get(val,i);
-                        if(o!=null&&!o.toString().isEmpty()){
+            } else if (val.getClass().isArray()) {
+                List notEmptyList = new ArrayList();
+                int len = Array.getLength(val);
+                if (len != 0) {
+                    for (int i = 0; i <= len - 1; i++) {
+                        Object o = Array.get(val, i);
+                        if (o != null && !o.toString().isEmpty()) {
                             notEmptyList.add(o);
                         }
                     }
                 }
-                switch (handler){
-                    case IN:{
-                        predicate=path.in(notEmptyList);
+                switch (handler) {
+                    case IN: {
+                        predicate = path.in(notEmptyList);
                         break;
                     }
-                    case NOT_IN:{
-                        predicate=cb.not(path.in(notEmptyList));
+                    case NOT_IN: {
+                        predicate = cb.not(path.in(notEmptyList));
                         break;
                     }
-                    default:{
+                    default: {
                         throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Array Instance!");
                     }
                 }
-            }else{
-                if(!val.toString().isEmpty()) {
+            } else {
+                if (!val.toString().isEmpty()) {
                     switch (handler) {
                         case EQUAL: {
                             predicate = cb.equal(path, val);

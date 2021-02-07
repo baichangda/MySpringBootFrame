@@ -11,14 +11,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public class RedisCacheManager extends AbstractCacheManager{
+public class RedisCacheManager extends AbstractCacheManager {
     RedisTemplate<String, String> redisTemplate;
 
     long localExpired;
 
     TimeUnit unit;
 
-    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory,long localExpired,TimeUnit unit) {
+    public RedisCacheManager(RedisConnectionFactory redisConnectionFactory, long localExpired, TimeUnit unit) {
         this.redisTemplate = new RedisTemplate<>();
         this.redisTemplate.setConnectionFactory(redisConnectionFactory);
         this.redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
@@ -27,12 +27,12 @@ public class RedisCacheManager extends AbstractCacheManager{
         this.redisTemplate.setHashValueSerializer(RedisUtil.JDK_SERIALIZATION_SERIALIZER);
         this.redisTemplate.afterPropertiesSet();
         this.localExpired = localExpired;
-        this.unit=unit;
+        this.unit = unit;
     }
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new RedisCache(redisTemplate,s, localExpired,unit);
+        return new RedisCache(redisTemplate, s, localExpired, unit);
     }
 
 }

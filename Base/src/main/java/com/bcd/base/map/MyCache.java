@@ -44,10 +44,8 @@ import java.util.function.Function;
  */
 public class MyCache<K, V> {
 
-    Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final Map<K, ExpiredValue<K, V>> dataMap = new HashMap<>();
-
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     /**
      * 1:强引用
      * 2:软引用

@@ -18,15 +18,15 @@ import java.util.concurrent.*;
 
 public abstract class BaseWebSocket extends TextWebSocketHandler implements WebSocketConfigurer {
 
-    protected final Map<WebSocketSession,ExecutorService> clientSessionToPool=new ConcurrentHashMap<>();
+    protected final Map<WebSocketSession, ExecutorService> clientSessionToPool = new ConcurrentHashMap<>();
 
-    protected final Map<WebSocketSession,Long> clientSessionToLastPong=new ConcurrentHashMap<>();
+    protected final Map<WebSocketSession, Long> clientSessionToLastPong = new ConcurrentHashMap<>();
 
     protected String url;
 
-    protected Logger logger= LoggerFactory.getLogger(getClass());
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected long timeOutPongTimeInMillis=60*1000;
+    protected long timeOutPongTimeInMillis = 60 * 1000;
     protected ScheduledExecutorService timeOutPongPool;
 
     public BaseWebSocket(String url) {
@@ -39,47 +39,47 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
     }
 
 
-
     /**
      * 开启心跳检测
      * 处理如下情况:
      * 1、由于长时间客户端和服务端不进行数据通信,此时由于防火墙等其他因素关闭tcp连接,导致不可用
-     *      此时服务器应该关闭session同时释放资源
-     *
+     * 此时服务器应该关闭session同时释放资源
+     * <p>
      * 2、tcp协议层下的硬件层网络连接突然断开,此时在tcp层面此连接依然可用,此时需要断开连接;
-     *      此时close源码参考:
-     *      {@link org.apache.tomcat.websocket.WsSession#sendCloseMessage(CloseReason)}
-     *      1、close源码在此情况tomcat源码先会调用发送close message到客户端直到超时,关闭远程session
-     *      2、检测是否{@link javax.websocket.CloseReason.CloseCodes#CLOSED_ABNORMALLY},
-     *          对应{@link CloseStatus#NO_CLOSE_FRAME},是则触发onError
-     *      3、触发onClose
+     * 此时close源码参考:
+     * {@link org.apache.tomcat.websocket.WsSession#sendCloseMessage(CloseReason)}
+     * 1、close源码在此情况tomcat源码先会调用发送close message到客户端直到超时,关闭远程session
+     * 2、检测是否{@link javax.websocket.CloseReason.CloseCodes#CLOSED_ABNORMALLY},
+     * 对应{@link CloseStatus#NO_CLOSE_FRAME},是则触发onError
+     * 3、触发onClose
      */
-    public void startHeartBeatCheck(){
-        timeOutPongPool=Executors.newSingleThreadScheduledExecutor();
-        timeOutPongPool.scheduleWithFixedDelay(()->{
-            clientSessionToLastPong.forEach((k,v)->{
-                if((System.currentTimeMillis()-v)>timeOutPongTimeInMillis){
+    public void startHeartBeatCheck() {
+        timeOutPongPool = Executors.newSingleThreadScheduledExecutor();
+        timeOutPongPool.scheduleWithFixedDelay(() -> {
+            clientSessionToLastPong.forEach((k, v) -> {
+                if ((System.currentTimeMillis() - v) > timeOutPongTimeInMillis) {
                     try {
                         k.close(CloseStatus.NO_CLOSE_FRAME);
                     } catch (Exception e) {
-                        logger.error("close session after pong timeout error",e);
+                        logger.error("close session after pong timeout error", e);
                     }
                 }
             });
-        },60,60,TimeUnit.SECONDS);
+        }, 60, 60, TimeUnit.SECONDS);
     }
 
     /**
      * 发送信息
+     *
      * @param session
      * @param message
      */
-    public void sendMessage(WebSocketSession session, String message){
-        clientSessionToPool.get(session).execute(()->{
+    public void sendMessage(WebSocketSession session, String message) {
+        clientSessionToPool.get(session).execute(() -> {
             try {
-                if(session!=null&&session.isOpen()){
+                if (session != null && session.isOpen()) {
                     List<String> subList;
-                    if(supportsPartialMessages()) {
+                    if (supportsPartialMessages()) {
                         subList = new LinkedList<>();
                         int len = message.length();
                         int index = 0;
@@ -94,30 +94,30 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
                             index = end;
                         }
                         subList.add(message.substring(index, len));
-                    }else{
-                        subList= Arrays.asList(message);
+                    } else {
+                        subList = Arrays.asList(message);
                     }
                     synchronized (session) {
-                        if(session.isOpen()){
-                            int subSize=subList.size();
-                            for(int i=0;i<=subSize-2;i++){
-                                session.sendMessage(new TextMessage(subList.get(i),false));
+                        if (session.isOpen()) {
+                            int subSize = subList.size();
+                            for (int i = 0; i <= subSize - 2; i++) {
+                                session.sendMessage(new TextMessage(subList.get(i), false));
                             }
-                            session.sendMessage(new TextMessage(subList.get(subSize-1),true));
-                        }else{
+                            session.sendMessage(new TextMessage(subList.get(subSize - 1), true));
+                        } else {
                             logger.error("Session Has Been Closed");
                         }
                     }
-                }else{
+                } else {
                     logger.error("Session Has Been Closed");
                 }
             } catch (IOException e) {
                 try {
                     //发送信息失败则关闭session
-                    logger.error("send message error",e);
+                    logger.error("send message error", e);
                     session.close(CloseStatus.NO_CLOSE_FRAME);
                 } catch (IOException ex) {
-                    logger.error("close session after send message error",e);
+                    logger.error("close session after send message error", e);
                 }
             }
         });
@@ -125,50 +125,50 @@ public abstract class BaseWebSocket extends TextWebSocketHandler implements WebS
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(this,url).setAllowedOrigins("*");
+        registry.addHandler(this, url).setAllowedOrigins("*");
     }
 
     /**
      * 连接打开时候触发
+     *
      * @param session
      */
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
-        logger.debug("session["+session.getRemoteAddress().toString()+"] afterConnectionEstablished");
-        clientSessionToPool.put(session,Executors.newSingleThreadExecutor());
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        logger.debug("session[" + session.getRemoteAddress().toString() + "] afterConnectionEstablished");
+        clientSessionToPool.put(session, Executors.newSingleThreadExecutor());
     }
 
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception{
-        super.handleMessage(session,message);
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+        super.handleMessage(session, message);
     }
 
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
         super.handlePongMessage(session, message);
-        clientSessionToLastPong.put(session,System.currentTimeMillis());
+        clientSessionToLastPong.put(session, System.currentTimeMillis());
     }
 
     /**
      * 连接关闭时候触发
      */
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception{
-        logger.debug("session["+session.getRemoteAddress().toString()+"] afterConnectionClosed,Reason["+closeStatus+"]");
-        ExecutorService pool= clientSessionToPool.remove(session);
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+        logger.debug("session[" + session.getRemoteAddress().toString() + "] afterConnectionClosed,Reason[" + closeStatus + "]");
+        ExecutorService pool = clientSessionToPool.remove(session);
         clientSessionToLastPong.remove(session);
-        if(pool!=null){
+        if (pool != null) {
             pool.shutdown();
         }
     }
 
     /**
      * 发生错误时候触发
+     *
      * @param session
      * @param exception
      */
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception{
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         ExceptionUtil.printException(exception);
     }
-
-
 
 
     @Override
