@@ -13,3 +13,5 @@
 **/node_modules/
 **/*-dev.yml
 **/*-test.yml
+
+.DS_Store
