@@ -40,13 +40,9 @@ public class DynamicJdbcUtil {
      * 数据源最大connection激活数量
      */
     private final static int DATA_SOURCE_MAX_ACTIVE = 3;
-
-
+    private static final ScheduledExecutorService CLEAN_UP_POOL = Executors.newSingleThreadScheduledExecutor();
     static Logger logger = LoggerFactory.getLogger(DynamicJdbcUtil.class);
-
-    private static ScheduledExecutorService CLEAN_UP_POOL = Executors.newSingleThreadScheduledExecutor();
-
-    private static LoadingCache<String, DynamicJdbcData> CACHE = CacheBuilder.newBuilder()
+    private static final LoadingCache<String, DynamicJdbcData> CACHE = CacheBuilder.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
 //            .removalListener(RemovalListeners.asynchronous(removalNotification->{},Executors.newSingleThreadExecutor()))
             .removalListener(removalNotification -> {
@@ -142,10 +138,10 @@ public class DynamicJdbcUtil {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        List<Map<String, Object>> dataList1 = getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
-        List<Map<String, Object>> dataList2 = getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList1 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList2 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
         TimeUnit.SECONDS.sleep(10);
-        List<Map<String, Object>> dataList3 = getTest().getJdbcTemplate().query("select * from t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList3 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
 
