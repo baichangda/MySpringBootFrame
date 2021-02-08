@@ -1,12 +1,12 @@
-create table "public"."t_sys_user_role"
+CREATE TABLE "public"."t_sys_user_role"
 (
-    "user_id"   int8        not null,
-    "role_code" varchar(50) not null,
-    constraint "t_sys_user_role_pkey" primary key ("user_id", "role_code")
+    "user_id"   int8        NOT NULL,
+    "role_code" varchar(50) NOT NULL,
+    CONSTRAINT "t_sys_user_role_pkey" PRIMARY KEY ("user_id", "role_code")
 );
 
-comment on column "public"."t_sys_user_role"."user_id" is '关联用户id';
+COMMENT ON COLUMN "public"."t_sys_user_role"."user_id" IS '关联用户id';
 
-comment on column "public"."t_sys_user_role"."role_code" is '关联角色编码';
+COMMENT ON COLUMN "public"."t_sys_user_role"."role_code" IS '关联角色编码';
 
-comment on table "public"."t_sys_user_role" is '用户与角色关联关系表';
+COMMENT ON TABLE "public"."t_sys_user_role" IS '用户与角色关联关系表';
