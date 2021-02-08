@@ -69,15 +69,14 @@ public class MenuService extends BaseService<MenuBean, Long> {
             return Collections.emptyList();
         }
         //1.3、排序
-        rootList.sort(Comparator.comparing(e -> e.getOrderNum()));
+        rootList.sort(Comparator.comparing(MenuBean::getOrderNum));
         //1.4、循环填充
-        List<MenuBean> tempList = new ArrayList<>();
-        tempList.addAll(rootList);
+        List<MenuBean> tempList = new ArrayList<>(rootList);
         for (int i = 0; i <= tempList.size() - 1; i++) {
             MenuBean cur = tempList.get(i);
             List<MenuBean> curChildren = parentIdToChildrenMap.get(cur.getId());
             if (curChildren != null) {
-                curChildren.sort(Comparator.comparing(e -> e.getOrderNum()));
+                curChildren.sort(Comparator.comparing(MenuBean::getOrderNum));
                 cur.setChildren(curChildren);
                 tempList.addAll(curChildren);
             }

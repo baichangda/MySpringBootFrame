@@ -21,7 +21,7 @@ public class ShiroUtil {
      */
     public static void clearCurrentUserCachedAuthorizationInfo() {
         RealmSecurityManager rsm = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(e -> e.getName(), e -> e));
+        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(Realm::getName, e -> e));
         PrincipalCollection principalCollection = SecurityUtils.getSubject().getPrincipals();
         for (String realmName : principalCollection.getRealmNames()) {
             Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e -> ((MyAuthorizingRealm) e).clearCachedAuthorizationInfo(principalCollection));
@@ -51,7 +51,7 @@ public class ShiroUtil {
     public static Set<String> getCurrentUserRoles() {
         Set<String> roleSet = new HashSet<>();
         RealmSecurityManager rsm = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(e -> e.getName(), e -> e));
+        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(Realm::getName, e -> e));
         PrincipalCollection principalCollection = SecurityUtils.getSubject().getPrincipals();
         for (String realmName : principalCollection.getRealmNames()) {
             Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e -> roleSet.addAll(((MyAuthorizingRealm) e).getAllRoles(principalCollection)));
@@ -67,7 +67,7 @@ public class ShiroUtil {
     public static Collection<String> getCurrentUserPermissions() {
         Set<String> permissionSet = new HashSet<>();
         RealmSecurityManager rsm = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(e -> e.getName(), e -> e));
+        Map<String, Realm> nameToRealm = rsm.getRealms().stream().collect(Collectors.toMap(Realm::getName, e -> e));
         PrincipalCollection principalCollection = SecurityUtils.getSubject().getPrincipals();
         for (String realmName : principalCollection.getRealmNames()) {
             Optional.ofNullable(nameToRealm.get(realmName)).ifPresent(e -> permissionSet.addAll(((MyAuthorizingRealm) e).getAllPermissions(principalCollection)));
