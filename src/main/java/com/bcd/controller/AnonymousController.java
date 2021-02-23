@@ -3,9 +3,8 @@ package com.bcd.controller;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.keys.KeysConst;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
@@ -23,22 +22,22 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/anonymous")
-@Api(tags = "公开/AnonymousController")
+//@Tag(name = "AnonymousController",description = "公开")
 public class AnonymousController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonymousController.class);
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
-    @ApiOperation(value = "获取公钥", notes = "获取公钥")
-    @ApiResponse(code = 200, message = "公钥信息", response = JsonMessage.class)
+    @Operation(description = "获取公钥")
+    @ApiResponse(responseCode = "200", description = "公钥信息")
     public JsonMessage<String> getPublicKey() {
         return JsonMessage.success().withData(KeysConst.PUBLIC_KEY_BASE64);
     }
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getCookie", method = RequestMethod.GET)
-    @ApiOperation(value = "获取cookie", notes = "获取cookie")
-    @ApiResponse(code = 200, message = "当前浏览器的cookie")
+    @Operation(description = "获取cookie")
+    @ApiResponse(responseCode = "200", description = "当前浏览器的cookie")
     public JsonMessage<String> getCookie() {
         Subject subject = SecurityUtils.getSubject();
         String cookie = Optional.ofNullable(subject).map(Subject::getSession).map(Session::getId).orElse("").toString();

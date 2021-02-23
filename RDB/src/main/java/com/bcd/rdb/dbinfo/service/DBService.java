@@ -11,7 +11,7 @@ import java.io.OutputStream;
 
 @Service
 @SuppressWarnings("unchecked")
-public interface TablesService {
+public interface DBService {
     MyWorkbookWriteHandler workbookWriteHandler = new MyWorkbookWriteHandler();
 
     /**

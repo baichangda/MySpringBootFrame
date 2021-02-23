@@ -22,11 +22,10 @@ public class ActionAnnotationMethodInterceptor extends AuthorizingAnnotationMeth
     public void assertAuthorized(MethodInvocation mi) {
         try {
             ActionAnnotationHandler handler = (ActionAnnotationHandler) getHandler();
-            StringBuilder sb = new StringBuilder();
-            sb.append(mi.getThis().getClass().getName());
-            sb.append(":");
-            sb.append(mi.getMethod().getName());
-            handler.setActionPermission(sb.toString());
+            String sb = mi.getThis().getClass().getName() +
+                    ":" +
+                    mi.getMethod().getName();
+            handler.setActionPermission(sb);
             handler.assertAuthorized(getAnnotation(mi));
         } catch (AuthorizationException ae) {
             // Annotation handler doesn't know why it was called, so add the information here if possible.

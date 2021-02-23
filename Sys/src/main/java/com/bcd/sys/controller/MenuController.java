@@ -9,10 +9,10 @@ import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.MenuService;
 import com.bcd.sys.shiro.ShiroUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,6 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/menu")
-@Api(tags = "菜单管理/MenuController")
 public class MenuController extends BaseController {
 
     @Autowired
@@ -36,9 +35,9 @@ public class MenuController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.menu_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    @ApiOperation(value = "保存菜单", notes = "保存菜单")
-    @ApiResponse(code = 200, message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "菜单实体") @Validated @RequestBody MenuBean menu) {
+    @Operation(description = "保存菜单")
+    @ApiResponse(responseCode = "200", description = "保存结果")
+    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "菜单实体") @Validated @RequestBody MenuBean menu) {
         menuService.save(menu);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -52,9 +51,9 @@ public class MenuController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.menu_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除菜单", notes = "删除菜单")
-    @ApiResponse(code = 200, message = "删除结果")
-    public JsonMessage delete(@ApiParam(value = "菜单id数组") @RequestParam Long[] ids) {
+    @Operation(description = "删除菜单")
+    @ApiResponse(responseCode = "200", description = "删除结果")
+    public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
         menuService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
@@ -66,8 +65,8 @@ public class MenuController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.menu_authorize)
     @RequestMapping(value = "/adminMenuTree", method = RequestMethod.POST)
-    @ApiOperation(value = "查询当前用户所属组织的admin拥有的权限的菜单树", notes = "查询当前用户所属组织的admin拥有的权限的菜单树")
-    @ApiResponse(code = 200, message = "菜单树")
+    @Operation(description = "查询当前用户所属组织的admin拥有的权限的菜单树")
+    @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage adminMenuTree() {
         List<MenuBean> menuBeanList = menuService.adminMenuTree();
         return JsonMessage.success().withData(menuBeanList);
@@ -81,10 +80,10 @@ public class MenuController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.menu_authorize)
     @RequestMapping(value = "/userMenuTree", method = RequestMethod.POST)
-    @ApiOperation(value = "查询用户拥有的权限的菜单树", notes = "查询用户拥有的权限的菜单树")
-    @ApiResponse(code = 200, message = "菜单树")
-    public JsonMessage userMenuTree(@ApiParam(value = "用户id", example = "1")
-                                    @RequestParam(value = "userId", required = false) Long userId) {
+    @Operation(description = "查询用户拥有的权限的菜单树")
+    @ApiResponse(responseCode = "200", description = "菜单树")
+    public JsonMessage userMenuTree(@Parameter(description = "用户id")
+                                    @RequestParam(required = false) Long userId) {
         List<MenuBean> menuBeanList = menuService.userMenuTree(userId);
         return JsonMessage.success().withData(menuBeanList);
     }
@@ -96,8 +95,8 @@ public class MenuController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.menu_search)
     @RequestMapping(value = "/selfMenuTree", method = RequestMethod.POST)
-    @ApiOperation(value = "查询当前用户拥有的权限的菜单树", notes = "查询当前用户拥有的权限的菜单树")
-    @ApiResponse(code = 200, message = "菜单树")
+    @Operation(description = "查询当前用户拥有的权限的菜单树")
+    @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage selfMenuTree() {
         UserBean userBean = ShiroUtil.getCurrentUser();
         List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.getId());

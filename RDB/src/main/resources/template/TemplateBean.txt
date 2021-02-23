@@ -5,7 +5,7 @@ import com.bcd.rdb.bean.BaseBean;
 <#else>
 import com.bcd.rdb.bean.SuperBaseBean;
 </#if>
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -33,20 +33,20 @@ public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBea
     //field
     <#list fieldList as field>
       <#if field.type == "String">
-      <#if field.nullable>
-    @ApiModelProperty(value = "${field.comment}(长度不能超过${field.strLen})")
-      <#else>
-    @ApiModelProperty(value = "${field.comment}(不能为空)(长度不能超过${field.strLen})")
+        <#if field.nullable>
+    @Schema(description = "${field.comment}", maxLength = ${field.strLen})
+        <#else>
+    @Schema(description = "${field.comment}", required = true, maxLength = ${field.strLen})
     @NotBlank(message = "[${field.commentPre}]不能为空")
-      </#if>
-    @Size(max = ${field.strLen},message="[${field.commentPre}]长度不能超过${field.strLen}")
+        </#if>
+    @Size(max = ${field.strLen}, message = "[${field.commentPre}]长度不能超过${field.strLen}")
       <#else>
-      <#if field.nullable>
-    @ApiModelProperty(value = "${field.comment}")
-      <#else>
-    @ApiModelProperty(value = "${field.comment}(不能为空)")
+        <#if field.nullable>
+    @Schema(description = "${field.comment}")
+        <#else>
+    @Schema(description = "${field.comment}", required = true)
     @NotNull(message = "[${field.commentPre}]不能为空")
-      </#if>
+        </#if>
       </#if>
     private ${field.type} ${field.name};
 

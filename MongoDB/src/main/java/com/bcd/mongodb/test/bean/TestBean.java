@@ -2,6 +2,7 @@ package com.bcd.mongodb.test.bean;
 
 import com.bcd.mongodb.bean.SuperBaseBean;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -15,8 +16,8 @@ import java.util.Date;
 @Document(collection = "test")
 //测试类
 public class TestBean extends SuperBaseBean<String> {
-    @ApiModelProperty(value = "vin")
+    @Schema(description = "vin")
     private String vin;
-    @ApiModelProperty(value = "时间")
+    @Schema(description = "时间")
     private Date time;
 }

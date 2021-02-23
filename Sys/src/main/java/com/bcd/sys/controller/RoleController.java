@@ -10,10 +10,10 @@ import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.service.RoleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +25,6 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/role")
-@Api(tags = "角色管理/RoleController")
 public class RoleController extends BaseController {
 
     @Autowired
@@ -39,14 +38,14 @@ public class RoleController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value = "查询角色列表", notes = "查询角色列表")
-    @ApiResponse(code = 200, message = "角色列表")
+    @Operation(description = "查询角色列表")
+    @ApiResponse(responseCode = "200", description = "角色列表")
     public JsonMessage<List<RoleBean>> list(
-            @ApiParam(value = "编码") @RequestParam(value = "code", required = false) String code,
-            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "角色名称") @RequestParam(value = "name", required = false) String name,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(value = "备注") @RequestParam(value = "remark", required = false) String remark
+            @Parameter(description = "编码") @RequestParam(required = false) String code,
+            @Parameter(description = "主键") @RequestParam(required = false) Long id,
+            @Parameter(description = "角色名称") @RequestParam(required = false) String name,
+            @Parameter(description = "关联机构编码") @RequestParam(required = false) String orgCode,
+            @Parameter(description = "备注") @RequestParam(required = false) String remark
     ) {
         Condition condition = Condition.and(
                 new StringCondition("code", code, StringCondition.Handler.ALL_LIKE),
@@ -65,16 +64,16 @@ public class RoleController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value = "查询角色列表", notes = "查询角色分页")
-    @ApiResponse(code = 200, message = "角色分页结果集")
+    @Operation(description = "查询角色列表")
+    @ApiResponse(responseCode = "200", description = "角色分页结果集")
     public JsonMessage<Page<RoleBean>> page(
-            @ApiParam(value = "编码") @RequestParam(value = "code", required = false) String code,
-            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "角色名称") @RequestParam(value = "name", required = false) String name,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(value = "备注") @RequestParam(value = "remark", required = false) String remark,
-            @ApiParam(value = "分页参数(页数)", defaultValue = "1") @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)", defaultValue = "20") @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize
+            @Parameter(description = "编码") @RequestParam(required = false) String code,
+            @Parameter(description = "主键") @RequestParam(required = false) Long id,
+            @Parameter(description = "角色名称") @RequestParam(required = false) String name,
+            @Parameter(description = "关联机构编码") @RequestParam(required = false) String orgCode,
+            @Parameter(description = "备注") @RequestParam(required = false) String remark,
+            @Parameter(description = "分页参数(页数)") @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+            @Parameter(description = "分页参数(页大小)") @RequestParam(required = false, defaultValue = "20") Integer pageSize
     ) {
         Condition condition = Condition.and(
                 new StringCondition("code", code, StringCondition.Handler.ALL_LIKE),
@@ -94,9 +93,9 @@ public class RoleController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.role_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    @ApiOperation(value = "保存角色", notes = "保存角色")
-    @ApiResponse(code = 200, message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "角色实体") @Validated @RequestBody RoleBean role) {
+    @Operation(description = "保存角色")
+    @ApiResponse(responseCode = "200", description = "保存结果")
+    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "角色实体") @Validated @RequestBody RoleBean role) {
         roleService.save(role);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -110,9 +109,9 @@ public class RoleController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.role_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除角色", notes = "删除角色")
-    @ApiResponse(code = 200, message = "删除结果")
-    public JsonMessage delete(@ApiParam(value = "角色id数组") @RequestParam Long[] ids) {
+    @Operation(description = "删除角色")
+    @ApiResponse(responseCode = "200", description = "删除结果")
+    public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
         //验证删除权限
         roleService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);

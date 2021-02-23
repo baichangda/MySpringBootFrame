@@ -12,7 +12,7 @@ import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
-import com.bcd.rdb.dbinfo.service.TablesService;
+import com.bcd.rdb.dbinfo.service.DBService;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -31,12 +31,12 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "org.postgresql.Driver")
 @Service
-public class PgsqlTableServiceImpl implements TablesService {
+public class PgsqlDBServiceImpl implements DBService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public static void main(String[] args) {
-        PgsqlTableServiceImpl tableService = new PgsqlTableServiceImpl();
-        tableService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921", "dbuser", "hlxpassword", "test_bcd", "d:\\msbf.xlsx");
+        PgsqlDBServiceImpl dbService = new PgsqlDBServiceImpl();
+        dbService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921", "dbuser", "hlxpassword", "test_bcd", "d:\\msbf.xlsx");
     }
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {

@@ -1,7 +1,7 @@
 package com.bcd.mongodb.bean;
 
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
-    @ApiModelProperty(value = "主键(唯一标识符,自动生成)(不需要赋值)")
+    @Schema(description = "主键(唯一标识符,自动生成)",accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     //主键
     public K id;

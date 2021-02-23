@@ -334,6 +334,8 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
     public void saveUser(UserBean user) {
         if (user.getId() == null) {
             user.setPassword(encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
+            user.setStatus(1);
+            save(user);
         } else {
             UserBean dbUser = findById(user.getId());
             user.setPassword(dbUser.getPassword());

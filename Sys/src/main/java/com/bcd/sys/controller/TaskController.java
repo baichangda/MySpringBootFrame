@@ -12,10 +12,10 @@ import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 import com.bcd.sys.task.cluster.ClusterTaskUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +32,6 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/task")
-@Api(tags = "任务管理/TaskController")
 public class TaskController extends BaseController {
 
     @Autowired
@@ -46,20 +45,20 @@ public class TaskController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value = "查询系统任务列表", notes = "查询系统任务列表")
-    @ApiResponse(code = 200, message = "任务列表")
+    @Operation(description = "查询系统任务列表")
+    @ApiResponse(responseCode = "200", description = "任务列表")
     public JsonMessage<List<TaskBean>> list(
-            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(value = "任务名称") @RequestParam(value = "name", required = false) String name,
-            @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(value = "status", required = false) Integer status,
-            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(value = "type", required = false) Byte type,
-            @ApiParam(value = "任务信息(失败时记录失败原因)") @RequestParam(value = "message", required = false) String message,
-            @ApiParam(value = "任务开始时间开始") @RequestParam(value = "startTimeBegin", required = false) Date startTimeBegin,
-            @ApiParam(value = "任务开始时间结束") @RequestParam(value = "startTimeEnd", required = false) Date startTimeEnd,
-            @ApiParam(value = "任务完成时间开始") @RequestParam(value = "finishTimeBegin", required = false) Date finishTimeBegin,
-            @ApiParam(value = "任务完成时间结束") @RequestParam(value = "finishTimeEnd", required = false) Date finishTimeEnd,
-            @ApiParam(value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(value = "filePaths", required = false) String filePaths
+            @Parameter(description = "主键") @RequestParam(required = false) Long id,
+            @Parameter(description = "关联机构编码") @RequestParam(required = false) String orgCode,
+            @Parameter(description = "任务名称") @RequestParam(required = false) String name,
+            @Parameter(description = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(required = false) Integer status,
+            @Parameter(description = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(required = false) Byte type,
+            @Parameter(description = "任务信息(失败时记录失败原因)") @RequestParam(required = false) String message,
+            @Parameter(description = "任务开始时间开始") @RequestParam(required = false) Date startTimeBegin,
+            @Parameter(description = "任务开始时间结束") @RequestParam(required = false) Date startTimeEnd,
+            @Parameter(description = "任务完成时间开始") @RequestParam(required = false) Date finishTimeBegin,
+            @Parameter(description = "任务完成时间结束") @RequestParam(required = false) Date finishTimeEnd,
+            @Parameter(description = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(required = false) String filePaths
     ) {
         Condition condition = Condition.and(
                 new NumberCondition("id", id, NumberCondition.Handler.EQUAL),
@@ -84,22 +83,22 @@ public class TaskController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value = "查询系统任务列表", notes = "查询系统任务分页")
-    @ApiResponse(code = 200, message = "任务分页结果集")
+    @Operation(description = "查询系统任务列表")
+    @ApiResponse(responseCode = "200", description = "任务分页结果集")
     public JsonMessage<Page<TaskBean>> page(
-            @ApiParam(value = "主键") @RequestParam(value = "id", required = false) Long id,
-            @ApiParam(value = "关联机构编码") @RequestParam(value = "orgCode", required = false) String orgCode,
-            @ApiParam(value = "任务名称") @RequestParam(value = "name", required = false) String name,
-            @ApiParam(value = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(value = "status", required = false) Integer status,
-            @ApiParam(value = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(value = "type", required = false) Byte type,
-            @ApiParam(value = "任务信息(失败时记录失败原因)") @RequestParam(value = "message", required = false) String message,
-            @ApiParam(value = "任务开始时间开始") @RequestParam(value = "startTimeBegin", required = false) Date startTimeBegin,
-            @ApiParam(value = "任务开始时间结束") @RequestParam(value = "startTimeEnd", required = false) Date startTimeEnd,
-            @ApiParam(value = "任务完成时间开始") @RequestParam(value = "finishTimeBegin", required = false) Date finishTimeBegin,
-            @ApiParam(value = "任务完成时间结束") @RequestParam(value = "finishTimeEnd", required = false) Date finishTimeEnd,
-            @ApiParam(value = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(value = "filePaths", required = false) String filePaths,
-            @ApiParam(value = "分页参数(页数)", defaultValue = "1") @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
-            @ApiParam(value = "分页参数(页大小)", defaultValue = "20") @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize
+            @Parameter(description = "主键") @RequestParam(required = false) Long id,
+            @Parameter(description = "关联机构编码") @RequestParam(required = false) String orgCode,
+            @Parameter(description = "任务名称") @RequestParam(required = false) String name,
+            @Parameter(description = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)") @RequestParam(required = false) Integer status,
+            @Parameter(description = "任务类型(1:普通任务;2:文件类型任务)") @RequestParam(required = false) Byte type,
+            @Parameter(description = "任务信息(失败时记录失败原因)") @RequestParam(required = false) String message,
+            @Parameter(description = "任务开始时间开始") @RequestParam(required = false) Date startTimeBegin,
+            @Parameter(description = "任务开始时间结束") @RequestParam(required = false) Date startTimeEnd,
+            @Parameter(description = "任务完成时间开始") @RequestParam(required = false) Date finishTimeBegin,
+            @Parameter(description = "任务完成时间结束") @RequestParam(required = false) Date finishTimeEnd,
+            @Parameter(description = "文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)") @RequestParam(required = false) String filePaths,
+            @Parameter(description = "分页参数(页数)") @RequestParam(required = false, defaultValue = "1") Integer pageNum,
+            @Parameter(description = "分页参数(页大小)") @RequestParam(required = false, defaultValue = "20") Integer pageSize
     ) {
         Condition condition = Condition.and(
                 new NumberCondition("id", id, NumberCondition.Handler.EQUAL),
@@ -126,9 +125,9 @@ public class TaskController extends BaseController {
      */
     @RequiresNotePermissions(NotePermission.sysTask_stop)
     @RequestMapping(value = "/stop", method = RequestMethod.POST)
-    @ApiOperation(value = "停止系统任务", notes = "停止系统任务")
-    @ApiResponse(code = 200, message = "停止系统任务结果")
-    public JsonMessage stop(@ApiParam(value = "系统任务id数组") @RequestParam Long[] ids) {
+    @Operation(description = "停止系统任务")
+    @ApiResponse(responseCode = "200", description = "停止系统任务结果")
+    public JsonMessage stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
         if (ids != null && ids.length > 0) {
             ClusterTaskUtil.stopTask(true, Arrays.stream(ids).map(e -> (Serializable) e).toArray(len -> new Serializable[len]));
         }

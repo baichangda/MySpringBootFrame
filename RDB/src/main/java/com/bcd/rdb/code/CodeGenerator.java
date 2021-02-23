@@ -232,7 +232,7 @@ public class CodeGenerator {
      */
     private void initConfig(Config config) {
         //如果配置了dbInfo、则不读取spring yml配置
-        if (config == null) {
+        if (config.getDbInfo()==null) {
             config.setDbInfo(dbSupport.getSpringDBConfig());
         }
         config.setTemplateDirPath(Paths.get(config.getTemplateDirPath() == null ? CodeConst.TEMPLATE_DIR_PATH : config.getTemplateDirPath()).toString());

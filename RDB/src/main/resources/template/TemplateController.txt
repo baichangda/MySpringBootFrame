@@ -5,7 +5,9 @@ import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
@@ -17,7 +19,6 @@ import ${packagePre}.bean.${moduleName?cap_first}Bean;
 import ${packagePre}.service.${moduleName?cap_first}Service;
 
 @SuppressWarnings(value = "unchecked")
-@Api(tags = "${moduleNameCN}/${moduleName?cap_first}")
 @RestController
 @RequestMapping("/api${requestMappingPre}/${moduleName?uncap_first}")
 public class ${moduleName?cap_first}Controller extends BaseController {
@@ -32,15 +33,15 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ApiOperation(value="查询${moduleNameCN}列表",notes = "查询${moduleNameCN}列表")
-    @ApiResponse(code = 200,message = "${moduleNameCN}列表")
+    @Operation(description="查询${moduleNameCN}列表")
+    @ApiResponse(responseCode = "200",description = "${moduleNameCN}列表")
     public JsonMessage<List<${moduleName?cap_first}Bean>> list(
         <#list fieldList as field>
           <#if field.type == "Date">
-        @ApiParam(value = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
-        @ApiParam(value = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End<#if field_has_next>,</#if>
+        @Parameter(description = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
+        @Parameter(description = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End<#if field_has_next>,</#if>
           <#else>
-        @ApiParam(value = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name}<#if field_has_next>,</#if>
+        @Parameter(description = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name}<#if field_has_next>,</#if>
           </#if>
         </#list>
     ){
@@ -66,19 +67,19 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @ApiOperation(value="查询${moduleNameCN}分页",notes = "查询${moduleNameCN}分页")
-    @ApiResponse(code = 200,message = "${moduleNameCN}分页结果集")
+    @Operation(description="查询${moduleNameCN}分页")
+    @ApiResponse(responseCode = "200",description = "${moduleNameCN}分页结果集")
     public JsonMessage<Page<${moduleName?cap_first}Bean>> page(
         <#list fieldList as field>
           <#if field.type == "Date">
-        @ApiParam(value = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
-        @ApiParam(value = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End,
+        @Parameter(description = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
+        @Parameter(description = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End,
           <#else>
-        @ApiParam(value = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name},
+        @Parameter(description = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name},
           </#if>
         </#list>
-        @ApiParam(value = "分页参数(页数)",defaultValue = "1")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
-        @ApiParam(value = "分页参数(页大小)",defaultValue = "20") @RequestParam(required = false,defaultValue = "20") Integer pageSize
+        @Parameter(description = "分页参数(页数)")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
+        @Parameter(description = "分页参数(页大小)") @RequestParam(required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
         <#list fieldList as field>
@@ -103,9 +104,9 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @ApiOperation(value = "保存${moduleNameCN}",notes = "保存${moduleNameCN}")
-    @ApiResponse(code = 200,message = "保存结果")
-    public JsonMessage save(@ApiParam(value = "${moduleNameCN}实体") <#if validateSaveParam>@Validated</#if> @RequestBody ${moduleName?cap_first}Bean ${moduleName?uncap_first}){
+    @Operation(description = "保存${moduleNameCN}")
+    @ApiResponse(responseCode = "200",description = "保存结果")
+    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "${moduleNameCN}实体") <#if validateSaveParam>@Validated</#if> @RequestBody ${moduleName?cap_first}Bean ${moduleName?uncap_first}){
         ${moduleName?uncap_first}Service.save(${moduleName?uncap_first});
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -117,9 +118,9 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @ApiOperation(value = "删除${moduleNameCN}",notes = "删除${moduleNameCN}")
-    @ApiResponse(code = 200,message = "删除结果")
-    public JsonMessage delete(@ApiParam(value = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
+    @Operation(description = "删除${moduleNameCN}")
+    @ApiResponse(responseCode = "200",description = "删除结果")
+    public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
         ${moduleName?uncap_first}Service.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }

@@ -1,7 +1,7 @@
 package com.bcd.base.message;
 
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
 
@@ -13,13 +13,13 @@ import java.io.Serializable;
 @SuppressWarnings("unchecked")
 public class JsonMessage<T> implements Serializable {
     private static final long serialVersionUID = 1L;
-    @ApiModelProperty("Api是否调用成功(true/false)")
+    @Schema(description = "Api是否调用成功(true/false)")
     private boolean result;
-    @ApiModelProperty("Api调用失败时提示信息")
+    @Schema(description = "Api调用失败时提示信息")
     private String message = "";
-    @ApiModelProperty("Api调用失败时错误编码")
+    @Schema(description = "Api调用失败时错误编码")
     private String code = "";
-    @ApiModelProperty("Api调用返回的数据(Json字符串)")
+    @Schema(description = "Api调用返回的数据(Json字符串)")
     private T data;
 
     public JsonMessage() {

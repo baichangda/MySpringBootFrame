@@ -11,7 +11,7 @@ import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
-import com.bcd.rdb.dbinfo.service.TablesService;
+import com.bcd.rdb.dbinfo.service.DBService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
 @Service
-public class MysqlTableServiceImpl implements TablesService {
+public class MysqlDBServiceImpl implements DBService {
     private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public static void main(String[] args) {

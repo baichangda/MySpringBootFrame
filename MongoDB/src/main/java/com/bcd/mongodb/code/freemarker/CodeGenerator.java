@@ -10,7 +10,7 @@ import com.bcd.mongodb.test.bean.TestBean;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,9 +212,9 @@ public class CodeGenerator {
             BeanField beanField = new BeanField();
             beanField.setName(fieldName);
             beanField.setType(fieldType.getSimpleName());
-            ApiModelProperty apiModelProperty = f.getAnnotation(ApiModelProperty.class);
-            if (apiModelProperty != null) {
-                beanField.setComment(apiModelProperty.value());
+            Schema schema= f.getAnnotation(Schema.class);
+            if (schema != null) {
+                beanField.setComment(schema.description());
             }
             return beanField;
         }).collect(Collectors.toMap(

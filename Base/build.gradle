@@ -35,27 +35,12 @@ dependencies {
     //apache commons compress
     compile("org.apache.commons:commons-compress:${commonsCompressVersion}")
 
-    //swagger集成
-    /**
-     * 排除swagger-models原因是因为
-     * spring-swagger2版本jar中一直引用的swagger-models 1.5.20版本
-     * 此版本存在bug
-     * 非string类型如果不设置example则会导致进入swagger页面报错,从1.5.22版本解决了这个问题
-     * 所以引用1.5的最新版本 1.5.24
-     *
-     * 注意:
-     * 指定google guava时候需要引用高版本
-     */
-    compile("io.springfox:springfox-swagger2:${swaggerVersion}") {
-        exclude group: 'io.swagger', module: 'swagger-models'
-    }
-    compile("io.springfox:springfox-swagger-ui:${swaggerVersion}")
-    compile group: 'io.swagger', name: 'swagger-models', version: "${swaggerModelVersion}"
-    // https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui
-    compile group: 'com.github.xiaoymin', name: 'swagger-bootstrap-ui', version: "${swaggerBootstrapUiVersion}"
-
     // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+
+    // https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-spring-boot-starter
+    compile group: 'com.github.xiaoymin', name: 'knife4j-spring-boot-starter', version: "${knife4jVersion}"
+
 
 
 }
@@ -72,5 +57,6 @@ buildscript {
         commonsPool2 = '+'
         shiroVersion = '+'
         guavaVersion = '+'
+        knife4jVersion='+'
     }
 }
