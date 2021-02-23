@@ -212,7 +212,7 @@ public class CodeGenerator {
             BeanField beanField = new BeanField();
             beanField.setName(fieldName);
             beanField.setType(fieldType.getSimpleName());
-            Schema schema= f.getAnnotation(Schema.class);
+            Schema schema = f.getAnnotation(Schema.class);
             if (schema != null) {
                 beanField.setComment(schema.description());
             }
