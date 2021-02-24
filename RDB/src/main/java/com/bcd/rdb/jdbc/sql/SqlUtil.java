@@ -91,30 +91,81 @@ public class SqlUtil {
 //        System.out.printf("\n%dms,%dms,%dms",t2-t1,t3-t2,t4-t3);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * @param sql
+     * @param params
+     * @return
+     */
     public static SqlListResult replace_nullParam(String sql, Object... params) {
         return replace_nullParam_count_limit(sql, false, null, null, params);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、替换sql中的select字段替换为count(*)
+     * @param sql
+     * @param params
+     * @return
+     */
     public static SqlListResult replace_nullParam_count(String sql, Object... params) {
         return replace_nullParam_count_limit(sql, true, null, null, params);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、根据分页参数在sql中加入limit
+     * @param sql
+     * @param pageNum
+     * @param pageSize
+     * @param params
+     * @return
+     */
     public static SqlListResult replace_nullParam_limit(String sql, int pageNum, int pageSize, Object... params) {
         return replace_nullParam_count_limit(sql, false, pageNum, pageSize, params);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * @param sql
+     * @param paramMap
+     * @return
+     */
     public static SqlMapResult replace_nullParam(String sql, Map<String, Object> paramMap) {
         return replace_nullParam_count_limit(sql, paramMap, true, null, null);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、替换sql中的select字段替换为count(*)
+     * @param sql
+     * @param paramMap
+     * @return
+     */
     public static SqlMapResult replace_nullParam_count(String sql, Map<String, Object> paramMap) {
         return replace_nullParam_count_limit(sql, paramMap, true, null, null);
     }
 
+    /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、根据分页参数在sql中加入limit
+     * @param sql
+     * @param paramMap
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     public static SqlMapResult replace_nullParam_limit(String sql, Map<String, Object> paramMap, int pageNum, int pageSize) {
         return replace_nullParam_count_limit(sql, paramMap, false, pageNum, pageSize);
     }
 
+    /**
+     * 1、根据分页参数在sql中加入limit
+     * @param sql
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     public static String replace_limit(String sql, int pageNum, int pageSize) {
         Objects.requireNonNull(sql);
         try {
@@ -127,6 +178,11 @@ public class SqlUtil {
         }
     }
 
+    /**
+     * 1、替换sql中的select字段替换为count(*)
+     * @param sql
+     * @return
+     */
     public static String replace_count(String sql) {
         Objects.requireNonNull(sql);
         try {
@@ -140,6 +196,11 @@ public class SqlUtil {
     }
 
     /**
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、替换sql中的select字段替换为count(*)
+     * 3、根据分页参数在sql中加入limit
+     *
+     *
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
      * <p>
      * 性能表现:
@@ -223,6 +284,11 @@ public class SqlUtil {
     }
 
     /**
+     *
+     * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     * 2、替换sql中的select字段替换为count(*)
+     * 3、根据分页参数在sql中加入limit
+     *
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
      * <p>
      * 性能表现:
@@ -293,7 +359,7 @@ public class SqlUtil {
     }
 
     /**
-     * 生成create sql
+     * 生成insert sql
      *
      * @param columnSet
      * @param table
