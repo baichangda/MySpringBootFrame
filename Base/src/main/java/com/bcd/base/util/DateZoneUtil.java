@@ -38,12 +38,16 @@ public class DateZoneUtil {
             return null;
         }
         int len = dateStr.length();
-        if (len == DateUtil.DATE_FORMAT_DAY.length()) {
-            return DateZoneUtil.stringToDate_day(dateStr);
-        } else if (len == DateUtil.DATE_FORMAT_SECOND.length()) {
-            return DateZoneUtil.stringToDate_second(dateStr);
-        } else {
-            throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
+        switch (len){
+            case 8:{
+                return DateZoneUtil.stringToDate_day(dateStr);
+            }
+            case 14:{
+                return DateZoneUtil.stringToDate_second(dateStr);
+            }
+            default:{
+                throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
+            }
         }
     }
 
