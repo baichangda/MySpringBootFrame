@@ -20,7 +20,6 @@ public class ApiController extends BaseController {
     @Autowired
     ApiService apiService;
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/exportApi", method = RequestMethod.GET)
     @Operation(description = "导出所有Api")
     @ApiResponse(responseCode = "200", description = "导入的Excel")

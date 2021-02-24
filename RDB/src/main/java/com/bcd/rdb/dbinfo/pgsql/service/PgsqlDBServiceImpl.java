@@ -36,7 +36,7 @@ public class PgsqlDBServiceImpl implements DBService {
 
     public static void main(String[] args) {
         PgsqlDBServiceImpl dbService = new PgsqlDBServiceImpl();
-        dbService.exportDBDesignerExcelToDisk("db.hbluewhale.com:12921", "dbuser", "hlxpassword", "test_bcd", "d:\\msbf.xlsx");
+        dbService.exportDBDesignerExcelToDisk("127.0.0.1:5432", "root", "123qwe", "msbf", "/Users/baichangda/msbf.xlsx");
     }
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
@@ -87,7 +87,11 @@ public class PgsqlDBServiceImpl implements DBService {
             columnsList.forEach(column -> {
                 List data = new ArrayList();
                 data.add(column.getColumn_name());
-                data.add(column.getUdt_name());
+                if(column.getUdt_name().equals("varchar")){
+                    data.add(column.getUdt_name()+"("+column.getCharacter_maximum_length()+")");
+                }else{
+                    data.add(column.getUdt_name());
+                }
                 data.add(column.getIs_nullable());
                 data.add(column.getColumn_default());
                 data.add(column.getDescription());

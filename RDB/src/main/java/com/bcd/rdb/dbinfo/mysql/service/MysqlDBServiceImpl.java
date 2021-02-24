@@ -102,8 +102,8 @@ public class MysqlDBServiceImpl implements DBService {
             dataList.add(head);
             columnsList.forEach(column -> {
                 List data = new ArrayList();
+                data.add(column.getColumn_name());
                 data.add(column.getColumn_type());
-                data.add(column.getData_type());
                 data.add(column.getIs_nullable());
                 data.add(column.getColumn_default());
                 data.add(column.getColumn_comment());

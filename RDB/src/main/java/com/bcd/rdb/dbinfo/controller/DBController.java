@@ -32,7 +32,7 @@ public class DBController extends BaseController {
     @Operation(description = "导出spring数据库设计")
     @ApiResponse(responseCode = "200",description = "导出结果")
     public void exportSpringDBDesignerExcel(
-            @Parameter(name = "数据库名称") @RequestParam String dbName,
+            @Parameter(description = "数据库名称") @RequestParam String dbName,
             HttpServletResponse response) {
         try {
             dbService.exportSpringDBDesignerExcel(dbName, response.getOutputStream(), () -> {
@@ -49,10 +49,10 @@ public class DBController extends BaseController {
     @Operation(description = "导出数据库设计")
     @ApiResponse(responseCode = "200", description = "导出结果")
     public void exportDBDesignerExcel(
-            @Parameter(name = "数据库url(例如:127.0.0.1:3306)") @RequestParam String url,
-            @Parameter(name = "数据库用户名") @RequestParam String username,
-            @Parameter(name = "数据库密码") @RequestParam String password,
-            @Parameter(name = "数据库名称") @RequestParam String dbName,
+            @Parameter(description = "数据库url(例如:127.0.0.1:3306)") @RequestParam String url,
+            @Parameter(description = "数据库用户名") @RequestParam String username,
+            @Parameter(description = "数据库密码") @RequestParam String password,
+            @Parameter(description = "数据库名称") @RequestParam String dbName,
             HttpServletResponse response) {
         try {
             dbService.exportDBDesignerExcel(url, username, password, dbName, response.getOutputStream(), () -> {

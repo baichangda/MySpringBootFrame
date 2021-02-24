@@ -18,6 +18,7 @@ public class Knife4jConfig {
     public Docket defaultApi2() {
         Docket docket=new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(new ApiInfoBuilder()
+                        .title("框架文档")
                         .description("框架文档")
                         .contact(
                                 new Contact("bcd","13720278557","471267877@qq.com")

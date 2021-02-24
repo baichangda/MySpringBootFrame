@@ -4,6 +4,8 @@ import com.bcd.base.cache.anno.MyCacheClass;
 import com.bcd.base.util.DateZoneUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
@@ -25,8 +27,8 @@ public class BaseController {
      */
     protected void doBeforeResponseFile(String fileName, HttpServletResponse response) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType("application/octet-stream");
-        response.addHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
     }
 
 
