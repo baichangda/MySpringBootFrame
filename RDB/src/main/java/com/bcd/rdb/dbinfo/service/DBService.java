@@ -54,7 +54,7 @@ public interface DBService {
             for (int i = 0; i < sheetNum; i++) {
                 SXSSFSheet sheet = (SXSSFSheet) writeWorkbookHolder.getCachedWorkbook().getSheetAt(i);
                 sheet.trackAllColumnsForAutoSizing();
-                sheet.setColumnWidth(0, 256 * 15 + 184);
+                sheet.setColumnWidth(0, 256 * 45 + 184);
                 sheet.setColumnWidth(1, 256 * 15 + 184);
                 sheet.setColumnWidth(2, 256 * 15 + 184);
                 sheet.setColumnWidth(3, 256 * 30 + 184);
@@ -62,4 +62,5 @@ public interface DBService {
             }
         }
     }
+
 }
