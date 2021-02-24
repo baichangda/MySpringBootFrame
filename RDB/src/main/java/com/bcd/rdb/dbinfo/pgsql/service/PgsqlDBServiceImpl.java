@@ -1,19 +1,13 @@
 package com.bcd.rdb.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.metadata.CellData;
-import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.support.ExcelTypeEnum;
-import com.alibaba.excel.write.handler.CellWriteHandler;
-import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
-import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.DBService;
-import org.apache.poi.ss.usermodel.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -87,9 +81,9 @@ public class PgsqlDBServiceImpl implements DBService {
             columnsList.forEach(column -> {
                 List data = new ArrayList();
                 data.add(column.getColumn_name());
-                if(column.getUdt_name().equals("varchar")){
-                    data.add(column.getUdt_name()+"("+column.getCharacter_maximum_length()+")");
-                }else{
+                if (column.getUdt_name().equals("varchar")) {
+                    data.add(column.getUdt_name() + "(" + column.getCharacter_maximum_length() + ")");
+                } else {
                     data.add(column.getUdt_name());
                 }
                 data.add(column.getIs_nullable());
