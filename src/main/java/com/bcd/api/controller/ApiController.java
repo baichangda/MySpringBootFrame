@@ -3,13 +3,8 @@ package com.bcd.api.controller;
 import com.bcd.api.service.ApiService;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.util.I18nUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +15,6 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "test",description = "接口/ApiController")
 public class ApiController extends BaseController {
 
     @Autowired
