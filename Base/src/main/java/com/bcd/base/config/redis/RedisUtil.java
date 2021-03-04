@@ -15,8 +15,9 @@ import java.lang.reflect.Type;
 @SuppressWarnings("unchecked")
 public class RedisUtil {
 
-    public final static JdkSerializationRedisSerializer JDK_SERIALIZATION_SERIALIZER = new JdkSerializationRedisSerializer();
-    public final static StringRedisSerializer STRING_SERIALIZER = StringRedisSerializer.UTF_8;
+    public final static RedisSerializer<Object> JDK_SERIALIZATION_SERIALIZER = RedisSerializer.java();
+    public final static RedisSerializer<String> STRING_SERIALIZER = RedisSerializer.string();
+    public final static RedisSerializer<byte[]> BYTE_ARRAY_SERIALIZER = RedisSerializer.byteArray();
     public static String SYSTEM_REDIS_KEY_PRE = "bcd:";
 
     /**

@@ -50,6 +50,9 @@ public class RedisTopicMQ<V> {
 
     private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
+            case BYTE_ARRAY: {
+                return RedisUtil.BYTE_ARRAY_SERIALIZER;
+            }
             case STRING: {
                 return RedisUtil.STRING_SERIALIZER;
             }

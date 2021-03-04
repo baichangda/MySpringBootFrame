@@ -5,6 +5,7 @@ import com.bcd.base.config.redis.mq.ValueSerializerType;
 import com.bcd.base.config.redis.mq.queue.RedisQueueMQ;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.stereotype.Component;
 
 //@Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInitializable {
@@ -22,7 +23,7 @@ public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInit
 
     @Override
     public void destroy() {
-        super.destroy();
+        super.unWatch();
     }
 
     @Override

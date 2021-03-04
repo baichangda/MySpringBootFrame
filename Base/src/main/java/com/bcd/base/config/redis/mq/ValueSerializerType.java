@@ -1,12 +1,14 @@
 package com.bcd.base.config.redis.mq;
 
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-
 import java.lang.reflect.Type;
 
 public enum ValueSerializerType {
     /**
-     * {@link org.springframework.data.redis.serializer.StringRedisSerializer#UTF_8}
+     * {@link com.bcd.base.config.redis.RedisUtil#BYTE_ARRAY_SERIALIZER}
+     */
+    BYTE_ARRAY,
+    /**
+     * {@link com.bcd.base.config.redis.RedisUtil#STRING_SERIALIZER}
      */
     STRING,
     /**
@@ -14,7 +16,7 @@ public enum ValueSerializerType {
      */
     JACKSON,
     /**
-     * {@link JdkSerializationRedisSerializer#JdkSerializationRedisSerializer()}
+     * {@link com.bcd.base.config.redis.RedisUtil#JDK_SERIALIZATION_SERIALIZER}
      */
     SERIALIZABLE
 }

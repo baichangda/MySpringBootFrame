@@ -61,6 +61,9 @@ public class RedisQueueMQ<V> {
 
     private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
+            case BYTE_ARRAY:{
+                return RedisUtil.BYTE_ARRAY_SERIALIZER;
+            }
             case STRING: {
                 return RedisUtil.STRING_SERIALIZER;
             }
@@ -148,11 +151,5 @@ public class RedisQueueMQ<V> {
                 logger.info("redisQueueMQ queue[{}] stop", name);
             });
         }
-    }
-
-    protected void destroy() {
-        unWatch();
-        consumePool.shutdown();
-        workPool.shutdown();
     }
 }
