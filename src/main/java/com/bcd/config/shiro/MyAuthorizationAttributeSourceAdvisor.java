@@ -6,6 +6,7 @@ import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.anno.RequiresRequestMappingUrl;
 import org.apache.shiro.authz.annotation.*;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -18,7 +19,7 @@ import java.lang.reflect.Method;
  * Created by Administrator on 2017/8/16.
  */
 @SuppressWarnings("unchecked")
-public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPointcutAdvisor {
+public class MyAuthorizationAttributeSourceAdvisor extends AuthorizationAttributeSourceAdvisor {
     private static final Logger logger = LoggerFactory.getLogger(MyAuthorizationAttributeSourceAdvisor.class);
 
     private static final Class<? extends Annotation>[] AUTHZ_ANNOTATION_CLASSES =
@@ -28,21 +29,11 @@ public class MyAuthorizationAttributeSourceAdvisor extends StaticMethodMatcherPo
                     RequiresAction.class, RequiresRequestMappingUrl.class, RequiresNotePermissions.class
             };
 
-    protected SecurityManager securityManager = null;
-
     /**
      * Create a new AuthorizationAttributeSourceAdvisor.
      */
     public MyAuthorizationAttributeSourceAdvisor(AuthorizationHandler authorizationHandler) {
         setAdvice(new MyAopAllianceAnnotationsAuthorizingMethodInterceptor(authorizationHandler));
-    }
-
-    public SecurityManager getSecurityManager() {
-        return securityManager;
-    }
-
-    public void setSecurityManager(SecurityManager securityManager) {
-        this.securityManager = securityManager;
     }
 
     /**
