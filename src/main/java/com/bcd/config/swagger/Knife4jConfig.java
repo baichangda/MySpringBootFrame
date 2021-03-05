@@ -35,7 +35,7 @@ public class Knife4jConfig {
     @Bean(value = "defaultApi2")
     public Docket defaultApi2() {
         Docket docket=new Docket(DocumentationType.SWAGGER_2)
-                .globalRequestParameters(Collections.singletonList(requestParameter()))
+//                .globalRequestParameters(Collections.singletonList(requestParameter()))
                 .apiInfo(new ApiInfoBuilder()
                         .title("框架文档")
                         .description("框架文档")

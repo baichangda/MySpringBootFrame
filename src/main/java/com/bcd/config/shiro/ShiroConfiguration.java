@@ -100,8 +100,8 @@ public class ShiroConfiguration {
         //设置realm
         securityManager.setRealms(realm);
         //设置rememberMeManager
-//        RememberMeManager rememberMeManager = new MyCookieRememberMeManager();
-        RememberMeManager rememberMeManager=new MyWebHeaderRememberMeManager();
+        RememberMeManager rememberMeManager = new MyCookieRememberMeManager();
+//        RememberMeManager rememberMeManager=new MyWebHeaderRememberMeManager();
         securityManager.setRememberMeManager(rememberMeManager);
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
@@ -127,8 +127,8 @@ public class ShiroConfiguration {
      */
     @Bean
     public SessionManager sessionManager(RedisConnectionFactory redisConnectionFactory) {
-        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
-//        DefaultWebSessionManager sessionManager = new MyDefaultWebSessionManager();
+//        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
+        DefaultWebSessionManager sessionManager = new MyDefaultWebSessionManager();
         sessionManager.setSessionDAO(new RedisSessionDAO(redisConnectionFactory));
         sessionManager.setGlobalSessionTimeout(10 * 1000);
         return sessionManager;
