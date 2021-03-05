@@ -133,6 +133,13 @@ public class MyWebHeaderSessionManager extends DefaultSessionManager implements 
         if (request != null) {
             request.removeAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_IS_VALID);
         }
+        if (WebUtils.isHttp(key)) {
+            log.debug("Referenced session was invalid.  Removing session ID header.");
+            WebUtils.getHttpResponse(key).setHeader(sessionHeaderKeyName,null);
+        } else {
+            log.debug("SessionKey argument is not HTTP compatible or does not have an HTTP request/response " +
+                    "pair. Session ID header will not be removed due to invalidated session.");
+        }
     }
 
 }
