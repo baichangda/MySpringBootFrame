@@ -50,12 +50,12 @@ public class BeanInfo {
         initUnique();
     }
 
-    public void initTableName() {
+    private void initTableName() {
         Table table = ((Table) clazz.getAnnotation(Table.class));
         this.tableName = table == null ? null : table.name();
     }
 
-    public void initUnique() {
+    private void initUnique() {
         uniqueFieldList = Arrays.asList(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class));
         uniqueFieldList.forEach(e -> e.setAccessible(true));
         if (uniqueFieldList.isEmpty()) {
@@ -68,7 +68,7 @@ public class BeanInfo {
     /**
      * 初始化主键字段
      */
-    public void initPkField() {
+    private void initPkField() {
         pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
     }
