@@ -34,9 +34,6 @@ dependencies {
 buildscript {
     ext {
         easyexcelVersion = '+'
-        commonsCodecVersion = '+'
-        commonsLangVersion = '+'
-        commonsCompressVersion = '+'
         swaggerVersion = '2.9.2'
         swaggerModelVersion = '1.6.1'
 //        swaggerModelVersion='1.5.24'
