@@ -97,22 +97,21 @@ allprojects {
             }
         }
     }
+
+    /**
+     * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
+     */
+    bootJar {
+        manifest {
+            attributes 'Start-Class': 'com.bcd.Application'
+        }
+    }
 }
 
 
 /**
  * ----------------------------------------------------------------------------
  */
-
-/**
- * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
- */
-bootJar {
-    manifest {
-        attributes 'Start-Class': 'com.bcd.Application'
-    }
-}
-
 bootRun {
     /**
      * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
