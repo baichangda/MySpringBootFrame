@@ -19,7 +19,7 @@ import java.io.Serializable;
 @MappedSuperclass
 @SuppressWarnings("unchecked")
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
-    @Schema(description = "主键(唯一标识符,自动生成)",accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "主键(唯一标识符,自动生成)", accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "my")
     @GenericGenerator(name = "my", strategy = "com.bcd.rdb.jpa.MyIdentityGenerator")

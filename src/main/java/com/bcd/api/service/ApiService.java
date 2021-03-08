@@ -11,8 +11,8 @@ import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.api.data.ApiParamData;
 import com.bcd.base.util.ProxyUtil;
 import com.bcd.base.util.SpringUtil;
+import com.google.common.base.Strings;
 import io.swagger.annotations.*;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.stereotype.Service;
@@ -74,7 +74,7 @@ public class ApiService {
             } else {
                 //如果 RequestParam 不为空,判断RequestParam有没有设置别名,没有则设置默认参数名
                 name = requestParam.value();
-                if (StringUtils.isEmpty(name)) {
+                if (Strings.isNullOrEmpty(name)) {
                     name = paramNames[i];
                 }
                 required = requestParam.required();
@@ -106,7 +106,7 @@ public class ApiService {
         ApiOperation apiOperation = method.getAnnotation(ApiOperation.class);
         if (apiOperation != null) {
             comment = apiOperation.notes();
-            if (StringUtils.isEmpty(comment)) {
+            if (Strings.isNullOrEmpty(comment)) {
                 comment = apiOperation.value();
             }
         }

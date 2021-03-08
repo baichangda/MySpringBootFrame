@@ -61,7 +61,7 @@ public class RedisQueueMQ<V> {
 
     private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
-            case BYTE_ARRAY:{
+            case BYTE_ARRAY: {
                 return RedisUtil.BYTE_ARRAY_SERIALIZER;
             }
             case STRING: {

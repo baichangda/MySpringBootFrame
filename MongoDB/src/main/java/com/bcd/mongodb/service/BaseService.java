@@ -7,7 +7,7 @@ import com.bcd.mongodb.anno.Unique;
 import com.bcd.mongodb.bean.info.BeanInfo;
 import com.bcd.mongodb.repository.BaseRepository;
 import com.bcd.mongodb.util.ConditionUtil;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -101,7 +101,7 @@ public class BaseService<T, K extends Serializable> {
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
         String msg = anno.messageValue();
-        if (StringUtils.isEmpty(msg)) {
+        if (Strings.isNullOrEmpty(msg)) {
             msg = I18NData.getI18NData(anno.messageKey()).getValue(field.getName());
         }
         return msg;

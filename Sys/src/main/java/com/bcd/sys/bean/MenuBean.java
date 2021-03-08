@@ -1,7 +1,6 @@
 package com.bcd.sys.bean;
 
 import com.bcd.rdb.bean.BaseBean;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,19 +30,19 @@ public class MenuBean extends BaseBean<Long> {
 
     @NotBlank(message = "[菜单名称]不能为空")
     @Size(max = 50, message = "[菜单名称]长度不能超过50")
-    @Schema(description = "菜单名称",required = true,maxLength = 50)
+    @Schema(description = "菜单名称", required = true, maxLength = 50)
     private String name;
 
     @Size(max = 256, message = "[url地址]长度不能超过256")
-    @Schema(description = "url地址",maxLength = 256)
+    @Schema(description = "url地址", maxLength = 256)
     private String url;
 
     @Size(max = 256, message = "[图标]长度不能超过256")
-    @Schema(description = "图标",maxLength = 256)
+    @Schema(description = "图标", maxLength = 256)
     private String icon;
 
     @NotNull(message = "[排序]不能为空")
-    @Schema(description = "排序",required = true)
+    @Schema(description = "排序", required = true)
     private Integer orderNum;
 
     @Transient

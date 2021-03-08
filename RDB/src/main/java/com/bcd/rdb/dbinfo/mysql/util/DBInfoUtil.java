@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -45,7 +45,7 @@ public class DBInfoUtil {
             LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
             //1.1、取出配置文件后缀
             String suffix = (String) springMap.get("profiles.active");
-            if (!StringUtils.isEmpty(suffix)) {
+            if (!Strings.isNullOrEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
                 String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
                 Path activePath = Paths.get(activePathStr);
@@ -157,7 +157,7 @@ public class DBInfoUtil {
      */
     public static List<TablesBean> findTables(Connection conn, String dbName) {
         List<TablesBean> res;
-        String sql = "select * from tables where table_schema=?";
+        String sql = "SELECT * FROM tables WHERE table_schema=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             try (ResultSet rs = pstsm.executeQuery()) {
@@ -177,7 +177,7 @@ public class DBInfoUtil {
      */
     public static TablesBean findTable(Connection conn, String dbName, String tableName) {
         TablesBean res;
-        String sql = "select * from tables where table_schema=? and table_name=?";
+        String sql = "SELECT * FROM tables WHERE table_schema=? AND table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
@@ -203,7 +203,7 @@ public class DBInfoUtil {
      */
     public static List<ColumnsBean> findColumns(Connection conn, String dbName, String tableName) {
         List<ColumnsBean> res;
-        String sql = "select * from columns where table_schema=? and table_name=?";
+        String sql = "SELECT * FROM columns WHERE table_schema=? AND table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);
@@ -220,9 +220,9 @@ public class DBInfoUtil {
      * 获取指定数据库表的主键
      */
     public static ColumnsBean findPKColumn(Connection conn, String dbName, String tableName) {
-        String sql = "select a.* from " +
-                "(select * from columns where table_schema=? and table_name=?) a inner join" +
-                "(select COLUMN_NAME from STATISTICS where table_schema=? and table_name=? and index_name='PRIMARY') b on a.COLUMN_NAME=b.COLUMN_NAME";
+        String sql = "SELECT a.* FROM " +
+                "(SELECT * FROM columns WHERE table_schema=? AND table_name=?) a INNER JOIN" +
+                "(SELECT column_name FROM statistics WHERE table_schema=? AND table_name=? AND index_name='PRIMARY') b ON a.column_name=b.column_name";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, dbName);
             pstsm.setString(2, tableName);

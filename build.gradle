@@ -61,12 +61,6 @@ allprojects {
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
         //邮件支持
         compile("org.springframework.boot:spring-boot-starter-mail")
-        //xjar加密
-        compile("com.github.core-lib:xjar:4.0.1")
-
-
-        dependencies { compile files('lib/jacob.jar') }
-
 
         // https://mvnrepository.com/artifact/org.projectlombok/lombok
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"

@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.pgsql.bean.TablesBean;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -52,7 +52,7 @@ public class DBInfoUtil {
             LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
             //1.1、取出配置文件后缀
             String suffix = (String) springMap.get("profiles.active");
-            if (!StringUtils.isEmpty(suffix)) {
+            if (!Strings.isNullOrEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
                 String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
                 Path activePath = Paths.get(activePathStr);
@@ -107,8 +107,8 @@ public class DBInfoUtil {
      */
     public static List<TablesBean> findTables(Connection conn, String dbName) {
         List<TablesBean> res;
-        String sql = "select relname as table_name,cast(obj_description(relfilenode,'pg_class') as varchar) as table_comment from pg_class c\n" +
-                "where relname in (select tablename from pg_tables where schemaname='public' and position('_2' in tablename)=0);";
+        String sql = "SELECT relname AS table_name,CAST(obj_description(relfilenode,'pg_class') AS varchar) AS table_comment FROM pg_class c\n" +
+                "WHERE relname IN (SELECT tablename FROM pg_tables WHERE schemaname='public' AND POSITION('_2' IN tablename)=0);";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstsm.executeQuery()) {
                 res = parseResult(rs, TablesBean.class);
@@ -127,8 +127,8 @@ public class DBInfoUtil {
      */
     public static TablesBean findTable(Connection conn, String dbName, String tableName) {
         TablesBean res;
-        String sql = "select relname as table_name,cast(obj_description(relfilenode,'pg_class') as varchar) as table_comment from pg_class c\n" +
-                "where relname in (select tablename from pg_tables where schemaname='public' and tablename=? and position('_2' in tablename)=0);";
+        String sql = "SELECT relname AS table_name,CAST(obj_description(relfilenode,'pg_class') AS varchar) AS table_comment FROM pg_class c\n" +
+                "WHERE relname IN (SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename=? AND POSITION('_2' IN tablename)=0);";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, tableName);
             try (ResultSet rs = pstsm.executeQuery()) {
@@ -159,11 +159,11 @@ public class DBInfoUtil {
                 "pg_class a\n" +
                 "INNER JOIN pg_attribute b ON b.attrelid = a.oid\n" +
                 "INNER JOIN information_schema.columns c ON b.attname = c.column_name\n" +
-                "INNER join pg_description d on b.attrelid=d.objoid and d.objsubid=b.attnum\n" +
+                "INNER JOIN pg_description d ON b.attrelid=d.objoid AND d.objsubid=b.attnum\n" +
                 "WHERE\n" +
                 "    a.relname = ? \n" +
-                "\t\tand c.table_catalog=? \n" +
-                "\t\tand c.table_name=?;";
+                "\t\tAND c.table_catalog=? \n" +
+                "\t\tAND c.table_name=?;";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, tableName);
             pstsm.setString(2, dbName);
@@ -189,12 +189,12 @@ public class DBInfoUtil {
                 "INNER JOIN pg_attribute c ON c.attrelid = b.oid\n" +
                 "AND c.attnum = a.conkey [ 1 ]\n" +
                 "INNER JOIN information_schema.columns d ON c.attname = d.column_name\n" +
-                "INNER join pg_description e on c.attrelid=e.objoid and e.objsubid=c.attnum\n" +
+                "INNER JOIN pg_description e ON c.attrelid=e.objoid AND e.objsubid=c.attnum\n" +
                 "WHERE\n" +
                 "    b.relname = ?\n" +
                 "\t\tAND a.contype = 'p' \n" +
-                "\t\tand d.table_catalog=?\n" +
-                "\t\tand d.table_name=?";
+                "\t\tAND d.table_catalog=?\n" +
+                "\t\tAND d.table_name=?";
         try (PreparedStatement pstsm = conn.prepareStatement(sql)) {
             pstsm.setString(1, tableName);
             pstsm.setString(2, dbName);

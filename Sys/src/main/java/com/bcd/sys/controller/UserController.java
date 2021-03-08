@@ -43,7 +43,7 @@ public class UserController extends BaseController {
     @Cacheable
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(description ="查询用户列表")
+    @Operation(description = "查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
     public JsonMessage<List<UserBean>> list(
             @Parameter(description = "生日开始") @RequestParam(required = false) Date birthdayBegin,
@@ -233,7 +233,7 @@ public class UserController extends BaseController {
     @Operation(description = "授予当前登录用户其他身份")
     @ApiResponse(responseCode = "200", description = "授权结果")
     public JsonMessage runAs(@Parameter(description = "要授权身份用户id数组")
-                                 @RequestParam Long[] ids) {
+                             @RequestParam Long[] ids) {
         userService.runAs(ids);
         return MessageDefine.SUCCESS_AUTHORITY.toJsonMessage(true);
     }

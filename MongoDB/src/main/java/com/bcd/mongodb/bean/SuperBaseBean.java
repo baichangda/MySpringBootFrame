@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public abstract class SuperBaseBean<K extends Serializable> implements Serializable {
-    @Schema(description = "主键(唯一标识符,自动生成)",accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "主键(唯一标识符,自动生成)", accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     //主键
     public K id;

@@ -38,14 +38,14 @@ public class DateZoneUtil {
             return null;
         }
         int len = dateStr.length();
-        switch (len){
-            case 8:{
+        switch (len) {
+            case 8: {
                 return DateZoneUtil.stringToDate_day(dateStr);
             }
-            case 14:{
+            case 14: {
                 return DateZoneUtil.stringToDate_second(dateStr);
             }
-            default:{
+            default: {
                 throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
             }
         }

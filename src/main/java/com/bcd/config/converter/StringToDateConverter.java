@@ -2,7 +2,7 @@ package com.bcd.config.converter;
 
 import com.bcd.base.util.DateUtil;
 import com.bcd.base.util.DateZoneUtil;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class StringToDateConverter implements Converter<String, Date> {
 
     @Override
     public Date convert(String source) {
-        if (StringUtils.isEmpty(source)) {
+        if (Strings.isNullOrEmpty(source)) {
             return null;
         } else {
             char first = source.charAt(0);

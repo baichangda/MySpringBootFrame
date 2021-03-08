@@ -1,7 +1,6 @@
 package com.bcd.mongodb.test.bean;
 
 import com.bcd.mongodb.bean.SuperBaseBean;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

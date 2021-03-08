@@ -30,7 +30,7 @@ public class DBController extends BaseController {
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/exportSpringDBDesignerExcel", method = RequestMethod.GET)
     @Operation(description = "导出spring数据库设计")
-    @ApiResponse(responseCode = "200",description = "导出结果")
+    @ApiResponse(responseCode = "200", description = "导出结果")
     public void exportSpringDBDesignerExcel(
             @Parameter(description = "数据库名称") @RequestParam String dbName,
             HttpServletResponse response) {

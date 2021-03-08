@@ -6,10 +6,7 @@ import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
 import com.bcd.base.util.JsonUtil;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -30,9 +27,9 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean[]> implements Spring
         TestBean testBean = new TestBean();
         testBean.setId(1);
         testBean.setName("呵呵");
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(()->{
-            send(new TestBean[]{testBean,testBean},"test");
-        },1,3, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            send(new TestBean[]{testBean, testBean}, "test");
+        }, 1, 3, TimeUnit.SECONDS);
     }
 
     @Override

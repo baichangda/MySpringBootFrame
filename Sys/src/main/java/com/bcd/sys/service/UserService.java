@@ -65,15 +65,17 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         // 加密
         String encodedText = Base64.encodeBase64String(RSASecurity.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
 
-        System.out.printf("RSA encoded: %s%n", encodedText);
+        logger.info("encodedBase64: {}", encodedText);
 
         //数据库密码
         String dbPwd = new Md5Hash(password, username).toBase64();
-        System.out.printf("dbPwd: %s%n", dbPwd);
+
+        logger.info("dbPwd: {}", dbPwd);
 
         // 解密
         String decodedText = RSASecurity.decode(KeysConst.PRIVATE_KEY, Base64.decodeBase64(encodedText));
-        System.out.printf("RSA decoded: %s%n", decodedText);
+
+        logger.info("decodedText: {}", decodedText);
     }
 
     @Override

@@ -93,6 +93,7 @@ public class SqlUtil {
 
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     *
      * @param sql
      * @param params
      * @return
@@ -104,6 +105,7 @@ public class SqlUtil {
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、替换sql中的select字段替换为count(*)
+     *
      * @param sql
      * @param params
      * @return
@@ -115,6 +117,7 @@ public class SqlUtil {
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、根据分页参数在sql中加入limit
+     *
      * @param sql
      * @param pageNum
      * @param pageSize
@@ -127,6 +130,7 @@ public class SqlUtil {
 
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
+     *
      * @param sql
      * @param paramMap
      * @return
@@ -138,6 +142,7 @@ public class SqlUtil {
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、替换sql中的select字段替换为count(*)
+     *
      * @param sql
      * @param paramMap
      * @return
@@ -149,6 +154,7 @@ public class SqlUtil {
     /**
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、根据分页参数在sql中加入limit
+     *
      * @param sql
      * @param paramMap
      * @param pageNum
@@ -161,6 +167,7 @@ public class SqlUtil {
 
     /**
      * 1、根据分页参数在sql中加入limit
+     *
      * @param sql
      * @param pageNum
      * @param pageSize
@@ -180,6 +187,7 @@ public class SqlUtil {
 
     /**
      * 1、替换sql中的select字段替换为count(*)
+     *
      * @param sql
      * @return
      */
@@ -199,8 +207,8 @@ public class SqlUtil {
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、替换sql中的select字段替换为count(*)
      * 3、根据分页参数在sql中加入limit
-     *
-     *
+     * <p>
+     * <p>
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
      * <p>
      * 性能表现:
@@ -284,11 +292,10 @@ public class SqlUtil {
     }
 
     /**
-     *
      * 1、根据传入的参数替换sql中的条件,将参数为null的条件变为 1=1 或者 1=0
      * 2、替换sql中的select字段替换为count(*)
      * 3、根据分页参数在sql中加入limit
-     *
+     * <p>
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)
      * <p>
      * 性能表现:
