@@ -58,7 +58,7 @@ public class BaseService<T, K extends Serializable> {
      *
      * @return
      */
-    public BeanInfo getBeanInfo() {
+    public final BeanInfo getBeanInfo() {
         if (beanInfo == null) {
             synchronized (this) {
                 if (beanInfo == null) {
