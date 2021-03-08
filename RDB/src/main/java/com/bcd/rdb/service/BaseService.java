@@ -50,7 +50,7 @@ public class BaseService<T, K extends Serializable> {
     @Autowired
     public JdbcTemplate jdbcTemplate;
 
-    private volatile BeanInfo beanInfo;
+    private BeanInfo beanInfo;
 
 
     /**
