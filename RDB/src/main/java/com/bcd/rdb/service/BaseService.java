@@ -44,7 +44,7 @@ public class BaseService<T, K extends Serializable> {
     @PersistenceContext
     public EntityManager em;
 
-    @Autowired
+    @Autowired(required = false)
     public BaseRepository<T, K> repository;
 
     @Autowired

@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class BaseService<T, K extends Serializable> {
     @Autowired
     public MongoTemplate mongoTemplate;
-    @Autowired
+    @Autowired(required = false)
     public BaseRepository<T, K> repository;
 
     private volatile BeanInfo beanInfo;
