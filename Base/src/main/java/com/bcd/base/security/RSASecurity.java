@@ -1,7 +1,6 @@
 package com.bcd.base.security;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -13,6 +12,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 public class RSASecurity {
 
@@ -110,13 +110,13 @@ public class RSASecurity {
         Object[] res1 = generateKey(1024);
         PublicKey publicKey1 = (PublicKey) res1[0];
         PrivateKey privateKey1 = (PrivateKey) res1[1];
-        System.out.println(Base64.encodeBase64String(publicKey1.getEncoded()));
-        System.out.println(Base64.encodeBase64String(privateKey1.getEncoded()));
+        System.out.println(Base64.getEncoder().encodeToString(publicKey1.getEncoded()));
+        System.out.println(Base64.getEncoder().encodeToString(privateKey1.getEncoded()));
         Object[] res2 = generateKey(1024);
         PublicKey publicKey2 = (PublicKey) res2[0];
         PrivateKey privateKey2 = (PrivateKey) res2[1];
-        System.out.println(Base64.encodeBase64String(publicKey2.getEncoded()));
-        System.out.println(Base64.encodeBase64String(privateKey2.getEncoded()));
+        System.out.println(Base64.getEncoder().encodeToString(publicKey2.getEncoded()));
+        System.out.println(Base64.getEncoder().encodeToString(privateKey2.getEncoded()));
 
         byte[] b1 = encode(publicKey1, "abc".getBytes());
         byte[] b2 = encode(publicKey2, "def".getBytes());

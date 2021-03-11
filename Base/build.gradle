@@ -8,7 +8,7 @@ dependencies {
     //springboot web支持
     compile("org.springframework.boot:spring-boot-starter-web")
     //springboot test支持
-    compile("org.springframework.boot:spring-boot-starter-test")
+//    compile("org.springframework.boot:spring-boot-starter-test")
     //springboot websocket支持
     compile("org.springframework.boot:spring-boot-starter-websocket")
     //springboot redis支持
@@ -34,10 +34,6 @@ dependencies {
 buildscript {
     ext {
         easyexcelVersion = '+'
-        swaggerVersion = '2.9.2'
-        swaggerModelVersion = '1.6.1'
-//        swaggerModelVersion='1.5.24'
-        swaggerBootstrapUiVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
         guavaVersion = '+'

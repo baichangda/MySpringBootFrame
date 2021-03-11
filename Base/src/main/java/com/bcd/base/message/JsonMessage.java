@@ -16,9 +16,9 @@ public class JsonMessage<T> implements Serializable {
     @Schema(description = "Api是否调用成功(true/false)")
     private boolean result;
     @Schema(description = "Api调用失败时提示信息")
-    private String message = "";
+    private String message;
     @Schema(description = "Api调用失败时错误编码")
-    private String code = "";
+    private String code;
     @Schema(description = "Api调用返回的数据(Json字符串)")
     private T data;
 
@@ -41,27 +41,27 @@ public class JsonMessage<T> implements Serializable {
         return result;
     }
 
-    public JsonMessage<T> withResult(boolean result) {
+    public <R> JsonMessage<R> withResult(boolean result) {
         this.result = result;
-        return this;
+        return (JsonMessage<R>) this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public JsonMessage<T> withMessage(String message) {
+    public <R> JsonMessage<R> withMessage(String message) {
         this.message = message;
-        return this;
+        return (JsonMessage<R>) this;
     }
 
     public String getCode() {
         return code;
     }
 
-    public JsonMessage<T> withCode(String code) {
+    public <R> JsonMessage<R> withCode(String code) {
         this.code = code;
-        return this;
+        return (JsonMessage<R>) this;
     }
 
     public T getData() {

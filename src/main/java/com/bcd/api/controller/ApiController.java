@@ -26,7 +26,7 @@ public class ApiController extends BaseController {
     public void exportApi(HttpServletResponse response) {
         try {
             apiService.exportApi(response.getOutputStream(), () -> {
-                String fileName = I18nUtil.getMessage("AnonymousController.exportApi.fileName") + ".xlsx";
+                String fileName = I18nUtil.getMessage("ApiController.exportApi.fileName") + ".xlsx";
                 doBeforeResponseFile(toDateFileName(fileName), response);
             });
         } catch (IOException e) {

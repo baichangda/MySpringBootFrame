@@ -22,7 +22,6 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/anonymous")
-//@Tag(name = "AnonymousController",description = "公开")
 public class AnonymousController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonymousController.class);
 
