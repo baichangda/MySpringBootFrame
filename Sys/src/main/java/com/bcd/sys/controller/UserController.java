@@ -73,7 +73,7 @@ public class UserController extends BaseController {
                 new NumberCondition("type", type, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success().withData(userService.findAll(condition));
+        return JsonMessage.<List<UserBean>>success().withData(userService.findAll(condition));
     }
 
     /**
@@ -113,7 +113,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success().withData(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.<Page<UserBean>>success().withData(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**

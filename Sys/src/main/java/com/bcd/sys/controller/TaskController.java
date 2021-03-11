@@ -72,7 +72,7 @@ public class TaskController extends BaseController {
                 new DateCondition("finishTime", finishTimeEnd, DateCondition.Handler.LE),
                 new StringCondition("filePaths", filePaths, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success().withData(taskService.findAll(condition));
+        return JsonMessage.<List<TaskBean>>success().withData(taskService.findAll(condition));
     }
 
     /**
@@ -112,7 +112,7 @@ public class TaskController extends BaseController {
                 new DateCondition("finishTime", finishTimeEnd, DateCondition.Handler.LE),
                 new StringCondition("filePaths", filePaths, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success().withData(taskService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.<Page<TaskBean>>success().withData(taskService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
 

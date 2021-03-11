@@ -29,11 +29,11 @@ public class JsonMessage<T> implements Serializable {
         this.result = result;
     }
 
-    public static <T> JsonMessage<T> success() {
+    public static <R> JsonMessage<R> success() {
         return new JsonMessage<>(true);
     }
 
-    public static <T> JsonMessage<T> fail() {
+    public static <R> JsonMessage<R> fail() {
         return new JsonMessage<>(false);
     }
 
@@ -41,35 +41,35 @@ public class JsonMessage<T> implements Serializable {
         return result;
     }
 
-    public <R> JsonMessage<R> withResult(boolean result) {
+    public JsonMessage<T> withResult(boolean result) {
         this.result = result;
-        return (JsonMessage<R>) this;
+        return this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public <R> JsonMessage<R> withMessage(String message) {
+    public JsonMessage<T> withMessage(String message) {
         this.message = message;
-        return (JsonMessage<R>) this;
+        return this;
     }
 
     public String getCode() {
         return code;
     }
 
-    public <R> JsonMessage<R> withCode(String code) {
+    public JsonMessage<T> withCode(String code) {
         this.code = code;
-        return (JsonMessage<R>) this;
+        return this;
     }
 
     public T getData() {
         return data;
     }
 
-    public <R> JsonMessage<R> withData(T data) {
+    public JsonMessage<T> withData(T data) {
         this.data = data;
-        return (JsonMessage<R>) this;
+        return this;
     }
 }

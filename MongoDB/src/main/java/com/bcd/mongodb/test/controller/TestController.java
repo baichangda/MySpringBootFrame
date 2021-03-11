@@ -49,7 +49,7 @@ public class TestController extends BaseController {
                 new DateCondition("time", timeEnd, DateCondition.Handler.LE),
                 new StringCondition("id", id)
         );
-        return JsonMessage.success().withData(testService.findAll(condition));
+        return JsonMessage.<List<TestBean>>success().withData(testService.findAll(condition));
     }
 
     /**
@@ -74,7 +74,7 @@ public class TestController extends BaseController {
                 new DateCondition("time", timeEnd, DateCondition.Handler.LE),
                 new StringCondition("id", id)
         );
-        return JsonMessage.success().withData(testService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.<Page<TestBean>>success().withData(testService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**

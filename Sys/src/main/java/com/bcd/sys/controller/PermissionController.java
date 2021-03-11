@@ -53,7 +53,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success().withData(permissionService.findAll(condition));
+        return JsonMessage.<List<PermissionBean>>success().withData(permissionService.findAll(condition));
     }
 
     /**
@@ -81,7 +81,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success().withData((permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize))));
+        return JsonMessage.<Page<PermissionBean>>success().withData((permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize))));
     }
 
     /**
