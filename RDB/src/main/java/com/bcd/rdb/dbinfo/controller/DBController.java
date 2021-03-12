@@ -36,7 +36,7 @@ public class DBController extends BaseController {
             HttpServletResponse response) {
         try {
             dbService.exportSpringDBDesignerExcel(dbName, response.getOutputStream(), () -> {
-                String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
+                String fileName = I18nUtil.getMessage("DBController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
@@ -56,7 +56,7 @@ public class DBController extends BaseController {
             HttpServletResponse response) {
         try {
             dbService.exportDBDesignerExcel(url, username, password, dbName, response.getOutputStream(), () -> {
-                String fileName = I18nUtil.getMessage("TablesController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
+                String fileName = I18nUtil.getMessage("DBController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
