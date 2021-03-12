@@ -76,9 +76,7 @@ public class DynamicJdbcUtil {
      * 所以需要另启动清除线程
      */
     static {
-        CLEAN_UP_POOL.scheduleWithFixedDelay(() -> {
-            CACHE.cleanUp();
-        }, EXPIRE_IN_SECOND, CLEAN_UP_POOL_PERIOD_IN_SECOND, TimeUnit.SECONDS);
+        CLEAN_UP_POOL.scheduleWithFixedDelay(CACHE::cleanUp, EXPIRE_IN_SECOND, CLEAN_UP_POOL_PERIOD_IN_SECOND, TimeUnit.SECONDS);
     }
 
     private static void test(String url, String username, String password) {
