@@ -19,7 +19,7 @@ public class JsonMessage<T> implements Serializable {
     private String message;
     @Schema(description = "Api调用失败时错误编码")
     private String code;
-    @Schema(description = "Api调用返回的数据(Json字符串)")
+    @Schema(description = "Api调用返回的数据")
     private T data;
 
     public JsonMessage() {

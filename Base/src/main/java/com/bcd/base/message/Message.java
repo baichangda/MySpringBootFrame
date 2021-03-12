@@ -32,7 +32,7 @@ public class Message implements Serializable {
     }
 
     public JsonMessage toJsonMessage(boolean result, Object... params) {
-        return new JsonMessage(result).withMessage(getValue(params)).withCode(code);
+        return new JsonMessage<>(result).withMessage(getValue(params)).withCode(code);
     }
 
     /**

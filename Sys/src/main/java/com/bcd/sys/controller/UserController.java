@@ -157,13 +157,13 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @Operation(description = "用户登录")
     @ApiResponse(responseCode = "200", description = "登录的用户信息")
-    public JsonMessage login(
+    public JsonMessage<UserBean> login(
             @Parameter(description = "用户名")
             @RequestParam String username,
             @Parameter(description = "密码")
             @RequestParam String password) {
         UserBean user = userService.login(username, password);
-        return JsonMessage.success().withData(user);
+        return JsonMessage.<UserBean>success().withData(user);
     }
 
     /**

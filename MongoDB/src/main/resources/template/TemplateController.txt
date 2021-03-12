@@ -59,7 +59,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.success().withData(${moduleName?uncap_first}Service.findAll(condition));
+        return JsonMessage.<List<${moduleName?cap_first}Bean>>success().withData(${moduleName?uncap_first}Service.findAll(condition));
     }
 
     /**
@@ -95,7 +95,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.success().withData(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.<Page<${moduleName?cap_first}Bean>>success().withData(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
