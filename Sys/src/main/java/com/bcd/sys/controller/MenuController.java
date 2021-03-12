@@ -36,7 +36,7 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存菜单")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public JsonMessage<String> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "菜单实体") @Validated @RequestBody MenuBean menu) {
+    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "菜单实体") @Validated @RequestBody MenuBean menu) {
         menuService.save(menu);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -52,7 +52,7 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除菜单")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage<String> delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
+    public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
         menuService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
@@ -66,7 +66,7 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/adminMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询当前用户所属组织的admin拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
-    public JsonMessage<List<MenuBean>> adminMenuTree() {
+    public JsonMessage adminMenuTree() {
         List<MenuBean> menuBeanList = menuService.adminMenuTree();
         return JsonMessage.success().withData(menuBeanList);
     }
@@ -81,7 +81,7 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/userMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询用户拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
-    public JsonMessage<List<MenuBean>> userMenuTree(@Parameter(description = "用户id")
+    public JsonMessage userMenuTree(@Parameter(description = "用户id")
                                     @RequestParam(required = false) Long userId) {
         List<MenuBean> menuBeanList = menuService.userMenuTree(userId);
         return JsonMessage.success().withData(menuBeanList);
@@ -96,7 +96,7 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/selfMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询当前用户拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
-    public JsonMessage<List<MenuBean>> selfMenuTree() {
+    public JsonMessage selfMenuTree() {
         UserBean userBean = ShiroUtil.getCurrentUser();
         List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.getId());
         return JsonMessage.success().withData(menuBeanList);

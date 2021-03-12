@@ -53,7 +53,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success().withData(permissionService.findAll(condition));
+        return JsonMessage.<List<PermissionBean>>success().withData(permissionService.findAll(condition));
     }
 
     /**
@@ -81,7 +81,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success().withData((permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize))));
+        return JsonMessage.<Page<PermissionBean>>success().withData((permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize))));
     }
 
     /**
@@ -94,7 +94,7 @@ public class PermissionController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存权限")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public JsonMessage<String> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "权限实体") @Validated @RequestBody PermissionBean permission) {
+    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "权限实体") @Validated @RequestBody PermissionBean permission) {
         permissionService.save(permission);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -110,7 +110,7 @@ public class PermissionController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除权限")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage<String> delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
+    public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
         permissionService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
