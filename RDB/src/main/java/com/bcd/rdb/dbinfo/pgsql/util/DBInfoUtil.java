@@ -13,7 +13,9 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class DBInfoUtil {
     private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
@@ -44,7 +46,6 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            Map<String, String> props = new HashMap<>();
             Yaml yaml = new Yaml();
             //1、加载spring配置
             LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));

@@ -13,7 +13,9 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * 此帮助类的所有api均会读取application-*.yml的数据库配置,并将数据库切换为information_schema
@@ -37,7 +39,6 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            Map<String, String> props = new HashMap<>();
             Yaml yaml = new Yaml();
             //1、加载spring配置
             LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
