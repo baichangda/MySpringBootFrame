@@ -73,7 +73,7 @@ public class UserController extends BaseController {
                 new NumberCondition("type", type, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<List<UserBean>>success().withData(userService.findAll(condition));
+        return JsonMessage.success().withData(userService.findAll(condition));
     }
 
     /**
@@ -113,7 +113,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<Page<UserBean>>success().withData(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success().withData(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -126,7 +126,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
+    public JsonMessage<String> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
 
         userService.saveUser(user);
         return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
@@ -142,7 +142,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
+    public JsonMessage<String> delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
         userService.deleteById(ids);
         return com.bcd.base.define.MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
     }
@@ -157,7 +157,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @Operation(description = "用户登录")
     @ApiResponse(responseCode = "200", description = "登录的用户信息")
-    public JsonMessage login(
+    public JsonMessage<UserBean> login(
             @Parameter(description = "用户名")
             @RequestParam String username,
             @Parameter(description = "密码")
@@ -174,7 +174,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @Operation(description = "用户注销")
     @ApiResponse(responseCode = "200", description = "注销结果")
-    public JsonMessage logout() {
+    public JsonMessage<String> logout() {
         Subject currentUser = SecurityUtils.getSubject();
         JsonMessage jsonMessage = MessageDefine.SUCCESS_LOGOUT.toJsonMessage(true);
         //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
@@ -192,7 +192,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @Operation(description = "重置密码")
     @ApiResponse(responseCode = "200", description = "重制密码结果")
-    public JsonMessage resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
+    public JsonMessage<String> resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
         userService.resetPassword(userId);
         return MessageDefine.SUCCESS_RESET_PASSWORD.toJsonMessage(true);
     }

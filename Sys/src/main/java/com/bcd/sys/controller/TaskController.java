@@ -72,7 +72,7 @@ public class TaskController extends BaseController {
                 new DateCondition("finishTime", finishTimeEnd, DateCondition.Handler.LE),
                 new StringCondition("filePaths", filePaths, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<List<TaskBean>>success().withData(taskService.findAll(condition));
+        return JsonMessage.success().withData(taskService.findAll(condition));
     }
 
     /**
@@ -112,7 +112,7 @@ public class TaskController extends BaseController {
                 new DateCondition("finishTime", finishTimeEnd, DateCondition.Handler.LE),
                 new StringCondition("filePaths", filePaths, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<Page<TaskBean>>success().withData(taskService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success().withData(taskService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
 
@@ -126,7 +126,7 @@ public class TaskController extends BaseController {
     @RequestMapping(value = "/stop", method = RequestMethod.POST)
     @Operation(description = "停止系统任务")
     @ApiResponse(responseCode = "200", description = "停止系统任务结果")
-    public JsonMessage stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
+    public JsonMessage<String> stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
         if (ids != null && ids.length > 0) {
             ClusterTaskUtil.stopTask(true, Arrays.stream(ids).map(e -> (Serializable) e).toArray(len -> new Serializable[len]));
         }

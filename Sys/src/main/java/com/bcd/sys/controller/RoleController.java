@@ -53,7 +53,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<List<RoleBean>>success().withData(roleService.findAll(condition));
+        return JsonMessage.success().withData(roleService.findAll(condition));
     }
 
     /**
@@ -81,7 +81,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<Page<RoleBean>>success().withData(roleService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success().withData(roleService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -94,7 +94,7 @@ public class RoleController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存角色")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "角色实体") @Validated @RequestBody RoleBean role) {
+    public JsonMessage<String> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "角色实体") @Validated @RequestBody RoleBean role) {
         roleService.save(role);
         return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
     }
@@ -110,7 +110,7 @@ public class RoleController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除角色")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
+    public JsonMessage<String> delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
         //验证删除权限
         roleService.deleteById(ids);
         return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
