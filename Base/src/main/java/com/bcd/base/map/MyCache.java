@@ -85,6 +85,9 @@ public class MyCache<K, V> {
     private TimeUnit clearExpiredValue_executor_unit;
     private ScheduledFuture<?> clearExpiredValueExecutor_scheduledFuture;
 
+    public static <K, V>MyCache<K,V> newInstance(){
+        return new MyCache<>();
+    }
 
     public synchronized MyCache<K, V> init() {
         initReferenceQueue();
@@ -330,6 +333,41 @@ public class MyCache<K, V> {
             }
         }
         return collection;
+    }
+
+    public static void main(String[] args) {
+        MyCache<Long, Long> myCache = MyCache.<Long, Long>newInstance().withSoftReferenceValue();
+        ExecutorService pool1= Executors.newSingleThreadExecutor();
+        ExecutorService pool2= Executors.newSingleThreadExecutor();
+        pool1.execute(()->{
+            while(true){
+                long t1=System.currentTimeMillis();
+                myCache.put(t1,t1);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        pool2.execute(()->{
+            while(true){
+                long t1=System.currentTimeMillis();
+                myCache.put(t1,t1);
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        long t1=System.currentTimeMillis();
+        for(long i=0;i<1000000;i++){
+            myCache.put(i,i);
+        }
+        long t2=System.currentTimeMillis();
+        System.out.println(t2-t1);
     }
 
 
