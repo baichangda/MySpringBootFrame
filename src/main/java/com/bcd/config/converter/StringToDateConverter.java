@@ -24,10 +24,8 @@ public class StringToDateConverter implements Converter<String, Date> {
         if (Strings.isNullOrEmpty(source)) {
             return null;
         } else {
-            char first = source.charAt(0);
-            if (first == 's') {
-                String val = source.substring(1);
-                return DateZoneUtil.stringToDate(val);
+            if (source.charAt(0) == 's') {
+                return DateZoneUtil.stringToDate(source.substring(1));
             } else {
                 long t = Long.parseLong(source);
                 return new Date(t);
