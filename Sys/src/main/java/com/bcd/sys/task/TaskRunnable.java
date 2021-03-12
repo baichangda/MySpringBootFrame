@@ -21,14 +21,11 @@ public class TaskRunnable<T extends Task> implements Runnable {
      * <p>
      * 状态变更可能性:
      * 0->1
-     * <p>
      * 1->2 //开始执行
      * 1->5 //还在等待中时调用停止方法取消
-     * <p>
      * 2->3 //执行成功
      * 2->4 //执行失败
      * 2->6 //执行中时调用停止方法
-     * <p>
      * 6->7 //任务停止
      */
     final AtomicInteger status = new AtomicInteger(0);
