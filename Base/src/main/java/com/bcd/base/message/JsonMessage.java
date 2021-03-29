@@ -1,6 +1,7 @@
 package com.bcd.base.message;
 
 
+import com.bcd.base.util.JsonUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
@@ -71,5 +72,9 @@ public class JsonMessage<T> implements Serializable {
     public JsonMessage<T> withData(T data) {
         this.data = data;
         return this;
+    }
+
+    public String toJson(){
+        return JsonUtil.toJson(this);
     }
 }

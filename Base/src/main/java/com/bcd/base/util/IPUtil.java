@@ -1,11 +1,11 @@
 package com.bcd.base.util;
 
 import com.google.common.base.Strings;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class IPUtil {
     /**
@@ -41,21 +41,28 @@ public class IPUtil {
         if (!Strings.isNullOrEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)) {
             return XFor;
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+        if (Strings.isNullOrEmpty(XFor) || "unknown".equalsIgnoreCase(XFor)) {
             XFor = request.getHeader("Proxy-Client-IP");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+        if (Strings.isNullOrEmpty(XFor) || "unknown".equalsIgnoreCase(XFor)) {
             XFor = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+        if (Strings.isNullOrEmpty(XFor) || "unknown".equalsIgnoreCase(XFor)) {
             XFor = request.getHeader("HTTP_CLIENT_IP");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+        if (Strings.isNullOrEmpty(XFor) || "unknown".equalsIgnoreCase(XFor)) {
             XFor = request.getHeader("HTTP_X_FORWARDED_FOR");
         }
-        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+        if (Strings.isNullOrEmpty(XFor) || "unknown".equalsIgnoreCase(XFor)) {
             XFor = request.getRemoteAddr();
         }
         return XFor;
+    }
+
+    public static void main(String[] args) {
+        ConcurrentHashMap<String,String> map=new ConcurrentHashMap<>();
+        for(int i=0;i<100;i++){
+            map.put(i+"",i+"");
+        }
     }
 }
