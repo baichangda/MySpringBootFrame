@@ -56,6 +56,13 @@ allprojects {
             downloadJavadoc = true
         }
     }
+
+    configurations.all {
+        exclude group:'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude module: 'logback-classic'
+        exclude module: 'logback-core'
+    }
+
     dependencies {
         //spring kafka支持
         compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
