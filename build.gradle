@@ -57,6 +57,7 @@ allprojects {
         }
     }
 
+    //去除springboot默认的logback
     configurations.all {
         exclude group:'org.springframework.boot', module: 'spring-boot-starter-logging'
         exclude module: 'logback-classic'
@@ -131,6 +132,8 @@ bootRun {
     //开启缓存行补齐
     args.add('-XX:-RestrictContended')
     args.add('-Dfile.encoding=UTF-8')
+    //log4j2全局异步日志
+    args.add('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
 
     jvmArgs(args)
 }
