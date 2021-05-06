@@ -134,7 +134,6 @@ bootRun {
     args.add('-Dfile.encoding=UTF-8')
     //log4j2全局异步日志
     args.add('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
-
     jvmArgs(args)
 }
 

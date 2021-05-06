@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.io.Serializable;
+import java.util.concurrent.Executors;
 
 @Configuration
 @SuppressWarnings("unchecked")
@@ -41,6 +42,7 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(factory);
+        redisMessageListenerContainer.setTaskExecutor(Executors.newSingleThreadExecutor());
         return redisMessageListenerContainer;
     }
 

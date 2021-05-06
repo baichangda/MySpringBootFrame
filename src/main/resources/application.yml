@@ -134,16 +134,16 @@ spring:
   #  kafka配置
   kafka:
     consumer:
-      #        bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
-      #        bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
-      bootstrap-servers: kafka.hbluewhale.com:9092
+#      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+#      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
+      bootstrap-servers: '10.0.11.50:9092'
       group-id: bcd
       key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
     producer:
-      #        bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
-      #        bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
-      bootstrap-servers: kafka.hbluewhale.com:9092
+#      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+#      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
+      bootstrap-servers: '10.0.11.50:9092'
       key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
