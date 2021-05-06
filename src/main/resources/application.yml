@@ -157,6 +157,9 @@ spring:
   #注意如果使用druid数据源、脚本中不能带 . 字符、否则会导致启动执行脚本失败
 #   flyway:
 #     enabled: true
-
-knife4j:
-  enable: true
+springdoc:
+  packages-to-scan:
+    - com.bcd
+  swagger-ui:
+    path: /swagger-ui.html
+    layout:

@@ -5,7 +5,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
     compile("org.springframework.boot:spring-boot-starter-web")
-
+    //springboot log4j2支持
+    compile('org.springframework.boot:spring-boot-starter-log4j2')
     //disruptor(log4j2异步日志需要用到)
     compile group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
     //springboot test支持
@@ -29,8 +30,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
 
-    // https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-spring-boot-starter
-    compile group: 'com.github.xiaoymin', name: 'knife4j-spring-boot-starter', version: "${knife4jVersion}"
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
+
 }
 buildscript {
     ext {
@@ -38,7 +40,7 @@ buildscript {
         commonsPool2 = '+'
         shiroVersion = '+'
         guavaVersion = '+'
-        knife4jVersion = '+'
         disruptorVersion='+'
+        springdocVersion='+'
     }
 }
