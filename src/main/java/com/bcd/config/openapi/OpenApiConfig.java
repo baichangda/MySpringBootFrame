@@ -21,7 +21,7 @@ public class OpenApiConfig{
     /**
      * 添加全局的请求头参数
      */
-    @Bean
+//    @Bean
     public OpenApiCustomiser openApiCustomiser() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
