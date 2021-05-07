@@ -22,8 +22,8 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/anon")
-public class AnonymousController extends BaseController {
-    Logger logger = LoggerFactory.getLogger(AnonymousController.class);
+public class AnonController extends BaseController {
+    Logger logger = LoggerFactory.getLogger(AnonController.class);
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
