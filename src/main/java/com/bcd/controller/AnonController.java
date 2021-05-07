@@ -21,7 +21,7 @@ import java.util.Optional;
  * Created by Administrator on 2017/6/15.
  */
 @RestController
-@RequestMapping("/api/anonymous")
+@RequestMapping("/api/anon")
 public class AnonymousController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonymousController.class);
 
