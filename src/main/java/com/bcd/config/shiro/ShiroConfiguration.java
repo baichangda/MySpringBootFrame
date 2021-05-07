@@ -2,6 +2,7 @@ package com.bcd.config.shiro;
 
 import com.bcd.base.config.shiro.AuthorizationHandler;
 import com.bcd.config.exception.handler.ExceptionResponseHandler;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.CacheManagerAware;
@@ -11,9 +12,11 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -130,7 +133,7 @@ public class ShiroConfiguration {
 //        MyWebHeaderSessionManager sessionManager=new MyWebHeaderSessionManager();
         DefaultWebSessionManager sessionManager = new MyDefaultWebSessionManager();
         sessionManager.setSessionDAO(new RedisSessionDAO(redisConnectionFactory));
-        sessionManager.setGlobalSessionTimeout(10 * 1000);
+        sessionManager.setGlobalSessionTimeout(30 * 60 * 1000);
         return sessionManager;
     }
 

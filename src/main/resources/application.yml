@@ -162,4 +162,3 @@ springdoc:
     - com.bcd
   swagger-ui:
     path: /swagger-ui.html
-    layout:
