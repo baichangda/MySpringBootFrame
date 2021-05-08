@@ -47,7 +47,6 @@ public class JsonUtil {
 
 
     /**
-     * 为ObjectMapper重新设置MapSerializer,使其能使用PropertyFilter过滤属性,并为所有的Map添加过滤器,如果设置了map过滤,则必须为objectMapper设置默认过滤器(默认设置空的过滤器)
      * 设置所有Number属性的 输出为字符串(Long类型数字传入前端会进行四舍五入导致精度丢失,为了避免这种情况,所有的数字全部采用String格式化)
      * 设置忽略null属性输出
      * 设置在解析json字符串为实体类时候,忽略多余的属性
