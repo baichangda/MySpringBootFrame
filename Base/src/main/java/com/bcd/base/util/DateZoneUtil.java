@@ -2,10 +2,7 @@ package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -70,7 +67,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDate.from(DATE_TIME_FORMATTER_SECOND.parse(dateStr)).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
+        return Date.from(LocalDateTime.from(DATE_TIME_FORMATTER_SECOND.parse(dateStr)).toInstant(ZONE_OFFSET));
     }
 
     /**
