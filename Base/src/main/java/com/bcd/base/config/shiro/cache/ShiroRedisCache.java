@@ -55,6 +55,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     @Override
     public V get(K k) throws CacheException {
+        logger.info("local cache[{}]",k);
         return cache.get(k,e -> {
             logger.info("load from redis cache name[{}] key[{}]", key, e);
             return boundHashOperations.get(e);
