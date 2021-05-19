@@ -1,12 +1,9 @@
 package com.bcd.config.redis.cache;
 
-import com.bcd.base.cache.MultiLevelCache;
+import com.bcd.base.cache.CacheConst;
 import com.bcd.base.config.redis.RedisUtil;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cache.Cache;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -16,22 +13,17 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-@EnableCaching
 @Configuration
 public class RedisCacheConfig {
     /**
-     * 定义两级缓存
-     * 一级:caffeine缓存(过期时间5s);  key: myCache_1::${key}
-     * 二级:redis(过期时间15s);  key: myCache_2::${key}
-     *
+     * redis缓存
      * @return
      */
     @ConditionalOnClass(RedisConnectionFactory.class)
-    @Bean("myCache")
-    public Cache myCache(RedisConnectionFactory factory) {
+    @Bean(CacheConst.REDIS_CACHE)
+    public Cache redisCache(RedisConnectionFactory factory) {
         RedisCacheManager redisCacheManager = new RedisCacheManager(
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()
@@ -39,18 +31,6 @@ public class RedisCacheConfig {
                         .entryTtl(Duration.ofMillis(15 * 1000L))
                         .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
-        MultiLevelCache cache = new MultiLevelCache("myCache",
-                new CaffeineCache("myCache_1",
-                        Caffeine.newBuilder()
-                                .expireAfterAccess(5, TimeUnit.SECONDS)
-                                .expireAfterWrite(5, TimeUnit.SECONDS)
-                                .softValues()
-                                .build()
-                ),
-                redisCacheManager.getCache("myCache_2")
-        );
-        return cache;
+        return redisCacheManager.getCache(CacheConst.REDIS_CACHE);
     }
-
-
 }

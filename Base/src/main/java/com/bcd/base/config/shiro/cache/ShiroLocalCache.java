@@ -17,13 +17,13 @@ import java.util.concurrent.TimeUnit;
  * @param <K>
  * @param <V>
  */
-public class LocalCache<K, V> implements Cache<K, V> {
+public class ShiroLocalCache<K, V> implements Cache<K, V> {
 
-    Logger logger = LoggerFactory.getLogger(LocalCache.class);
+    Logger logger = LoggerFactory.getLogger(ShiroLocalCache.class);
 
     com.github.benmanes.caffeine.cache.Cache<K,V> cache;
 
-    public LocalCache(long expired, TimeUnit unit) {
+    public ShiroLocalCache(long expired, TimeUnit unit) {
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(expired, unit)
                 .expireAfterAccess(expired, unit)

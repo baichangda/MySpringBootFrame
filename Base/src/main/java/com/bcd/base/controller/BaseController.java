@@ -1,6 +1,5 @@
 package com.bcd.base.controller;
 
-import com.bcd.base.cache.anno.MyCacheClass;
 import com.bcd.base.util.DateZoneUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import java.util.Date;
 /**
  * Created by Administrator on 2017/4/11.
  */
-@MyCacheClass
 public class BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());

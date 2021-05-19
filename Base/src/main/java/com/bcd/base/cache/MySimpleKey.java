@@ -1,46 +1,42 @@
 package com.bcd.base.cache;
 
+import lombok.Getter;
 import com.bcd.base.util.JsonUtil;
+import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 
+@Getter
 public class MySimpleKey implements Serializable {
     private String className;
     private String methodName;
     private Object[] args;
+    private String json;
+    private int hashCode;
 
     public MySimpleKey(String className, String methodName, Object... args) {
         this.className = className;
         this.methodName = methodName;
         this.args = args;
+        this.json = JsonUtil.toJson(new Object[]{className, methodName, args});
+        this.hashCode=json.hashCode();
     }
 
-    public String getClassName() {
-        return className;
+
+    @Override
+    public boolean equals(@Nullable Object other) {
+        return (this == other ||
+                (other instanceof MySimpleKey && json.equals(((MySimpleKey) other).getJson())));
     }
 
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-    }
-
-    public Object[] getArgs() {
-        return args;
-    }
-
-    public void setArgs(Object[] args) {
-        this.args = args;
+    @Override
+    public final int hashCode() {
+        // Expose pre-calculated hashCode field
+        return hashCode;
     }
 
     @Override
     public String toString() {
-        return JsonUtil.toJson(this);
+        return json;
     }
 }

@@ -24,9 +24,9 @@ import java.util.concurrent.TimeUnit;
  * @param <K>
  * @param <V>
  */
-public class RedisCache<K, V> implements Cache<K, V> {
+public class ShiroRedisCache<K, V> implements Cache<K, V> {
 
-    Logger logger = LoggerFactory.getLogger(RedisCache.class);
+    Logger logger = LoggerFactory.getLogger(ShiroRedisCache.class);
 
     String key;
 
@@ -42,7 +42,7 @@ public class RedisCache<K, V> implements Cache<K, V> {
      * @param key
      * @param localExpired  本地缓存失效时间
      */
-    public RedisCache(RedisTemplate<String, String> redisTemplate, String key, long localExpired, TimeUnit unit) {
+    public ShiroRedisCache(RedisTemplate<String, String> redisTemplate, String key, long localExpired, TimeUnit unit) {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations = redisTemplate.boundHashOps(RedisUtil.doWithKey(key));
         this.key = key;

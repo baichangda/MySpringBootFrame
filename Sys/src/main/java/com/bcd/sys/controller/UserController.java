@@ -1,5 +1,7 @@
 package com.bcd.sys.controller;
 
+import com.bcd.base.cache.CacheConst;
+import com.bcd.base.cache.LocalCache;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +33,7 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/user")
+@CacheConfig(cacheNames = CacheConst.LOCAL_CACHE,keyGenerator = CacheConst.KEY_GENERATOR)
 public class UserController extends BaseController {
 
     @Autowired
@@ -40,7 +44,7 @@ public class UserController extends BaseController {
      *
      * @return
      */
-    @Cacheable
+    @LocalCache
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询用户列表")

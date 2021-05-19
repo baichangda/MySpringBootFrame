@@ -1,6 +1,6 @@
 package com.bcd.config.shiro;
 
-import com.bcd.base.config.shiro.cache.LocalCache;
+import com.bcd.base.config.shiro.cache.ShiroLocalCache;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
@@ -24,6 +24,6 @@ public class LocalCacheManager extends AbstractCacheManager {
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new LocalCache(expired, unit);
+        return new ShiroLocalCache(expired, unit);
     }
 }

@@ -1,7 +1,7 @@
 package com.bcd.config.shiro;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.shiro.cache.RedisCache;
+import com.bcd.base.config.shiro.cache.ShiroRedisCache;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
@@ -32,7 +32,7 @@ public class RedisCacheManager extends AbstractCacheManager {
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new RedisCache(redisTemplate, s, localExpired, unit);
+        return new ShiroRedisCache(redisTemplate, s, localExpired, unit);
     }
 
 }
