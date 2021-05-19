@@ -33,6 +33,10 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
     compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
 
+    // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+    compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
+
+
 }
 buildscript {
     ext {
@@ -42,5 +46,6 @@ buildscript {
         guavaVersion = '+'
         disruptorVersion='+'
         springdocVersion='+'
+        caffeineVersion='2.9.+'
     }
 }

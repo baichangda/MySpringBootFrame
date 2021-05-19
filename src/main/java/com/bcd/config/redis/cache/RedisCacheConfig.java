@@ -1,11 +1,12 @@
 package com.bcd.config.redis.cache;
 
-import com.bcd.base.cache.LocalCache;
 import com.bcd.base.cache.MultiLevelCache;
 import com.bcd.base.config.redis.RedisUtil;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisCacheConfig {
     /**
      * 定义两级缓存
-     * 一级:google guava缓存(过期时间5s);  key: myCache_1::${key}
+     * 一级:caffeine缓存(过期时间5s);  key: myCache_1::${key}
      * 二级:redis(过期时间15s);  key: myCache_2::${key}
      *
      * @return
@@ -39,7 +40,13 @@ public class RedisCacheConfig {
                         .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         MultiLevelCache cache = new MultiLevelCache("myCache",
-                new LocalCache("myCache_1", 5L, TimeUnit.SECONDS),
+                new CaffeineCache("myCache_1",
+                        Caffeine.newBuilder()
+                                .expireAfterAccess(5, TimeUnit.SECONDS)
+                                .expireAfterWrite(5, TimeUnit.SECONDS)
+                                .softValues()
+                                .build()
+                ),
                 redisCacheManager.getCache("myCache_2")
         );
         return cache;

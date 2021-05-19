@@ -1,7 +1,8 @@
 package com.bcd.base.config.shiro.cache;
 
 import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.map.MyCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -11,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,7 +34,8 @@ public class RedisCache<K, V> implements Cache<K, V> {
 
     BoundHashOperations<String, K, V> boundHashOperations;
 
-    MyCache<K, V> cache;
+
+    com.github.benmanes.caffeine.cache.Cache<K,V> cache;
 
     /**
      * @param redisTemplate
@@ -45,15 +46,16 @@ public class RedisCache<K, V> implements Cache<K, V> {
         this.redisTemplate = redisTemplate;
         this.boundHashOperations = redisTemplate.boundHashOps(RedisUtil.doWithKey(key));
         this.key = key;
-        this.cache = new MyCache<K, V>()
-                .expiredAfter(localExpired, unit)
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(), 60, 60, TimeUnit.MINUTES)
-                .init();
+        this.cache = Caffeine.newBuilder()
+                .expireAfterWrite(localExpired, unit)
+                .expireAfterAccess(localExpired, unit)
+                .scheduler(Scheduler.systemScheduler())
+                .build();
     }
 
     @Override
     public V get(K k) throws CacheException {
-        return cache.computeIfAbsent(k, e -> {
+        return cache.get(k,e -> {
             logger.info("load from redis cache name[{}] key[{}]", key, e);
             return boundHashOperations.get(e);
         });
@@ -73,14 +75,14 @@ public class RedisCache<K, V> implements Cache<K, V> {
         logger.info("remove name[{}] key[{}]", key, k);
         V old = boundHashOperations.get(k);
         boundHashOperations.delete(k);
-        cache.remove(k);
+        cache.invalidate(k);
         return old;
     }
 
     @Override
     public void clear() throws CacheException {
         redisTemplate.delete(key);
-        cache.clear();
+        cache.invalidateAll();
     }
 
     @Override

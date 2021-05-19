@@ -86,30 +86,7 @@ public class JsonUtil {
     }
 
     public static void main(String[] args) throws JsonProcessingException {
-        int i = 1;
-        System.out.println((++i) + (++i));
-        TestBean t1 = new TestBean();
-        t1.setId(1);
-        t1.setName("t1");
-        TestBean t2 = new TestBean();
-        t2.setId(2);
-        t2.setName("t2");
-        TestBean t3 = new TestBean();
-        t2.setId(3);
-        t2.setName("t3");
-        t1.setDataList(Arrays.asList(t2, t3));
-        ObjectMapper objectMapper = JsonUtil.withConfig(new ObjectMapper());
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule.addDeserializer(TestBean.class, new StdDeserializer<TestBean>(TestBean.class) {
-            @Override
-            public TestBean deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-                String field = p.nextFieldName();
-                JsonToken token = p.nextToken();
-                return null;
-            }
-        });
-        objectMapper.registerModule(simpleModule);
-        TestBean res = objectMapper.readValue(JsonUtil.toJson(t1), TestBean.class);
+        TestBean testBean=new TestBean();
     }
 
 }

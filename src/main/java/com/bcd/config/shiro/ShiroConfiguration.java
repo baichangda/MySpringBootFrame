@@ -85,7 +85,7 @@ public class ShiroConfiguration {
      * @return
      */
     @Bean
-    public LocalCacheManager expireMapCacheManager() {
+    public LocalCacheManager localCacheManager() {
         LocalCacheManager cacheManager = new LocalCacheManager(3, TimeUnit.SECONDS);
         return cacheManager;
     }

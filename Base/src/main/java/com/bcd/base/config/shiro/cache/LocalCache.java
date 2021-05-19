@@ -1,6 +1,7 @@
 package com.bcd.base.config.shiro.cache;
 
-import com.bcd.base.map.MyCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,47 +21,56 @@ public class LocalCache<K, V> implements Cache<K, V> {
 
     Logger logger = LoggerFactory.getLogger(LocalCache.class);
 
-    MyCache<K, V> cache;
+    com.github.benmanes.caffeine.cache.Cache<K,V> cache;
 
     public LocalCache(long expired, TimeUnit unit) {
-        this.cache = new MyCache<K, V>()
-                .expiredAfter(expired, unit)
-                .withClearExpiredValueExecutor(Executors.newSingleThreadScheduledExecutor(), 60, 60, TimeUnit.MINUTES)
-                .init();
+        this.cache = Caffeine.newBuilder()
+                .expireAfterWrite(expired, unit)
+                .expireAfterAccess(expired, unit)
+                .scheduler(Scheduler.systemScheduler())
+                .build();
     }
 
     @Override
     public V get(K k) throws CacheException {
-        return cache.get(k);
+        return cache.getIfPresent(k);
     }
 
     @Override
     public V put(K k, V v) throws CacheException {
-        return cache.put(k, v);
+        V oldV=cache.getIfPresent(k);
+        cache.put(k, v);
+        return oldV;
     }
 
     @Override
     public V remove(K k) throws CacheException {
-        return cache.remove(k);
+        V oldV=cache.getIfPresent(k);
+        if(oldV==null){
+            return null;
+        }else{
+            cache.invalidate(k);
+            return oldV;
+        }
     }
 
     @Override
     public void clear() throws CacheException {
-        cache.clear();
+        cache.invalidateAll();
     }
 
     @Override
     public int size() {
-        return cache.size();
+        return (int) cache.estimatedSize();
     }
 
     @Override
     public Set<K> keys() {
-        return cache.keySet();
+        return cache.asMap().keySet();
     }
 
     @Override
     public Collection<V> values() {
-        return cache.values();
+        return cache.asMap().values();
     }
 }

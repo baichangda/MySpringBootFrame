@@ -1,17 +1,15 @@
 package com.bcd.base.map;
 
 
-import com.bcd.base.util.ExceptionUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 
 /**
@@ -33,135 +31,44 @@ public class ExpireCallBackMap<V> {
     private final Map<String, Value<V>> dataMap = new HashMap<>();
 
     /**
-     * 用于从map中检索出过期key并移除 定时任务线程池
+     * 用于执行回调任务线程池
      */
-    private ScheduledExecutorService expireScanPool;
-    private Long delay;
-    private TimeUnit unit;
+    private ScheduledExecutorService expirePool = Executors.newSingleThreadScheduledExecutor();
+    private ExecutorService callbackPool;
 
     /**
-     * 用于执行过期的回调方法线程池
-     * 为null则不触发回调
+     * @param callbackPool 回调任务线程池
      */
-    private ExecutorService expireWorkPool;
-
-    /**
-     * 不开启扫描和回调
-     */
-    public ExpireCallBackMap() {
-        this(null, null);
-    }
-
-    /**
-     * @param delay 扫描计划执行间隔,为null表示不开启扫描
-     */
-    public ExpireCallBackMap(Long delay, TimeUnit unit) {
-        this(delay, unit, null);
-    }
-
-    /**
-     * @param delay          扫描计划执行间隔,为null则表示不进行扫描
-     * @param unit           扫描计划执行间隔,为null则表示不进行扫描
-     * @param expireWorkPool 过期回调执行线程池 传入null代表不触发回调
-     */
-    public ExpireCallBackMap(Long delay, TimeUnit unit, ExecutorService expireWorkPool) {
-        this.delay = delay;
-        this.unit = unit;
-        this.expireWorkPool = expireWorkPool;
+    public ExpireCallBackMap(ExecutorService callbackPool) {
+        this.callbackPool = callbackPool;
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(1L, TimeUnit.SECONDS, Executors.newSingleThreadExecutor());
-        map.init();
-        map.put("1", "2", 1, TimeUnit.SECONDS, (k, v) -> {
-            System.out.println(map.get("1"));
-            System.out.println(map.get("2"));
+        ExpireCallBackMap<String> map = new ExpireCallBackMap<>(Executors.newSingleThreadExecutor());
+        map.put("1", Instant.now().toString(), 1, TimeUnit.SECONDS, (k, v) -> {
+            System.out.println(v);
+            System.out.println(Instant.now());
         });
-        map.put("2", "3", 10, TimeUnit.SECONDS, (k, v) -> {
-            System.out.println(map.get("1"));
-            System.out.println(map.get("2"));
+        map.put("2", Instant.now().toString(), 10, TimeUnit.SECONDS, (k, v) -> {
+            System.out.println(v);
+            System.out.println(Instant.now());
         });
     }
 
-    private void initExpiredSchedule() {
-        expireScanPool = Executors.newSingleThreadScheduledExecutor();
-        expireScanPool.scheduleWithFixedDelay(this::scanAndClearExpired, delay, delay, unit);
-    }
 
-    /**
-     * 扫描并且清除过期值
-     * 会触发回调
-     */
-    public void scanAndClearExpired() {
-        Iterator<Map.Entry<String, Value<V>>> it = dataMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Value<V>> cur = it.next();
-            synchronized (cur.getKey().intern()) {
-                Value<V> expireValue = cur.getValue();
-                if (expireValue.isExpired()) {
-                    it.remove();
-                    callback(cur.getKey(), expireValue.getVal(), expireValue.getCallback());
-                }
-            }
-        }
-    }
-
-    public void init() {
-        if (delay != null && unit != null) {
-            initExpiredSchedule();
-        }
-    }
-
-    public void destroy() {
-        if (expireScanPool != null) {
-            expireScanPool.shutdown();
-        }
-    }
-
-    private void callback(String k, V v, BiConsumer callBack) {
-        if (expireWorkPool != null) {
-            if (callBack != null) {
-                expireWorkPool.execute(() -> {
-                    try {
-                        callBack.accept(k, v);
-                    } catch (Exception e) {
-                        ExceptionUtil.printException(e);
-                    }
-                });
-            }
-        }
-    }
-
-    /**
-     * 获取值
-     *
-     * @param expireValue
-     * @param k
-     * @param triggerCallback
-     * @return
-     */
-    private V getVal(Value<V> expireValue, String k, boolean triggerCallback) {
-        if (expireValue == null) {
+    private V getVal(Value<V> value, boolean cancelFuture){
+        if(value==null){
             return null;
-        } else {
-            if (expireValue.isExpired()) {
-                //移除元素、标记
-                dataMap.remove(k);
-                //触发回调
-                if (triggerCallback) {
-                    V v = expireValue.getVal();
-                    BiConsumer callBack = expireValue.getCallback();
-                    callback(k, v, callBack);
-                }
-                return null;
-            } else {
-                return expireValue.getVal();
+        }else{
+            if(cancelFuture&&value.getFuture()!=null){
+                value.getFuture().cancel(false);
             }
+            return value.getVal();
         }
     }
 
+
     /**
-     * 过期检查且触发回调
      *
      * @param k
      * @return
@@ -169,12 +76,11 @@ public class ExpireCallBackMap<V> {
     public V get(String k) {
         synchronized (k.intern()) {
             Value<V> expireValue = dataMap.get(k);
-            return getVal(expireValue, k, true);
+            return getVal(expireValue,false);
         }
     }
 
     /**
-     * put元素、不会过期检查触发回调
      *
      * @param k
      * @param v
@@ -186,7 +92,6 @@ public class ExpireCallBackMap<V> {
     }
 
     /**
-     * put元素、不会过期检查触发回调
      *
      * @param k
      * @param v
@@ -195,15 +100,19 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V put(String k, V v, long expiredTime, TimeUnit unit, BiConsumer<String, V> callback) {
-        Value<V> expireValue = new Value<>(System.currentTimeMillis() + unit.toMillis(expiredTime), v, callback);
+        ScheduledFuture<?> future = expirePool.schedule(() ->
+                        callbackPool.execute(() ->
+                                callback.accept(k, v)
+                        )
+                , expiredTime, unit);
+        Value<V> expireValue = new Value<>(v, future);
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.put(k, expireValue);
-            return getVal(oldVal, k, false);
+            return getVal(oldVal,true);
         }
     }
 
     /**
-     * remove元素、不会过期检查触发回调
      *
      * @param k
      * @return
@@ -211,12 +120,11 @@ public class ExpireCallBackMap<V> {
     public V remove(String k) {
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.remove(k);
-            return getVal(oldVal, k, false);
+            return getVal(oldVal,true);
         }
     }
 
     /**
-     * removeAll、不会过期检查触发回调
      *
      * @return
      */
@@ -226,32 +134,12 @@ public class ExpireCallBackMap<V> {
         }
     }
 
-    private final static class Value<T> {
-        private Long expiredTimeInMillis;
+    @AllArgsConstructor
+    @Getter
+    public final static class Value<T> {
         private T val;
-        private BiConsumer callback;
-
-        public Value(Long expiredTimeInMillis, T val, BiConsumer callback) {
-            this.expiredTimeInMillis = expiredTimeInMillis;
-            this.val = val;
-            this.callback = callback;
-        }
-
-        public T getVal() {
-            return val;
-        }
-
-        public BiConsumer getCallback() {
-            return callback;
-        }
-
-        public Long getExpiredTimeInMillis() {
-            return expiredTimeInMillis;
-        }
-
-        public boolean isExpired() {
-            return expiredTimeInMillis < System.currentTimeMillis();
-        }
+        //可能为null
+        private Future future;
     }
 
 }
