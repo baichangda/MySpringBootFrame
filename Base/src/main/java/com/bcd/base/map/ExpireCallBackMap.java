@@ -14,10 +14,9 @@ import java.util.function.BiConsumer;
 
 /**
  * 可以插入过期key-value的 Map
- * 插入的key-value会在aliveTime后被移除
+ * 插入的key-value会在expireTime后被移除
  * 过期策略:
- * 1、懒汉模式: 在调用get时候检查,如果过期则移除
- * 2、定期检查模式: 启动计划任务执行器周期性的检查所有此类的实例,检查并移除里面过期的key
+ * 1、定时线程池执行 计划移除任务
  * 在过期被移除后,会调用设置的过期回调方法
  * <p>
  * 适用于绑定过期回调
