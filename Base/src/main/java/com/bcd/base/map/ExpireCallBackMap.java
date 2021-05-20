@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -25,13 +24,14 @@ import java.util.function.BiConsumer;
  */
 @SuppressWarnings("unchecked")
 public class ExpireCallBackMap<V> {
-    private final static Logger logger = LoggerFactory.getLogger(ExpireCallBackMap.class);
-    private final Map<String, Value<V>> dataMap = new HashMap<>();
+    public final static Logger logger = LoggerFactory.getLogger(ExpireCallBackMap.class);
+
+    private final Map<String, Value<V>> dataMap = new ConcurrentHashMap<>();
 
     /**
      * 用于执行回调任务线程池
      */
-    private ScheduledExecutorService expirePool = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService expirePool = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
     private ExecutorService callbackPool;
 
     /**
@@ -42,27 +42,16 @@ public class ExpireCallBackMap<V> {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        logger.info("test");
         ExpireCallBackMap<String> map = new ExpireCallBackMap<>(Executors.newSingleThreadExecutor());
         map.put("1", Instant.now().toString(), 1, TimeUnit.SECONDS, (k, v) -> {
-            System.out.println(v);
-            System.out.println(Instant.now());
+            logger.info("{}",v);
+            logger.info("{}",Instant.now());
         });
         map.put("2", Instant.now().toString(), 10, TimeUnit.SECONDS, (k, v) -> {
-            System.out.println(v);
-            System.out.println(Instant.now());
+            logger.info("{}",v);
+            logger.info("{}",Instant.now());
         });
-    }
-
-
-    private V getVal(Value<V> value, boolean cancelFuture) {
-        if (value == null) {
-            return null;
-        } else {
-            if (cancelFuture && value.getFuture() != null) {
-                value.getFuture().cancel(false);
-            }
-            return value.getVal();
-        }
     }
 
 
@@ -71,10 +60,11 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V get(String k) {
+        Value<V> expireValue;
         synchronized (k.intern()) {
-            Value<V> expireValue = dataMap.get(k);
-            return getVal(expireValue, false);
+            expireValue = dataMap.get(k);
         }
+        return expireValue==null?null:expireValue.getVal();
     }
 
     /**
@@ -95,20 +85,30 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V put(String k, V v, long expiredTime, TimeUnit unit, BiConsumer<String, V> callback) {
-        ScheduledFuture<?> future = expirePool.schedule(() -> {
-            V old = remove(k);
-            //如果移除的是当前值、且回调不为null
-            if (old == v && callback != null) {
-                callbackPool.execute(() ->
-                        callback.accept(k, v)
-                );
-            }
-        }, expiredTime, unit);
-        Value<V> expireValue = new Value<>(v, future);
+        Value<V> old;
         synchronized (k.intern()) {
-            Value<V> oldVal = dataMap.put(k, expireValue);
-            return getVal(oldVal, true);
+            old = dataMap.remove(k);
+            if (old != null) {
+                boolean res = old.getFuture().cancel(false);
+                if (!res) {
+                    logger.warn("cancel future failed in put for key[{}]", k);
+                }
+            }
+            ScheduledFuture<?> future = expirePool.schedule(() -> {
+                Value<V> expired;
+                synchronized (k.intern()) {
+                    expired = dataMap.remove(k);
+                }
+                //如果移除的是当前值、且回调不为null
+                if (expired != null && expired.getVal() == v && callback != null) {
+                    callbackPool.execute(() -> callback.accept(k, v));
+                }
+
+            }, expiredTime, unit);
+            Value<V> expireValue = new Value<>(v, future);
+            dataMap.put(k, expireValue);
         }
+        return old==null?null:old.getVal();
     }
 
     /**
@@ -116,10 +116,17 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V remove(String k) {
+        Value<V> removed;
         synchronized (k.intern()) {
-            Value<V> oldVal = dataMap.remove(k);
-            return getVal(oldVal, true);
+            removed = dataMap.remove(k);
+            if (removed != null) {
+                boolean res = removed.getFuture().cancel(false);
+                if (!res) {
+                    logger.warn("cancel future failed in remove for key[{}]", k);
+                }
+            }
         }
+        return removed==null?null:removed.getVal();
     }
 
     /**
