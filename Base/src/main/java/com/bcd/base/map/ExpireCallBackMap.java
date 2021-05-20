@@ -20,7 +20,6 @@ import java.util.function.BiConsumer;
  * 在过期被移除后,会调用设置的过期回调方法
  * <p>
  * 适用于绑定过期回调
- * 如果作为缓存可能会导致内存溢出
  *
  * @param <V>
  */
