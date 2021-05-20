@@ -54,11 +54,11 @@ public class ExpireCallBackMap<V> {
     }
 
 
-    private V getVal(Value<V> value, boolean cancelFuture){
-        if(value==null){
+    private V getVal(Value<V> value, boolean cancelFuture) {
+        if (value == null) {
             return null;
-        }else{
-            if(cancelFuture&&value.getFuture()!=null){
+        } else {
+            if (cancelFuture && value.getFuture() != null) {
                 value.getFuture().cancel(false);
             }
             return value.getVal();
@@ -67,19 +67,17 @@ public class ExpireCallBackMap<V> {
 
 
     /**
-     *
      * @param k
      * @return
      */
     public V get(String k) {
         synchronized (k.intern()) {
             Value<V> expireValue = dataMap.get(k);
-            return getVal(expireValue,false);
+            return getVal(expireValue, false);
         }
     }
 
     /**
-     *
      * @param k
      * @param v
      * @param expiredTime
@@ -90,7 +88,6 @@ public class ExpireCallBackMap<V> {
     }
 
     /**
-     *
      * @param k
      * @param v
      * @param expiredTime
@@ -98,32 +95,34 @@ public class ExpireCallBackMap<V> {
      * @return
      */
     public V put(String k, V v, long expiredTime, TimeUnit unit, BiConsumer<String, V> callback) {
-        ScheduledFuture<?> future = expirePool.schedule(() ->
-                        callbackPool.execute(() ->
-                                callback.accept(k, v)
-                        )
-                , expiredTime, unit);
+        ScheduledFuture<?> future = expirePool.schedule(() -> {
+            V old = remove(k);
+            //如果移除的是当前值、且回调不为null
+            if (old == v && callback != null) {
+                callbackPool.execute(() ->
+                        callback.accept(k, v)
+                );
+            }
+        }, expiredTime, unit);
         Value<V> expireValue = new Value<>(v, future);
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.put(k, expireValue);
-            return getVal(oldVal,true);
+            return getVal(oldVal, true);
         }
     }
 
     /**
-     *
      * @param k
      * @return
      */
     public V remove(String k) {
         synchronized (k.intern()) {
             Value<V> oldVal = dataMap.remove(k);
-            return getVal(oldVal,true);
+            return getVal(oldVal, true);
         }
     }
 
     /**
-     *
      * @return
      */
     public void removeAll() {
