@@ -32,7 +32,7 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/user")
-@CacheConfig(cacheNames = CacheConst.LOCAL_CACHE,keyGenerator = CacheConst.KEY_GENERATOR)
+@CacheConfig(cacheNames = CacheConst.LOCAL_CACHE, keyGenerator = CacheConst.KEY_GENERATOR)
 public class UserController extends BaseController {
 
     @Autowired
