@@ -28,7 +28,7 @@ public class RedisCacheConfig {
                 RedisCacheWriter.nonLockingRedisCacheWriter(factory),
                 RedisCacheConfiguration.defaultCacheConfig()
                         .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisUtil.STRING_SERIALIZER))
-                        .entryTtl(Duration.ofMillis(15 * 1000L))
+                        .entryTtl(Duration.ofMillis(5 * 1000L))
                         .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         return redisCacheManager.getCache(CacheConst.REDIS_CACHE);

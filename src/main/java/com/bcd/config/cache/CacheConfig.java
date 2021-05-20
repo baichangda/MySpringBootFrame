@@ -22,7 +22,7 @@ public class CacheConfig {
     public Cache localCache() {
         return new CaffeineCache(CacheConst.LOCAL_CACHE,
             Caffeine.newBuilder()
-                .expireAfterWrite(15,TimeUnit.SECONDS)
+                .expireAfterWrite(5,TimeUnit.SECONDS)
                 .softValues()
                 .build()
         );
