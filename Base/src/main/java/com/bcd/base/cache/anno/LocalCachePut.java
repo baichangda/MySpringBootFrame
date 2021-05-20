@@ -1,15 +1,16 @@
 package com.bcd.base.cache.anno;
 
 import com.bcd.base.cache.CacheConst;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.lang.annotation.*;
 
-@Cacheable(cacheNames = CacheConst.LOCAL_CACHE,keyGenerator = CacheConst.KEY_GENERATOR)
+@CachePut(cacheNames = CacheConst.LOCAL_CACHE,keyGenerator = CacheConst.KEY_GENERATOR)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface LocalCacheable {
+public @interface LocalCachePut {
 
 
 }

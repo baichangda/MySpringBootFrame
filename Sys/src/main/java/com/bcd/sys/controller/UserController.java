@@ -1,7 +1,7 @@
 package com.bcd.sys.controller;
 
 import com.bcd.base.cache.CacheConst;
-import com.bcd.base.cache.LocalCache;
+import com.bcd.base.cache.anno.LocalCacheable;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
@@ -21,7 +21,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +43,7 @@ public class UserController extends BaseController {
      *
      * @return
      */
-    @LocalCache
+    @LocalCacheable
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询用户列表")

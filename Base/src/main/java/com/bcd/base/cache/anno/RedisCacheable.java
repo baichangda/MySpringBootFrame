@@ -1,5 +1,6 @@
-package com.bcd.base.cache;
+package com.bcd.base.cache.anno;
 
+import com.bcd.base.cache.CacheConst;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.lang.annotation.*;
@@ -8,7 +9,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RedisCache {
+public @interface RedisCacheable {
 
 
 }
