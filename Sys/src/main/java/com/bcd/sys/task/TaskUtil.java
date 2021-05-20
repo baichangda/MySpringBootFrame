@@ -118,7 +118,7 @@ public class TaskUtil {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("===========1");
+            logger.info("===========1");
         };
         Runnable runnable2 = () -> {
             try {
@@ -126,7 +126,7 @@ public class TaskUtil {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("===========2");
+            logger.info("===========2");
         };
         Future f1 = CommonConst.SYS_TASK_POOL.submit(runnable1);
         Future f2 = CommonConst.SYS_TASK_POOL.submit(runnable2);
@@ -136,6 +136,6 @@ public class TaskUtil {
         Thread.sleep(10000);
         boolean res3 = CommonConst.SYS_TASK_POOL.remove(runnable1);
         boolean res4 = CommonConst.SYS_TASK_POOL.remove(runnable2);
-        System.out.println(res1 + " " + res2 + " " + res3 + " " + res4);
+        logger.info(res1 + " " + res2 + " " + res3 + " " + res4);
     }
 }
