@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 public class PermissionService extends BaseService<PermissionBean, Long> implements SpringInitializable {
     @Override
     public void init(ContextRefreshedEvent event) {
-        initNotePermission();
+        initNotePermission(event);
     }
 
     @Transactional
-    public void initNotePermission() {
+    public void initNotePermission(ContextRefreshedEvent event) {
         //1、扫描所有已经使用过的 NotePermission
-        Map<String, Object> beanMap = SpringUtil.applicationContext.getBeansWithAnnotation(Controller.class);
+        Map<String, Object> beanMap = event.getApplicationContext().getBeansWithAnnotation(Controller.class);
         Set<NotePermission> permissionSet = new LinkedHashSet<>();
         beanMap.values().forEach(e1 -> {
             Class controllerClass = ProxyUtil.getSource(e1).getClass();

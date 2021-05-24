@@ -36,7 +36,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
 
-
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    compile group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
 }
 buildscript {
     ext {
@@ -47,5 +48,6 @@ buildscript {
         disruptorVersion='+'
         springdocVersion='+'
         caffeineVersion='2.9.+'
+        retrofitJacksonVersion='+'
     }
 }
