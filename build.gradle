@@ -30,6 +30,7 @@ buildscript {
 allprojects {
     group 'com.bcd'
     version '1.0'
+    apply plugin: 'java-library'
     apply plugin: 'java'
     apply plugin: 'idea'
     //加入maven发布依赖
@@ -66,9 +67,9 @@ allprojects {
 
     dependencies {
         //spring kafka支持
-        compile("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+        api("org.springframework.kafka:spring-kafka:${kafkaVersion}")
         //邮件支持
-        compile("org.springframework.boot:spring-boot-starter-mail")
+        api("org.springframework.boot:spring-boot-starter-mail")
 
         // https://mvnrepository.com/artifact/org.projectlombok/lombok
         compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
@@ -174,6 +175,6 @@ flywayMigrate {
  */
 
 dependencies {
-    compile project(':Sys')
-    compile project(':MongoDB')
+    api project(':Sys')
+    api project(':MongoDB')
 }

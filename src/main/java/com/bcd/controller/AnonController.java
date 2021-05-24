@@ -33,9 +33,6 @@ import java.util.Optional;
 public class AnonController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonController.class);
 
-    @Autowired
-    TestRetrofit2 testRetrofit2;
-
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
     @Operation(description = "获取公钥")
