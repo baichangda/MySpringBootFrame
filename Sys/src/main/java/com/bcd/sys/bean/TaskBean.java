@@ -1,7 +1,6 @@
 package com.bcd.sys.bean;
 
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.SuperBaseBean;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.task.Task;
@@ -80,10 +79,6 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
     @Schema(description = "创建人姓名", maxLength = 50)
     private String createUserName;
 
-    @Size(max = 50, message = "[创建ip]长度不能超过50")
-    @Schema(description = "创建ip", maxLength = 50)
-    private String createIp;
-
     public TaskBean(String name) {
         this.name = name;
         this.percent = 0F;
@@ -102,7 +97,6 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
             createUserId = userBean.getId();
             createUserName = userBean.getRealName();
         }
-        createIp = IPUtil.getIpAddress();
     }
 
     @Override

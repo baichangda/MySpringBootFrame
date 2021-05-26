@@ -11,7 +11,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Unique {
-    String messageKey() default "Field.value.unique";
-
-    String messageValue() default "";
+    String value() default "field [{}] has duplicate val";
 }

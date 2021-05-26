@@ -2,7 +2,7 @@ package com.bcd.rdb.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.i18n.I18NData;
+import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.anno.Unique;
 import com.bcd.rdb.bean.info.BeanInfo;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
@@ -12,7 +12,6 @@ import com.bcd.rdb.jdbc.sql.SqlListResult;
 import com.bcd.rdb.jdbc.sql.SqlUtil;
 import com.bcd.rdb.repository.BaseRepository;
 import com.bcd.rdb.util.ConditionUtil;
-import com.google.common.base.Strings;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -418,11 +417,7 @@ public class BaseService<T, K extends Serializable> {
      */
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
-        String msg = anno.messageValue();
-        if (Strings.isNullOrEmpty(msg)) {
-            msg = I18NData.getI18NData(anno.messageKey()).getValue(field.getName());
-        }
-        return msg;
+        return StringUtil.format(anno.value(),field.getName());
     }
 
     /**

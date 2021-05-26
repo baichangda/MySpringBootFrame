@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS t_sys_task
     file_paths       varchar(100)    NULL COMMENT '文件路径(如果是生成文件的任务,存储的是文件路径;可以存储多个,以;分割)',
     create_user_id   bigint COMMENT '创建人id',
     create_user_name varchar(50) COMMENT '创建人姓名',
-    create_ip        varchar(50) COMMENT '创建ip',
     PRIMARY KEY (id)
 );
 

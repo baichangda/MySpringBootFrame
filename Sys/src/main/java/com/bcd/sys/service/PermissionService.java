@@ -3,8 +3,6 @@ package com.bcd.sys.service;
 import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
-import com.bcd.base.util.ProxyUtil;
-import com.bcd.base.util.SpringUtil;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -13,6 +11,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -34,7 +33,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         Map<String, Object> beanMap = event.getApplicationContext().getBeansWithAnnotation(Controller.class);
         Set<NotePermission> permissionSet = new LinkedHashSet<>();
         beanMap.values().forEach(e1 -> {
-            Class controllerClass = ProxyUtil.getSource(e1).getClass();
+            Class controllerClass=ClassUtils.getUserClass(e1);
             List<Method> methodList = MethodUtils.getMethodsListWithAnnotation(controllerClass, RequiresNotePermissions.class);
             methodList.forEach(e2 -> {
                 RequiresNotePermissions requiresNotePermissions = e2.getAnnotation(RequiresNotePermissions.class);

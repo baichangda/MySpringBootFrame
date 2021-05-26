@@ -1,7 +1,7 @@
 package com.bcd.config.shiro.anno;
 
 import com.bcd.base.config.shiro.anno.RequiresAction;
-import com.google.common.base.Strings;
+import com.bcd.base.util.StringUtil;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;
 import org.apache.shiro.subject.Subject;
 
@@ -30,7 +30,7 @@ public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
          * 此处使用拼装出的字符串『ClassName : MethodName』
          * */
         String permissionString = getActionPermission();
-        if (!Strings.isNullOrEmpty(permissionString)) {
+        if (!StringUtil.isNullOrEmpty(permissionString)) {
             subject.checkPermission(permissionString);
         }
     }

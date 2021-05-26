@@ -7,11 +7,11 @@ import com.alibaba.excel.metadata.Cell;
 import com.alibaba.excel.read.metadata.holder.ReadRowHolder;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.FileUtil;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
 import com.bcd.rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.rdb.dbinfo.service.DBService;
+import org.aspectj.util.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -133,7 +133,6 @@ public class MysqlDBServiceImpl implements DBService {
      */
     public void exportDBDesignerExcelToDisk(String url, String username, String password, String dbName, String file) {
         Path p = Paths.get(file);
-        FileUtil.createFileIfNotExists(p);
         try (OutputStream os = Files.newOutputStream(p);
              Connection connection = DBInfoUtil.getConn(url, username, password)) {
             exportDBDesignerExcel(connection, dbName, os, null);

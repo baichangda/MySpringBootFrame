@@ -2,7 +2,6 @@ package com.bcd.rdb.dbinfo.controller;
 
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.I18nUtil;
 import com.bcd.rdb.dbinfo.service.DBService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +35,7 @@ public class DBController extends BaseController {
             HttpServletResponse response) {
         try {
             dbService.exportSpringDBDesignerExcel(dbName, response.getOutputStream(), () -> {
-                String fileName = I18nUtil.getMessage("DBController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
+                String fileName = "db-" + dbName + ".xlsx";
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
@@ -56,7 +55,7 @@ public class DBController extends BaseController {
             HttpServletResponse response) {
         try {
             dbService.exportDBDesignerExcel(url, username, password, dbName, response.getOutputStream(), () -> {
-                String fileName = I18nUtil.getMessage("DBController.exportDBDesignerExcel.fileName", new Object[]{dbName}) + ".xlsx";
+                String fileName = "db-" + dbName + ".xlsx";
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {

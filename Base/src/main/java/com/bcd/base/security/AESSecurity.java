@@ -1,7 +1,6 @@
 package com.bcd.base.security;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import org.apache.tomcat.util.buf.HexUtils;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -95,18 +94,4 @@ public class AESSecurity {
         }
     }
 
-    public static void main(String[] args){
-        SecretKey key = generateKey(128);
-        System.out.println(Base64.getEncoder().encodeToString(key.getEncoded()));
-        byte[] res = encode("鄂A12345".getBytes(), key);
-        System.out.println(Base64.getEncoder().encodeToString(res));
-        System.out.println(new String(decode(res, key)));
-
-
-        SecretKeySpec mysqlKey = restoreMysqlKey("encryptKey".getBytes());
-        byte[] mysqlRes = encode("鄂A12345".getBytes(), mysqlKey);
-        System.out.println(HexUtils.toHexString(mysqlRes));
-        System.out.println(new String(decode(mysqlRes, mysqlKey)));
-        System.out.println(new String(decode(HexUtils.fromHexString("D823BE22DF06BB2E451E96123FED0735"), mysqlKey)));
-    }
 }

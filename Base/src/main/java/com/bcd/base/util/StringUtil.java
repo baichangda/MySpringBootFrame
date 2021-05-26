@@ -1,5 +1,6 @@
 package com.bcd.base.util;
 
+import org.slf4j.helpers.MessageFormatter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,6 +9,10 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("unchecked")
 public class StringUtil {
+
+    public static boolean isNullOrEmpty(String o){
+        return o==null||o.isEmpty();
+    }
 
     /**
      * 将一串包含特殊字符串的换成驼峰模式
@@ -110,6 +115,18 @@ public class StringUtil {
             res.add(matcher.group(1));
         }
         return res;
+    }
+
+    /**
+     * 将信息转换为格式化
+     * 使用方式和sl4j log一样、例如
+     * {@link org.slf4j.Logger#info(String, Object...)}
+     * @param message
+     * @param params
+     * @return
+     */
+    public static String format(String message,Object... params){
+        return MessageFormatter.arrayFormat(message, params, null).getMessage();
     }
 
 }

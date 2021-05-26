@@ -1,10 +1,11 @@
 package com.bcd.rdb.dbinfo.mysql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.StringUtil;
 import com.bcd.rdb.dbinfo.data.DBInfo;
 import com.bcd.rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.rdb.dbinfo.mysql.bean.TablesBean;
-import com.google.common.base.Strings;
+import org.apache.logging.log4j.util.Strings;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -46,7 +47,7 @@ public class DBInfoUtil {
             LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
             //1.1、取出配置文件后缀
             String suffix = (String) springMap.get("profiles.active");
-            if (!Strings.isNullOrEmpty(suffix)) {
+            if (!StringUtil.isNullOrEmpty(suffix)) {
                 //1.2、如果有激活的配置文件,则加载
                 String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
                 Path activePath = Paths.get(activePathStr);

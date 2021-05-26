@@ -26,32 +26,20 @@ public class JsonMessage<T> implements Serializable {
     public JsonMessage() {
     }
 
-    public JsonMessage(boolean result) {
-        this.result = result;
-    }
-
-    public static <R> JsonMessage<R> success() {
-        return new JsonMessage<>(true);
-    }
-
-    public static <R> JsonMessage<R> fail() {
-        return new JsonMessage<>(false);
+    public JsonMessage(boolean result,T data) {
+        this.result=result;
+        this.data = data;
     }
 
     public boolean isResult() {
         return result;
     }
 
-    public JsonMessage<T> withResult(boolean result) {
-        this.result = result;
-        return this;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public JsonMessage<T> withMessage(String message) {
+    public JsonMessage<T> message(String message) {
         this.message = message;
         return this;
     }
@@ -60,7 +48,7 @@ public class JsonMessage<T> implements Serializable {
         return code;
     }
 
-    public JsonMessage<T> withCode(String code) {
+    public JsonMessage<T> code(String code) {
         this.code = code;
         return this;
     }
@@ -69,12 +57,24 @@ public class JsonMessage<T> implements Serializable {
         return data;
     }
 
-    public JsonMessage<T> withData(T data) {
-        this.data = data;
-        return this;
+    public static JsonMessage<?> success(){
+        return new JsonMessage<>(true,null);
+    }
+
+    public static JsonMessage<?> fail(){
+        return new JsonMessage<>(false,null);
+    }
+
+    public static <R> JsonMessage<R> success(R data){
+        return new JsonMessage<>(true,data);
+    }
+
+    public static <R> JsonMessage<R> fail(R data){
+        return new JsonMessage<>(false,data);
     }
 
     public String toJson(){
         return JsonUtil.toJson(this);
     }
+
 }

@@ -3,7 +3,6 @@ package com.bcd.sys.controller;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
@@ -38,7 +37,7 @@ public class MenuController extends BaseController {
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "菜单实体") @Validated @RequestBody MenuBean menu) {
         menuService.save(menu);
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success().message("保存成功");
     }
 
 
@@ -54,7 +53,7 @@ public class MenuController extends BaseController {
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
         menuService.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success().message("删除成功");
     }
 
     /**
@@ -68,7 +67,7 @@ public class MenuController extends BaseController {
     @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage<List<MenuBean>> adminMenuTree() {
         List<MenuBean> menuBeanList = menuService.adminMenuTree();
-        return JsonMessage.<List<MenuBean>>success().withData(menuBeanList);
+        return JsonMessage.success(menuBeanList);
     }
 
     /**
@@ -84,7 +83,7 @@ public class MenuController extends BaseController {
     public JsonMessage<List<MenuBean>> userMenuTree(@Parameter(description = "用户id")
                                     @RequestParam(required = false) Long userId) {
         List<MenuBean> menuBeanList = menuService.userMenuTree(userId);
-        return JsonMessage.<List<MenuBean>>success().withData(menuBeanList);
+        return JsonMessage.success(menuBeanList);
     }
 
     /**
@@ -99,7 +98,7 @@ public class MenuController extends BaseController {
     public JsonMessage<List<MenuBean>> selfMenuTree() {
         UserBean userBean = ShiroUtil.getCurrentUser();
         List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.getId());
-        return JsonMessage.<List<MenuBean>>success().withData(menuBeanList);
+        return JsonMessage.success(menuBeanList);
     }
 
 }

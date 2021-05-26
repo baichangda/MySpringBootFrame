@@ -2,6 +2,7 @@ package com.bcd.base.exception;
 
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
+import com.bcd.base.util.StringUtil;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
@@ -37,7 +38,7 @@ public class BaseRuntimeException extends RuntimeException {
      * @return
      */
     public static BaseRuntimeException getException(String message, Object... params) {
-        return new BaseRuntimeException(MessageFormatter.arrayFormat(message, params, null).getMessage());
+        return new BaseRuntimeException(StringUtil.format(message,params));
     }
 
     public static BaseRuntimeException getException(Throwable e) {
@@ -45,7 +46,7 @@ public class BaseRuntimeException extends RuntimeException {
     }
 
     public static BaseRuntimeException getException(Throwable e, String code) {
-        return new BaseRuntimeException(e).withCode(code);
+        return new BaseRuntimeException(e).code(code);
     }
 
     public static void main(String[] args) {
@@ -60,7 +61,7 @@ public class BaseRuntimeException extends RuntimeException {
         return ExceptionUtil.toJsonMessage(this);
     }
 
-    public BaseRuntimeException withCode(String code) {
+    public BaseRuntimeException code(String code) {
         this.code = code;
         return this;
     }

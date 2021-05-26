@@ -3,9 +3,7 @@ package com.bcd.rdb.jdbc.dynamic;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,9 +17,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DynamicJdbcUtil {
@@ -32,52 +27,35 @@ public class DynamicJdbcUtil {
     private final static int EXPIRE_IN_SECOND = 5;
 
     /**
-     * 扫描定时任务线程执行扫描清除周期
-     */
-    private final static int CLEAN_UP_POOL_PERIOD_IN_SECOND = 10;
-
-    /**
      * 数据源最大connection激活数量
+     *
+     *
      */
     private final static int DATA_SOURCE_MAX_ACTIVE = 3;
-    private static final ScheduledExecutorService CLEAN_UP_POOL = Executors.newSingleThreadScheduledExecutor();
     static Logger logger = LoggerFactory.getLogger(DynamicJdbcUtil.class);
-    private static final LoadingCache<String, DynamicJdbcData> CACHE = CacheBuilder.newBuilder()
+    private static final LoadingCache<String, DynamicJdbcData> CACHE = Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
-//            .removalListener(RemovalListeners.asynchronous(removalNotification->{},Executors.newSingleThreadExecutor()))
-            .removalListener(removalNotification -> {
+            .<String, DynamicJdbcData>evictionListener((k,v,c) -> {
                 //移除数据源时候关闭数据源
-                DynamicJdbcData jdbcData = (DynamicJdbcData) removalNotification.getValue();
-                DruidDataSource dataSource = ((DruidDataSource) jdbcData.getJdbcTemplate().getDataSource());
-                logger.info("dataSource[{}] [{}] start remove", removalNotification.getKey().toString(), dataSource.hashCode());
+                DruidDataSource dataSource = ((DruidDataSource) v.getJdbcTemplate().getDataSource());
+                logger.info("dataSource[{}] [{}] start remove", k, dataSource.hashCode());
                 dataSource.close();
-                logger.info("dataSource[{}] [{}] finish remove", removalNotification.getKey().toString(), dataSource.hashCode());
+                logger.info("dataSource[{}] [{}] finish remove", k, dataSource.hashCode());
             })
-            .build(new CacheLoader<String, DynamicJdbcData>() {
-                @Override
-                public DynamicJdbcData load(String s) {
-                    //加载新的数据源
-                    logger.info("dataSource[{}] start load", s);
-                    String[] arr = s.split(",");
-                    DruidDataSource dataSource = getDataSource(arr[0], arr[1], arr[2]);
-                    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-                    jdbcTemplate.afterPropertiesSet();
-                    TransactionTemplate transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(dataSource));
-                    transactionTemplate.afterPropertiesSet();
-                    DynamicJdbcData jdbcData = new DynamicJdbcData(jdbcTemplate, transactionTemplate);
-                    logger.info("dataSource[{}] [{}] finish load", s, dataSource.hashCode());
-                    return jdbcData;
-                }
+            .scheduler(Scheduler.systemScheduler())
+            .build(s -> {
+                //加载新的数据源
+                logger.info("dataSource[{}] start load", s);
+                String[] arr = s.split(",");
+                DruidDataSource dataSource = getDataSource(arr[0], arr[1], arr[2]);
+                JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+                jdbcTemplate.afterPropertiesSet();
+                TransactionTemplate transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(dataSource));
+                transactionTemplate.afterPropertiesSet();
+                DynamicJdbcData jdbcData = new DynamicJdbcData(jdbcTemplate, transactionTemplate);
+                logger.info("dataSource[{}] [{}] finish load", s, dataSource.hashCode());
+                return jdbcData;
             });
-
-    /**
-     * 启动扫描线程
-     * 虽然guava cache有设置过期时间、但是guava cache并不会自动清除、而是等待下次访问才会清除
-     * 所以需要另启动清除线程
-     */
-    static {
-        CLEAN_UP_POOL.scheduleWithFixedDelay(CACHE::cleanUp, EXPIRE_IN_SECOND, CLEAN_UP_POOL_PERIOD_IN_SECOND, TimeUnit.SECONDS);
-    }
 
     private static void test(String url, String username, String password) {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
@@ -115,12 +93,7 @@ public class DynamicJdbcUtil {
     }
 
     public static DynamicJdbcData getJdbcData(String url, String username, String password) {
-
-        try {
-            return CACHE.get(getKey(url, username, password));
-        } catch (ExecutionException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        return CACHE.get(getKey(url, username, password));
     }
 
     public static void close(String url, String username, String password) {
@@ -143,7 +116,6 @@ public class DynamicJdbcUtil {
 
         closeAll();
 
-        CLEAN_UP_POOL.shutdown();
     }
 }
 

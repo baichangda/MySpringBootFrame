@@ -1,7 +1,6 @@
 package com.bcd.base.message;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.i18n.I18NData;
 
 /**
  * Created by Administrator on 2017/7/26.
@@ -11,38 +10,25 @@ public class ErrorMessage extends Message {
         super(msg);
     }
 
-    public ErrorMessage(I18NData i18NData) {
-        super(i18NData);
-    }
-
     public static ErrorMessage getMessage(String msg) {
         return new ErrorMessage(msg);
     }
 
-    public static ErrorMessage getMessage(I18NData i18NData) {
-        return new ErrorMessage(i18NData);
-    }
-
     public JsonMessage toJsonMessage(Object... params) {
-        return JsonMessage.fail().withMessage(getValue(params)).withCode(code);
+        return JsonMessage.fail().message(getValue(params)).code(code);
     }
 
     public BaseRuntimeException toRuntimeException(Object... params) {
-        return BaseRuntimeException.getException(getValue(params)).withCode(code);
+        return BaseRuntimeException.getException(getValue(params)).code(code);
     }
 
-    public ErrorMessage withCode(String code) {
+    public ErrorMessage code(String code) {
         this.code = code;
         return this;
     }
 
-    public ErrorMessage withMsg(String msg) {
+    public ErrorMessage msg(String msg) {
         this.msg = msg;
-        return this;
-    }
-
-    public ErrorMessage withI18NData(I18NData i18NData) {
-        this.i18NData = i18NData;
         return this;
     }
 }

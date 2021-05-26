@@ -6,7 +6,6 @@ import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.service.RoleService;
@@ -53,7 +52,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<List<RoleBean>>success().withData(roleService.findAll(condition));
+        return JsonMessage.success(roleService.findAll(condition));
     }
 
     /**
@@ -81,7 +80,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<Page<RoleBean>>success().withData(roleService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(roleService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -96,7 +95,7 @@ public class RoleController extends BaseController {
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "角色实体") @Validated @RequestBody RoleBean role) {
         roleService.save(role);
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success().message("保存成功");
     }
 
 
@@ -113,7 +112,7 @@ public class RoleController extends BaseController {
     public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
         //验证删除权限
         roleService.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success().message("删除成功");
     }
 
 }

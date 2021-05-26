@@ -6,7 +6,6 @@ import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
 import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.service.PermissionService;
@@ -53,7 +52,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.<List<PermissionBean>>success().withData(permissionService.findAll(condition));
+        return JsonMessage.success(permissionService.findAll(condition));
     }
 
     /**
@@ -81,7 +80,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.<Page<PermissionBean>>success().withData((permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize))));
+        return JsonMessage.success(permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -96,7 +95,7 @@ public class PermissionController extends BaseController {
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "权限实体") @Validated @RequestBody PermissionBean permission) {
         permissionService.save(permission);
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success().message("保存成功");
     }
 
 
@@ -112,7 +111,7 @@ public class PermissionController extends BaseController {
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
         permissionService.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success().message("删除成功");
     }
 
 }

@@ -1,6 +1,5 @@
 package com.bcd.base.message;
 
-import com.bcd.base.i18n.I18NData;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.io.Serializable;
@@ -12,27 +11,17 @@ public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     protected String code;
     protected String msg;
-    //对应的是message的I18NData
-    protected I18NData i18NData;
 
     protected Message(String msg) {
         this.msg = msg;
-    }
-
-    protected Message(I18NData i18NData) {
-        this.i18NData = i18NData;
     }
 
     public static Message getMessage(String msg) {
         return new Message(msg);
     }
 
-    public static Message getMessage(I18NData i18NData) {
-        return new Message(i18NData);
-    }
-
-    public JsonMessage toJsonMessage(boolean result, Object... params) {
-        return new JsonMessage<>(result).withMessage(getValue(params)).withCode(code);
+    public JsonMessage<?> toJsonMessage(boolean result, Object... params) {
+        return new JsonMessage<>(result,null).message(getValue(params)).code(code);
     }
 
     /**
@@ -46,18 +35,10 @@ public class Message implements Serializable {
      * @return
      */
     public String getValue(Object... params) {
-        if (msg == null) {
-            if (i18NData == null) {
-                return null;
-            } else {
-                return i18NData.getValue(params);
-            }
+        if (params == null || params.length == 0) {
+            return msg;
         } else {
-            if (params == null || params.length == 0) {
-                return msg;
-            } else {
-                return MessageFormatter.arrayFormat(msg, params, null).getMessage();
-            }
+            return MessageFormatter.arrayFormat(msg, params, null).getMessage();
         }
     }
 
@@ -65,7 +46,7 @@ public class Message implements Serializable {
         return code;
     }
 
-    public Message withCode(String code) {
+    public Message code(String code) {
         this.code = code;
         return this;
     }
@@ -74,17 +55,8 @@ public class Message implements Serializable {
         return msg;
     }
 
-    public Message withMsg(String msg) {
+    public Message msg(String msg) {
         this.msg = msg;
-        return this;
-    }
-
-    public I18NData getI18NData() {
-        return i18NData;
-    }
-
-    public Message withI18NData(I18NData i18NData) {
-        this.i18NData = i18NData;
         return this;
     }
 }

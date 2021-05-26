@@ -11,7 +11,6 @@ import com.bcd.base.config.shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.service.UserService;
 import com.bcd.sys.shiro.ShiroUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,7 +75,7 @@ public class UserController extends BaseController {
                 new NumberCondition("type", type, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<List<UserBean>>success().withData(userService.findAll(condition));
+        return JsonMessage.success(userService.findAll(condition));
     }
 
     /**
@@ -116,7 +115,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.<Page<UserBean>>success().withData(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -132,7 +131,7 @@ public class UserController extends BaseController {
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
 
         userService.saveUser(user);
-        return com.bcd.base.define.MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success().message("保存成功");
     }
 
     /**
@@ -147,7 +146,7 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
         userService.deleteById(ids);
-        return com.bcd.base.define.MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success().message("删除成功");
     }
 
     /**
@@ -166,7 +165,7 @@ public class UserController extends BaseController {
             @Parameter(description = "密码")
             @RequestParam String password) {
         UserBean user = userService.login(username, password);
-        return JsonMessage.<UserBean>success().withData(user);
+        return JsonMessage.success(user);
     }
 
     /**
@@ -177,9 +176,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @Operation(description = "用户注销")
     @ApiResponse(responseCode = "200", description = "注销结果")
-    public JsonMessage logout() {
+    public JsonMessage<?> logout() {
         Subject currentUser = SecurityUtils.getSubject();
-        JsonMessage jsonMessage = MessageDefine.SUCCESS_LOGOUT.toJsonMessage(true);
+        JsonMessage<?> jsonMessage = JsonMessage.success().message("注销成功");
         //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
         currentUser.logout();
         return jsonMessage;
@@ -195,9 +194,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @Operation(description = "重置密码")
     @ApiResponse(responseCode = "200", description = "重制密码结果")
-    public JsonMessage resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
+    public JsonMessage<?> resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
         userService.resetPassword(userId);
-        return MessageDefine.SUCCESS_RESET_PASSWORD.toJsonMessage(true);
+        return JsonMessage.success().message("重置成功");
     }
 
 
@@ -219,9 +218,9 @@ public class UserController extends BaseController {
         UserBean userBean = ShiroUtil.getCurrentUser();
         boolean flag = userService.updatePassword(userBean.getId(), oldPassword, newPassword);
         if (flag) {
-            return com.bcd.base.define.MessageDefine.SUCCESS_UPDATE.toJsonMessage(true);
+            return JsonMessage.success().message("修改成功");
         } else {
-            return MessageDefine.ERROR_PASSWORD_WRONG.toJsonMessage();
+            return JsonMessage.fail().message("密码错误");
         }
     }
 
@@ -238,7 +237,7 @@ public class UserController extends BaseController {
     public JsonMessage runAs(@Parameter(description = "要授权身份用户id数组")
                              @RequestParam Long[] ids) {
         userService.runAs(ids);
-        return MessageDefine.SUCCESS_AUTHORITY.toJsonMessage(true);
+        return JsonMessage.success().message("授权成功");
     }
 
     /**
@@ -252,7 +251,7 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "200", description = "解除授权结果")
     public JsonMessage releaseRunAs() {
         userService.releaseRunAs();
-        return MessageDefine.SUCCESS_RELEASE.toJsonMessage(true);
+        return JsonMessage.success().message("解除授权成功");
     }
 
 }

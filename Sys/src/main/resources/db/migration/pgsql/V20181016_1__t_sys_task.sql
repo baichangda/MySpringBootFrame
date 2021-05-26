@@ -13,7 +13,6 @@ CREATE TABLE "public"."t_sys_task"
     "file_paths"       varchar(100),
     "create_user_id"   int8,
     "create_user_name" varchar(50),
-    "create_ip"        varchar(50),
     CONSTRAINT "t_sys_task_pkey" PRIMARY KEY ("id")
 );
 
@@ -42,7 +41,5 @@ COMMENT ON COLUMN "public"."t_sys_task"."file_paths" IS '文件路径(如果是�
 COMMENT ON COLUMN "public"."t_sys_task"."create_user_id" IS '创建人id';
 
 COMMENT ON COLUMN "public"."t_sys_task"."create_user_name" IS '创建人姓名';
-
-COMMENT ON COLUMN "public"."t_sys_task"."create_ip" IS '创建ip';
 
 COMMENT ON TABLE "public"."t_sys_task" IS '系统任务处理表';

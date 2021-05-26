@@ -27,9 +27,6 @@ dependencies {
     api("org.apache.shiro:shiro-spring:${shiroVersion}")
     api("org.apache.shiro:shiro-ehcache:${shiroVersion}")
 
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    api group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
-
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
     api group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
 

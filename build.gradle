@@ -107,13 +107,15 @@ allprojects {
         }
     }
 
-    /**
-     * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
-     */
-    bootJar {
-        manifest {
-            attributes 'Start-Class': 'com.bcd.Application'
-        }
+}
+
+/**
+ * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
+ */
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.bcd.Application'
+
     }
 }
 

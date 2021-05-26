@@ -6,10 +6,10 @@ import com.bcd.base.config.init.SpringInitializable;
 import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.security.RSASecurity;
+import com.bcd.rdb.define.MessageDefine;
 import com.bcd.rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
-import com.bcd.sys.define.MessageDefine;
 import com.bcd.sys.keys.KeysConst;
 import com.bcd.sys.shiro.PhoneCodeToken;
 import com.bcd.sys.shiro.ShiroUtil;
@@ -241,7 +241,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
     public void runAs(Long... ids) {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isRunAs()) {
-            throw MessageDefine.ERROR_HAS_RUN_AS.toRuntimeException();
+            throw BaseRuntimeException.getException("当前用户已经授权过");
         }
         List<UserBean> userBeanList = findAllById(ids);
         SimplePrincipalCollection simplePrincipalCollection = new SimplePrincipalCollection();
@@ -252,7 +252,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
     public void releaseRunAs() {
         Subject subject = SecurityUtils.getSubject();
         if (!subject.isRunAs()) {
-            throw MessageDefine.ERROR_NOT_RUN_AS.toRuntimeException();
+            throw BaseRuntimeException.getException("当前用户没有授权过");
         }
         subject.releaseRunAs();
     }

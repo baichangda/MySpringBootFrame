@@ -1,6 +1,5 @@
 package com.bcd.sys.aop;
 
-import com.bcd.base.util.IPUtil;
 import com.bcd.rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.shiro.ShiroUtil;
@@ -73,7 +72,6 @@ public class EntityAopConfig {
         //2、属性注入
         if (id == null) {
             bean.setCreateTime(new Date());
-            bean.setCreateIp(IPUtil.getIpAddress());
             if (user != null) {
                 bean.setCreateUserId(user.getId());
                 bean.setCreateUserName(user.getRealName());
@@ -81,7 +79,6 @@ public class EntityAopConfig {
             }
         } else {
             bean.setUpdateTime(new Date());
-            bean.setUpdateIp(IPUtil.getIpAddress());
             if (user != null) {
                 bean.setUpdateUserId(user.getId());
                 bean.setUpdateUserName(user.getRealName());

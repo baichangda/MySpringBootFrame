@@ -2,12 +2,11 @@ package com.bcd.mongodb.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.i18n.I18NData;
+import com.bcd.base.util.StringUtil;
 import com.bcd.mongodb.anno.Unique;
 import com.bcd.mongodb.bean.info.BeanInfo;
 import com.bcd.mongodb.repository.BaseRepository;
 import com.bcd.mongodb.util.ConditionUtil;
-import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -100,15 +99,12 @@ public class BaseService<T, K extends Serializable> {
      */
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
-        String msg = anno.messageValue();
-        if (Strings.isNullOrEmpty(msg)) {
-            msg = I18NData.getI18NData(anno.messageKey()).getValue(field.getName());
-        }
-        return msg;
+        return StringUtil.format(anno.value(),field.getName());
     }
 
     /**
      * 保存前进行唯一性验证
+     * 在并发保存情况下无法保证数据一致性、需要根据业务情况加锁
      *
      * @param t
      */
@@ -128,6 +124,7 @@ public class BaseService<T, K extends Serializable> {
 
     /**
      * 保存前进行批量唯一性验证
+     * 在并发保存情况下无法保证数据一致性、需要根据业务情况加锁
      *
      * @param iterable
      */

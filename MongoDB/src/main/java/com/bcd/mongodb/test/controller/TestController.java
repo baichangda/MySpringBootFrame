@@ -4,7 +4,6 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.mongodb.test.bean.TestBean;
 import com.bcd.mongodb.test.service.TestService;
@@ -49,7 +48,7 @@ public class TestController extends BaseController {
                 new DateCondition("time", timeEnd, DateCondition.Handler.LE),
                 new StringCondition("id", id)
         );
-        return JsonMessage.<List<TestBean>>success().withData(testService.findAll(condition));
+        return JsonMessage.success(testService.findAll(condition));
     }
 
     /**
@@ -74,7 +73,7 @@ public class TestController extends BaseController {
                 new DateCondition("time", timeEnd, DateCondition.Handler.LE),
                 new StringCondition("id", id)
         );
-        return JsonMessage.<Page<TestBean>>success().withData(testService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(testService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -88,9 +87,8 @@ public class TestController extends BaseController {
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test) {
         testService.save(test);
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success().message("保存成功");
     }
-
 
     /**
      * 删除测试
@@ -103,7 +101,7 @@ public class TestController extends BaseController {
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "测试id数组") @RequestParam String[] ids) {
         testService.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success().message("删除成功");
     }
 
 }
