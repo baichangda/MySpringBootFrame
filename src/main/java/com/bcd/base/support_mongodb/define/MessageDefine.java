@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.define;
+package com.bcd.base.support_mongodb.define;
 
 
 /**

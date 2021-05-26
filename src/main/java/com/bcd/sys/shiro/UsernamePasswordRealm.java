@@ -2,9 +2,9 @@ package com.bcd.sys.shiro;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.config.shiro.cache.ShiroRedisCache;
-import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
+import com.bcd.base.support_redis.RedisUtil;
+import com.bcd.base.support_shiro.cache.ShiroRedisCache;
+import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.service.PermissionService;

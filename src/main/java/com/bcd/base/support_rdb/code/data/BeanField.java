@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.code.data;
+package com.bcd.base.support_rdb.code.data;
 
 import lombok.Getter;
 import lombok.Setter;

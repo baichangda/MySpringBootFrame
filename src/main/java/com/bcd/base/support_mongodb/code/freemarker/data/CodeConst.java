@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.code.freemarker.data;
+package com.bcd.base.support_mongodb.code.freemarker.data;
 
 import freemarker.template.Configuration;
 import freemarker.template.Version;

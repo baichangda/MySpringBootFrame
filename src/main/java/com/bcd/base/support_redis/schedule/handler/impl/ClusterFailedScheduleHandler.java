@@ -1,7 +1,7 @@
-package com.bcd.base.redis.schedule.handler.impl;
+package com.bcd.base.support_redis.schedule.handler.impl;
 
-import com.bcd.base.redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.base.redis.schedule.handler.RedisScheduleHandler;
+import com.bcd.base.support_redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.support_redis.schedule.handler.RedisScheduleHandler;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.time.Duration;

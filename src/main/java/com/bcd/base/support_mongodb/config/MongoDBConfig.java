@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.config;
+package com.bcd.base.support_mongodb.config;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;

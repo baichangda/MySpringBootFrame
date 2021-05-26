@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.jdbc.sql;
+package com.bcd.base.support_rdb.jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;

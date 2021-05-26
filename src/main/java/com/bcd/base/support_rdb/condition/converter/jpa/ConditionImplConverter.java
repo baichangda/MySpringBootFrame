@@ -1,9 +1,9 @@
-package com.bcd.base.rdb.condition.converter.jpa;
+package com.bcd.base.support_rdb.condition.converter.jpa;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.ConditionImpl;
-import com.bcd.base.rdb.util.ConditionUtil;
+import com.bcd.base.support_rdb.util.ConditionUtil;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

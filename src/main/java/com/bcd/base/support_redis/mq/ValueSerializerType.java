@@ -1,6 +1,6 @@
-package com.bcd.base.redis.mq;
+package com.bcd.base.support_redis.mq;
 
-import com.bcd.base.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 
 import java.lang.reflect.Type;
 

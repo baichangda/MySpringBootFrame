@@ -1,6 +1,6 @@
-package com.bcd.base.cache.anno;
+package com.bcd.base.support_spring_cache.anno;
 
-import com.bcd.base.cache.CacheConst;
+import com.bcd.base.support_spring_cache.CacheConst;
 import org.springframework.cache.annotation.CacheEvict;
 
 import java.lang.annotation.*;

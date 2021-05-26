@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.code.data;
+package com.bcd.base.support_rdb.code.data;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,8 +28,8 @@ public class BeanData {
 
     /**
      * 父类
-     * 1: #{@link com.bcd.base.rdb.bean.BaseBean}
-     * 2: #{@link com.bcd.base.rdb.bean.SuperBaseBean}
+     * 1: #{@link com.bcd.base.support_rdb.bean.BaseBean}
+     * 2: #{@link com.bcd.base.support_rdb.bean.SuperBaseBean}
      */
     private int superBeanType = 2;
 

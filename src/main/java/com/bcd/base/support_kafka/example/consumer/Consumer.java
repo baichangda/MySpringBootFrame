@@ -1,4 +1,4 @@
-package com.bcd.base.kafka.example.consumer;
+package com.bcd.base.support_kafka.example.consumer;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;

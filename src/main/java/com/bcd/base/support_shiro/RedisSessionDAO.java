@@ -1,6 +1,6 @@
 package com.bcd.base.support_shiro;
 
-import com.bcd.base.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;

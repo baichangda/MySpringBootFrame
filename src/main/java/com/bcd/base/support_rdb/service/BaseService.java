@@ -1,17 +1,17 @@
-package com.bcd.base.rdb.service;
+package com.bcd.base.support_rdb.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
-import com.bcd.base.rdb.anno.Unique;
-import com.bcd.base.rdb.bean.info.BeanInfo;
-import com.bcd.base.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
-import com.bcd.base.rdb.jdbc.sql.BatchCreateSqlResult;
-import com.bcd.base.rdb.jdbc.sql.BatchUpdateSqlResult;
-import com.bcd.base.rdb.jdbc.sql.SqlListResult;
-import com.bcd.base.rdb.jdbc.sql.SqlUtil;
-import com.bcd.base.rdb.repository.BaseRepository;
-import com.bcd.base.rdb.util.ConditionUtil;
+import com.bcd.base.support_rdb.anno.Unique;
+import com.bcd.base.support_rdb.bean.info.BeanInfo;
+import com.bcd.base.support_rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.bcd.base.support_rdb.jdbc.sql.BatchCreateSqlResult;
+import com.bcd.base.support_rdb.jdbc.sql.BatchUpdateSqlResult;
+import com.bcd.base.support_rdb.jdbc.sql.SqlListResult;
+import com.bcd.base.support_rdb.jdbc.sql.SqlUtil;
+import com.bcd.base.support_rdb.repository.BaseRepository;
+import com.bcd.base.support_rdb.util.ConditionUtil;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;

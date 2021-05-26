@@ -1,7 +1,7 @@
 package com.bcd.base.support_shiro;
 
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import com.bcd.sys.define.CommonConst;
 import org.apache.shiro.web.filter.authc.AuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;

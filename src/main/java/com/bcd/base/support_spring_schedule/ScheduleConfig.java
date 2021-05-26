@@ -1,4 +1,4 @@
-package com.bcd.base.schedule;
+package com.bcd.base.support_spring_schedule;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;

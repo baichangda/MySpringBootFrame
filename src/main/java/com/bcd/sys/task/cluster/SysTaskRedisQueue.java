@@ -1,6 +1,6 @@
 package com.bcd.sys.task.cluster;
 
-import com.bcd.base.config.init.SpringInitializable;
+import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.*;
 import org.slf4j.Logger;

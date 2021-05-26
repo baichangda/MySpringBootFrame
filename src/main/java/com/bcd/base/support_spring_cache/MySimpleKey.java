@@ -1,4 +1,4 @@
-package com.bcd.base.cache;
+package com.bcd.base.support_spring_cache;
 
 import lombok.Getter;
 import com.bcd.base.util.JsonUtil;

@@ -1,7 +1,7 @@
-package com.bcd.base.mongodb.test.repository;
+package com.bcd.base.support_mongodb.test.repository;
 
-import com.bcd.base.mongodb.repository.BaseRepository;
-import com.bcd.base.mongodb.test.bean.TestBean;
+import com.bcd.base.support_mongodb.repository.BaseRepository;
+import com.bcd.base.support_mongodb.test.bean.TestBean;
 import org.springframework.stereotype.Repository;
 
 

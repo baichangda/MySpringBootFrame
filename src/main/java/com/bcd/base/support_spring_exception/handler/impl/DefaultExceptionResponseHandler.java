@@ -1,10 +1,10 @@
-package com.bcd.base.exception.handler.impl;
+package com.bcd.base.support_spring_exception.handler.impl;
 
 import com.bcd.base.support_shiro.ShiroConst;
 import com.bcd.base.message.ErrorMessage;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpResponse;

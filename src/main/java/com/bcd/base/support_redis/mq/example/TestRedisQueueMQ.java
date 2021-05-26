@@ -1,8 +1,8 @@
-package com.bcd.base.redis.mq.example;
+package com.bcd.base.support_redis.mq.example;
 
-import com.bcd.base.init.SpringInitializable;
-import com.bcd.base.redis.mq.ValueSerializerType;
-import com.bcd.base.redis.mq.queue.RedisQueueMQ;
+import com.bcd.base.support_spring_init.SpringInitializable;
+import com.bcd.base.support_redis.mq.ValueSerializerType;
+import com.bcd.base.support_redis.mq.queue.RedisQueueMQ;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 

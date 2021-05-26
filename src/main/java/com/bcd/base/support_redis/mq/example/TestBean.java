@@ -1,4 +1,4 @@
-package com.bcd.base.redis.mq.example;
+package com.bcd.base.support_redis.mq.example;
 
 class TestBean {
     private Integer id;

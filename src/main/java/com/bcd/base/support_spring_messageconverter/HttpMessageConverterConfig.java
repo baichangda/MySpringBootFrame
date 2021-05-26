@@ -1,4 +1,4 @@
-package com.bcd.base.messageconverter;
+package com.bcd.base.support_spring_messageconverter;
 
 import com.bcd.base.util.JsonUtil;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;

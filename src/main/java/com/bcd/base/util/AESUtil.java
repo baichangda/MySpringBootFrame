@@ -8,7 +8,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-public class AESSecurity {
+public class AESUtil {
 
     public static final String KEY_ALGORITHM = "AES";
 

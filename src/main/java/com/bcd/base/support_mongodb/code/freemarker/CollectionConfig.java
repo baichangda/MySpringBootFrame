@@ -1,8 +1,8 @@
-package com.bcd.base.mongodb.code.freemarker;
+package com.bcd.base.support_mongodb.code.freemarker;
 
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.mongodb.code.freemarker.data.CodeConst;
+import com.bcd.base.support_mongodb.code.freemarker.data.CodeConst;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

@@ -1,6 +1,6 @@
-package com.bcd.base.exception;
+package com.bcd.base.support_spring_exception;
 
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;

@@ -14,7 +14,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class RSASecurity {
+public class RSAUtil {
 
     /**
      * 算法/模式/补码方式

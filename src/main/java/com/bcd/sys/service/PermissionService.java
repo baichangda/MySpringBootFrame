@@ -1,9 +1,9 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.config.init.SpringInitializable;
-import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
-import com.bcd.base.config.shiro.data.NotePermission;
-import com.bcd.base.rdb.service.BaseService;
+import com.bcd.base.support_spring_init.SpringInitializable;
+import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
+import com.bcd.base.support_shiro.data.NotePermission;
+import com.bcd.base.support_rdb.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.aop.framework.AopContext;

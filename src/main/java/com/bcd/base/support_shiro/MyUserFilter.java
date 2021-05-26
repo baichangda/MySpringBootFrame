@@ -1,6 +1,6 @@
 package com.bcd.base.support_shiro;
 
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.apache.shiro.web.util.WebUtils;
 

@@ -1,6 +1,6 @@
 package com.bcd.sys.task.cluster;
 
-import com.bcd.base.config.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.Task;
 import com.bcd.sys.task.TaskDAO;

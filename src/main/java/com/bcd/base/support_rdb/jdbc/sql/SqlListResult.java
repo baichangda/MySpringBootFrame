@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.jdbc.sql;
+package com.bcd.base.support_rdb.jdbc.sql;
 
 import java.util.List;
 

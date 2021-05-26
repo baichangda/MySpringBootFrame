@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.bean;
+package com.bcd.base.support_mongodb.bean;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,6 +1,6 @@
-package com.bcd.base.mongodb.bean.info;
+package com.bcd.base.support_mongodb.bean.info;
 
-import com.bcd.base.mongodb.anno.Unique;
+import com.bcd.base.support_mongodb.anno.Unique;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

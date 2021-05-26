@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.anno;
+package com.bcd.base.support_mongodb.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

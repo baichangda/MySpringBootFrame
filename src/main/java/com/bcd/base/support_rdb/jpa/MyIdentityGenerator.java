@@ -1,6 +1,6 @@
-package com.bcd.base.rdb.jpa;
+package com.bcd.base.support_rdb.jpa;
 
-import com.bcd.base.rdb.bean.SuperBaseBean;
+import com.bcd.base.support_rdb.bean.SuperBaseBean;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentityGenerator;
 

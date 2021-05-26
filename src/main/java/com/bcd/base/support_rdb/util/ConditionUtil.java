@@ -1,10 +1,10 @@
-package com.bcd.base.rdb.util;
+package com.bcd.base.support_rdb.util;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.condition.converter.jpa.*;
+import com.bcd.base.support_rdb.condition.converter.jpa.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;

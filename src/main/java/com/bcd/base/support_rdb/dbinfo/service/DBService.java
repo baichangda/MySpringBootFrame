@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.dbinfo.service;
+package com.bcd.base.support_rdb.dbinfo.service;
 
 import com.alibaba.excel.write.handler.WorkbookWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;

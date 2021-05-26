@@ -1,7 +1,7 @@
 package com.bcd.sys.define;
 
 
-import com.bcd.base.config.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 
 public class CommonConst {
     public final static long ADMIN_ID = 1L;

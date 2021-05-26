@@ -1,6 +1,6 @@
 package com.bcd.base.support_shiro;
 
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.CacheManagerAware;

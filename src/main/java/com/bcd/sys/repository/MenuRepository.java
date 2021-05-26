@@ -1,6 +1,6 @@
 package com.bcd.sys.repository;
 
-import com.bcd.base.rdb.repository.BaseRepository;
+import com.bcd.base.support_rdb.repository.BaseRepository;
 import com.bcd.sys.bean.MenuBean;
 import org.springframework.stereotype.Repository;
 

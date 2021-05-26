@@ -1,4 +1,4 @@
-package com.bcd.base.init;
+package com.bcd.base.support_spring_init;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

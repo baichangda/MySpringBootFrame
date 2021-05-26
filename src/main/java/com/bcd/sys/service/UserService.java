@@ -2,12 +2,11 @@ package com.bcd.sys.service;
 
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.config.init.SpringInitializable;
-import com.bcd.base.config.shiro.realm.MyAuthorizingRealm;
+import com.bcd.base.support_spring_init.SpringInitializable;
+import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.security.RSASecurity;
-import com.bcd.base.rdb.define.MessageDefine;
-import com.bcd.base.rdb.service.BaseService;
+import com.bcd.base.util.RSAUtil;
+import com.bcd.base.support_rdb.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
@@ -63,7 +62,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         String username = "admin";
         String password = "123qwe";
         // 加密
-        String encodedText = Base64.encodeBase64String(RSASecurity.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
+        String encodedText = Base64.encodeBase64String(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
 
         logger.info("encodedBase64: {}", encodedText);
 
@@ -73,7 +72,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         logger.info("dbPwd: {}", dbPwd);
 
         // 解密
-        String decodedText = RSASecurity.decode(KeysConst.PRIVATE_KEY, Base64.decodeBase64(encodedText));
+        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, Base64.decodeBase64(encodedText));
 
         logger.info("decodedText: {}", decodedText);
     }
@@ -154,7 +153,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         if (CommonConst.IS_PASSWORD_ENCODED) {
             //使用私钥解密密码
             PrivateKey privateKey = KeysConst.PRIVATE_KEY;
-            String password = RSASecurity.decode(privateKey, Base64.decodeBase64(encryptPassword));
+            String password = RSAUtil.decode(privateKey, Base64.decodeBase64(encryptPassword));
             //构造登录对象
             token = new UsernamePasswordToken(username, password);
         } else {
@@ -191,8 +190,8 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
             //2.1、获取私钥
             PrivateKey privateKey = KeysConst.PRIVATE_KEY;
             //2.2、解密密码
-            String oldPassword = RSASecurity.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
-            String newPassword = RSASecurity.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
+            String oldPassword = RSAUtil.decode(privateKey, Base64.decodeBase64(encryptOldPassword));
+            String newPassword = RSAUtil.decode(privateKey, Base64.decodeBase64(encryptNewPassword));
             //2.3、将原始密码MD5加密后与数据库中进行对比
             if (userBean.getPassword().equals(encryptPassword(userBean.getUsername(), oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名

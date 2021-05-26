@@ -1,7 +1,7 @@
-package com.bcd.base.exception;
+package com.bcd.base.support_spring_exception;
 
-import com.bcd.base.exception.handler.ExceptionResponseHandler;
-import com.bcd.base.exception.handler.impl.DefaultExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
+import com.bcd.base.support_spring_exception.handler.impl.DefaultExceptionResponseHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

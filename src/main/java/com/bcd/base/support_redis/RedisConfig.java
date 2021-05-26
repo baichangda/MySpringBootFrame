@@ -1,4 +1,4 @@
-package com.bcd.base.redis;
+package com.bcd.base.support_redis;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

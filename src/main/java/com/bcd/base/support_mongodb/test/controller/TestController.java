@@ -1,12 +1,12 @@
-package com.bcd.base.mongodb.test.controller;
+package com.bcd.base.support_mongodb.test.controller;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.mongodb.test.bean.TestBean;
-import com.bcd.base.mongodb.test.service.TestService;
+import com.bcd.base.support_mongodb.test.bean.TestBean;
+import com.bcd.base.support_mongodb.test.service.TestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

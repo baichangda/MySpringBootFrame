@@ -1,9 +1,9 @@
-package com.bcd.base.mongodb.condition.converter;
+package com.bcd.base.support_mongodb.condition.converter;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.ConditionImpl;
-import com.bcd.base.mongodb.util.ConditionUtil;
+import com.bcd.base.support_mongodb.util.ConditionUtil;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.List;

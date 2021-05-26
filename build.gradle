@@ -1,5 +1,17 @@
 buildscript {
     ext {
+        mysqlVersion = '8.+'
+        pgsqlVersion = '42.2.+'
+        jsqlparserVersion = '+'
+        druidVersion = '+'
+        freemarkerVersion = '+'
+        easyexcelVersion = '+'
+        commonsPool2 = '+'
+        shiroVersion = '+'
+        disruptorVersion='+'
+        springdocVersion='+'
+        caffeineVersion='2.9.+'
+        retrofitJacksonVersion='+'
         springBootVersion = '+'
         kafkaVersion = '+'
         flywayVersion = '7.5.1'
@@ -66,6 +78,69 @@ allprojects {
     }
 
     dependencies {
+        //springboot支持
+        api("org.springframework.boot:spring-boot-starter")
+        //springboot aop支持
+        api("org.springframework.boot:spring-boot-starter-aop")
+        //springboot web支持
+        api("org.springframework.boot:spring-boot-starter-web")
+        //springboot log4j2支持
+        api('org.springframework.boot:spring-boot-starter-log4j2')
+        //disruptor(log4j2异步日志需要用到)
+        api group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
+        //springboot test支持
+//    api("org.springframework.boot:spring-boot-starter-test")
+        //springboot websocket支持
+        api("org.springframework.boot:spring-boot-starter-websocket")
+        //springboot redis支持
+        //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
+        api("org.springframework.boot:spring-boot-starter-data-redis")
+        api("org.apache.commons:commons-pool2:${commonsPool2}")
+        //springboot validation支持
+        api("org.springframework.boot:spring-boot-starter-validation")
+
+        // https://mvnrepository.com/artifact/com.alibaba/easyexcel
+        api group: 'com.alibaba', name: 'easyexcel', version: "${easyexcelVersion}"
+
+        //shiro权限框架集成
+        api("org.apache.shiro:shiro-spring:${shiroVersion}")
+        api("org.apache.shiro:shiro-ehcache:${shiroVersion}")
+
+        // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+        api group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
+
+        // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+        api group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
+
+
+
+
+        // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+        api group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
+
+
+        //springboot mongodb支持
+        api("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+        // https://mvnrepository.com/artifact/org.freemarker/freemarker
+        api group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
+
+        //springboot jpa支持
+        api("org.springframework.boot:spring-boot-starter-data-jpa")
+        //springboot jdbc支持
+        api("org.springframework.boot:spring-boot-starter-jdbc")
+        //mysql驱动包
+        runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
+
+        // https://mvnrepository.com/artifact/org.postgresql/postgresql
+        runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
+
+        api("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
+
+        // https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter
+        api group: 'com.alibaba', name: 'druid-spring-boot-starter', version: "${druidVersion}"
+
+
         //spring kafka支持
         api("org.springframework.kafka:spring-kafka:${kafkaVersion}")
         //邮件支持
@@ -107,17 +182,17 @@ allprojects {
         }
     }
 
-}
-
-/**
- * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
- */
-bootJar {
-    manifest {
-        attributes 'Start-Class': 'com.bcd.Application'
-
+    /**
+     * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
+     */
+    bootJar {
+        manifest {
+            attributes 'Start-Class': 'com.bcd.Application'
+        }
     }
 }
+
+
 
 
 /**
@@ -175,8 +250,3 @@ flywayMigrate {
 /**
  * ----------------------------------------------------------------------------
  */
-
-dependencies {
-    api project(':Sys')
-    api project(':MongoDB')
-}

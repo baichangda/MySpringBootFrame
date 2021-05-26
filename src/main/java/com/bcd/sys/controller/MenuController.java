@@ -1,7 +1,7 @@
 package com.bcd.sys.controller;
 
-import com.bcd.base.config.shiro.anno.RequiresNotePermissions;
-import com.bcd.base.config.shiro.data.NotePermission;
+import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
+import com.bcd.base.support_shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.MenuBean;

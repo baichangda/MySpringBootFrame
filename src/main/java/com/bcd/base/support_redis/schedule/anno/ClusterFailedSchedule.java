@@ -1,4 +1,4 @@
-package com.bcd.base.redis.schedule.anno;
+package com.bcd.base.support_redis.schedule.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

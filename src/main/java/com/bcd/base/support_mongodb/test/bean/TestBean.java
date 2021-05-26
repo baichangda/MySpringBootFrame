@@ -1,6 +1,6 @@
-package com.bcd.base.mongodb.test.bean;
+package com.bcd.base.support_mongodb.test.bean;
 
-import com.bcd.base.mongodb.bean.SuperBaseBean;
+import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

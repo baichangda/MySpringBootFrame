@@ -1,7 +1,7 @@
-package com.bcd.base.rdb.code;
+package com.bcd.base.support_rdb.code;
 
-import com.bcd.base.rdb.code.data.BeanField;
-import com.bcd.base.rdb.dbinfo.data.DBInfo;
+import com.bcd.base.support_rdb.code.data.BeanField;
+import com.bcd.base.support_rdb.dbinfo.data.DBInfo;
 
 import java.sql.Connection;
 import java.util.List;

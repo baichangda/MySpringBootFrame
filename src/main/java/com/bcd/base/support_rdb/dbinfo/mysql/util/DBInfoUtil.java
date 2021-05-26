@@ -1,10 +1,10 @@
-package com.bcd.base.rdb.dbinfo.mysql.util;
+package com.bcd.base.support_rdb.dbinfo.mysql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
-import com.bcd.base.rdb.dbinfo.data.DBInfo;
-import com.bcd.base.rdb.dbinfo.mysql.bean.ColumnsBean;
-import com.bcd.base.rdb.dbinfo.mysql.bean.TablesBean;
+import com.bcd.base.support_rdb.dbinfo.data.DBInfo;
+import com.bcd.base.support_rdb.dbinfo.mysql.bean.ColumnsBean;
+import com.bcd.base.support_rdb.dbinfo.mysql.bean.TablesBean;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;

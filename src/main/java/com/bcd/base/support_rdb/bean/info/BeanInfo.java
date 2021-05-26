@@ -1,6 +1,6 @@
-package com.bcd.base.rdb.bean.info;
+package com.bcd.base.support_rdb.bean.info;
 
-import com.bcd.base.rdb.anno.Unique;
+import com.bcd.base.support_rdb.anno.Unique;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

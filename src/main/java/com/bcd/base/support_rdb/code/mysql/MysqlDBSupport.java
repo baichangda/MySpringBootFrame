@@ -1,13 +1,13 @@
-package com.bcd.base.rdb.code.mysql;
+package com.bcd.base.support_rdb.code.mysql;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.code.CodeConst;
-import com.bcd.base.rdb.code.DBSupport;
-import com.bcd.base.rdb.code.TableConfig;
-import com.bcd.base.rdb.code.data.BeanField;
-import com.bcd.base.rdb.dbinfo.data.DBInfo;
-import com.bcd.base.rdb.dbinfo.mysql.bean.ColumnsBean;
-import com.bcd.base.rdb.dbinfo.mysql.util.DBInfoUtil;
+import com.bcd.base.support_rdb.code.CodeConst;
+import com.bcd.base.support_rdb.code.DBSupport;
+import com.bcd.base.support_rdb.code.TableConfig;
+import com.bcd.base.support_rdb.code.data.BeanField;
+import com.bcd.base.support_rdb.dbinfo.data.DBInfo;
+import com.bcd.base.support_rdb.dbinfo.mysql.bean.ColumnsBean;
+import com.bcd.base.support_rdb.dbinfo.mysql.util.DBInfoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

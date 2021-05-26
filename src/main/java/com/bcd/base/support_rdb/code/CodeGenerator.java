@@ -1,12 +1,12 @@
-package com.bcd.base.rdb.code;
+package com.bcd.base.support_rdb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.code.data.BeanData;
-import com.bcd.base.rdb.code.data.ControllerData;
-import com.bcd.base.rdb.code.data.RepositoryData;
-import com.bcd.base.rdb.code.data.ServiceData;
-import com.bcd.base.rdb.code.mysql.MysqlDBSupport;
-import com.bcd.base.rdb.code.pgsql.PgsqlDBSupport;
+import com.bcd.base.support_rdb.code.data.BeanData;
+import com.bcd.base.support_rdb.code.data.ControllerData;
+import com.bcd.base.support_rdb.code.data.RepositoryData;
+import com.bcd.base.support_rdb.code.data.ServiceData;
+import com.bcd.base.support_rdb.code.mysql.MysqlDBSupport;
+import com.bcd.base.support_rdb.code.pgsql.PgsqlDBSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -71,7 +71,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Bean.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateBean.txt");
+            Template template = configuration.getTemplate("rdb_TemplateBean.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
@@ -97,7 +97,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateRepository.txt");
+            Template template = configuration.getTemplate("rdb_TemplateRepository.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
@@ -123,7 +123,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateService.txt");
+            Template template = configuration.getTemplate("rdb_TemplateService.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
@@ -149,7 +149,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateController.txt");
+            Template template = configuration.getTemplate("rdb_TemplateController.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);

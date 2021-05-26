@@ -1,4 +1,4 @@
-package com.bcd.base.cache;
+package com.bcd.base.support_spring_cache;
 
 public class CacheConst {
     public final static String LOCAL_CACHE ="localCache";

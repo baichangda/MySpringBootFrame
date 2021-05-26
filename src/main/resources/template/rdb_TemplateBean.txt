@@ -1,9 +1,9 @@
 package ${packagePre}.bean;
 
 <#if superBeanType == 1>
-import com.bcd.rdb.bean.BaseBean;
+import com.bcd.base.rdb.bean.BaseBean;
 <#else>
-import com.bcd.rdb.bean.SuperBaseBean;
+import com.bcd.base.rdb.bean.SuperBaseBean;
 </#if>
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;

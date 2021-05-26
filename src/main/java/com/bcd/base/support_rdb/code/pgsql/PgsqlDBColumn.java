@@ -1,6 +1,6 @@
-package com.bcd.base.rdb.code.pgsql;
+package com.bcd.base.support_rdb.code.pgsql;
 
-import com.bcd.base.rdb.code.data.BeanField;
+import com.bcd.base.support_rdb.code.data.BeanField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

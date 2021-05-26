@@ -1,7 +1,5 @@
-package com.bcd.base.cache;
+package com.bcd.base.support_spring_cache;
 
-import com.bcd.base.cache.CacheConst;
-import com.bcd.base.cache.MySimpleKeyGenerator;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;

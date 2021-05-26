@@ -1,7 +1,7 @@
-package com.bcd.base.redis.mq.topic;
+package com.bcd.base.support_redis.mq.topic;
 
-import com.bcd.base.redis.RedisUtil;
-import com.bcd.base.redis.mq.ValueSerializerType;
+import com.bcd.base.support_redis.RedisUtil;
+import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.JsonUtil;

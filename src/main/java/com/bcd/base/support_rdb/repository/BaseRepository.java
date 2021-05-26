@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.repository;
+package com.bcd.base.support_rdb.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

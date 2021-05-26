@@ -1,4 +1,4 @@
-package com.bcd.base.cache;
+package com.bcd.base.support_spring_cache;
 
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 

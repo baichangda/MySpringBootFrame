@@ -1,12 +1,12 @@
-package com.bcd.base.mongodb.service;
+package com.bcd.base.support_mongodb.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
-import com.bcd.base.mongodb.anno.Unique;
-import com.bcd.base.mongodb.bean.info.BeanInfo;
-import com.bcd.base.mongodb.repository.BaseRepository;
-import com.bcd.base.mongodb.util.ConditionUtil;
+import com.bcd.base.support_mongodb.anno.Unique;
+import com.bcd.base.support_mongodb.bean.info.BeanInfo;
+import com.bcd.base.support_mongodb.repository.BaseRepository;
+import com.bcd.base.support_mongodb.util.ConditionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

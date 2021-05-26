@@ -1,4 +1,4 @@
-package com.bcd.base.rdb.bean;
+package com.bcd.base.support_rdb.bean;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

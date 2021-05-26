@@ -1,7 +1,7 @@
 package com.bcd.sys.task.cluster;
 
-import com.bcd.base.config.redis.mq.ValueSerializerType;
-import com.bcd.base.config.redis.mq.topic.RedisTopicMQ;
+import com.bcd.base.support_redis.mq.ValueSerializerType;
+import com.bcd.base.support_redis.mq.topic.RedisTopicMQ;
 import com.bcd.sys.task.CommonConst;
 import com.bcd.sys.task.TaskRunnable;
 import org.springframework.beans.factory.annotation.Autowired;

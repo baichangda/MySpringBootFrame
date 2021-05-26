@@ -1,12 +1,12 @@
-package com.bcd.base.rdb.dbinfo.pgsql.service;
+package com.bcd.base.support_rdb.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.dbinfo.pgsql.bean.ColumnsBean;
-import com.bcd.base.rdb.dbinfo.pgsql.bean.TablesBean;
-import com.bcd.base.rdb.dbinfo.pgsql.util.DBInfoUtil;
-import com.bcd.base.rdb.dbinfo.service.DBService;
+import com.bcd.base.support_rdb.dbinfo.pgsql.bean.ColumnsBean;
+import com.bcd.base.support_rdb.dbinfo.pgsql.bean.TablesBean;
+import com.bcd.base.support_rdb.dbinfo.pgsql.util.DBInfoUtil;
+import com.bcd.base.support_rdb.dbinfo.service.DBService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 

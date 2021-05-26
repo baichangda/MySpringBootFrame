@@ -1,4 +1,4 @@
-package com.bcd.base.kafka.example.producer;
+package com.bcd.base.support_kafka.example.producer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;

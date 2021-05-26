@@ -1,6 +1,6 @@
 package com.bcd.sys.shiro;
 
-import com.bcd.base.config.shiro.AuthorizationHandler;
+import com.bcd.base.support_shiro.AuthorizationHandler;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.shiro.aop.MethodInvocation;

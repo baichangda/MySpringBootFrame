@@ -1,6 +1,6 @@
 package com.bcd.base.support_shiro.cache;
 
-import com.bcd.base.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.shiro.cache.Cache;

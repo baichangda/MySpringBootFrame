@@ -1,12 +1,12 @@
-package com.bcd.base.mongodb.code.freemarker;
+package com.bcd.base.support_mongodb.code.freemarker;
 
 import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
-import com.bcd.base.mongodb.bean.BaseBean;
-import com.bcd.base.mongodb.bean.SuperBaseBean;
-import com.bcd.base.mongodb.code.freemarker.data.*;
-import com.bcd.base.mongodb.test.bean.TestBean;
+import com.bcd.base.support_mongodb.bean.BaseBean;
+import com.bcd.base.support_mongodb.bean.SuperBaseBean;
+import com.bcd.base.support_mongodb.code.freemarker.data.*;
+import com.bcd.base.support_mongodb.test.bean.TestBean;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -52,7 +52,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateRepository.txt");
+            Template template = configuration.getTemplate("mongo_TemplateRepository.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
@@ -78,7 +78,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateService.txt");
+            Template template = configuration.getTemplate("mongo_TemplateService.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
@@ -104,7 +104,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("TemplateController.txt");
+            Template template = configuration.getTemplate("mongo_TemplateController.txt");
             template.process(data, out);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);

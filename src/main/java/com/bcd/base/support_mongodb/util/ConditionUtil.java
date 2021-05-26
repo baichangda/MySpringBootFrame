@@ -1,10 +1,10 @@
-package com.bcd.base.mongodb.util;
+package com.bcd.base.support_mongodb.util;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.mongodb.condition.converter.*;
+import com.bcd.base.support_mongodb.condition.converter.*;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 

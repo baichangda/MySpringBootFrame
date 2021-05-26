@@ -1,4 +1,4 @@
-package com.bcd.base.retrofit;
+package com.bcd.base.support_retrofit;
 
 import com.bcd.base.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Value;

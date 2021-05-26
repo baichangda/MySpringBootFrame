@@ -1,4 +1,4 @@
-package com.bcd.base.mongodb.repository;
+package com.bcd.base.support_mongodb.repository;
 
 
 import org.springframework.data.mongodb.repository.MongoRepository;

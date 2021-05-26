@@ -1,6 +1,6 @@
 package com.bcd.sys.aop;
 
-import com.bcd.base.rdb.bean.BaseBean;
+import com.bcd.base.support_rdb.bean.BaseBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.shiro.ShiroUtil;
 import org.aspectj.lang.JoinPoint;

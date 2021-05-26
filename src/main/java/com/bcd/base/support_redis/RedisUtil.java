@@ -1,4 +1,4 @@
-package com.bcd.base.redis;
+package com.bcd.base.support_redis;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;

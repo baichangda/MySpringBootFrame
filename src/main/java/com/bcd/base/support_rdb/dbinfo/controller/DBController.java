@@ -1,8 +1,8 @@
-package com.bcd.base.rdb.dbinfo.controller;
+package com.bcd.base.support_rdb.dbinfo.controller;
 
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.dbinfo.service.DBService;
+import com.bcd.base.support_rdb.dbinfo.service.DBService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

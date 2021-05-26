@@ -1,7 +1,7 @@
-package com.bcd.base.redis.cache;
+package com.bcd.base.support_redis.cache;
 
-import com.bcd.base.cache.CacheConst;
-import com.bcd.base.redis.RedisUtil;
+import com.bcd.base.support_spring_cache.CacheConst;
+import com.bcd.base.support_redis.RedisUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cache.Cache;
 import org.springframework.context.annotation.Bean;

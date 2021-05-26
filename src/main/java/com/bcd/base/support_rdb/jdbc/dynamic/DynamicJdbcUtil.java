@@ -1,8 +1,8 @@
-package com.bcd.base.rdb.jdbc.dynamic;
+package com.bcd.base.support_rdb.jdbc.dynamic;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.bcd.base.support_rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.github.benmanes.caffeine.cache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

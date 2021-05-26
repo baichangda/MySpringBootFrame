@@ -1,6 +1,6 @@
-package com.bcd.base.redis.schedule.handler;
+package com.bcd.base.support_redis.schedule.handler;
 
-import com.bcd.base.redis.RedisUtil;
+import com.bcd.base.support_redis.RedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

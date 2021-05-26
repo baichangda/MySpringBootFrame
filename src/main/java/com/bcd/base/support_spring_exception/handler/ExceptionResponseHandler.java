@@ -1,4 +1,4 @@
-package com.bcd.base.exception.handler;
+package com.bcd.base.support_spring_exception.handler;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.bcd.base.init;
+package com.bcd.base.support_spring_init;
 
 import org.springframework.context.event.ContextRefreshedEvent;
 

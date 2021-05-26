@@ -1,7 +1,7 @@
 package com.bcd.sys.keys;
 
-import com.bcd.base.config.redis.RedisUtil;
-import com.bcd.base.security.RSASecurity;
+import com.bcd.base.support_redis.RedisUtil;
+import com.bcd.base.util.RSAUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -66,14 +66,14 @@ public class KeysConst {
     static {
         if (!IS_CLUSTER) {
             if (IS_GENERATE_KEY_ON_STARTUP) {
-                Object[] keys = RSASecurity.generateKey(1024);
+                Object[] keys = RSAUtil.generateKey(1024);
                 KeysConst.PUBLIC_KEY = (RSAPublicKey) keys[0];
                 KeysConst.PRIVATE_KEY = (RSAPrivateKey) keys[1];
                 KeysConst.PUBLIC_KEY_BASE64 = Base64.encodeBase64String(KeysConst.PUBLIC_KEY.getEncoded());
                 KeysConst.PRIVATE_KEY_BASE64 = Base64.encodeBase64String(KeysConst.PRIVATE_KEY.getEncoded());
             } else {
-                KeysConst.PUBLIC_KEY = RSASecurity.restorePublicKey(Base64.decodeBase64(KeysConst.PUBLIC_KEY_BASE64));
-                KeysConst.PRIVATE_KEY = RSASecurity.restorePrivateKey(Base64.decodeBase64(KeysConst.PRIVATE_KEY_BASE64));
+                KeysConst.PUBLIC_KEY = RSAUtil.restorePublicKey(Base64.decodeBase64(KeysConst.PUBLIC_KEY_BASE64));
+                KeysConst.PRIVATE_KEY = RSAUtil.restorePrivateKey(Base64.decodeBase64(KeysConst.PRIVATE_KEY_BASE64));
             }
         }
     }

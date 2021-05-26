@@ -1,10 +1,10 @@
-package com.bcd.base.redis.schedule.aop;
+package com.bcd.base.support_redis.schedule.aop;
 
-import com.bcd.base.redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.base.redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.base.redis.schedule.handler.RedisScheduleHandler;
-import com.bcd.base.redis.schedule.handler.impl.ClusterFailedScheduleHandler;
-import com.bcd.base.redis.schedule.handler.impl.SingleFailedScheduleHandler;
+import com.bcd.base.support_redis.schedule.anno.ClusterFailedSchedule;
+import com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule;
+import com.bcd.base.support_redis.schedule.handler.RedisScheduleHandler;
+import com.bcd.base.support_redis.schedule.handler.impl.ClusterFailedScheduleHandler;
+import com.bcd.base.support_redis.schedule.handler.impl.SingleFailedScheduleHandler;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -40,8 +40,8 @@ public class RedisScheduleAopConfig {
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.base.redis.schedule.anno.ClusterFailedSchedule) " +
-            "|| @annotation(com.bcd.base.redis.schedule.anno.SingleFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.support_redis.schedule.anno.ClusterFailedSchedule) " +
+            "|| @annotation(com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule)")
     public void methodSchedule() {
 
     }
