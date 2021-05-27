@@ -1,9 +1,9 @@
 package com.bcd.base.support_rdb.jdbc.dynamic;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_rdb.jdbc.rowmapper.MyColumnMapRowMapper;
 import com.github.benmanes.caffeine.cache.*;
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,7 +37,7 @@ public class DynamicJdbcUtil {
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
             .<String, DynamicJdbcData>evictionListener((k,v,c) -> {
                 //移除数据源时候关闭数据源
-                DruidDataSource dataSource = ((DruidDataSource) v.getJdbcTemplate().getDataSource());
+                HikariDataSource dataSource = (HikariDataSource) v.getJdbcTemplate().getDataSource();
                 logger.info("dataSource[{}] [{}] start remove", k, dataSource.hashCode());
                 dataSource.close();
                 logger.info("dataSource[{}] [{}] finish remove", k, dataSource.hashCode());
@@ -47,7 +47,7 @@ public class DynamicJdbcUtil {
                 //加载新的数据源
                 logger.info("dataSource[{}] start load", s);
                 String[] arr = s.split(",");
-                DruidDataSource dataSource = getDataSource(arr[0], arr[1], arr[2]);
+                HikariDataSource dataSource = getDataSource(arr[0], arr[1], arr[2]);
                 JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
                 jdbcTemplate.afterPropertiesSet();
                 TransactionTemplate transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(dataSource));
@@ -65,23 +65,15 @@ public class DynamicJdbcUtil {
         }
     }
 
-    private static DruidDataSource getDataSource(String url, String username, String password) {
+    private static HikariDataSource getDataSource(String url, String username, String password) {
         //首先测试
         test(url, username, password);
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setEnable(true);
-        dataSource.setMaxActive(DATA_SOURCE_MAX_ACTIVE);
-        dataSource.setMinIdle(1);
-        dataSource.setInitialSize(1);
-        dataSource.setUrl(url);
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(url);
+        dataSource.setMinimumIdle(1);
+        dataSource.setMaximumPoolSize(DATA_SOURCE_MAX_ACTIVE);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
-        try {
-            dataSource.init();
-        } catch (SQLException e) {
-            dataSource.close();
-            throw BaseRuntimeException.getException(e);
-        }
         return dataSource;
     }
 

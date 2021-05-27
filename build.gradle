@@ -3,14 +3,12 @@ buildscript {
         mysqlVersion = '8.+'
         pgsqlVersion = '42.2.+'
         jsqlparserVersion = '+'
-        druidVersion = '+'
         freemarkerVersion = '+'
-        easyexcelVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
         disruptorVersion = '+'
         springdocVersion = '+'
-        caffeineVersion = '+'
+        caffeineVersion = '2.+'
         retrofitJacksonVersion = '+'
         springBootVersion = '+'
         kafkaVersion = '+'
@@ -47,8 +45,8 @@ apply plugin: 'maven-publish'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.springframework.boot'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenLocal()
@@ -74,8 +72,15 @@ configurations.all {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
+    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
     //springboot aop支持
     implementation("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
@@ -84,10 +89,9 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
     //disruptor(log4j2异步日志需要用到)
     implementation group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
-    //springboot test支持
-//    api("org.springframework.boot:spring-boot-starter-test")
-    //springboot websocket支持
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    //邮件支持
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -95,9 +99,11 @@ dependencies {
     //springboot validation支持
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    //spring kafka支持
+    implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
-
 
     //shiro权限框架集成
     implementation("org.apache.shiro:shiro-spring:${shiroVersion}")
@@ -118,32 +124,21 @@ dependencies {
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     implementation group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
 
+
     //springboot jpa支持
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     //springboot jdbc支持
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     //mysql驱动包
     runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
-
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
-
     implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
 
-    // https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter
-    implementation group: 'com.alibaba', name: 'druid-spring-boot-starter', version: "${druidVersion}"
 
-    //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-    //邮件支持
-    implementation("org.springframework.boot:spring-boot-starter-mail")
 
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
-    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
-    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
 
 
 
@@ -204,12 +199,8 @@ bootRun {
     //开启缓存行补齐
     jvmArgs('-XX:-RestrictContended')
     jvmArgs('-Dfile.encoding=UTF-8')
-    //jdk9+ 警告信息和base模块的反射开启
-    jvmArgs('--illegal-access=deny')
-    jvmArgs('--add-opens','java.base/java.lang.invoke=ALL-UNNAMED')
     //log4j2全局异步日志
     jvmArgs ('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
-    print(jvmArgs)
 }
 
 

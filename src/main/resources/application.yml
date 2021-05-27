@@ -19,46 +19,20 @@ spring:
   freemarker:
     checkTemplateLocation: false
   datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+
     #mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true
     username: root
     password: 123456
     #pgsql
-    #     driver-class-name: org.postgresql.Driver
-    #     url: jdbc:postgresql://127.0.0.1:5432/msbf
-    #     username: root
-    #     password: 123456
-    druid:
-      initial-size: 5
-      max-active: 15
-      filter:
-        #sql统计配置
-        stat:
-          enabled: true
-          #忽略参数合并sql
-          merge-sql: true
-        #sql防火墙配置
-        wall:
-          enabled: true
-
-      #开启web api调用统计
-      web-stat-filter:
-        enabled: true
-        exclusions: "*.html,*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*"
-        #设置session.getAttribute("user")的key名称
-        principal-session-name: user
-        url-pattern: /*
-        #设置身份的cookie名称
-        principal-cookie-name: JSESSIONID
-      #开启stat的servlet、开启这个后才能访问页面
-      stat-view-servlet:
-        enabled: true
-        #不能开启账号密码登录、和shiro框架存在冲突、直接进入index.html页面
-      #         login-username: admin
-      #         login-password: 123qwe
-      #监控所有模块service文件夹下的类
-      aop-patterns: com.bcd.*.service.*
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://127.0.0.1:5432/msbf
+#    username: root
+#    password: 123456
 
   #  jpa配置
   jpa:
@@ -73,7 +47,7 @@ spring:
         #mysql
         dialect: org.hibernate.dialect.MySQL8Dialect
         #pgsql
-        #         dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        #dialect: org.hibernate.dialect.PostgreSQL95Dialect
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
 
 
@@ -113,19 +87,19 @@ spring:
         maxWait: -1
       shutdown-timeout: 100ms
     #主从配置
-    #      sentinel:
-    #        master: myMaster
-    #        nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
-    #集群配置
-    #       cluster:
-    #         maxRedirects: 3
-    #         nodes:
-    #           - 114.116.107.184:7001
-    #           - 114.116.107.184:7002
-    #           - 114.116.107.184:7003
-    #           - 114.115.141.139:7004
-    #           - 114.115.141.139:7005
-    #           - 114.115.141.139:7006
+#     sentinel:
+#       master: myMaster
+#       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
+#    #集群配置
+#     cluster:
+#       maxRedirects: 3
+#       nodes:
+#         - 114.116.107.184:7001
+#         - 114.116.107.184:7002
+#         - 114.116.107.184:7003
+#         - 114.115.141.139:7004
+#         - 114.115.141.139:7005
+#         - 114.115.141.139:7006
 
     #单机配置
     host: 127.0.0.1
