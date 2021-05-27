@@ -1,5 +1,6 @@
 buildscript {
     ext {
+        guavaVersion = '+'
         mysqlVersion = '8.+'
         pgsqlVersion = '42.2.+'
         jsqlparserVersion = '+'
@@ -78,6 +79,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
     implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
@@ -134,12 +138,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
     implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
-
-
-
-
-
-
 
 
 }
@@ -200,7 +198,7 @@ bootRun {
     jvmArgs('-XX:-RestrictContended')
     jvmArgs('-Dfile.encoding=UTF-8')
     //log4j2全局异步日志
-    jvmArgs ('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
+    jvmArgs('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
 }
 
 
