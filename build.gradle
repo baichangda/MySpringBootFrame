@@ -142,6 +142,11 @@ dependencies {
     compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
+    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
+    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
+
+
 }
 
 //生成jar时打包源码
@@ -192,16 +197,19 @@ bootRun {
      * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
      * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
      */
-    List args = new ArrayList<>();
+
     if (project.hasProperty('jvmArgs')) {
-        args.addAll(project.jvmArgs.split("\\s+") as List)
+        jvmArgs.addAll(project.jvmArgs.split("\\s+") as List)
     }
     //开启缓存行补齐
-    args.add('-XX:-RestrictContended')
-    args.add('-Dfile.encoding=UTF-8')
+    jvmArgs('-XX:-RestrictContended')
+    jvmArgs('-Dfile.encoding=UTF-8')
+    //jdk9+ 警告信息和base模块的反射开启
+    jvmArgs('--illegal-access=deny')
+    jvmArgs('--add-opens','java.base/java.lang.invoke=ALL-UNNAMED')
     //log4j2全局异步日志
-    args.add('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
-    jvmArgs(args)
+    jvmArgs ('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
+    print(jvmArgs)
 }
 
 
