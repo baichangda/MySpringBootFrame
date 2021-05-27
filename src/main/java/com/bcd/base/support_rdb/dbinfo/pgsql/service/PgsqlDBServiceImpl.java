@@ -1,12 +1,12 @@
 package com.bcd.base.support_rdb.dbinfo.pgsql.service;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_rdb.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.base.support_rdb.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.base.support_rdb.dbinfo.pgsql.util.DBInfoUtil;
 import com.bcd.base.support_rdb.dbinfo.service.DBService;
+import com.bcd.base.util.ExcelUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +49,7 @@ public class PgsqlDBServiceImpl implements DBService {
         }
     }
 
-    public void exportDBDesignerExcel(Connection connection, String dbName, OutputStream os, Runnable doBeforeWrite) {
+    public void exportDBDesignerExcel(Connection connection, String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
         List<List> dataList = new ArrayList<>();
         List emptyList = new ArrayList();
         for (int i = 0; i <= headArr.length - 1; i++) {
@@ -97,10 +97,11 @@ public class PgsqlDBServiceImpl implements DBService {
             doBeforeWrite.run();
         }
 
-        EasyExcel.write(os)
-                .excelType(ExcelTypeEnum.XLSX)
-                .registerWriteHandler(workbookWriteHandler)
-                .sheet(dbName).doWrite(dataList);
+        try(XSSFWorkbook workbook=new XSSFWorkbook()){
+            applyStyleToSheet(workbook.getSheetAt(0));
+            ExcelUtil.writeToWorkbook(workbook,dataList, ExcelUtil::writeToCell);
+            workbook.write(os);
+        }
     }
 
     /**

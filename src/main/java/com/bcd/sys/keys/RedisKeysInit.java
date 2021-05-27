@@ -4,7 +4,7 @@ import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.RSAUtil;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,8 +28,8 @@ public class RedisKeysInit implements SpringInitializable {
             if (keys == null) {
                 Object[] objects = RSAUtil.generateKey(1024);
                 keys = new String[2];
-                keys[0] = Base64.encodeBase64String(((PublicKey) objects[0]).getEncoded());
-                keys[1] = Base64.encodeBase64String(((PrivateKey) objects[1]).getEncoded());
+                keys[0] = Base64.getEncoder().encodeToString(((PublicKey) objects[0]).getEncoded());
+                keys[1] = Base64.getEncoder().encodeToString(((PrivateKey) objects[1]).getEncoded());
                 //3.1、如果插入失败,则说明在生成过程中redis中已经被存储了一份,此时再取出redis公钥私钥
                 boolean res = redisTemplate.opsForValue().setIfAbsent(KeysConst.REDIS_KEY_NAME, keys);
                 if (!res) {
@@ -39,8 +39,8 @@ public class RedisKeysInit implements SpringInitializable {
             //4、最后设置此虚拟机公钥私钥
             KeysConst.PUBLIC_KEY_BASE64 = keys[0];
             KeysConst.PRIVATE_KEY_BASE64 = keys[1];
-            KeysConst.PUBLIC_KEY = RSAUtil.restorePublicKey(Base64.decodeBase64(keys[0]));
-            KeysConst.PRIVATE_KEY = RSAUtil.restorePrivateKey(Base64.decodeBase64(keys[1]));
+            KeysConst.PUBLIC_KEY = RSAUtil.restorePublicKey(Base64.getDecoder().decode(keys[0]));
+            KeysConst.PRIVATE_KEY = RSAUtil.restorePrivateKey(Base64.getDecoder().decode(keys[1]));
 
         }
     }

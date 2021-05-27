@@ -4,7 +4,6 @@ import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.CacheManagerAware;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -51,18 +50,6 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class ShiroConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(ShiroConfiguration.class);
-
-    /**
-     * ehcache缓存管理器
-     *
-     * @return
-     */
-    @Bean
-    public EhCacheManager ehCacheManager() {
-        EhCacheManager cacheManager = new EhCacheManager();
-        cacheManager.setCacheManagerConfigFile("classpath:com/bcd/config/ehcache-shiro.xml");
-        return cacheManager;
-    }
 
     /**
      * redis缓存管理器

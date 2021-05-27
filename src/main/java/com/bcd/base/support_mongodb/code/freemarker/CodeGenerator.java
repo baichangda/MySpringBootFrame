@@ -1,6 +1,5 @@
 package com.bcd.base.support_mongodb.code.freemarker;
 
-import com.bcd.base.define.CommonConst;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.support_mongodb.bean.BaseBean;
@@ -191,7 +190,7 @@ public class CodeGenerator {
             if ("id".equals(e.getName())) {
                 return true;
             }
-            for (Class<?> aClass : CommonConst.BASE_DATA_TYPE) {
+            for (Class<?> aClass : CodeConst.SUPPORT_FIELD_TYPE) {
                 if (aClass.isAssignableFrom(e.getType())) {
                     return true;
                 }

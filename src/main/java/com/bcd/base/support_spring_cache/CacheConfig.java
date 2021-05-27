@@ -1,6 +1,7 @@
 package com.bcd.base.support_spring_cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -14,15 +15,17 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
     /**
      * 定义一级缓存(在非redis情况)
+     *
      * @return
      */
     @Bean(CacheConst.LOCAL_CACHE)
     public Cache localCache() {
         return new CaffeineCache(CacheConst.LOCAL_CACHE,
-            Caffeine.newBuilder()
-                .expireAfterWrite(5,TimeUnit.SECONDS)
-                .softValues()
-                .build()
+                Caffeine.newBuilder()
+                        .expireAfterWrite(5, TimeUnit.SECONDS)
+                        .softValues()
+                        .scheduler(Scheduler.systemScheduler())
+                        .build()
         );
     }
 

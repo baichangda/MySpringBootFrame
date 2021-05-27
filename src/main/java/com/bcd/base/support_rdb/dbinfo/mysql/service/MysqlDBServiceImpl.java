@@ -1,16 +1,16 @@
 package com.bcd.base.support_rdb.dbinfo.mysql.service;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.excel.metadata.Cell;
-import com.alibaba.excel.read.metadata.holder.ReadRowHolder;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_rdb.dbinfo.mysql.bean.TablesBean;
 import com.bcd.base.support_rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.base.support_rdb.dbinfo.service.DBService;
+import com.bcd.base.util.DateUtil;
+import com.bcd.base.util.ExcelUtil;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -36,22 +36,6 @@ public class MysqlDBServiceImpl implements DBService {
 //        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();
 //        tableService.exportDBDesignerExcelToDisk("127.0.0.1:3306","root","123456","msbf","/Users/baichangda/msbf.xlsx");
 
-        List<Map<String, Object>> dataList = EasyExcel.read(Paths.get("/Users/baichangda/msbf.xlsx").toFile(), new AnalysisEventListener<Map<String, Object>>() {
-            @Override
-            public void invoke(Map<String, Object> data, AnalysisContext context) {
-                ReadRowHolder readRowHolder = context.readRowHolder();
-                Map<Integer, Cell> cellDataMap = readRowHolder.getCellMap();
-                cellDataMap.forEach((k, v) -> {
-                    System.out.print(v + " ");
-                });
-                System.out.println();
-            }
-
-            @Override
-            public void doAfterAllAnalysed(AnalysisContext context) {
-
-            }
-        }).excelType(ExcelTypeEnum.XLSX).headRowNumber(0).doReadAllSync();
     }
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
@@ -115,10 +99,11 @@ public class MysqlDBServiceImpl implements DBService {
             doBeforeWrite.run();
         }
 
-        EasyExcel.write(os)
-                .excelType(ExcelTypeEnum.XLSX)
-                .registerWriteHandler(workbookWriteHandler)
-                .sheet(dbName).doWrite(dataList);
+        try(XSSFWorkbook workbook=new XSSFWorkbook()){
+            applyStyleToSheet(workbook.getSheetAt(0));
+            ExcelUtil.writeToWorkbook(workbook,dataList, ExcelUtil::writeToCell);
+            workbook.write(os);
+        }
     }
 
     /**

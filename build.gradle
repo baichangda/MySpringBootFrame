@@ -8,13 +8,13 @@ buildscript {
         easyexcelVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
-        disruptorVersion='+'
-        springdocVersion='+'
-        caffeineVersion='2.9.+'
-        retrofitJacksonVersion='+'
+        disruptorVersion = '+'
+        springdocVersion = '+'
+        caffeineVersion = '+'
+        retrofitJacksonVersion = '+'
         springBootVersion = '+'
         kafkaVersion = '+'
-        flywayVersion = '7.5.1'
+        flywayVersion = '7.3.+'
         lombokVersion = "+"
         mavenRepoUrl = 'https://maven.aliyun.com/repository/central'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
@@ -23,14 +23,13 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
-        mavenCentral()
     }
 
     dependencies {
         //使用springboot框架
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springBootVersion}"
         //使用flyway插件
-        classpath "org.flywaydb:flyway-gradle-plugin:${flywayVersion}"
+        classpath group: 'org.flywaydb', name: 'flyway-gradle-plugin', version: "${flywayVersion}"
     }
 }
 
@@ -38,161 +37,151 @@ buildscript {
  * ----------------------------------------------------------------------------
  */
 
-//所有模块配置
-allprojects {
-    group 'com.bcd'
-    version '1.0'
-    apply plugin: 'java-library'
-    apply plugin: 'java'
-    apply plugin: 'idea'
-    //加入maven发布依赖
-    apply plugin: 'maven-publish'
-    apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'org.springframework.boot'
+group 'com.bcd'
+version '1.0'
+apply plugin: 'java-library'
+apply plugin: 'java'
+apply plugin: 'idea'
+//加入maven发布依赖
+apply plugin: 'maven-publish'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.springframework.boot'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+sourceCompatibility = 11
+targetCompatibility = 11
 
-    repositories {
-        mavenLocal()
-        maven { url "${mavenRepoUrl}" }
-        maven { url "https://jitpack.io" }
+repositories {
+    mavenLocal()
+    maven { url "${mavenRepoUrl}" }
+    maven { url "https://jitpack.io" }
 //        maven { url "${incarMavenRepoUrl}" }
-        mavenCentral()
-    }
+}
 
-    //下载源码和文档
-    //gradle cleanIdea idea
-    idea {
-        module {
-            downloadSources = true
-            downloadJavadoc = true
-        }
+//下载源码和文档
+//gradle cleanIdea idea
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
+}
 
-    //去除springboot默认的logback
-    configurations.all {
-        exclude group:'org.springframework.boot', module: 'spring-boot-starter-logging'
-        exclude module: 'logback-classic'
-        exclude module: 'logback-core'
-    }
+//去除springboot默认的logback
+configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    exclude module: 'logback-classic'
+    exclude module: 'logback-core'
+}
 
-    dependencies {
-        //springboot支持
-        api("org.springframework.boot:spring-boot-starter")
-        //springboot aop支持
-        api("org.springframework.boot:spring-boot-starter-aop")
-        //springboot web支持
-        api("org.springframework.boot:spring-boot-starter-web")
-        //springboot log4j2支持
-        api('org.springframework.boot:spring-boot-starter-log4j2')
-        //disruptor(log4j2异步日志需要用到)
-        api group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
-        //springboot test支持
+dependencies {
+    //springboot支持
+    implementation("org.springframework.boot:spring-boot-starter")
+    //springboot aop支持
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    //springboot web支持
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    //springboot log4j2支持
+    implementation('org.springframework.boot:spring-boot-starter-log4j2')
+    //disruptor(log4j2异步日志需要用到)
+    implementation group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
+    //springboot test支持
 //    api("org.springframework.boot:spring-boot-starter-test")
-        //springboot websocket支持
-        api("org.springframework.boot:spring-boot-starter-websocket")
-        //springboot redis支持
-        //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
-        api("org.springframework.boot:spring-boot-starter-data-redis")
-        api("org.apache.commons:commons-pool2:${commonsPool2}")
-        //springboot validation支持
-        api("org.springframework.boot:spring-boot-starter-validation")
+    //springboot websocket支持
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    //springboot redis支持
+    //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.apache.commons:commons-pool2:${commonsPool2}")
+    //springboot validation支持
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
-        // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-        api group: 'com.alibaba', name: 'easyexcel', version: "${easyexcelVersion}"
-
-        //shiro权限框架集成
-        api("org.apache.shiro:shiro-spring:${shiroVersion}")
-        api("org.apache.shiro:shiro-ehcache:${shiroVersion}")
-
-        // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
-        api group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
-
-        // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
-        api group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
 
 
+    //shiro权限框架集成
+    implementation("org.apache.shiro:shiro-spring:${shiroVersion}")
+    implementation("org.apache.shiro:shiro-ehcache:${shiroVersion}")
 
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
 
-        // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-        api group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
+    // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
 
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
 
-        //springboot mongodb支持
-        api("org.springframework.boot:spring-boot-starter-data-mongodb")
+    //springboot mongodb支持
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
-        // https://mvnrepository.com/artifact/org.freemarker/freemarker
-        api group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
+    // https://mvnrepository.com/artifact/org.freemarker/freemarker
+    implementation group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
 
-        //springboot jpa支持
-        api("org.springframework.boot:spring-boot-starter-data-jpa")
-        //springboot jdbc支持
-        api("org.springframework.boot:spring-boot-starter-jdbc")
-        //mysql驱动包
-        runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
+    //springboot jpa支持
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    //springboot jdbc支持
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    //mysql驱动包
+    runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
 
-        // https://mvnrepository.com/artifact/org.postgresql/postgresql
-        runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
 
-        api("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
+    implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
 
-        // https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter
-        api group: 'com.alibaba', name: 'druid-spring-boot-starter', version: "${druidVersion}"
+    // https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter
+    implementation group: 'com.alibaba', name: 'druid-spring-boot-starter', version: "${druidVersion}"
 
+    //spring kafka支持
+    implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+    //邮件支持
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 
-        //spring kafka支持
-        api("org.springframework.kafka:spring-kafka:${kafkaVersion}")
-        //邮件支持
-        api("org.springframework.boot:spring-boot-starter-mail")
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
-        // https://mvnrepository.com/artifact/org.projectlombok/lombok
-        compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
-        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+}
 
-    }
+//生成jar时打包源码
+task sourceJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier "sources"
+}
 
-    //生成jar时打包源码
-    task sourceJar(type: Jar) {
-        from sourceSets.main.java.srcDirs
-        classifier "sources"
-    }
+jar {
+    enabled = true
+}
 
-    jar {
-        enabled = true
-    }
-
-    //发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
-    //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                from components.java
-                artifact(sourceJar)
-            }
-        }
-        repositories {
-            maven {
-                url 'https://repository.incarcloud.com/content/repositories/snapshots/'
-                credentials {
-                    username 'deployment'
-                    password 'deploy123456'
-                }
-            }
+//发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
+//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact(sourceJar)
         }
     }
-
-    /**
-     * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
-     */
-    bootJar {
-        manifest {
-            attributes 'Start-Class': 'com.bcd.Application'
+    repositories {
+        maven {
+            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
+            credentials {
+                username 'deployment'
+                password 'deploy123456'
+            }
         }
     }
 }
 
-
+/**
+ * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
+ */
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.bcd.Application'
+    }
+}
 
 
 /**
