@@ -85,6 +85,8 @@ dependencies {
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
+    //springboot cache支持
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
     //springboot aop支持
     implementation("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
