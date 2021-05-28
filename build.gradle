@@ -214,16 +214,12 @@ flyway {
     url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
     user = 'root'
     password = '123456'
-    for (project in subprojects) {
-        subLocations.add('filesystem:' + project.sourceSets.main.resources.srcDirs.iterator().next().getPath() + '/db/migration/mysql')
-    }
+    subLocations.add('filesystem:' + project.sourceSets.main.resources.srcDirs.iterator().next().getPath() + '/db/migration/mysql')
     //pgsql
 //    url = 'jdbc:postgresql://127.0.0.1:5432/msbf'
 //    user = 'root'
 //    password = '123456'
-//    for(project in subprojects){
-//        subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
-//    }
+//    subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
 
     flyway.locations = subLocations
 }

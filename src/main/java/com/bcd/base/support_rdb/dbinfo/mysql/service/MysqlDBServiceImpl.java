@@ -100,8 +100,8 @@ public class MysqlDBServiceImpl implements DBService {
         }
 
         try(XSSFWorkbook workbook=new XSSFWorkbook()){
-            applyStyleToSheet(workbook.getSheetAt(0));
             ExcelUtil.writeToWorkbook(workbook,dataList, ExcelUtil::writeToCell);
+            applyStyleToSheet(workbook.getSheetAt(0));
             workbook.write(os);
         }
     }

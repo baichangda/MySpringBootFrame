@@ -38,12 +38,4 @@ public class BaseBean<K extends Serializable> extends SuperBaseBean<K> {
     @Length(max = 50, message = "[更新人姓名]长度不能超过50")
     @Schema(description = "更新人姓名", maxLength = 50, accessMode = Schema.AccessMode.READ_ONLY)
     protected String updateUserName;
-
-    @Length(max = 50, message = "[创建ip地址]长度不能超过50")
-    @Schema(description = "创建ip地址", maxLength = 50, accessMode = Schema.AccessMode.READ_ONLY)
-    protected String createIp;
-
-    @Length(max = 50, message = "[更新ip地址]长度不能超过50")
-    @Schema(description = "更新ip地址", maxLength = 50, accessMode = Schema.AccessMode.READ_ONLY)
-    protected String updateIp;
 }
