@@ -63,12 +63,6 @@ spring:
   data.mongodb.uri: mongodb://test:test@127.0.0.1:27017/test
 
 
-  #  i18n资源文件配置
-  messages:
-    basename: i18n/base/messages,i18n/main/messages,i18n/sys/messages,i18n/rdb/messages,i18n/mongodb/messages
-    encoding: UTF-8
-    cache-duration: -1
-
   #  redis配置
   #  如果都进行了配置,加载的先后顺序为:
   #  sentinel>cluster>single
