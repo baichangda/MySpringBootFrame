@@ -54,7 +54,7 @@ public class ClassUtil {
     public static Map<String, List<Class>> findWithSub(Class annoClass, String... packages) {
         try {
             Map<String, List<Class>> annoNameToClassListMap = new HashMap<>();
-            //1、找出所有带 ICSComponent 注解的类
+            //1、找出所有带注解的类
             List<Class> classList = ClassUtil.getClassesWithAnno(annoClass, packages);
             //2、找出其中的 注解,并从集合中移除
             List<Class> subAnnoList = new ArrayList<>();
