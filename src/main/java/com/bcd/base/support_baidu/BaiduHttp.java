@@ -24,4 +24,12 @@ public interface BaiduHttp {
                        @Field("image") String image,
                        @Field("url") String url,
                        @Field("language_type") String language_type);
+
+    @FormUrlEncoded
+    @POST("/rest/2.0/image-classify/v1/car")
+    Call<JsonNode> car(@Query("access_token") String access_token,
+                       @Field("image") String image,
+                       @Field("url") String url,
+                       @Field("top_num") Integer top_num,
+                       @Field("baike_num") Integer baike_num);
 }
