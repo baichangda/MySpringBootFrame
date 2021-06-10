@@ -111,35 +111,35 @@ public class UnsafeUtil {
         switch (type) {
             case 1: {
                 getUnsafe().putByte(instance, offset, (byte) val);
-                break;
+                return;
             }
             case 2: {
                 getUnsafe().putShort(instance, offset, (short) val);
-                break;
+                return;
             }
             case 3: {
                 getUnsafe().putInt(instance, offset, (int) val);
-                break;
+                return;
             }
             case 4: {
                 getUnsafe().putLong(instance, offset, (long) val);
-                break;
+                return;
             }
             case 5: {
                 getUnsafe().putFloat(instance, offset, (float) val);
-                break;
+                return;
             }
             case 6: {
                 getUnsafe().putDouble(instance, offset, (double) val);
-                break;
+                return;
             }
             case 7: {
                 getUnsafe().putChar(instance, offset, (char) val);
-                break;
+                return;
             }
             case 8: {
                 getUnsafe().putBoolean(instance, offset, (boolean) val);
-                break;
+                return;
             }
             default: {
                 getUnsafe().putObject(instance, offset, val);
