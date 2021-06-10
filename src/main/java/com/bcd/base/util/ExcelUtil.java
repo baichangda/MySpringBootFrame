@@ -3,13 +3,14 @@ package com.bcd.base.util;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,9 +39,8 @@ public class ExcelUtil {
             Workbook workbook = cell.getRow().getSheet().getWorkbook();
             DataFormat dataFormat = workbook.createDataFormat();
             CellStyle cellStyle = workbook.createCellStyle();
-            cellStyle.setDataFormat(dataFormat.getFormat("yyyy/m/d"));
+            cellStyle.setDataFormat(dataFormat.getFormat("yyyymmddhhmmss"));
             cell.setCellStyle(cellStyle);
-
             cell.setCellValue((Date) val);
         } else if (Boolean.class.isAssignableFrom(clazz)) {
             cell.setCellValue((Boolean) val);
@@ -244,6 +244,16 @@ public class ExcelUtil {
             return readFromSheet(sheet, beginRowIndex, beginColIndex, endColIndex, rowFunction, cellFunction);
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public static void main(String[] args) throws IOException{
+        Workbook workbook= new XSSFWorkbook();
+        List<List> dataList=new ArrayList<>();
+        dataList.add(Arrays.asList("a",123,new Date()));
+        ExcelUtil.writeToWorkbook(workbook,dataList, ExcelUtil::writeToCell);
+        try(OutputStream os = Files.newOutputStream(Paths.get("/Users/baichangda/Downloads/test_excel.xlsx"))){
+            workbook.write(os);
         }
     }
 
