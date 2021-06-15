@@ -1,4 +1,4 @@
-package com.bcd.base.support_shiro.data;
+package com.bcd.base.support_shiro;
 
 public enum NotePermission {
     user_search("user:search", "用户查询"),

@@ -1,4 +1,4 @@
-package com.bcd.base.support_shiro.anno;
+package com.bcd.base.support_shiro;
 
 import com.bcd.base.util.StringUtil;
 import org.apache.shiro.authz.aop.AuthorizingAnnotationHandler;

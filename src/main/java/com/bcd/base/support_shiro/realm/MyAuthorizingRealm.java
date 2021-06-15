@@ -1,4 +1,4 @@
-package com.bcd.base.support_shiro.realm;
+package com.bcd.base.support_shiro;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
