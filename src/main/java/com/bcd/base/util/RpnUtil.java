@@ -81,11 +81,10 @@ public class RpnUtil {
      * 同时需要进行偏移量计算也就是 字符-65
      *
      * @param rpn    rpn表达式集合,其中变量必须是char,常量必须是int
-     * @param vals   变量对应值数组,取值规则为 vals[int(char)-offset]
-     * @param offset 代表char对应的数字在vals的偏移量
+     * @param vals   变量对应值数组,取值规则为 vals[int(char)]
      * @return
      */
-    public static int calcRPN_char_int(Object[] rpn, int[] vals, int offset) {
+    public static int calcRPN_char_int(Object[] rpn, int[] vals) {
         int stackIndex = -1;
         int[] stack = new int[rpn.length];
         for (Object s : rpn) {
@@ -94,28 +93,27 @@ public class RpnUtil {
             } else {
                 switch ((char) s) {
                     case '+': {
-                        stack[stackIndex-1]=stack[stackIndex-1]+stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]+stack[stackIndex+1];
                         break;
                     }
                     case '-': {
-                        stack[stackIndex-1]=stack[stackIndex-1]-stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]-stack[stackIndex+1];
                         break;
                     }
                     case '*': {
-                        stack[stackIndex-1]=stack[stackIndex-1]*stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]*stack[stackIndex+1];
                         break;
                     }
                     case '/': {
-                        stack[stackIndex-1]=stack[stackIndex-1]/stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]/stack[stackIndex+1];
                         break;
                     }
                     default: {
-                        int val = vals[(char) s - offset];
-                        stack[++stackIndex] = val;
+                        stack[++stackIndex] = vals[(char)s];
                         break;
                     }
                 }
@@ -140,23 +138,23 @@ public class RpnUtil {
             } else {
                 switch ((String) o) {
                     case "+": {
-                        stack[stackIndex-1]=stack[stackIndex-1]+stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]+stack[stackIndex+1];
                         break;
                     }
                     case "-": {
-                        stack[stackIndex-1]=stack[stackIndex-1]-stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]-stack[stackIndex+1];
                         break;
                     }
                     case "*": {
-                        stack[stackIndex-1]=stack[stackIndex-1]*stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]*stack[stackIndex+1];
                         break;
                     }
                     case "/": {
-                        stack[stackIndex-1]=stack[stackIndex-1]/stack[stackIndex];
                         stackIndex--;
+                        stack[stackIndex]=stack[stackIndex]/stack[stackIndex+1];
                         break;
                     }
                     default: {
@@ -182,23 +180,23 @@ public class RpnUtil {
         for (String s : rpn) {
             switch (s) {
                 case "+": {
-                    stack[stackIndex-1]=stack[stackIndex-1]+stack[stackIndex];
                     stackIndex--;
+                    stack[stackIndex]=stack[stackIndex]+stack[stackIndex+1];
                     break;
                 }
                 case "-": {
-                    stack[stackIndex-1]=stack[stackIndex-1]-stack[stackIndex];
                     stackIndex--;
+                    stack[stackIndex]=stack[stackIndex]-stack[stackIndex+1];
                     break;
                 }
                 case "*": {
-                    stack[stackIndex-1]=stack[stackIndex-1]*stack[stackIndex];
                     stackIndex--;
+                    stack[stackIndex]=stack[stackIndex]*stack[stackIndex+1];
                     break;
                 }
                 case "/": {
-                    stack[stackIndex-1]=stack[stackIndex-1]/stack[stackIndex];
                     stackIndex--;
+                    stack[stackIndex]=stack[stackIndex]/stack[stackIndex+1];
                     break;
                 }
                 default: {
@@ -379,62 +377,43 @@ public class RpnUtil {
     }
 
     /**
-     * 解y=ax+b
-     * 转换成x=(y-b)/a
-     * 其中a、b皆为常量 a!=0
-     * example:
-     * y=0.1x+100 --> x=(y-100)/0.1 此时rpn长度为5
-     * y=0.1x --> x=y/0.1 此时rpn长度为3
-     * y=x --> x=y 此时rpn长度为1
+     * 解析表达式
+     * a!=0 , b>0
+     * 支持
+     * y=a*x
+     * y=x+b
+     * y=x-b
+     * y=a*x+b
+     * y=a*x-b
+     * <p>
+     * 顺序必须完全一致
      *
-     * @param rpn
+     * @param expr
      * @return
      */
-    public static String[] reverseSimpleRPN(String[] rpn) {
-        switch (rpn.length) {
-            case 1: {
-                return new String[]{rpn[0]};
-            }
-            case 3: {
-                String[] res = new String[3];
-                res[0] = rpn[0];
-                res[1] = rpn[1];
-                res[2] = reverseSymbol(rpn[2]);
-                return res;
-            }
-            case 5: {
-                String[] res = new String[5];
-                res[0] = rpn[0];
-                res[1] = rpn[3];
-                res[2] = reverseSymbol(rpn[4]);
-                res[3] = rpn[1];
-                res[4] = reverseSymbol(rpn[2]);
-                return res;
-            }
-            default: {
-                throw BaseRuntimeException.getException("rpn[{0}] not support", Arrays.toString(rpn));
+    public static double[] parseSimpleExpr(String expr) {
+        int len = expr.length();
+        int x_index = expr.indexOf("x");
+        double a;
+        if (x_index == 0) {
+            a = 1;
+        } else {
+            String str1 = expr.substring(0, x_index - 1);
+            if (str1.equals("-")) {
+                a = -1;
+            } else {
+                a = Double.parseDouble(str1);
             }
         }
-    }
+        double b;
+        if (x_index + 1 == len) {
+            b = 0;
+        } else {
+            String str2 = expr.substring(x_index + 1);
+            b = Double.parseDouble(str2);
+        }
 
-    private static String reverseSymbol(String symbol) {
-        switch (symbol) {
-            case "+": {
-                return "-";
-            }
-            case "-": {
-                return "+";
-            }
-            case "*": {
-                return "/";
-            }
-            case "/": {
-                return "*";
-            }
-            default: {
-                throw BaseRuntimeException.getException("reverseSymbol[{0}] not support", symbol);
-            }
-        }
+        return new double[]{a, b};
     }
 
     public static void main(String[] args) {
