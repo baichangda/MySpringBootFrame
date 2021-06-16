@@ -377,40 +377,86 @@ public class RpnUtil {
     }
 
     /**
-     * 解析表达式
-     * a!=0 , b>0
-     * 支持
-     * y=a*x
-     * y=x+b
-     * y=x-b
-     * y=a*x+b
-     * y=a*x-b
-     * <p>
-     * 顺序必须完全一致
+     * 解析表达式 y=ax+b 中的a、b
+     * 顺序可以调整、可以加上括号
      *
      * @param expr
-     * @return
+     * @return [a,b]
      */
     public static double[] parseSimpleExpr(String expr) {
-        int len = expr.length();
-        int x_index = expr.indexOf("x");
-        double a;
-        if (x_index == 0) {
-            a = 1;
-        } else {
-            String str1 = expr.substring(0, x_index - 1);
-            if (str1.equals("-")) {
-                a = -1;
-            } else {
-                a = Double.parseDouble(str1);
+        double a = 1;
+        double b = 0;
+        String[] rpn = parseArithmeticToRPN(expr);
+        int stackIndex = -1;
+        final Object[] stack = new Object[expr.length()];
+        for (String s : rpn) {
+            try {
+                double v = Double.parseDouble(s);
+                stack[++stackIndex] = v;
+            } catch (NumberFormatException ex) {
+                switch (s) {
+                    case "+": {
+                        stackIndex--;
+                        if (stack[stackIndex] instanceof String) {
+                            b = (double) stack[stackIndex + 1];
+                            stack[stackIndex] = stack[stackIndex] + "+" + stack[stackIndex + 1];
+                        } else if (stack[stackIndex + 1] instanceof String) {
+                            b = (double) stack[stackIndex];
+                            stack[stackIndex] = stack[stackIndex] + "+" + stack[stackIndex + 1];
+                        } else {
+                            stack[stackIndex] = (double) stack[stackIndex] + (double) stack[stackIndex + 1];
+                        }
+                        break;
+                    }
+                    case "-": {
+                        stackIndex--;
+                        if (stackIndex == -1) {
+                            if (stack[stackIndex + 1] instanceof String) {
+                                a = -a;
+                                stack[0] = "-" + stack[stackIndex + 1];
+                            } else {
+                                stack[0] = -(double) stack[stackIndex + 1];
+                            }
+                            stackIndex = 0;
+                        } else {
+                            if (stack[stackIndex] instanceof String) {
+                                b = -(double) stack[stackIndex + 1];
+                                stack[stackIndex] = stack[stackIndex] + "-" + stack[stackIndex + 1];
+                            } else if (stack[stackIndex + 1] instanceof String) {
+                                b = (double) stack[stackIndex];
+                                a = -a;
+                                stack[stackIndex] = stack[stackIndex] + "-" + stack[stackIndex + 1];
+                            } else {
+                                stack[stackIndex] = (double) stack[stackIndex] - (double) stack[stackIndex + 1];
+                            }
+                        }
+                        break;
+                    }
+                    case "*": {
+                        stackIndex--;
+                        if (stack[stackIndex] instanceof String) {
+                            a = (double) stack[stackIndex + 1];
+                            stack[stackIndex] = stack[stackIndex] + "*" + stack[stackIndex + 1];
+                        } else if (stack[stackIndex + 1] instanceof String) {
+                            a = (double) stack[stackIndex];
+                            stack[stackIndex] = stack[stackIndex] + "*" + stack[stackIndex + 1];
+                        } else {
+                            stack[stackIndex] = (double) stack[stackIndex] * (double) stack[stackIndex + 1];
+                        }
+                        break;
+                    }
+                    default: {
+                        stack[++stackIndex] = s;
+                        break;
+                    }
+                }
             }
         }
-        double b;
-        if (x_index + 1 == len) {
-            b = 0;
-        } else {
-            String str2 = expr.substring(x_index + 1);
-            b = Double.parseDouble(str2);
+
+        //处理特殊情况、y=b时候
+        if (stack[0] instanceof Double) {
+            a = 0;
+            b = (double) stack[0];
         }
 
         return new double[]{a, b};
