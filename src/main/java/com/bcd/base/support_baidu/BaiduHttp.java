@@ -19,8 +19,8 @@ import java.time.Instant;
 
 public interface BaiduHttp {
 
-    String client_id = "Klz8YKRBRGrLt1AqZkvbrFV9";
-    String client_secret = "ltoBm51TfiidKDYMTljHajMoXuqcC6E8";
+    String client_id = "5GjWi9nxIXvZbqVujPIj8xCl";
+    String client_secret = "v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo";
     Object[] access_data = new Object[2];
     BaiduHttp instance = new Retrofit.Builder()
             .addConverterFactory(JacksonConverterFactory.create(JsonUtil.GLOBAL_OBJECT_MAPPER))
