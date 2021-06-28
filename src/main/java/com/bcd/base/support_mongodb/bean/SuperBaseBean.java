@@ -34,8 +34,8 @@ public abstract class SuperBaseBean<K extends Serializable> implements Serializa
             if (obj == null) {
                 return false;
             } else {
-                if (this.getClass() == obj.getClass()) {
-                    Object objId = ((SuperBaseBean) obj).getId();
+                if (obj instanceof SuperBaseBean) {
+                    Object objId = ((SuperBaseBean<?>) obj).getId();
                     if (id == objId) {
                         return true;
                     } else {

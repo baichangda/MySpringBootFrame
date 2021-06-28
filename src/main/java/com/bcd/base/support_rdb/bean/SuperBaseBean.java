@@ -25,4 +25,30 @@ public abstract class SuperBaseBean<K extends Serializable> implements Serializa
     @GenericGenerator(name = "my", strategy = "com.bcd.base.support_rdb.jpa.MyIdentityGenerator")
     @Column(name = "id", nullable = false)
     public K id;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else {
+            if (obj == null) {
+                return false;
+            } else {
+                if (obj instanceof SuperBaseBean) {
+                    Object objId = ((SuperBaseBean<?>) obj).getId();
+                    if (id == objId) {
+                        return true;
+                    } else {
+                        if (id == null || objId == null) {
+                            return false;
+                        } else {
+                            return id.equals(objId);
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
 }
