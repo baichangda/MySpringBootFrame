@@ -1,5 +1,7 @@
 package com.bcd.base.util;
 
+
+
 import com.bcd.base.exception.BaseRuntimeException;
 
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class RpnUtil {
      * @param rpn rpn表达式集合
      * @return
      */
-    public static Ele_double[] doWithRpnList_char_double(String[] rpn) {
+    public static Ele_double[] to_ele_double(String[] rpn) {
         return Arrays.stream(rpn).map(e -> {
             try {
                 return new Ele_double(1, Double.parseDouble(e));
@@ -95,7 +97,7 @@ public class RpnUtil {
      * @param rpn rpn表达式集合
      * @return
      */
-    public static Ele_int[] doWithRpnList_char_int(String[] rpn) {
+    public static Ele_int[] to_ele_int(String[] rpn) {
         return Arrays.stream(rpn).map(e -> {
             try {
                 return new Ele_int(1, Integer.parseInt(e));
@@ -127,18 +129,13 @@ public class RpnUtil {
     }
 
     /**
-     * list中变量定义必须是char 支持 a-z A-Z
-     * <p>
-     * A-Z --> 65-90
-     * a-z --> 97-122
-     * 所以char数组长度为 65-122 长度为58
-     * 同时需要进行偏移量计算也就是 字符-65
+     * 计算rpn表达式
      *
-     * @param rpn  rpn表达式集合,其中变量必须是char,常量必须是int
+     * @param rpn  rpn表达式集合
      * @param vals 变量对应值数组,取值规则为 vals[int(char)]
      * @return
      */
-    public static int calcRPN_char_int(Ele_int[] rpn, int[] vals) {
+    public static int calc_int(Ele_int[] rpn, int[] vals) {
         if (rpn.length == 1) {
             Ele_int first = rpn[0];
             switch (first.type) {
@@ -211,7 +208,7 @@ public class RpnUtil {
      * @param vals 变量对应值数组,取值规则为 vals[int(char)]
      * @return
      */
-    public static double calcRPN_char_double(Ele_double[] rpn, double[] vals) {
+    public static double calc_double(Ele_double[] rpn, double[] vals) {
         if (rpn.length == 1) {
             Ele_double first = rpn[0];
             switch (first.type) {
@@ -280,16 +277,16 @@ public class RpnUtil {
 //        System.err.println(Arrays.toString(parseArithmeticToRPN("1-4")));
 //        System.err.println(Arrays.toString(parseArithmeticToRPN("(a-(b+(c)))")));
 //        System.err.println(Arrays.toString(parseArithmeticToRPN("(a-(b+(c)))")));
-        System.out.println(Arrays.toString(parseSimpleExpr("x+3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("3+x")));
-        System.out.println(Arrays.toString(parseSimpleExpr("x-3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("3-x")));
-        System.out.println(Arrays.toString(parseSimpleExpr("-x+3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("-x-3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("-x*2+3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("2*-x-3")));
-        System.out.println(Arrays.toString(parseSimpleExpr("-x")));
-        System.out.println(Arrays.toString(parseSimpleExpr("-3*-x-1")));
+        System.out.println(Arrays.toString(toExprVar("x+3")));
+        System.out.println(Arrays.toString(toExprVar("3+x")));
+        System.out.println(Arrays.toString(toExprVar("x-3")));
+        System.out.println(Arrays.toString(toExprVar("3-x")));
+        System.out.println(Arrays.toString(toExprVar("-x+3")));
+        System.out.println(Arrays.toString(toExprVar("-x-3")));
+        System.out.println(Arrays.toString(toExprVar("-x*2+3")));
+        System.out.println(Arrays.toString(toExprVar("2*-x-3")));
+        System.out.println(Arrays.toString(toExprVar("-x")));
+        System.out.println(Arrays.toString(toExprVar("-3*-x-1")));
     }
 
     /**
@@ -298,7 +295,7 @@ public class RpnUtil {
      *
      * @return
      */
-    public static String[] parseArithmeticToRPN(String str) {
+    public static String[] toRpn(String str) {
         List<String> output = new ArrayList<>();
         int stackIndex = -1;
         char[] stack = new char[str.length()];
@@ -386,7 +383,7 @@ public class RpnUtil {
                         }
                     }
                 }
-                String[] curRes = parseArithmeticToRPN(new String(arr, i + 1, end - i - 1));
+                String[] curRes = toRpn(new String(arr, i + 1, end - i - 1));
                 /**
                  * 如果括号外面为负号则
                  * -num -> num
@@ -463,15 +460,19 @@ public class RpnUtil {
         }
     }
 
-    public static String parseRPNToArithmetic(Object[] rpn) {
+    /**
+     * 将rpn转换为数学表达式
+     * @param rpn
+     * @return
+     */
+    public static String toExpr(String[] rpn) {
         if (rpn.length == 1) {
-            return rpn[0].toString();
+            return rpn[0];
         } else {
             String[] stack = new String[rpn.length];
             int[] symbolPriority = new int[rpn.length];
             int index = -1;
-            for (Object o : rpn) {
-                String s = o.toString();
+            for (String s : rpn) {
                 if (s.equals("+") ||
                         s.equals("-") ||
                         s.equals("*") ||
@@ -521,10 +522,10 @@ public class RpnUtil {
      * @param expr
      * @return [a, b]
      */
-    public static double[] parseSimpleExpr(String expr) {
+    public static double[] toExprVar(String expr) {
         double a = 0;
         double b = 0;
-        String[] rpn = parseArithmeticToRPN(expr);
+        String[] rpn = toRpn(expr);
         int index1 = -1;
         int index2 = -1;
         for (int i = 0; i < rpn.length; i++) {
