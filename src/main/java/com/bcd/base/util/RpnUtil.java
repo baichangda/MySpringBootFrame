@@ -8,7 +8,7 @@ import java.util.List;
 
 public class RpnUtil {
 
-    public static class Ele {
+    public static class Ele_int {
         /**
          * 1: 数字常量
          * 2: 正数字变量
@@ -21,11 +21,35 @@ public class RpnUtil {
         public int type;
         public int val;
 
-        public Ele(int type, int val) {
+        public Ele_int(int type, int val) {
             this.type = type;
             this.val = val;
         }
+    }
 
+    public static class Ele_double {
+        /**
+         * 1: 数字常量
+         * 2: 正数字变量
+         * 3: 负数字变量
+         * 4: +
+         * 5: -
+         * 6: *
+         * 7: /
+         */
+        public int type;
+        public double val_double;
+        public int val_int;
+
+        public Ele_double(int type, double val_double) {
+            this.type = type;
+            this.val_double = val_double;
+        }
+
+        public Ele_double(int type, int val_int) {
+            this.type = type;
+            this.val_int = val_int;
+        }
     }
 
     /**
@@ -34,35 +58,72 @@ public class RpnUtil {
      * @param rpn rpn表达式集合
      * @return
      */
-    public static Ele[] doWithRpnList_char_int(String[] rpn) {
+    public static Ele_double[] doWithRpnList_char_double(String[] rpn) {
         return Arrays.stream(rpn).map(e -> {
             try {
-                return new Ele(1, Integer.parseInt(e));
+                return new Ele_double(1, Double.parseDouble(e));
             } catch (NumberFormatException ex) {
                 if (e.length() == 1) {
                     char c = e.charAt(0);
                     switch (c){
                         case '+':{
-                            return new Ele(4, c);
+                            return new Ele_double(4, 0);
                         }
                         case '-':{
-                            return new Ele(5, c);
+                            return new Ele_double(5, 0);
                         }
                         case '*':{
-                            return new Ele(6, c);
+                            return new Ele_double(6, 0);
                         }
                         case '/':{
-                            return new Ele(7, c);
+                            return new Ele_double(7, 0);
                         }
                         default:{
-                            return new Ele(2, c);
+                            return new Ele_double(2, c);
                         }
                     }
                 } else {
-                    return new Ele(3, e.charAt(1));
+                    return new Ele_double(3, e.charAt(1));
                 }
             }
-        }).toArray(Ele[]::new);
+        }).toArray(Ele_double[]::new);
+    }
+
+    /**
+     * 处理rpn表达式集合、不同类型值转换为不同对象
+     *
+     * @param rpn rpn表达式集合
+     * @return
+     */
+    public static Ele_int[] doWithRpnList_char_int(String[] rpn) {
+        return Arrays.stream(rpn).map(e -> {
+            try {
+                return new Ele_int(1, Integer.parseInt(e));
+            } catch (NumberFormatException ex) {
+                if (e.length() == 1) {
+                    char c = e.charAt(0);
+                    switch (c){
+                        case '+':{
+                            return new Ele_int(4, 0);
+                        }
+                        case '-':{
+                            return new Ele_int(5, 0);
+                        }
+                        case '*':{
+                            return new Ele_int(6, 0);
+                        }
+                        case '/':{
+                            return new Ele_int(7, 0);
+                        }
+                        default:{
+                            return new Ele_int(2, c);
+                        }
+                    }
+                } else {
+                    return new Ele_int(3, e.charAt(1));
+                }
+            }
+        }).toArray(Ele_int[]::new);
     }
 
     /**
@@ -77,9 +138,9 @@ public class RpnUtil {
      * @param vals 变量对应值数组,取值规则为 vals[int(char)]
      * @return
      */
-    public static int calcRPN_char_int(Ele[] rpn, int[] vals) {
+    public static int calcRPN_char_int(Ele_int[] rpn, int[] vals) {
         if (rpn.length == 1) {
-            Ele first = rpn[0];
+            Ele_int first = rpn[0];
             switch (first.type) {
                 case 1: {
                     return first.val;
@@ -97,7 +158,7 @@ public class RpnUtil {
         } else {
             int stackIndex = -1;
             final int[] stack = new int[rpn.length];
-            for (Ele e : rpn) {
+            for (Ele_int e : rpn) {
                 switch (e.type) {
                     case 1: {
                         stack[++stackIndex] = e.val;
@@ -109,6 +170,79 @@ public class RpnUtil {
                     }
                     case 3: {
                         stack[++stackIndex] = -vals[e.val];
+                        break;
+                    }
+                    case 4: {
+                        stackIndex--;
+                        stack[stackIndex] = stack[stackIndex] + stack[stackIndex + 1];
+                        break;
+                    }
+                    case 5: {
+                        stackIndex--;
+                        stack[stackIndex] = stack[stackIndex] - stack[stackIndex + 1];
+                        break;
+                    }
+                    case 6: {
+                        stackIndex--;
+                        stack[stackIndex] = stack[stackIndex] * stack[stackIndex + 1];
+                        break;
+                    }
+                    case 7: {
+                        stackIndex--;
+                        stack[stackIndex] = stack[stackIndex] / stack[stackIndex + 1];
+                        break;
+                    }
+                }
+            }
+            return stack[0];
+        }
+    }
+
+
+    /**
+     * list中变量定义必须是char 支持 a-z A-Z
+     * <p>
+     * A-Z --> 65-90
+     * a-z --> 97-122
+     * 所以char数组长度为 65-122 长度为58
+     * 同时需要进行偏移量计算也就是 字符-65
+     *
+     * @param rpn  rpn表达式集合,其中变量必须是char,常量必须是int
+     * @param vals 变量对应值数组,取值规则为 vals[int(char)]
+     * @return
+     */
+    public static double calcRPN_char_double(Ele_double[] rpn, double[] vals) {
+        if (rpn.length == 1) {
+            Ele_double first = rpn[0];
+            switch (first.type) {
+                case 1: {
+                    return first.val_double;
+                }
+                case 2: {
+                    return vals[first.val_int];
+                }
+                case 3: {
+                    return -vals[first.val_int];
+                }
+                default: {
+                    throw BaseRuntimeException.getException("error single type[{}] val_int[{}] val_double[{}]", first.type, first.val_int, first.val_double);
+                }
+            }
+        } else {
+            int stackIndex = -1;
+            final double[] stack = new double[rpn.length];
+            for (Ele_double e : rpn) {
+                switch (e.type) {
+                    case 1: {
+                        stack[++stackIndex] = e.val_double;
+                        break;
+                    }
+                    case 2: {
+                        stack[++stackIndex] = vals[e.val_int];
+                        break;
+                    }
+                    case 3: {
+                        stack[++stackIndex] = -vals[e.val_int];
                         break;
                     }
                     case 4: {
