@@ -57,23 +57,15 @@ public class DynamicJdbcUtil {
                 return jdbcData;
             });
 
-    private static void test(String url, String username, String password) {
-        try (Connection connection = DriverManager.getConnection(url, username, password)) {
-
-        } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
     private static HikariDataSource getDataSource(String url, String username, String password) {
         //首先测试
-        test(url, username, password);
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(url);
         dataSource.setMinimumIdle(1);
         dataSource.setMaximumPoolSize(DATA_SOURCE_MAX_ACTIVE);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
+        dataSource.isRunning();
         return dataSource;
     }
 
