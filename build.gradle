@@ -3,10 +3,12 @@ buildscript {
         guavaVersion = '+'
         mysqlVersion = '8.+'
         pgsqlVersion = '42.2.+'
+        jacksonVersion = '+'
         jsqlparserVersion = '+'
         freemarkerVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
+        poiVersion='+'
         disruptorVersion = '+'
         springdocVersion = '+'
         caffeineVersion = '2.+'
@@ -82,6 +84,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
 
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
@@ -91,10 +97,16 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
     implementation("org.springframework.boot:spring-boot-starter-web")
+
     //springboot log4j2支持
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
     //disruptor(log4j2异步日志需要用到)
     implementation group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
+
+    //springboot jpa支持
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    //springboot jdbc支持
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     //邮件支持
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
@@ -105,11 +117,14 @@ dependencies {
     //springboot validation支持
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    //springboot mongodb支持
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
     //spring kafka支持
     implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
 
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: "${poiVersion}"
 
     //shiro权限框架集成
     implementation("org.apache.shiro:shiro-spring:${shiroVersion}")
@@ -124,17 +139,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
 
-    //springboot mongodb支持
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     implementation group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
 
 
-    //springboot jpa支持
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    //springboot jdbc支持
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     //mysql驱动包
     runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
