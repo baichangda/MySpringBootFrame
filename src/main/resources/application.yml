@@ -130,3 +130,8 @@ springdoc:
     - com.bcd
   swagger-ui:
     path: /swagger-ui.html
+
+
+baidu:
+  apiKey: 5GjWi9nxIXvZbqVujPIj8xCl
+  secretKey: v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo

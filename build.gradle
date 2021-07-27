@@ -17,6 +17,7 @@ buildscript {
         kafkaVersion = '+'
         flywayVersion = '7.3.+'
         lombokVersion = "+"
+        baiduAipVersion='+'
         mavenRepoUrl = 'https://maven.aliyun.com/repository/central'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
@@ -150,6 +151,10 @@ dependencies {
     implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
 
 
+    // https://mvnrepository.com/artifact/com.baidu.aip/java-sdk
+    implementation ("com.baidu.aip:java-sdk:${baiduAipVersion}"){
+        exclude group: 'org.slf4j',module: 'slf4j-simple'
+    }
 }
 
 //生成jar时打包源码
