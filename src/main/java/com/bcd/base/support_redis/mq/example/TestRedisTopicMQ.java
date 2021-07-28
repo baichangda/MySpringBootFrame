@@ -32,8 +32,4 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean[]> implements Spring
         }, 1, 3, TimeUnit.SECONDS);
     }
 
-    @Override
-    public void destroy() {
-        unWatch();
-    }
 }

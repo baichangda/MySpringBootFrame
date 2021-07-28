@@ -168,16 +168,6 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
         stop = true;
     }
 
-    public void destroy() {
-        stop();
-        if (fetchPool != null) {
-            fetchPool.shutdown();
-        }
-        if (workPool != null) {
-            workPool.shutdown();
-        }
-    }
-
     public int getPopNullIntervalInSecond() {
         return popNullIntervalInSecond;
     }

@@ -21,11 +21,6 @@ public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInit
     }
 
     @Override
-    public void destroy() {
-        super.unWatch();
-    }
-
-    @Override
     public void onMessage(String data) {
         logger.info(data);
     }
