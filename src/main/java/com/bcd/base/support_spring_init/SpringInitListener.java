@@ -21,7 +21,6 @@ public class SpringInitListener implements ApplicationListener<ContextRefreshedE
                 logger.info("SpringInitListener[{}] init succeed", e.getClass());
             } catch (Exception ex) {
                 logger.error("SpringInitListener[{}] init failed,shutdown...", e.getClass(), ex);
-                e.destroy();
             }
         });
 

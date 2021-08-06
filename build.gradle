@@ -3,7 +3,6 @@ buildscript {
         guavaVersion = '+'
         mysqlVersion = '8.+'
         pgsqlVersion = '42.2.+'
-        jacksonVersion = '+'
         jsqlparserVersion = '+'
         freemarkerVersion = '+'
         commonsPool2 = '+'
@@ -84,10 +83,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
-
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
 
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
