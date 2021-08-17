@@ -1,12 +1,10 @@
 *.class
 *.iml
-*.log
-*.log.*
-*.lst
 
 .gradle/
 .idea/
 
+**/logs/
 **/build/
 **/target/
 **/out/
