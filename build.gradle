@@ -7,7 +7,7 @@ buildscript {
         freemarkerVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
-        poiVersion='+'
+        easyexcelVersion='+'
         disruptorVersion = '+'
         springdocVersion = '+'
         caffeineVersion = '2.+'
@@ -120,8 +120,8 @@ dependencies {
     //spring kafka支持
     implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
 
-    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: "${poiVersion}"
+    // https://mvnrepository.com/artifact/com.alibaba/easyexcel
+    implementation group: 'com.alibaba', name: 'easyexcel', version: "${easyexcelVersion}"
 
     //shiro权限框架集成
     implementation("org.apache.shiro:shiro-spring:${shiroVersion}")

@@ -1,15 +1,15 @@
 package com.bcd.base.support_rdb.dbinfo.mysql.service;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.write.handler.AbstractSheetWriteHandler;
+import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
+import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_rdb.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_rdb.dbinfo.mysql.bean.TablesBean;
 import com.bcd.base.support_rdb.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.base.support_rdb.dbinfo.service.DBService;
-import com.bcd.base.util.DateUtil;
-import com.bcd.base.util.ExcelUtil;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
@@ -99,11 +98,13 @@ public class MysqlDBServiceImpl implements DBService {
             doBeforeWrite.run();
         }
 
-        try(XSSFWorkbook workbook=new XSSFWorkbook()){
-            ExcelUtil.writeToWorkbook(workbook,dataList, ExcelUtil::writeToCell);
-            applyStyleToSheet(workbook.getSheetAt(0));
-            workbook.write(os);
-        }
+        EasyExcel.write(os).sheet(0).registerWriteHandler(new AbstractSheetWriteHandler(){
+            @Override
+            public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
+                super.afterSheetCreate(writeWorkbookHolder, writeSheetHolder);
+                applyStyleToSheet(writeSheetHolder.getCachedSheet());
+            }
+        }).doWrite(dataList);
     }
 
     /**
