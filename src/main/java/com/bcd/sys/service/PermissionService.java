@@ -51,7 +51,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
             permissionBean.setName(e.getNote());
             return permissionBean;
         }).collect(Collectors.toList());
-        ((PermissionService) AopContext.currentProxy()).saveBatch(permissionBeanList);
+        ((PermissionService) AopContext.currentProxy()).saveAll(permissionBeanList);
     }
 
 }

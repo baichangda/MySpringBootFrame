@@ -46,8 +46,7 @@ public class BaseService<T, K extends Serializable> {
     @Autowired(required = false)
     public BaseRepository<T, K> repository;
 
-    @Autowired
-    public JdbcTemplate jdbcTemplate;
+
 
     private BeanInfo beanInfo;
 
@@ -140,73 +139,6 @@ public class BaseService<T, K extends Serializable> {
         return repository.saveAll(iterable);
     }
 
-    /**
-     * 批量新增、不做唯一校验、所有的对象采用新增方式
-     *
-     * @param list
-     * @param ignoreFields
-     */
-    @Transactional
-    public void insertBatch(List<T> list, String... ignoreFields) {
-        if (list.isEmpty()) {
-            return;
-        }
-        Set<String> ignoreFieldSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
-        //忽略主键字段、主键一般为自增
-        ignoreFieldSet.add(getBeanInfo().pkField.getName());
-        BatchCreateSqlResult batchCreateSqlResult = SqlUtil.generateBatchCreateResult(list, getBeanInfo().tableName, null, ignoreFieldSet.toArray(new String[0]));
-        jdbcTemplate.batchUpdate(batchCreateSqlResult.getSql(), batchCreateSqlResult.getParamList());
-    }
-
-    /**
-     * 批量更新、不做唯一校验、所有的对象采用更新方式、所有对象主键不能为null
-     *
-     * @param list
-     * @param ignoreFields
-     */
-    @Transactional
-    public void updateBatch(List<T> list, String... ignoreFields) {
-        if (list.isEmpty()) {
-            return;
-        }
-        Set<String> ignoreFieldSet = Arrays.stream(ignoreFields).collect(Collectors.toSet());
-        //忽略主键字段
-        ignoreFieldSet.add(getBeanInfo().pkField.getName());
-        BatchUpdateSqlResult batchUpdateSqlResult = SqlUtil.generateBatchUpdateResult(list, getBeanInfo().tableName, null, ignoreFieldSet.toArray(new String[0]));
-        jdbcTemplate.batchUpdate(batchUpdateSqlResult.getSql(), batchUpdateSqlResult.getParamList());
-    }
-
-    /**
-     * 批量新增/更新、不做唯一校验、根据主键是否有值来区分新增还是更新
-     *
-     * @param list
-     * @param ignoreFields
-     */
-    @Transactional
-    public void saveBatch(List<T> list, String... ignoreFields) {
-        if (list.isEmpty()) {
-            return;
-        }
-        List<T> insertList = new ArrayList<>();
-        List<T> updateList = new ArrayList<>();
-        try {
-            for (T t : list) {
-                if (getBeanInfo().pkField.get(t) == null) {
-                    insertList.add(t);
-                } else {
-                    updateList.add(t);
-                }
-            }
-        } catch (IllegalAccessException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
-        if (!insertList.isEmpty()) {
-            insertBatch(insertList, ignoreFields);
-        }
-        if (!updateList.isEmpty()) {
-            updateBatch(updateList, ignoreFields);
-        }
-    }
 
     @Transactional
     public void deleteAll() {
@@ -307,65 +239,7 @@ public class BaseService<T, K extends Serializable> {
         return query;
     }
 
-    /**
-     * 分页查询
-     *
-     * @param sql      查询结果集sql(不带limit)
-     * @param pageable 分页对象参数
-     * @param params   参数
-     * @return
-     */
-    public Page<Map<String, Object>> pageBySql(String sql, Pageable pageable, Object... params) {
-        SqlListResult countSql = SqlUtil.replace_nullParam_count(sql, params);
-        Integer count;
-        if (countSql.getParamList().isEmpty()) {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
-        } else {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
-        }
-        if (count == 0) {
-            return new PageImpl<>(new ArrayList<>(), pageable, 0);
-        } else {
-            SqlListResult dataSql = SqlUtil.replace_nullParam_limit(sql, pageable.getPageNumber(), pageable.getPageSize(), params);
-            List<Map<String, Object>> dataList;
-            if (dataSql.getParamList().isEmpty()) {
-                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER);
-            } else {
-                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER, dataSql.getParamList().toArray(new Object[0]));
-            }
-            return new PageImpl<>(dataList, pageable, count);
-        }
-    }
 
-    /**
-     * 分页查询
-     *
-     * @param sql      查询结果集sql(不带limit)
-     * @param pageable 分页对象参数
-     * @param params   参数
-     * @return
-     */
-    public Page<T> pageBySql(String sql, Pageable pageable, Class<T> clazz, Object... params) {
-        SqlListResult countSql = SqlUtil.replace_nullParam_count(sql, params);
-        Integer count;
-        if (countSql.getParamList().isEmpty()) {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
-        } else {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
-        }
-        if (count == 0) {
-            return new PageImpl<>(new ArrayList<>(), pageable, 0);
-        } else {
-            SqlListResult dataSql = SqlUtil.replace_nullParam_limit(sql, pageable.getPageNumber(), pageable.getPageSize(), params);
-            List<T> dataList;
-            if (dataSql.getParamList().isEmpty()) {
-                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz));
-            } else {
-                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz), dataSql.getParamList().toArray(new Object[0]));
-            }
-            return new PageImpl<>(dataList, pageable, count);
-        }
-    }
 
     /**
      * 字段唯一性验证

@@ -3,7 +3,9 @@ package com.bcd.sys.service;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.define.CommonConst;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,6 +17,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MenuService extends BaseService<MenuBean, Long> {
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
     /**
      * 查询当前用户所属组织的admin拥有的权限的菜单树
      *

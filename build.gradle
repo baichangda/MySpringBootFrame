@@ -104,6 +104,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     //springboot jdbc支持
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
     //邮件支持
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
@@ -144,7 +145,7 @@ dependencies {
     runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
-    implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
+
 
 
     // https://mvnrepository.com/artifact/com.baidu.aip/java-sdk
