@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.code;
+package com.bcd.base.support_jpa.code;
 
 import freemarker.template.Configuration;
 import freemarker.template.Version;

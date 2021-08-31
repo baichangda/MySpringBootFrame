@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.bean;
+package com.bcd.base.support_jpa.bean;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,7 @@ public abstract class SuperBaseBean<K extends Serializable> implements Serializa
     @Schema(description = "主键(唯一标识符,自动生成)", accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "my")
-    @GenericGenerator(name = "my", strategy = "com.bcd.base.support_rdb.jpa.MyIdentityGenerator")
+    @GenericGenerator(name = "my", strategy = "com.bcd.base.support_jpa.identity.MyIdentityGenerator")
     @Column(name = "id", nullable = false)
     public K id;
 

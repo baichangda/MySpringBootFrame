@@ -1,6 +1,6 @@
-package com.bcd.base.support_rdb.code;
+package com.bcd.base.support_jpa.code;
 
-import com.bcd.base.support_rdb.dbinfo.data.DBInfo;
+import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

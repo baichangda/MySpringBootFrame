@@ -1,6 +1,6 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.support_rdb.service.BaseService;
+import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.define.CommonConst;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

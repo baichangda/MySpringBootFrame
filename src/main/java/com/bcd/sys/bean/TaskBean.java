@@ -1,7 +1,7 @@
 package com.bcd.sys.bean;
 
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.support_rdb.bean.SuperBaseBean;
+import com.bcd.base.support_jpa.bean.SuperBaseBean;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.task.Task;
 import com.bcd.sys.task.TaskStatus;

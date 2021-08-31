@@ -6,7 +6,7 @@ import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.RSAUtil;
-import com.bcd.base.support_rdb.service.BaseService;
+import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;

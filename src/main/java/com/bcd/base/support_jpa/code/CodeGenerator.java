@@ -1,12 +1,12 @@
-package com.bcd.base.support_rdb.code;
+package com.bcd.base.support_jpa.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_rdb.code.data.BeanData;
-import com.bcd.base.support_rdb.code.data.ControllerData;
-import com.bcd.base.support_rdb.code.data.RepositoryData;
-import com.bcd.base.support_rdb.code.data.ServiceData;
-import com.bcd.base.support_rdb.code.mysql.MysqlDBSupport;
-import com.bcd.base.support_rdb.code.pgsql.PgsqlDBSupport;
+import com.bcd.base.support_jpa.code.data.BeanData;
+import com.bcd.base.support_jpa.code.data.ControllerData;
+import com.bcd.base.support_jpa.code.data.RepositoryData;
+import com.bcd.base.support_jpa.code.data.ServiceData;
+import com.bcd.base.support_jpa.code.mysql.MysqlDBSupport;
+import com.bcd.base.support_jpa.code.pgsql.PgsqlDBSupport;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

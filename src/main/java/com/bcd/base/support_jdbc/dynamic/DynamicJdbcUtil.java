@@ -1,7 +1,6 @@
-package com.bcd.base.support_rdb.jdbc.dynamic;
+package com.bcd.base.support_jdbc.dynamic;
 
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_rdb.jdbc.rowmapper.MyColumnMapRowMapper;
+import com.bcd.base.support_jdbc.rowmapper.MyColumnMapRowMapper;
 import com.github.benmanes.caffeine.cache.*;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -10,9 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;

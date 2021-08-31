@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.anno;
+package com.bcd.base.support_jpa.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,13 +1,13 @@
-package com.bcd.base.support_rdb.code.pgsql;
+package com.bcd.base.support_jpa.code.pgsql;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_rdb.code.CodeConst;
-import com.bcd.base.support_rdb.code.DBSupport;
-import com.bcd.base.support_rdb.code.TableConfig;
-import com.bcd.base.support_rdb.code.data.BeanField;
-import com.bcd.base.support_rdb.dbinfo.data.DBInfo;
-import com.bcd.base.support_rdb.dbinfo.pgsql.bean.ColumnsBean;
-import com.bcd.base.support_rdb.dbinfo.pgsql.util.DBInfoUtil;
+import com.bcd.base.support_jpa.code.CodeConst;
+import com.bcd.base.support_jpa.code.DBSupport;
+import com.bcd.base.support_jpa.code.TableConfig;
+import com.bcd.base.support_jpa.code.data.BeanField;
+import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
+import com.bcd.base.support_jpa.dbinfo.pgsql.bean.ColumnsBean;
+import com.bcd.base.support_jpa.dbinfo.pgsql.util.DBInfoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

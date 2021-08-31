@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.jdbc.rowmapper;
+package com.bcd.base.support_jdbc.rowmapper;
 
 import com.bcd.base.util.StringUtil;
 import org.springframework.jdbc.core.ColumnMapRowMapper;

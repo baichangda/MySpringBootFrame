@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.dbinfo.data;
+package com.bcd.base.support_jpa.dbinfo.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

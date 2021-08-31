@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.dbinfo.mysql.bean;
+package com.bcd.base.support_jpa.dbinfo.mysql.bean;
 
 
 import lombok.Getter;

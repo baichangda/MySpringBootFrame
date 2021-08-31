@@ -1,4 +1,4 @@
-package com.bcd.base.support_rdb.dbinfo.pgsql.bean;
+package com.bcd.base.support_jpa.dbinfo.pgsql.bean;
 
 import lombok.Getter;
 import lombok.Setter;
