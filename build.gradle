@@ -7,7 +7,7 @@ buildscript {
         freemarkerVersion = '+'
         commonsPool2 = '+'
         shiroVersion = '+'
-        easyexcelVersion='+'
+        easyexcelVersion = '+'
         disruptorVersion = '+'
         springdocVersion = '+'
         caffeineVersion = '2.+'
@@ -16,7 +16,7 @@ buildscript {
         kafkaVersion = '+'
         flywayVersion = '7.3.+'
         lombokVersion = "+"
-        baiduAipVersion='+'
+        baiduAipVersion = '+'
         mavenRepoUrl = 'https://maven.aliyun.com/repository/central'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
@@ -147,10 +147,9 @@ dependencies {
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
 
 
-
     // https://mvnrepository.com/artifact/com.baidu.aip/java-sdk
-    implementation ("com.baidu.aip:java-sdk:${baiduAipVersion}"){
-        exclude group: 'org.slf4j',module: 'slf4j-simple'
+    implementation("com.baidu.aip:java-sdk:${baiduAipVersion}") {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
 }
 
@@ -188,6 +187,8 @@ publishing {
  * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
  */
 bootJar {
+    exclude "**/*-dev.yml"
+    exclude "**/*-test.yml"
     manifest {
         attributes 'Start-Class': 'com.bcd.Application'
     }
