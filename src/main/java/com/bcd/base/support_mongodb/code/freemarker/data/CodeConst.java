@@ -15,7 +15,7 @@ public class CodeConst {
     public final static String CLASS_BUILD_DIR_PATH = "build/classes/java/main";
     public final static String SOURCE_DIR_PATH = "src/main/java";
 
-    public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/MongoDB/src/main/resources/template";
+    public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/src/main/resources/template";
 
     public final static Class[] SUPPORT_FIELD_TYPE = new Class[]{
             Integer.class, String.class, Double.class, Character.class, Byte.class, Float.class,

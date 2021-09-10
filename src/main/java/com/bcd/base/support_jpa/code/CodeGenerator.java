@@ -35,7 +35,7 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/RDB/src/main/java/com/bcd/rdb/code";
+        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/src/main/java/com/bcd/base/support_jpa/code";
 //        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
         List<TableConfig> tableConfigs = TableConfig.newHelper()
                 .setNeedCreateBeanFile(true)
@@ -277,5 +277,6 @@ public class CodeGenerator {
             throw BaseRuntimeException.getException(e);
         }
     }
+
 
 }

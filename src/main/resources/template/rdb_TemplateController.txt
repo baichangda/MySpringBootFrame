@@ -3,7 +3,6 @@ package ${packagePre}.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.define.MessageDefine;
 import com.bcd.base.message.JsonMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -59,7 +58,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.<List<${moduleName?cap_first}Bean>>success().withData(${moduleName?uncap_first}Service.findAll(condition));
+        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition));
     }
 
     /**
@@ -95,7 +94,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.<Page<${moduleName?cap_first}Bean>>success().withData(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
@@ -108,7 +107,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @ApiResponse(responseCode = "200",description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "${moduleNameCN}实体") <#if validateSaveParam>@Validated</#if> @RequestBody ${moduleName?cap_first}Bean ${moduleName?uncap_first}){
         ${moduleName?uncap_first}Service.save(${moduleName?uncap_first});
-        return MessageDefine.SUCCESS_SAVE.toJsonMessage(true);
+        return JsonMessage.success();
     }
 
 
@@ -122,7 +121,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @ApiResponse(responseCode = "200",description = "删除结果")
     public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
         ${moduleName?uncap_first}Service.deleteById(ids);
-        return MessageDefine.SUCCESS_DELETE.toJsonMessage(true);
+        return JsonMessage.success();
     }
 
 }

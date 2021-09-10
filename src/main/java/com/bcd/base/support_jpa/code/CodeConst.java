@@ -12,7 +12,7 @@ import java.util.Set;
 public class CodeConst {
     public final static Version FREEMARKER_VERSION = Configuration.VERSION_2_3_30;
 
-    public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/RDB/src/main/resources/template";
+    public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/src/main/resources/template";
 
     public final static Set<String> CREATE_INFO_FIELD_NAME = new HashSet<>();
 

@@ -1,6 +1,6 @@
 package ${packagePre}.service;
 
-import com.bcd.base.rdb.service.BaseService;
+import com.bcd.base.support_jpa.service.BaseService;
 import org.springframework.stereotype.Service;
 import ${packagePre}.bean.${moduleName?cap_first}Bean;
 

@@ -1,6 +1,6 @@
 package ${packagePre}.repository;
 
-import com.bcd.base.mongodb.repository.BaseRepository;
+import com.bcd.base.support_mongodb.repository.BaseRepository;
 import org.springframework.stereotype.Repository;
 import ${packagePre}.bean.${moduleName?cap_first}Bean;
 
