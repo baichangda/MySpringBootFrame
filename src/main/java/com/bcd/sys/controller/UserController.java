@@ -1,6 +1,5 @@
 package com.bcd.sys.controller;
 
-import com.bcd.base.support_spring_cache.CacheConst;
 import com.bcd.base.support_spring_cache.anno.LocalCacheable;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
@@ -19,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +29,6 @@ import java.util.List;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/user")
-@CacheConfig(cacheNames = CacheConst.LOCAL_CACHE, keyGenerator = CacheConst.KEY_GENERATOR)
 public class UserController extends BaseController {
 
     @Autowired
