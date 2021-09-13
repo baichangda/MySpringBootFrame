@@ -3,6 +3,7 @@ package com.bcd.sys.bean;
 import com.bcd.base.support_jpa.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,6 +23,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "t_sys_user")
+@Data
 public class UserBean extends BaseBean<Long> {
     private final static long serialVersionUID = 1L;
 
