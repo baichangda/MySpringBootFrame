@@ -3,6 +3,7 @@ package com.bcd.sys.shiro;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.support_redis.RedisUtil;
+import com.bcd.base.support_shiro.cache.ShiroLocalCache;
 import com.bcd.base.support_shiro.cache.ShiroRedisCache;
 import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
@@ -59,7 +60,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
             @Override
             public <K, V> Cache<K, V> getCache(String s) throws CacheException {
                 if (s.equals(getAuthorizationCacheName())) {
-                    return new ShiroRedisCache<>(redisTemplate, s, 5, TimeUnit.SECONDS);
+                    return new ShiroLocalCache<>(5, TimeUnit.SECONDS);
                 } else {
                     return null;
                 }
