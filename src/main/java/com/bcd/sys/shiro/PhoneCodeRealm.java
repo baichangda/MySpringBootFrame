@@ -55,16 +55,6 @@ public class PhoneCodeRealm extends MyAuthorizingRealm {
         redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(RedisUtil.newJackson2JsonRedisSerializer(SimpleAuthorizationInfo.class));
         redisTemplate.afterPropertiesSet();
-        setCacheManager(new CacheManager() {
-            @Override
-            public <K, V> Cache<K, V> getCache(String s) throws CacheException {
-                if (s.equals(getAuthorizationCacheName())) {
-                    return new ShiroLocalCache<>(5, TimeUnit.SECONDS);
-                } else {
-                    return null;
-                }
-            }
-        });
     }
 
     @Override

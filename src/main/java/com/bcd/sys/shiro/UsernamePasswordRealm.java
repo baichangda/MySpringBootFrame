@@ -14,6 +14,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
@@ -56,16 +57,6 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
         redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(RedisUtil.newJackson2JsonRedisSerializer(SimpleAuthorizationInfo.class));
         redisTemplate.afterPropertiesSet();
-        setCacheManager(new CacheManager() {
-            @Override
-            public <K, V> Cache<K, V> getCache(String s) throws CacheException {
-                if (s.equals(getAuthorizationCacheName())) {
-                    return new ShiroLocalCache<>(5, TimeUnit.SECONDS);
-                } else {
-                    return null;
-                }
-            }
-        });
     }
 
     /**

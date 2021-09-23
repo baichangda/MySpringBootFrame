@@ -1,7 +1,7 @@
 package com.bcd.base.support_shiro;
 
 import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
-import org.apache.shiro.authc.Authenticator;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.mgt.RememberMeManager;
@@ -81,7 +81,8 @@ public class ShiroConfiguration {
      */
     @Bean
     public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager,
-                                                               RedisCacheManager redisCacheManager, LocalCacheManager localCacheManager) {
+                                                               RedisCacheManager redisCacheManager,
+                                                               LocalCacheManager localCacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
         securityManager.setRealms(realm);
