@@ -5,25 +5,22 @@ import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 public class LocalCacheManager extends AbstractCacheManager {
-    long expired;
-
-    TimeUnit unit;
+    Duration expired;
 
     /**
      * @param expired key过期时间
-     * @param unit
      */
-    public LocalCacheManager(long expired, TimeUnit unit) {
+    public LocalCacheManager(Duration expired) {
         this.expired = expired;
-        this.unit = unit;
     }
 
     @Override
     protected Cache createCache(String s) throws CacheException {
-        return new ShiroLocalCache(expired, unit);
+        return new ShiroLocalCache(expired);
     }
 }

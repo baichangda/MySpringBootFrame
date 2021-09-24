@@ -7,6 +7,7 @@ import org.apache.shiro.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -23,9 +24,9 @@ public class ShiroLocalCache<K, V> implements Cache<K, V> {
 
     com.github.benmanes.caffeine.cache.Cache<K,V> cache;
 
-    public ShiroLocalCache(long expired, TimeUnit unit) {
+    public ShiroLocalCache(Duration expired) {
         this.cache = Caffeine.newBuilder()
-                .expireAfterWrite(expired, unit)
+                .expireAfterWrite(expired)
                 .scheduler(Scheduler.systemScheduler())
                 .build();
     }

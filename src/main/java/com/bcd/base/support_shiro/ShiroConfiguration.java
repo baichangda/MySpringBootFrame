@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class ShiroConfiguration {
      */
     @Bean
     public LocalCacheManager localCacheManager() {
-        LocalCacheManager cacheManager = new LocalCacheManager(5, TimeUnit.SECONDS);
+        LocalCacheManager cacheManager = new LocalCacheManager(Duration.ofSeconds(3));
         return cacheManager;
     }
 
