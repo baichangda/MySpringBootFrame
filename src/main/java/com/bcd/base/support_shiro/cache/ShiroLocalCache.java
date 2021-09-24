@@ -26,7 +26,6 @@ public class ShiroLocalCache<K, V> implements Cache<K, V> {
     public ShiroLocalCache(long expired, TimeUnit unit) {
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(expired, unit)
-                .expireAfterAccess(expired, unit)
                 .scheduler(Scheduler.systemScheduler())
                 .build();
     }
