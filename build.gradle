@@ -12,7 +12,7 @@ buildscript {
         springdocVersion = '+'
         caffeineVersion = '2.+'
         retrofitJacksonVersion = '+'
-        springBootVersion = '+'
+        springBootVersion = '2.5.4'
         kafkaVersion = '+'
         flywayVersion = '7.3.+'
         lombokVersion = "+"

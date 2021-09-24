@@ -52,24 +52,13 @@ public class ShiroConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(ShiroConfiguration.class);
 
     /**
-     * redis缓存管理器
-     *
-     * @return
-     */
-    @Bean
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheManager cacheManager = new RedisCacheManager(redisConnectionFactory, 5, TimeUnit.SECONDS);
-        return cacheManager;
-    }
-
-    /**
      * 本地过期map缓存管理器
      *
      * @return
      */
     @Bean
     public LocalCacheManager localCacheManager() {
-        LocalCacheManager cacheManager = new LocalCacheManager(3, TimeUnit.SECONDS);
+        LocalCacheManager cacheManager = new LocalCacheManager(5, TimeUnit.SECONDS);
         return cacheManager;
     }
 
@@ -81,7 +70,6 @@ public class ShiroConfiguration {
      */
     @Bean
     public DefaultWebSecurityManager defaultWebSecurityManager(List<Realm> realm, SessionManager sessionManager,
-                                                               RedisCacheManager redisCacheManager,
                                                                LocalCacheManager localCacheManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         //设置realm
@@ -93,11 +81,7 @@ public class ShiroConfiguration {
         //设置sessionManager从redis中获取
         securityManager.setSessionManager(sessionManager);
         //设置缓存管理器
-        securityManager.setCacheManager(redisCacheManager);
-        //单独设置session缓存管理器
-        if (sessionManager instanceof CacheManagerAware) {
-            ((CacheManagerAware) sessionManager).setCacheManager(localCacheManager);
-        }
+        securityManager.setCacheManager(localCacheManager);
         //设置登陆验证器
         Authenticator authenticator = securityManager.getAuthenticator();
         if (authenticator instanceof ModularRealmAuthenticator) {

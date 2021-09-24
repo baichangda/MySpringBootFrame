@@ -13,7 +13,9 @@ import com.bcd.sys.keys.KeysConst;
 import com.bcd.sys.shiro.PhoneCodeToken;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.shiro.UsernamePasswordRealm;
+
 import java.util.Base64;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -268,10 +270,14 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         if (username == null && phone == null) {
             return;
         }
-        Serializable curSessionId = SecurityUtils.getSubject().getSession().getId();
         UserBean curUser = ShiroUtil.getCurrentUser();
-        String curUserName = curUser.getUsername();
-        String curPhone = curUser.getPhone();
+        if(curUser!=null&& (
+                (username!=null&&username.equals(curUser.getUsername()))||
+                (phone!=null&&phone.equals(curUser.getPhone()))
+        )){
+            throw BaseRuntimeException.getException("不能踢掉自己");
+        }
+        Serializable curSessionId = SecurityUtils.getSubject().getSession().getId();
         DefaultWebSecurityManager securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
         DefaultWebSessionManager sessionManager = (DefaultWebSessionManager) securityManager.getSessionManager();
         SessionDAO sessionDAO = sessionManager.getSessionDAO();
@@ -288,28 +294,14 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
                 if (userBean == null) {
                     return;
                 }
-                boolean isDel = false;
-
-                if (username != null) {
-                    if (username.equals(userBean.getUsername())) {
-                        isDel = true;
-                    }
-                }
-                if (!isDel && phone != null) {
-                    if (phone.equals(userBean.getPhone())) {
-                        isDel = true;
-                    }
-                }
-                if (isDel) {
+                if ((username != null && username.equals(userBean.getUsername())) ||
+                        (phone != null && phone.equals(userBean.getPhone()))) {
                     //清除session
                     sessionDAO.delete(e);
                     kickSessionSet.add(e.getId().toString());
                     //判断当前session用户名是否是当前登陆用户名,是则添加进入set,用于清除权限缓存
                     PrincipalCollection principalCollection = (PrincipalCollection) e.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-                    if (!principalCollection.getPrimaryPrincipal().equals(curUserName) &&
-                            !principalCollection.getPrimaryPrincipal().equals(curPhone)) {
-                        principalCollectionSet.add(principalCollection);
-                    }
+                    principalCollectionSet.add(principalCollection);
                 }
             }
         });

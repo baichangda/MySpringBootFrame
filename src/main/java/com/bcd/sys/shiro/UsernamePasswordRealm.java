@@ -3,8 +3,6 @@ package com.bcd.sys.shiro;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.support_redis.RedisUtil;
-import com.bcd.base.support_shiro.cache.ShiroLocalCache;
-import com.bcd.base.support_shiro.cache.ShiroRedisCache;
 import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -14,10 +12,6 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.cache.AbstractCacheManager;
-import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheException;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
@@ -28,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class UsernamePasswordRealm extends MyAuthorizingRealm {

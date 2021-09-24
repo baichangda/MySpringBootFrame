@@ -4,8 +4,6 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_shiro.ShiroMessageDefine;
-import com.bcd.base.support_shiro.cache.ShiroLocalCache;
-import com.bcd.base.support_shiro.cache.ShiroRedisCache;
 import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.bean.UserBean;
@@ -17,9 +15,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheException;
-import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class PhoneCodeRealm extends MyAuthorizingRealm {
