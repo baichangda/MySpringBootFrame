@@ -2,10 +2,11 @@ package com.bcd.base.support_spring_exception;
 
 import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import com.bcd.base.support_spring_exception.handler.impl.DefaultExceptionResponseHandler;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.handler.HandlerExceptionResolverComposite;
 
@@ -15,9 +16,10 @@ import org.springframework.web.servlet.handler.HandlerExceptionResolverComposite
  */
 @Configuration
 public class ExceptionConfig {
+
     @Bean
-    public ExceptionResponseHandler exceptionResponseHandler(@Qualifier("mappingJackson2HttpMessageConverter_my") MappingJackson2HttpMessageConverter converter) {
-        ExceptionResponseHandler handler = new DefaultExceptionResponseHandler(converter);
+    public ExceptionResponseHandler exceptionResponseHandler(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
+        ExceptionResponseHandler handler = new DefaultExceptionResponseHandler(mappingJackson2HttpMessageConverter);
         return handler;
     }
 
