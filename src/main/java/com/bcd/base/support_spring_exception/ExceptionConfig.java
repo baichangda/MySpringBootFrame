@@ -2,11 +2,9 @@ package com.bcd.base.support_spring_exception;
 
 import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
 import com.bcd.base.support_spring_exception.handler.impl.DefaultExceptionResponseHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.handler.HandlerExceptionResolverComposite;
 
