@@ -39,7 +39,6 @@ public class UserController extends BaseController {
      *
      * @return
      */
-    @LocalCacheable
     @RequiresNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询用户列表")
@@ -142,7 +141,7 @@ public class UserController extends BaseController {
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
-        userService.deleteById(ids);
+        userService.deleteAllByIdInBatch(ids);
         return JsonMessage.success().message("删除成功");
     }
 

@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings(value = "unchecked")
@@ -110,7 +111,7 @@ public class PermissionController extends BaseController {
     @Operation(description = "删除权限")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
-        permissionService.deleteById(ids);
+        permissionService.deleteAllByIdInBatch(ids);
         return JsonMessage.success().message("删除成功");
     }
 

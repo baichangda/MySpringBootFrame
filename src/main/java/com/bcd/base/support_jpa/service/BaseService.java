@@ -7,6 +7,7 @@ import com.bcd.base.support_jpa.anno.Unique;
 import com.bcd.base.support_jpa.bean.info.BeanInfo;
 import com.bcd.base.support_jpa.repository.BaseRepository;
 import com.bcd.base.support_jpa.util.ConditionUtil;
+import com.google.common.collect.Iterators;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class BaseService<T, K extends Serializable> {
         return repository.findAllById(iterable);
     }
 
-    public List<T> findAllById(K[] kArr) {
+    public List<T> findAllById(K ... kArr) {
         return repository.findAllById(Arrays.asList(kArr));
     }
 
@@ -121,13 +122,11 @@ public class BaseService<T, K extends Serializable> {
 
     @Transactional
     public T save(T t) {
-        validateUniqueBeforeSave(t);
         return repository.save(t);
     }
 
     @Transactional
     public List<T> saveAll(Iterable<T> iterable) {
-        validateUniqueBeforeSave(iterable);
         return repository.saveAll(iterable);
     }
 
@@ -138,10 +137,8 @@ public class BaseService<T, K extends Serializable> {
     }
 
     @Transactional
-    public void deleteById(K... ids) {
-        for (K id : ids) {
-            repository.deleteById(id);
-        }
+    public void deleteById(K id) {
+        repository.deleteById(id);
     }
 
     @Transactional
@@ -150,18 +147,34 @@ public class BaseService<T, K extends Serializable> {
     }
 
     @Transactional
-    public void deleteAll(Iterable<T> iterable) {
-        repository.deleteAll(iterable);
-    }
-
-    @Transactional
     public void deleteAllInBatch() {
         repository.deleteAllInBatch();
     }
 
     @Transactional
-    public void deleteInBatch(Iterable<T> iterable) {
-        repository.deleteInBatch(iterable);
+    public void deleteAllInBatch(Iterable<T> iterable) {
+        repository.deleteAllInBatch(iterable);
+    }
+
+    @Transactional
+    public void deleteAllInBatch(T ... tArr) {
+        if(tArr.length==0){
+            return;
+        }
+        repository.deleteAllInBatch(Arrays.asList(tArr));
+    }
+
+    @Transactional
+    public void deleteAllByIdInBatch(Iterable<K> iterable) {
+        repository.deleteAllByIdInBatch(iterable);
+    }
+
+    @Transactional
+    public void deleteAllByIdInBatch(K ... ids) {
+        if(ids.length==0){
+            return;
+        }
+        repository.deleteAllByIdInBatch(Arrays.asList(ids));
     }
 
 
@@ -291,7 +304,7 @@ public class BaseService<T, K extends Serializable> {
      *
      * @param t
      */
-    public void validateUniqueBeforeSave(T t) {
+    public void validateUniqueAnno(T t) {
         if (!getBeanInfo().isCheckUnique) {
             return;
         }
@@ -313,7 +326,7 @@ public class BaseService<T, K extends Serializable> {
      *
      * @param iterable
      */
-    public void validateUniqueBeforeSave(Iterable<T> iterable) {
+    public void validateUniqueAnno(Iterable<T> iterable) {
         if (!getBeanInfo().isCheckUnique) {
             return;
         }
