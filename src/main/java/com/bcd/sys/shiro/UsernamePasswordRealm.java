@@ -34,7 +34,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
     public UsernamePasswordRealm(RedisConnectionFactory redisConnectionFactory) {
         if (CommonConst.IS_PASSWORD_ENCODED) {
             HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher(Md5Hash.ALGORITHM_NAME);
-            hashedCredentialsMatcher.setStoredCredentialsHexEncoded(false);
+            hashedCredentialsMatcher.setStoredCredentialsHexEncoded(true);
             setCredentialsMatcher(hashedCredentialsMatcher);
         }
         setAuthenticationTokenClass(UsernamePasswordToken.class);
@@ -70,6 +70,7 @@ public class UsernamePasswordRealm extends MyAuthorizingRealm {
             }
             // 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
             SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), getName());
+
             if (CommonConst.IS_PASSWORD_ENCODED) {
                 simpleAuthenticationInfo.setCredentialsSalt(ByteSource.Util.bytes(user.getUsername()));
             }

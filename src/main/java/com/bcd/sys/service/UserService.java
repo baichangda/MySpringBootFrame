@@ -14,12 +14,15 @@ import com.bcd.sys.shiro.PhoneCodeToken;
 import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.sys.shiro.UsernamePasswordRealm;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.codec.Hex;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
@@ -64,17 +67,17 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         String username = "admin";
         String password = "123qwe";
         // 加密
-        String encodedText = Base64.getEncoder().encodeToString(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
+        String encodedText = Hex.encodeToString(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
 
-        logger.info("encodedBase64: {}", encodedText);
+        logger.info("encodedHex: {}", encodedText);
 
         //数据库密码
-        String dbPwd = new Md5Hash(password, username).toBase64();
+        String dbPwd = new Md5Hash(password, username).toHex();
 
         logger.info("dbPwd: {}", dbPwd);
 
         // 解密
-        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, Base64.getDecoder().decode(encodedText));
+        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, Hex.decode(encodedText));
 
         logger.info("decodedText: {}", decodedText);
     }
@@ -224,7 +227,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
      */
     public String encryptPassword(String username, String password) {
         if (CommonConst.IS_PASSWORD_ENCODED) {
-            return new Md5Hash(password, username).toBase64();
+            return new Md5Hash(password, username).toHex();
         } else {
             return password;
         }
