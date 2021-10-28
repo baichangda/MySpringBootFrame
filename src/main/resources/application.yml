@@ -15,7 +15,8 @@ spring:
     resources:
       chain:
         cache: false
-  profiles.active: dev
+  profiles:
+    active: dev
   freemarker:
     checkTemplateLocation: false
   datasource:

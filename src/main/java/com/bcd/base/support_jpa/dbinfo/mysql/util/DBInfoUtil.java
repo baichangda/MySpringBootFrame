@@ -1,21 +1,19 @@
 package com.bcd.base.support_jpa.dbinfo.mysql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
 import com.bcd.base.support_jpa.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_jpa.dbinfo.mysql.bean.TablesBean;
-import org.yaml.snakeyaml.Yaml;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 此帮助类的所有api均会读取application-*.yml的数据库配置,并将数据库切换为information_schema
@@ -25,6 +23,43 @@ public class DBInfoUtil {
     private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
 
     private final static String DB_INFO_SCHEMA = "information_schema";
+
+    public static JsonNode[] getSpringProps(String... keys) throws IOException {
+        YAMLMapper yamlMapper = YAMLMapper.builder().build();
+        final JsonNode base = yamlMapper.readTree(new File(SPRING_PROPERTIES_PATH));
+        final JsonNode suffix = Optional.ofNullable(base.get("spring")).map(e -> e.get("profile")).map(e -> e.get("suffix")).orElse(null);
+        JsonNode active = null;
+        if (suffix != null) {
+            String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix.asText() + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
+            active = yamlMapper.readTree(new File(activePathStr));
+        }
+        JsonNode[] res = new JsonNode[keys.length];
+        A:
+        for (int i = 0; i < keys.length; i++) {
+            String key = keys[i];
+            String[] arr = key.split("\\.");
+            JsonNode temp = active;
+            if (active != null) {
+                for (String s : arr) {
+                    temp = temp.get(s);
+                    if (temp == null) {
+                        break;
+                    }
+                }
+            }
+            if (temp == null) {
+                temp = base;
+                for (String s : arr) {
+                    temp = temp.get(s);
+                    if (temp == null) {
+                        continue A;
+                    }
+                }
+            }
+            res[i] = temp;
+        }
+        return res;
+    }
 
     /**
      * 获取spring配置文件中的数据库信息,并将获取到的url转换成information_schema
@@ -39,27 +74,12 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            Yaml yaml = new Yaml();
-            //1、加载spring配置
-            LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
-            LinkedHashMap springMap = (LinkedHashMap) dataMap.get("spring");
-            LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
-            //1.1、取出配置文件后缀
-            String suffix = (String) springMap.get("profiles.active");
-            if (!StringUtil.isNullOrEmpty(suffix)) {
-                //1.2、如果有激活的配置文件,则加载
-                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
-                Path activePath = Paths.get(activePathStr);
-                if (activePath.toFile().exists()) {
-                    dataMap = yaml.load(new FileInputStream(activePath.toFile()));
-                    springMap = (LinkedHashMap) dataMap.get("spring");
-                    dataSourceMap = (LinkedHashMap) springMap.get("datasource");
-                }
-            }
-            //2、取出值
-            String url = dataSourceMap.get("url").toString();
-            String username = dataSourceMap.get("username").toString();
-            String password = dataSourceMap.get("password").toString();
+            final JsonNode[] props = getSpringProps("spring.datasource.url"
+                    , "spring.datasource.username"
+                    , "spring.datasource.password");
+            String url = props[0].asText();
+            String username = props[0].asText();
+            String password = props[0].asText();
             int index = url.indexOf('?');
             String pre;
             if (index == -1) {
@@ -70,9 +90,12 @@ public class DBInfoUtil {
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             String dbInfoUrl = url.replace("/" + propDbName, "/" + DB_INFO_SCHEMA);
             return new DBInfo(dbInfoUrl, username, password, propDbName);
-        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
+
+
     }
 
     /**
