@@ -7,10 +7,7 @@ public enum TaskStatus {
     FAILED(4, "执行失败"),
 
     CANCELED(5, "任务被取消"),
-    STOPPING(6, "任务停止中"),
-    STOPPED(7, "任务被终止"),
-
-    EXCEPTION(8, "任务执行异常");
+    STOPPED(6, "任务被终止");
 
     private int status;
     private String name;

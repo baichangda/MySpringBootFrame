@@ -8,12 +8,12 @@ public class CommonConst {
     /**
      * 用来执行系统任务的线程池
      */
-    public final static ThreadPoolExecutor SYS_TASK_POOL = (ThreadPoolExecutor) Executors.newFixedThreadPool(2);
-    /**
-     * 用来执行on事件的线程池
-     */
-    public final static ThreadPoolExecutor SYS_TASK_EVENT_POOL = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-
+    public final static ThreadPoolExecutor[] TASK_POOLS = new ThreadPoolExecutor[4] ;
+    static {
+        for (int i = 0; i < TASK_POOLS.length; i++) {
+            TASK_POOLS[i]= (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        }
+    }
 
     /**
      * 用来存储任务对应的结果集(供关闭使用)

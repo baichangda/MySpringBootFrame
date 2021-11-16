@@ -1,7 +1,7 @@
 package com.bcd.sys.task.cluster;
 
+import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_spring_init.SpringInitializable;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.sys.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +22,16 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 @Component
-public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> implements SpringInitializable {
+public class SysTaskRedisQueue<T extends Task>{
+
+    /**
+     * 集群模式中redis任务队列名称
+     */
+    public final static String SYS_TASK_LIST_NAME = RedisUtil.doWithKey("sysTask");
+
     private final static Logger logger = LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
-    private Semaphore lock = new Semaphore(CommonConst.SYS_TASK_POOL.getMaximumPoolSize());
+    private Semaphore lock = new Semaphore(1);
 
     private BoundListOperations boundListOperations;
 
@@ -47,15 +53,11 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
     private ExecutorService workPool = Executors.newCachedThreadPool();
 
     public SysTaskRedisQueue(@Qualifier("string_serializable_redisTemplate") RedisTemplate redisTemplate) {
-        this.name = ClusterTaskUtil.SYS_TASK_LIST_NAME;
+        this.name = SYS_TASK_LIST_NAME;
         this.boundListOperations = redisTemplate.boundListOps(this.name);
         this.popNullIntervalInSecond = 30;
     }
 
-    @Override
-    public void init(ContextRefreshedEvent event) {
-        start();
-    }
 
     /**
      * 从redis list中获取任务并执行
@@ -72,7 +74,7 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
             } else {
                 workPool.execute(() -> {
                     try {
-                        onTask((C) data);
+                        onTask((TaskRunnable<T>) data);
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                         lock.release();
@@ -93,21 +95,13 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
     /**
      * 接收到任务处理
      *
-     * @param context
+     * @param runnable
      */
-    public void onTask(C context) {
-        //1、接收并解析任务数据
-        T task = context.getTask();
-        TaskFunction<T> taskFunction = context.getFunction();
-        //2、如果找不到对应执行方法实体,则任务执行失败并抛出异常
-        if (taskFunction == null) {
-            BaseRuntimeException exception = BaseRuntimeException.getException("can't find clusterTaskFunction[" + context.getFunctionName() + "]");
-            TaskUtil.onFailed(task, exception);
-            throw exception;
-        }
-        //3、使用线程池执行任务
-        TaskRunnable<T> runnable = new TaskRunnable(context);
-        CommonConst.SYS_TASK_POOL.execute(() -> {
+    public void onTask(TaskRunnable<T> runnable) {
+        //初始化环境
+        runnable.init();
+        runnable.getExecutor().execute(()->{
+            //使用线程池执行任务
             try {
                 //3.1、执行任务
                 runnable.run();
@@ -115,12 +109,12 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
                 //3.2、执行完毕后释放锁
                 lock.release();
             }
+            CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(runnable.getTask().getId().toString(), runnable);
         });
-        CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(task.getId().toString(), runnable);
     }
 
-    public void send(C context) {
-        boundListOperations.leftPush(context);
+    public void send(TaskRunnable<T> runnable) {
+        boundListOperations.leftPush(runnable);
     }
 
     public LinkedHashMap<Serializable, Boolean> remove(Serializable... ids) {
@@ -128,12 +122,12 @@ public class SysTaskRedisQueue<T extends Task, C extends ClusterTaskContext<T>> 
             return new LinkedHashMap<>();
         }
         LinkedHashMap<Serializable, Boolean> resMap = new LinkedHashMap<>();
-        List<C> contextList = boundListOperations.range(0L, -1L);
+        List<TaskRunnable<T>> runnableList = boundListOperations.range(0L, -1L);
         for (Serializable id : ids) {
             boolean res = false;
-            for (C context : contextList) {
-                if (id.equals(context.getTask().getId())) {
-                    Long count = boundListOperations.remove(1, context);
+            for (TaskRunnable<T> runnable : runnableList) {
+                if (id.equals(runnable.getTask().getId())) {
+                    Long count = boundListOperations.remove(1, runnable);
                     if (count != null && count == 1) {
                         res = true;
                         break;

@@ -10,7 +10,7 @@ import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
-import com.bcd.sys.task.cluster.ClusterTaskUtil;
+import com.bcd.sys.task.TaskUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -127,7 +127,7 @@ public class TaskController extends BaseController {
     @ApiResponse(responseCode = "200", description = "停止系统任务结果")
     public JsonMessage stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
         if (ids != null && ids.length > 0) {
-            ClusterTaskUtil.stopTask(true, Arrays.stream(ids).map(e -> (Serializable) e).toArray(len -> new Serializable[len]));
+            TaskUtil.stopTask_single(Arrays.stream(ids).map(e -> (Serializable) e).toArray(len -> new Serializable[len]));
         }
         return JsonMessage.success().message("停止成功");
     }
