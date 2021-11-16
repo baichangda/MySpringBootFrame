@@ -36,7 +36,7 @@ public class TaskRunnable<T extends Task> implements Runnable {
         //初始化function
         function = TaskFunction.from(functionName);
         //分配线程
-        executor = CommonConst.TASK_POOLS[task.getId().hashCode() % CommonConst.TASK_POOLS.length];
+        executor = CommonConst.executorChooser.next();
     }
 
 
@@ -77,7 +77,7 @@ public class TaskRunnable<T extends Task> implements Runnable {
             TaskUtil.onFailed(task, ex);
         } finally {
             //最后从当前服务器任务id和结果映射结果集中移除
-            CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.remove(task.getId().toString());
+            CommonConst.taskIdToRunnable.remove(task.getId().toString());
         }
     }
 

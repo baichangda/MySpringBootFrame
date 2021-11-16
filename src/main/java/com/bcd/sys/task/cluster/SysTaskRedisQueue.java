@@ -1,12 +1,10 @@
 package com.bcd.sys.task.cluster;
 
 import com.bcd.base.support_redis.RedisUtil;
-import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.sys.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -109,7 +107,7 @@ public class SysTaskRedisQueue<T extends Task>{
                 //3.2、执行完毕后释放锁
                 lock.release();
             }
-            CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(runnable.getTask().getId().toString(), runnable);
+            CommonConst.taskIdToRunnable.put(runnable.getTask().getId().toString(), runnable);
         });
     }
 

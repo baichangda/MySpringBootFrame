@@ -1,7 +1,6 @@
 package com.bcd.sys.task;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.task.cluster.StopSysTaskListener;
 import com.bcd.sys.task.cluster.SysTaskRedisQueue;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @SuppressWarnings("unchecked")
 @Component
@@ -63,7 +62,7 @@ public class TaskUtil implements ApplicationListener<ContextRefreshedEvent> {
                 } catch (Exception e) {
                     throw BaseRuntimeException.getException(e);
                 }
-                CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.put(id.toString(), runnable);
+                CommonConst.taskIdToRunnable.put(id.toString(), runnable);
                 runnable.run();
                 return id;
             }, runnable.getExecutor()).get();
@@ -84,7 +83,7 @@ public class TaskUtil implements ApplicationListener<ContextRefreshedEvent> {
             return;
         }
         for (Serializable id : ids) {
-            TaskRunnable runnable = CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.get(id.toString());
+            TaskRunnable runnable = CommonConst.taskIdToRunnable.get(id.toString());
             runnable.stop();
         }
     }
@@ -198,5 +197,9 @@ public class TaskUtil implements ApplicationListener<ContextRefreshedEvent> {
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onStop error", e);
         }
+    }
+
+    public static void selectExecutor(ThreadPoolExecutor[] pools){
+
     }
 }

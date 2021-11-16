@@ -8,17 +8,18 @@ public class CommonConst {
     /**
      * 用来执行系统任务的线程池
      */
-    public final static ThreadPoolExecutor[] TASK_POOLS = new ThreadPoolExecutor[4] ;
+    public final static ThreadPoolExecutor[] pools = new ThreadPoolExecutor[4] ;
     static {
-        for (int i = 0; i < TASK_POOLS.length; i++) {
-            TASK_POOLS[i]= (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        for (int i = 0; i < pools.length; i++) {
+            pools[i]= (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         }
     }
+    public final static ExecutorChooser executorChooser= ExecutorChooser.getChooser();
 
     /**
      * 用来存储任务对应的结果集(供关闭使用)
      */
-    public final static ConcurrentHashMap<String, TaskRunnable<? extends Task>> SYS_TASK_ID_TO_TASK_RUNNABLE_MAP = new ConcurrentHashMap<>();
+    public final static ConcurrentHashMap<String, TaskRunnable<? extends Task>> taskIdToRunnable = new ConcurrentHashMap<>();
 
 
 }

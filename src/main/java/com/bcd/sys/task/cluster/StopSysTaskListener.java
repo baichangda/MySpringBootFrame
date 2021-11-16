@@ -23,7 +23,7 @@ public class StopSysTaskListener extends RedisTopicMQ<String[]> {
     public void onMessage(String[] ids) {
         //依次停止每个任务,将结束的任务记录到结果map中
         for (String id : ids) {
-            TaskRunnable runnable = CommonConst.SYS_TASK_ID_TO_TASK_RUNNABLE_MAP.get(id);
+            TaskRunnable runnable = CommonConst.taskIdToRunnable.get(id);
             if (runnable != null) {
                 runnable.stop();
             }
