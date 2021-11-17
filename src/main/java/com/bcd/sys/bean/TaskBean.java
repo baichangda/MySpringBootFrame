@@ -28,7 +28,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> implements Task {
+public class TaskBean extends SuperBaseBean<Long> implements Task<Long> {
 
 
     //field
@@ -50,7 +50,7 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
 
     @NotNull(message = "[任务处理进度]")
     @Schema(description = "任务处理进度", required = true)
-    private Float percent;
+    private Float percent=0F;
 
     @Size(max = 65535, message = "[失败堆栈信息]长度不能超过65535")
     @Schema(hidden = true, description = "失败堆栈信息(失败时后台异常堆栈信息)", maxLength = 65535)
@@ -81,7 +81,6 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
 
     public TaskBean(String name) {
         this.name = name;
-        this.percent = 0F;
     }
 
     public TaskBean() {
@@ -91,7 +90,6 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
     @Override
     public void onCreated() {
         createTime = new Date();
-        status = TaskStatus.WAITING.getStatus();
         UserBean userBean = ShiroUtil.getCurrentUser();
         if (userBean != null) {
             createUserId = userBean.getId();
@@ -102,20 +100,17 @@ public class TaskBean extends SuperBaseBean<Long> implements Task {
     @Override
     public void onStarted() {
         startTime = new Date();
-        status = TaskStatus.EXECUTING.getStatus();
     }
 
     @Override
     public void onSucceed() {
         finishTime = new Date();
         percent = 100F;
-        status = TaskStatus.SUCCEED.getStatus();
     }
 
     @Override
     public void onFailed(Exception ex) {
         finishTime = new Date();
-        status = TaskStatus.FAILED.getStatus();
         Throwable realException = ExceptionUtil.parseRealException(ex);
         message = ExceptionUtil.getMessage(realException);
         stackMessage = ExceptionUtil.getStackTraceMessage(realException);

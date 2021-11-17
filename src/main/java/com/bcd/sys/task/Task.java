@@ -2,12 +2,12 @@ package com.bcd.sys.task;
 
 import java.io.Serializable;
 
-public interface Task extends Serializable {
+public interface Task<K extends Serializable> extends Serializable {
 
     void setStatus(int status);
 
 
-    Serializable getId();
+    K getId();
 
     /**
      * 创建时触发方法
@@ -48,14 +48,6 @@ public interface Task extends Serializable {
      * 在数据库保存前执行
      */
     default void onCanceled() {
-
-    }
-
-    /**
-     * 任务停止中时触发方法
-     * 在数据库保存前执行
-     */
-    default void onStopping() {
 
     }
 

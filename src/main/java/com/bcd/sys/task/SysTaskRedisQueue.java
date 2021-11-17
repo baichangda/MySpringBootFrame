@@ -1,7 +1,7 @@
-package com.bcd.sys.task.cluster;
+package com.bcd.sys.task;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
-import com.bcd.sys.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
@@ -18,19 +18,17 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
+public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
     private final static Logger logger = LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
     private String queueName;
-    private Semaphore lock = new Semaphore(CommonConst.pools.length);
+
+    TaskBuilder<T, K> taskBuilder;
+
+    private Semaphore semaphore;
 
     private BoundListOperations boundListOperations;
-
-    /**
-     * 当rpop操作结果为null时候,每次rpop的间隔时间
-     */
-    private int popNullIntervalInSecond;
 
     private volatile boolean stop;
 
@@ -44,12 +42,13 @@ public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
      */
     private ExecutorService workPool = Executors.newCachedThreadPool();
 
-    public SysTaskRedisQueue(String name, RedisConnectionFactory connectionFactory) {
+    public SysTaskRedisQueue(String name, RedisConnectionFactory connectionFactory, TaskBuilder<T, K> taskBuilder) {
         final RedisTemplate<String, Object> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
         this.name = name;
         this.queueName = RedisUtil.doWithKey("sysTask:" + name);
         this.boundListOperations = redisTemplate.boundListOps(this.queueName);
-        this.popNullIntervalInSecond = 30;
+        this.taskBuilder = taskBuilder;
+        this.semaphore = new Semaphore(this.taskBuilder.poolSize);
     }
 
 
@@ -59,24 +58,23 @@ public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
      * @throws InterruptedException
      */
     private void fetchAndExecute() throws InterruptedException {
-        lock.acquire();
+        semaphore.acquire();
         try {
-            Object data = boundListOperations.rightPop();
+            Object data = boundListOperations.rightPop(30,TimeUnit.SECONDS);
             if (data == null) {
-                TimeUnit.SECONDS.sleep(popNullIntervalInSecond);
-                lock.release();
+                semaphore.release();
             } else {
                 workPool.execute(() -> {
                     try {
                         onTask((TaskRunnable<T, K>) data);
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
-                        lock.release();
+                        semaphore.release();
                     }
                 });
             }
         } catch (Exception ex) {
-            lock.release();
+            semaphore.release();
             if (ex instanceof QueryTimeoutException) {
                 logger.error("SysTaskRedisQueue[" + name + "] fetchAndExecute QueryTimeoutException", ex);
             } else {
@@ -101,9 +99,8 @@ public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
                 runnable.run();
             } finally {
                 //3.2、执行完毕后释放锁
-                lock.release();
+                semaphore.release();
             }
-            CommonConst.taskIdToRunnable.put(runnable.getTask().getId().toString(), runnable);
         });
     }
 
@@ -137,7 +134,7 @@ public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
     }
 
 
-    public void start() {
+    public void init() {
         stop = false;
         fetchPool.execute(() -> {
             while (!stop) {
@@ -152,15 +149,21 @@ public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
         });
     }
 
-    public void stop() {
+    public void destroy() {
         stop = true;
+        fetchPool.shutdown();
+        workPool.shutdown();
+        try {
+            while (!fetchPool.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+            while (!workPool.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+        }catch (InterruptedException ex){
+            throw BaseRuntimeException.getException(ex);
+        }
     }
 
-    public int getPopNullIntervalInSecond() {
-        return popNullIntervalInSecond;
-    }
 
-    public void setPopNullIntervalInSecond(int popNullIntervalInSecond) {
-        this.popNullIntervalInSecond = popNullIntervalInSecond;
-    }
 }

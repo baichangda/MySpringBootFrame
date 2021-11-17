@@ -1,12 +1,15 @@
 package com.bcd.sys.task;
 
 
-import java.util.concurrent.ConcurrentHashMap;
+import com.bcd.base.exception.BaseRuntimeException;
 
-public abstract class TaskFunction<T extends Task> {
-    private final static ConcurrentHashMap<String, TaskFunction> storage = new ConcurrentHashMap<>();
+import java.io.Serializable;
+import java.util.HashMap;
 
-    public static <T extends Task> TaskFunction<T> from(String name) {
+public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
+    private final static HashMap<String, TaskFunction> storage = new HashMap<>();
+
+    public static <T extends Task<K>, K extends Serializable> TaskFunction<T, K> from(String name) {
         return storage.get(name);
     }
 
@@ -18,7 +21,13 @@ public abstract class TaskFunction<T extends Task> {
 
     public TaskFunction(String name) {
         this.name = name;
-        storage.put(this.name, this);
+        synchronized (storage) {
+            if (storage.containsKey(name)) {
+                throw BaseRuntimeException.getException("TaskFunction[{}] [{}] exist", name, storage.get(name));
+            } else {
+                storage.put(name, this);
+            }
+        }
     }
 
     public TaskFunction() {
@@ -32,7 +41,7 @@ public abstract class TaskFunction<T extends Task> {
      * @param runnable 上下文环境
      * @return true: 执行成功、false: 任务被打断
      */
-    public abstract boolean execute(TaskRunnable<T> runnable);
+    public abstract boolean execute(TaskRunnable<T, K> runnable);
 
     /**
      * 方法是否支持打断操作
@@ -55,7 +64,7 @@ public abstract class TaskFunction<T extends Task> {
      *
      * @param runnable
      */
-    public void stop(TaskRunnable<T> runnable) {
+    public void stop(TaskRunnable<T, K> runnable) {
 
     }
 }

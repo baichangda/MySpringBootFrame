@@ -9,11 +9,11 @@ public interface ExecutorChooser {
 
     ThreadPoolExecutor next();
 
-    static ExecutorChooser getChooser() {
-        if (isPowerOfTwo(CommonConst.pools.length)) {
-            return new PowerOfTwoEventExecutorChooser();
+    static ExecutorChooser getChooser(ThreadPoolExecutor[] pools) {
+        if (isPowerOfTwo(pools.length)) {
+            return new PowerOfTwoEventExecutorChooser(pools);
         } else {
-            return new GenericEventExecutorChooser();
+            return new GenericEventExecutorChooser(pools);
         }
     }
 
@@ -23,10 +23,15 @@ public interface ExecutorChooser {
 
     final class PowerOfTwoEventExecutorChooser implements ExecutorChooser {
         private final AtomicInteger idx = new AtomicInteger();
+        private final ThreadPoolExecutor[] pools;
+
+        public PowerOfTwoEventExecutorChooser(ThreadPoolExecutor[] pools) {
+            this.pools = pools;
+        }
 
         @Override
         public ThreadPoolExecutor next() {
-            return CommonConst.pools[idx.getAndIncrement() & CommonConst.pools.length - 1];
+            return pools[idx.getAndIncrement() & pools.length - 1];
         }
     }
 
@@ -35,10 +40,15 @@ public interface ExecutorChooser {
         // The 64-bit long solves this by placing the overflow so far into the future, that no system
         // will encounter this in practice.
         private final AtomicLong idx = new AtomicLong();
+        private final ThreadPoolExecutor[] pools;
+
+        public GenericEventExecutorChooser(ThreadPoolExecutor[] pools) {
+            this.pools = pools;
+        }
 
         @Override
         public ThreadPoolExecutor next() {
-            return CommonConst.pools[(int) Math.abs(idx.getAndIncrement() % CommonConst.pools.length)];
+            return pools[(int) Math.abs(idx.getAndIncrement() % pools.length)];
         }
     }
 }

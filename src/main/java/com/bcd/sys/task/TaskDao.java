@@ -2,14 +2,14 @@ package com.bcd.sys.task;
 
 import java.io.Serializable;
 
-public interface TaskDAO<K extends Serializable, T extends Task> {
+public interface TaskDao<T extends Task<K>,K extends Serializable> {
     /**
      * 创建task
      *
      * @param task
      * @return
      */
-    Serializable doCreate(T task);
+    T doCreate(T task);
 
     /**
      * 根据id读取task
@@ -24,7 +24,7 @@ public interface TaskDAO<K extends Serializable, T extends Task> {
      *
      * @param task
      */
-    void doUpdate(T task);
+    T doUpdate(T task);
 
     /**
      * 删除task

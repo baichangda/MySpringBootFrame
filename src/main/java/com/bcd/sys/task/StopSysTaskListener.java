@@ -1,18 +1,19 @@
-package com.bcd.sys.task.cluster;
+package com.bcd.sys.task;
 
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.support_redis.mq.topic.RedisTopicMQ;
-import com.bcd.sys.task.TaskBuilder;
-import com.bcd.sys.task.TaskRunnable;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
-public class StopSysTaskListener extends RedisTopicMQ<String[]> {
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class StopSysTaskListener<T extends Task<K>, K extends Serializable> extends RedisTopicMQ<String[]> {
 
     TaskBuilder<T,K> taskBuilder;
 
     public StopSysTaskListener(String name, RedisConnectionFactory connectionFactory,TaskBuilder<T,K> taskBuilder) {
-        super(connectionFactory, ValueSerializerType.JACKSON, RedisUtil.doWithKey("stopSysTask:" + name));
+        super(connectionFactory,1,1, ValueSerializerType.JACKSON, RedisUtil.doWithKey("stopSysTask:" + name));
         this.taskBuilder=taskBuilder;
     }
 

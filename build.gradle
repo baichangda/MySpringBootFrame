@@ -151,6 +151,8 @@ dependencies {
     implementation("com.baidu.aip:java-sdk:${baiduAipVersion}") {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 //生成jar时打包源码

@@ -5,6 +5,7 @@ import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.support_redis.mq.topic.RedisTopicMQ;
 import com.bcd.base.util.JsonUtil;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 import java.util.concurrent.Executors;
@@ -12,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 //@Component
 public class TestRedisTopicMQ extends RedisTopicMQ<TestBean[]> implements SpringInitializable {
-    public TestRedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer) {
-        super(redisMessageListenerContainer, ValueSerializerType.JACKSON, "test");
+    public TestRedisTopicMQ(RedisConnectionFactory redisConnectionFactory) {
+        super(redisConnectionFactory,1,1, ValueSerializerType.JACKSON, "test");
     }
 
     @Override

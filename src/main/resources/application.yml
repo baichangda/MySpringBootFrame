@@ -71,7 +71,7 @@ spring:
     #公用配置
     ssl: false
     database: 0
-    timeout: 10000
+    timeout: 60000
     password:
     #异步lettuce连接池(默认)
     lettuce:

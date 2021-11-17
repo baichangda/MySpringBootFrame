@@ -4,39 +4,49 @@ package com.bcd.sys.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Transient;
+import java.io.Serializable;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @SuppressWarnings("unchecked")
-public class TaskRunnable<T extends Task> implements Runnable {
+public class TaskRunnable<T extends Task<K>, K extends Serializable> implements Runnable,Serializable{
     private final static Logger logger = LoggerFactory.getLogger(TaskRunnable.class);
 
-    private final T task;
+    private final static long serialVersionUID = 1L;
+
+    private T task;
     private Object[] params;
     private volatile boolean stop = false;
     private String functionName;
+    private String taskBuilderName;
 
     /**
-     * {@link #function}和{@link #executor}
+     * {@link #function}、{@link #executor}、{@link #taskBuilder}
      * 不支持序列化、需要通过{@link #init()}来初始化
      */
-    @Transient
-    private TaskFunction<T> function;
-    @Transient
-    private ThreadPoolExecutor executor;
+    private transient TaskFunction<T, K> function;
+    private transient ThreadPoolExecutor executor;
+    private transient TaskBuilder<T, K> taskBuilder;
 
-    public TaskRunnable(T task, String functionName, Object[] params) {
+    public TaskRunnable(T task, TaskFunction<T, K> function, Object[] params, TaskBuilder<T, K> taskBuilder) {
         this.task = task;
-        this.functionName = functionName;
+        this.function = function;
+        this.functionName = function.getName();
         this.params = params;
-
+        this.taskBuilder = taskBuilder;
+        this.taskBuilderName = taskBuilder.name;
     }
 
     public void init() {
-        //初始化function
-        function = TaskFunction.from(functionName);
+        if (function == null) {
+            //初始化function
+            function = TaskFunction.from(functionName);
+        }
+        if (taskBuilder == null) {
+            //初始化taskBuilder
+            taskBuilder = TaskBuilder.from(taskBuilderName);
+        }
         //分配线程
-        executor = CommonConst.executorChooser.next();
+        executor = taskBuilder.executorChooser.next();
     }
 
 
@@ -48,8 +58,8 @@ public class TaskRunnable<T extends Task> implements Runnable {
         boolean removed = executor.remove(this);
         if (removed) {
             //取消成功
-            executor.execute(()->{
-                TaskUtil.onCanceled(task);
+            executor.execute(() -> {
+                task = taskBuilder.onCanceled(task);
             });
         } else {
             //如果失败、说明任务正在执行
@@ -62,22 +72,23 @@ public class TaskRunnable<T extends Task> implements Runnable {
 
     @Override
     public void run() {
+        taskBuilder.taskIdToRunnable.put(task.getId().toString(), this);
         //触发开始方法
-        TaskUtil.onStarted(task);
+        task = taskBuilder.onStarted(task);
         try {
             //执行任务
             final boolean apply = function.execute(this);
             if (apply) {
-                TaskUtil.onSucceed(task);
+                task = taskBuilder.onSucceed(task);
             } else {
-                TaskUtil.onStopped(task);
+                task = taskBuilder.onStopped(task);
             }
         } catch (Exception ex) {
             logger.error("execute task[" + task.getId() + "] failed", ex);
-            TaskUtil.onFailed(task, ex);
+            task = taskBuilder.onFailed(task, ex);
         } finally {
             //最后从当前服务器任务id和结果映射结果集中移除
-            CommonConst.taskIdToRunnable.remove(task.getId().toString());
+            taskBuilder.taskIdToRunnable.remove(task.getId().toString());
         }
     }
 
@@ -94,7 +105,7 @@ public class TaskRunnable<T extends Task> implements Runnable {
         return functionName;
     }
 
-    public TaskFunction<T> getFunction() {
+    public TaskFunction<T, K> getFunction() {
         return function;
     }
 

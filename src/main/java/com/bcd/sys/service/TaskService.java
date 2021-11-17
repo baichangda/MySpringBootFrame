@@ -2,7 +2,7 @@ package com.bcd.sys.service;
 
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.TaskDAO;
+import com.bcd.sys.task.TaskDao;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -11,10 +11,10 @@ import java.io.Serializable;
  *
  */
 @Service
-public class TaskService extends BaseService<TaskBean, Long> implements TaskDAO<Long, TaskBean> {
+public class TaskService extends BaseService<TaskBean, Long> implements TaskDao<TaskBean,Long> {
     @Override
-    public Serializable doCreate(TaskBean task) {
-        return save(task).getId();
+    public TaskBean doCreate(TaskBean task) {
+        return save(task);
     }
 
     @Override
@@ -23,8 +23,8 @@ public class TaskService extends BaseService<TaskBean, Long> implements TaskDAO<
     }
 
     @Override
-    public void doUpdate(TaskBean task) {
-        save(task);
+    public TaskBean doUpdate(TaskBean task) {
+        return save(task);
     }
 
     @Override

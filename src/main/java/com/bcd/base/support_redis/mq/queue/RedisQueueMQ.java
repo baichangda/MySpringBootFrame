@@ -18,7 +18,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,26 +32,28 @@ public class RedisQueueMQ<V> {
 
     protected BoundListOperations<String, byte[]> boundListOperations;
 
-    protected ThreadPoolExecutor consumePool;
+    protected ThreadPoolExecutor consumeExecutor;
 
-    protected ExecutorService workPool;
+    protected ThreadPoolExecutor workExecutor;
 
     protected RedisTemplate<String, byte[]> redisTemplate;
 
+    protected RedisConnectionFactory connectionFactory;
+
+    protected ValueSerializerType valueSerializerType;
+
+    protected int consumerThreadNum;
+
+    protected int workThreadNum;
+
     private volatile boolean stop;
 
-    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializer) {
-        this(name, redisConnectionFactory, valueSerializer, (ThreadPoolExecutor) Executors.newFixedThreadPool(1), Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1));
-    }
-
-    public RedisQueueMQ(String name, RedisConnectionFactory redisConnectionFactory, ValueSerializerType valueSerializerType, ThreadPoolExecutor consumePool, ExecutorService workPool) {
+    public RedisQueueMQ(String name, RedisConnectionFactory connectionFactory, ValueSerializerType valueSerializerType, int consumerThreadNum, int workThreadNum) {
         this.name = name;
-        this.stop = false;
-        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisConnectionFactory);
-        this.boundListOperations = redisTemplate.boundListOps(name);
-        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
-        this.consumePool = consumePool;
-        this.workPool = workPool;
+        this.connectionFactory = connectionFactory;
+        this.valueSerializerType = valueSerializerType;
+        this.consumerThreadNum = consumerThreadNum;
+        this.workThreadNum = workThreadNum;
     }
 
     public String getName() {
@@ -101,14 +102,32 @@ public class RedisQueueMQ<V> {
         boundListOperations.leftPushAll(bytesArr);
     }
 
-    public void watch() {
+    public void init() {
         this.stop = false;
+        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
+        this.boundListOperations = redisTemplate.boundListOps(name);
+        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
+        this.consumeExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(consumerThreadNum);
+        this.workExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(workThreadNum);
         start();
     }
 
-    public void unWatch() {
+    public void destroy() {
         this.stop = true;
+        try {
+            consumeExecutor.shutdown();
+            while (!consumeExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+            workExecutor.shutdown();
+            while (!workExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+        } catch (InterruptedException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
     }
+
 
     public void onMessage(V data) {
         logger.info(data.toString());
@@ -119,14 +138,14 @@ public class RedisQueueMQ<V> {
     }
 
     protected void start() {
-        while (consumePool.getPoolSize() < consumePool.getMaximumPoolSize()) {
-            consumePool.execute(() -> {
+        while (consumeExecutor.getPoolSize() < consumeExecutor.getMaximumPoolSize()) {
+            consumeExecutor.execute(() -> {
                 long popTimeout = ((LettuceConnectionFactory) redisTemplate.getConnectionFactory()).getTimeout() / 2;
                 while (!stop) {
                     try {
                         byte[] data = boundListOperations.rightPop(popTimeout, TimeUnit.MILLISECONDS);
                         if (data != null) {
-                            workPool.execute(() -> {
+                            workExecutor.execute(() -> {
                                 try {
                                     onMessageFromRedis(data);
                                 } catch (Exception e) {

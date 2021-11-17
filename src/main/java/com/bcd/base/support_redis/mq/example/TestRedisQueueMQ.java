@@ -9,12 +9,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 //@Component
 public class TestRedisQueueMQ extends RedisQueueMQ<String> implements SpringInitializable {
     public TestRedisQueueMQ(RedisConnectionFactory redisConnectionFactory) {
-        super("a", redisConnectionFactory, ValueSerializerType.STRING);
+        super("a", redisConnectionFactory, ValueSerializerType.STRING,1,1);
     }
 
     @Override
     public void init(ContextRefreshedEvent event) {
-        watch();
+        init();
 //        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(()->{
 //            sendBatch(Arrays.asList("1","2"));
 //        },1,5, TimeUnit.SECONDS);

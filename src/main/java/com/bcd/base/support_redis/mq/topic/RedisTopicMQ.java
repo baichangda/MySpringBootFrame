@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -18,6 +19,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -35,12 +37,24 @@ public class RedisTopicMQ<V> {
 
     protected MessageListener messageListener;
 
-    public RedisTopicMQ(RedisMessageListenerContainer redisMessageListenerContainer, ValueSerializerType valueSerializerType, String... names) {
+    protected RedisConnectionFactory connectionFactory;
+
+    protected int subscriptionThreadNum;
+    protected int taskThreadNum;
+
+    protected ThreadPoolExecutor taskExecutor;
+
+    protected ThreadPoolExecutor subscriptionExecutor;
+
+    protected ValueSerializerType valueSerializerType;
+
+    public RedisTopicMQ(RedisConnectionFactory connectionFactory, int subscriptionThreadNum, int taskThreadNum, ValueSerializerType valueSerializerType, String... names) {
+        this.connectionFactory = connectionFactory;
+        this.subscriptionThreadNum = subscriptionThreadNum;
+        this.taskThreadNum = taskThreadNum;
+        this.valueSerializerType = valueSerializerType;
         this.names = names;
-        this.redisMessageListenerContainer = redisMessageListenerContainer;
-        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(redisMessageListenerContainer.getConnectionFactory());
-        this.redisSerializer = getDefaultRedisSerializer(valueSerializerType);
-        this.messageListener = getMessageListener();
+
     }
 
     public String[] getNames() {
@@ -117,6 +131,49 @@ public class RedisTopicMQ<V> {
 
     public void unWatch() {
         this.redisMessageListenerContainer.removeMessageListener(this.messageListener);
+    }
+
+    public void init() {
+        taskExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(taskThreadNum);
+        subscriptionExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(subscriptionThreadNum);
+
+        redisMessageListenerContainer = new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(connectionFactory);
+        redisMessageListenerContainer.setTaskExecutor(taskExecutor);
+        redisMessageListenerContainer.setSubscriptionExecutor(subscriptionExecutor);
+        redisMessageListenerContainer.afterPropertiesSet();
+        redisMessageListenerContainer.start();
+
+        redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
+        redisSerializer = getDefaultRedisSerializer(valueSerializerType);
+
+        messageListener = getMessageListener();
+
+        watch();
+    }
+
+    public void destroy() {
+        unWatch();
+
+        try {
+            redisMessageListenerContainer.destroy();
+        } catch (Exception ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+
+        try {
+            subscriptionExecutor.shutdown();
+            while (!subscriptionExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+            taskExecutor.shutdown();
+            while (!taskExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+
+            }
+        } catch (InterruptedException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+
     }
 
     public void onMessage(V data) {
