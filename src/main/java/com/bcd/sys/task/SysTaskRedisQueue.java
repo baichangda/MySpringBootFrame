@@ -4,11 +4,10 @@ import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.sys.task.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.QueryTimeoutException;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
@@ -19,17 +18,12 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-@Component
-public class SysTaskRedisQueue<T extends Task>{
-
-    /**
-     * 集群模式中redis任务队列名称
-     */
-    public final static String SYS_TASK_LIST_NAME = RedisUtil.doWithKey("sysTask");
+public class SysTaskRedisQueue<T extends Task, K extends Serializable> {
 
     private final static Logger logger = LoggerFactory.getLogger(SysTaskRedisQueue.class);
     private String name;
-    private Semaphore lock = new Semaphore(1);
+    private String queueName;
+    private Semaphore lock = new Semaphore(CommonConst.pools.length);
 
     private BoundListOperations boundListOperations;
 
@@ -50,9 +44,11 @@ public class SysTaskRedisQueue<T extends Task>{
      */
     private ExecutorService workPool = Executors.newCachedThreadPool();
 
-    public SysTaskRedisQueue(@Qualifier("string_serializable_redisTemplate") RedisTemplate redisTemplate) {
-        this.name = SYS_TASK_LIST_NAME;
-        this.boundListOperations = redisTemplate.boundListOps(this.name);
+    public SysTaskRedisQueue(String name, RedisConnectionFactory connectionFactory) {
+        final RedisTemplate<String, Object> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
+        this.name = name;
+        this.queueName = RedisUtil.doWithKey("sysTask:" + name);
+        this.boundListOperations = redisTemplate.boundListOps(this.queueName);
         this.popNullIntervalInSecond = 30;
     }
 
@@ -72,7 +68,7 @@ public class SysTaskRedisQueue<T extends Task>{
             } else {
                 workPool.execute(() -> {
                     try {
-                        onTask((TaskRunnable<T>) data);
+                        onTask((TaskRunnable<T, K>) data);
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                         lock.release();
@@ -95,10 +91,10 @@ public class SysTaskRedisQueue<T extends Task>{
      *
      * @param runnable
      */
-    public void onTask(TaskRunnable<T> runnable) {
+    public void onTask(TaskRunnable<T, K> runnable) {
         //初始化环境
         runnable.init();
-        runnable.getExecutor().execute(()->{
+        runnable.getExecutor().execute(() -> {
             //使用线程池执行任务
             try {
                 //3.1、执行任务
@@ -111,19 +107,19 @@ public class SysTaskRedisQueue<T extends Task>{
         });
     }
 
-    public void send(TaskRunnable<T> runnable) {
+    public void send(TaskRunnable<T, K> runnable) {
         boundListOperations.leftPush(runnable);
     }
 
-    public LinkedHashMap<Serializable, Boolean> remove(Serializable... ids) {
+    public LinkedHashMap<K, Boolean> remove(K... ids) {
         if (ids == null || ids.length == 0) {
             return new LinkedHashMap<>();
         }
-        LinkedHashMap<Serializable, Boolean> resMap = new LinkedHashMap<>();
-        List<TaskRunnable<T>> runnableList = boundListOperations.range(0L, -1L);
-        for (Serializable id : ids) {
+        LinkedHashMap<K, Boolean> resMap = new LinkedHashMap<>();
+        List<TaskRunnable<T, K>> runnableList = boundListOperations.range(0L, -1L);
+        for (K id : ids) {
             boolean res = false;
-            for (TaskRunnable<T> runnable : runnableList) {
+            for (TaskRunnable<T, K> runnable : runnableList) {
                 if (id.equals(runnable.getTask().getId())) {
                     Long count = boundListOperations.remove(1, runnable);
                     if (count != null && count == 1) {
