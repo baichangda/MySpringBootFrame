@@ -6,7 +6,6 @@ import com.lmax.disruptor.*;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
-import org.apache.catalina.User;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
