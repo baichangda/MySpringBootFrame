@@ -48,8 +48,8 @@ apply plugin: 'maven-publish'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.springframework.boot'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 17
+targetCompatibility = 17
 
 repositories {
     mavenLocal()
