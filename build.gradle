@@ -2,7 +2,7 @@ buildscript {
     ext {
         guavaVersion = '+'
         mysqlVersion = '8.+'
-        pgsqlVersion = '42.2.+'
+        pgsqlVersion = '42.+'
         jsqlparserVersion = '+'
         freemarkerVersion = '+'
         commonsPool2 = '+'
@@ -10,20 +10,21 @@ buildscript {
         easyexcelVersion = '+'
         disruptorVersion = '+'
         springdocVersion = '+'
-        caffeineVersion = '2.+'
-        okHttpVersion = '4.9.+'
+        caffeineVersion = '3.+'
+        retrofitJacksonVersion = '+'
         springBootVersion = '2.+'
         kafkaVersion = '+'
-        flywayVersion = '7.3.+'
+        flywayVersion = '+'
         lombokVersion = "+"
         baiduAipVersion = '+'
-        mavenRepoUrl = 'https://maven.aliyun.com/repository/central'
+        mavenRepoUrl = 'https://maven.aliyun.com/repository/public/'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
         maven { url "${mavenRepoUrl}" }
+        mavenCentral()
     }
 
     dependencies {
@@ -54,7 +55,7 @@ targetCompatibility = 17
 repositories {
     mavenLocal()
     maven { url "${mavenRepoUrl}" }
-    maven { url "https://jitpack.io" }
+    mavenCentral()
 //        maven { url "${incarMavenRepoUrl}" }
 }
 
@@ -149,9 +150,8 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
 
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: "${okHttpVersion}"
-
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
@@ -206,14 +206,12 @@ bootRun {
      * 启动时候带入jvm的参数;如下(启动jvisualvm监控)
      * nohup gradle bootRun -PjvmArgs="-Djava.rmi.server.hostname=172.16.24.36 -Dcom.sun.management.jmxremote.port=10001 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true" &
      */
-
     if (project.hasProperty('jvmArgs')) {
-        jvmArgs.addAll(project.jvmArgs.split("\\s+") as List)
+        jvmArgs(project.jvmArgs.split("\\s+") as List)
     }
     //开启缓存行补齐
     jvmArgs('-XX:-RestrictContended')
     jvmArgs('-Dfile.encoding=UTF-8')
-    //log4j2全局异步日志
     jvmArgs('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
 }
 
