@@ -2,8 +2,6 @@ package com.bcd.controller;
 
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
-import com.bcd.base.util.JsonUtil;
-import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.keys.KeysConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,16 +10,9 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import retrofit2.Call;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
-
-import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 

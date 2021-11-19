@@ -4,7 +4,6 @@ import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 import com.bcd.sys.task.TaskBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.util.concurrent.TimeUnit;
@@ -25,7 +24,7 @@ public class Test {
         final TaskBuilder<TaskBean, Long> builder =
                 TaskBuilder.newBuilder("test", taskService)
                         .withPoolSize(1)
-                .build();
+                        .build();
         TaskBean taskBean1 = new TaskBean("a");
         final Long id1 = builder.registerTask(taskBean1, testTaskFunction1);
         TaskBean taskBean2 = new TaskBean("b");
@@ -35,7 +34,7 @@ public class Test {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        builder.stopTask(id1,id2);
+        builder.stopTask(id1, id2);
 
         try {
             TimeUnit.SECONDS.sleep(1);
@@ -52,7 +51,7 @@ public class Test {
         TestTaskFunction2 testTaskFunction2 = new TestTaskFunction2();
         final TaskBuilder<TaskBean, Long> builder =
                 TaskBuilder.newBuilder("test", taskService)
-                        .withCluster("test",redisConnectionFactory)
+                        .withCluster("test", redisConnectionFactory)
                         .withPoolSize(1)
                         .build();
         TaskBean taskBean1 = new TaskBean("c");
@@ -64,7 +63,7 @@ public class Test {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        builder.stopTask(id1,id2);
+        builder.stopTask(id1, id2);
 
         try {
             TimeUnit.SECONDS.sleep(3);
@@ -73,4 +72,5 @@ public class Test {
         }
         builder.destroy();
     }
+
 }

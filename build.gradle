@@ -11,8 +11,8 @@ buildscript {
         disruptorVersion = '+'
         springdocVersion = '+'
         caffeineVersion = '2.+'
-        retrofitJacksonVersion = '+'
-        springBootVersion = '2.5.4'
+        okHttpVersion = '4.9.+'
+        springBootVersion = '2.+'
         kafkaVersion = '+'
         flywayVersion = '7.3.+'
         lombokVersion = "+"
@@ -134,9 +134,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
 
-    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
-
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     implementation group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
 
@@ -151,6 +148,10 @@ dependencies {
     implementation("com.baidu.aip:java-sdk:${baiduAipVersion}") {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
+
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: "${okHttpVersion}"
+
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
