@@ -16,7 +16,7 @@ buildscript {
         kafkaVersion = '+'
         flywayVersion = '+'
         lombokVersion = "+"
-        baiduAipVersion = '+'
+        pdfboxVersion = "+"
         mavenRepoUrl = 'https://maven.aliyun.com/repository/public/'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
@@ -145,15 +145,15 @@ dependencies {
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
 
 
-    // https://mvnrepository.com/artifact/com.baidu.aip/java-sdk
-    implementation("com.baidu.aip:java-sdk:${baiduAipVersion}") {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'
-    }
-
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: "${pdfboxVersion}"
+
+
 }
 
 //生成jar时打包源码

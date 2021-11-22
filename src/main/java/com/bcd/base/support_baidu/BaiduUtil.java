@@ -1,21 +1,13 @@
 package com.bcd.base.support_baidu;
 
-import com.baidu.aip.imageclassify.AipImageClassify;
-import com.baidu.aip.ocr.AipOcr;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_jpa.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.html.HtmlEscapers;
 import okhttp3.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -25,37 +17,78 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-@Configuration
-public class BaiduConfig {
+public class BaiduUtil {
 
-    static Logger logger = LoggerFactory.getLogger(BaiduConfig.class);
+    static Logger logger = LoggerFactory.getLogger(BaiduUtil.class);
 
-    @Value("${baidu.apiKey}")
-    String apiKey;
-    @Value("${baidu.secretKey}")
-    String secretKey;
+//    private final static String clientId = "HXDSSTZbdtEgOnbo94jKfGDH";
+//    private final static String clientSecret = "6fzE3GL7G9I3hjzxnX6QYDSyNaopjvkf";
 
-    static String accessToken;
-    static long expiredInSecond;
+    private final static String clientId = "5GjWi9nxIXvZbqVujPIj8xCl";
+    private final static String clientSecret = "v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo";
 
-    static BaiduInterface baiduInterface = retrofit().create(BaiduInterface.class);
+    private static String accessToken;
+    private static long expiredInSecond;
 
-    @Bean
-    public AipImageClassify aipImageClassify() {
-        return new AipImageClassify("wx-bcd-aipImageClassify", apiKey, secretKey);
+    private static Retrofit retrofit;
+    private static BaiduInterface baiduInterface;
+
+    public static Retrofit getRetrofit() {
+        if (retrofit == null) {
+            synchronized (BaiduUtil.class) {
+                if (retrofit == null) {
+                    final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                            .addNetworkInterceptor(chain -> {
+                                final Request request = chain.request();
+                                final HttpUrl url = request.url();
+                                Request newRequest = request;
+                                if (!"/oauth/2.0/token".equals(url.encodedPath())) {
+                                    newRequest = request.newBuilder().url(url.newBuilder().addQueryParameter("access_token", getAccessToken()).build()).build();
+                                }
+//                                logger.info("{}", request.url());
+//                                logger.info("{}", newRequest.url());
+                                return chain.proceed(newRequest);
+                            })
+                            .build();
+                    retrofit = new Retrofit.Builder()
+                            .baseUrl("https://aip.baidubce.com")
+                            .addConverterFactory(JacksonConverterFactory.create(JsonUtil.GLOBAL_OBJECT_MAPPER))
+                            .client(okHttpClient)
+                            .build();
+                }
+            }
+        }
+        return retrofit;
     }
 
+    public static BaiduInterface getBaiduInterface() {
+        if (baiduInterface == null) {
+            synchronized (BaiduUtil.class) {
+                if (baiduInterface == null) {
+                    baiduInterface = getRetrofit().create(BaiduInterface.class);
+                }
+            }
+        }
+        return baiduInterface;
+    }
+
+    /**
+     * https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu
+     *
+     * @return
+     */
     public static String getAccessToken() {
-        if (accessToken == null) {
-            synchronized (BaiduConfig.class) {
-                if (accessToken == null) {
+        if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
+            synchronized (BaiduUtil.class) {
+                if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
                     try {
-                        final JsonNode jsonNode = baiduInterface.token("HXDSSTZbdtEgOnbo94jKfGDH", "6fzE3GL7G9I3hjzxnX6QYDSyNaopjvkf")
+                        final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
                                 .execute().body();
                         logger.info("access_token:\n{}", jsonNode.toPrettyString());
                         accessToken = jsonNode.get("access_token").asText();
@@ -69,70 +102,95 @@ public class BaiduConfig {
         return accessToken;
     }
 
-    public static Retrofit retrofit() {
-        final OkHttpClient okHttpClient = new OkHttpClient.Builder().addNetworkInterceptor(chain -> {
-            final Request request = chain.request();
-            final HttpUrl url = request.url();
-            Request newRequest=request;
-            if (!"/oauth/2.0/token".equals(url.encodedPath())) {
-                newRequest=request.newBuilder().url(url.newBuilder().addQueryParameter("access_token", getAccessToken()).build()).build();
-            }
-            System.out.println(request.url());
-            System.out.println(newRequest.url());
-            return chain.proceed(newRequest);
-        }).build();
-        return new Retrofit.Builder()
-                .baseUrl("https://aip.baidubce.com")
-                .addConverterFactory(JacksonConverterFactory.create(JsonUtil.GLOBAL_OBJECT_MAPPER))
-                .client(okHttpClient)
-                .build();
-    }
 
-    public static String getToken(String apiKey, String secretKey) throws IOException {
-        final OkHttpClient okHttpClient = new OkHttpClient();
-
-        final Request req = new Request.Builder()
-                .url("https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials" +
-                        "&client_id=" + apiKey +
-                        "&client_secret=" + secretKey)
-                .build();
-        final Response rep = okHttpClient.newCall(req).execute();
-        final String res = rep.body().string();
-        final JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(res);
-        return jsonNode.get("access_token").asText();
-    }
-
-    public static String baiduFanyi(String str, String from, String to, String token) {
+    /**
+     * https://ai.baidu.com/ai-doc/MT/4kqryjku9
+     *
+     * @param str
+     * @param from
+     * @param to
+     * @return
+     */
+    public static JsonNode translation(String str, String from, String to) {
         try {
-            final OkHttpClient okHttpClient = new OkHttpClient();
             Map<String, String> map = new HashMap<>();
             map.put("from", from);
             map.put("to", to);
             map.put("q", str);
-            final RequestBody requestBody = RequestBody.create(MediaType.get("application/json;charset=utf-8"), JsonUtil.toJson(map));
-
-            final Request req = new Request.Builder()
-                    .header("Content-Type", "application/json;charset=utf-8")
-                    .url("https://aip.baidubce.com/rpc/2.0/mt/texttrans/v1?access_token=" + token)
-                    .post(requestBody).build();
-            final Response rep = okHttpClient.newCall(req).execute();
-            final String res = rep.body().string();
-            final JsonNode jsonNode = JsonUtil.GLOBAL_OBJECT_MAPPER.readTree(res);
-            final JsonNode arr = jsonNode.get("result").get("trans_result");
-            StringBuilder sb = new StringBuilder();
-            for (JsonNode node : arr) {
-                sb.append(HtmlEscapers.htmlEscaper().escape(node.get("dst").asText()));
-                sb.append("\n");
-            }
-            return sb.toString();
+            return getBaiduInterface().translation(map).execute().body();
         } catch (IOException ex) {
             throw BaseRuntimeException.getException(ex);
         }
     }
 
-    public static void test(String pdfDirPath) throws IOException {
-        final JsonNode[] props = DBInfoUtil.getSpringProps("baidu.apiKey", "baidu.secretKey");
-        AipOcr aipOcr = new AipOcr("wx-bcd-aipOcr", props[0].asText(), props[1].asText());
+    /**
+     * 识别图片文字(base64格式)
+     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
+     *
+     * @param imagePath
+     * @param languageType
+     * @return
+     */
+    public static JsonNode ocr_imagePath(String imagePath, String languageType) {
+        try {
+            final byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
+            return getBaiduInterface().ocr(Base64.getEncoder().encodeToString(bytes), null, null, null, languageType, null, null, null).execute().body();
+        } catch (IOException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+    }
+
+    /**
+     * 识别图片文字(base64格式)
+     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
+     *
+     * @param imageBase64
+     * @param languageType
+     * @return
+     */
+    public static JsonNode ocr_imageBase64(String imageBase64, String languageType) {
+        try {
+            return getBaiduInterface().ocr(imageBase64, null, null, null, languageType, null, null, null).execute().body();
+        } catch (IOException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+    }
+
+    /**
+     * 识别指定url图片文字
+     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
+     *
+     * @param url
+     * @param languageType
+     * @return
+     */
+    public static JsonNode ocr_url(String url, String languageType) {
+        try {
+            return getBaiduInterface().ocr(null, url, null, null, languageType, null, null, null).execute().body();
+        } catch (IOException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+    }
+
+    /**
+     * 识别pdf指定页文字
+     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
+     *
+     * @param pdfFile
+     * @param pdfFileNum
+     * @param languageType
+     * @return
+     */
+    public static JsonNode ocr_pdf(String pdfFile, int pdfFileNum, String languageType) {
+        try {
+            return getBaiduInterface().ocr(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
+        } catch (IOException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
+    }
+
+
+    public static void allPdfOcr(String pdfDirPath, String languageType) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
@@ -155,13 +213,11 @@ public class BaiduConfig {
                         ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
                     }
                     //调用百度识别
-                    JSONObject jsonObject = null;
+                    JsonNode jsonNode = null;
                     try {
-                        HashMap<String, String> options = new HashMap<>();
-                        options.put("language_type", "CHN_ENG");
-                        jsonObject = aipOcr.basicAccurateGeneral(pngPath.toString(), options);
-                        for (Object words_result : jsonObject.getJSONArray("words_result")) {
-                            bw.write(((JSONObject) words_result).get("words").toString());
+                        jsonNode = ocr_imagePath(pngPath.toString(), languageType);
+                        for (JsonNode words_result : jsonNode.get("words_result")) {
+                            bw.write(words_result.get("words").asText());
                             bw.newLine();
                         }
                         bw.newLine();
@@ -169,11 +225,10 @@ public class BaiduConfig {
                         bw.newLine();
                         bw.newLine();
                         bw.flush();
-                        jsonObject = null;
                     } catch (Exception ex) {
                         logger.info("handle pdf[{}] total[{}] pageNum[{}] failed", pdfPath, pageSize, i + 1, ex);
-                        if (jsonObject != null) {
-                            logger.info("baidu res:\n{}", jsonObject);
+                        if (jsonNode != null) {
+                            logger.info("baidu res:\n{}", jsonNode);
                         }
                     }
                 }
@@ -183,9 +238,7 @@ public class BaiduConfig {
         }
     }
 
-    public static void test1(String pdfDirPath, String token) throws IOException, NoSuchFieldException {
-        final JsonNode[] props = DBInfoUtil.getSpringProps("baidu.apiKey", "baidu.secretKey");
-        AipOcr aipOcr = new AipOcr("wx-bcd-aipOcr", props[0].asText(), props[1].asText());
+    public static void allPdfOcrAndTranslation(String pdfDirPath, String languageType) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
@@ -212,17 +265,15 @@ public class BaiduConfig {
                         ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
                     }
                     //调用百度识别
-                    JSONObject jsonObject = null;
+                    JsonNode jsonNode = null;
                     try {
-                        HashMap<String, String> options = new HashMap<>();
-                        options.put("language_type", "CHN_ENG");
-                        jsonObject = aipOcr.basicAccurateGeneral(pngPath.toString(), options);
+                        jsonNode = ocr_imagePath(pngPath.toString(), languageType);
                         StringBuilder sb = new StringBuilder();
-                        for (Object words_result : jsonObject.getJSONArray("words_result")) {
-                            sb.append(((JSONObject) words_result).get("words").toString());
+                        for (JsonNode words_result : jsonNode.get("words_result")) {
+                            sb.append(words_result.get("words").asText());
                             sb.append("\n");
                         }
-                        final String fanyiRes = baiduFanyi(sb.toString(), "zh", "en", token);
+                        final String fanyiRes = translation(sb.toString(), "zh", "en").get("trans_result").get(0).get("dst").asText();
                         bw1.write(sb.toString());
                         bw2.write(fanyiRes);
                         bw1.newLine();
@@ -236,11 +287,11 @@ public class BaiduConfig {
                         bw2.newLine();
                         bw2.newLine();
                         bw2.flush();
-                        jsonObject = null;
+                        jsonNode = null;
                     } catch (Exception ex) {
                         logger.info("handle pdf[{}] total[{}] pageNum[{}] failed", pdfPath, pageSize, i + 1, ex);
-                        if (jsonObject != null) {
-                            logger.info("baidu res:\n{}", jsonObject);
+                        if (jsonNode != null) {
+                            logger.info("baidu res:\n{}", jsonNode);
                         }
                     }
                 }
@@ -251,17 +302,9 @@ public class BaiduConfig {
     }
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
-//        final String token = getToken("HXDSSTZbdtEgOnbo94jKfGDH", "6fzE3GL7G9I3hjzxnX6QYDSyNaopjvkf");
-//        final String s = baiduFanyi("哈哈哈", "zh", "en", token);
-//        test1("/Users/baichangda/pdftemp", token);
-//        test1("/Users/baichangda/pdftest", token);
-//        test("/Users/baichangda/pdftest");
-
-        BaiduConfig baiduConfig = new BaiduConfig();
-        final Retrofit retrofit = baiduConfig.retrofit();
-        final BaiduInterface baiduInterface = retrofit.create(BaiduInterface.class);
-        final JsonNode jsonNode = baiduInterface.token("HXDSSTZbdtEgOnbo94jKfGDH", "6fzE3GL7G9I3hjzxnX6QYDSyNaopjvkf").execute().body();
-        System.out.println(jsonNode);
+        allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
+//        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG");
+        System.out.println(translation("啊啊啊", "zh", "en"));
 
     }
 }
