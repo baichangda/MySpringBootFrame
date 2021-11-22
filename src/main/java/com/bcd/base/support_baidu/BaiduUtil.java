@@ -1,6 +1,5 @@
 package com.bcd.base.support_baidu;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import okhttp3.*;
@@ -78,115 +77,47 @@ public class BaiduUtil {
         return baiduInterface;
     }
 
-    /**
-     * https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu
-     *
-     * @return
-     */
-    public static String getAccessToken() {
+    public static String getAccessToken() throws IOException {
         if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
             synchronized (BaiduUtil.class) {
                 if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
-                    try {
-                        final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
-                                .execute().body();
-                        logger.info("access_token:\n{}", jsonNode.toPrettyString());
-                        accessToken = jsonNode.get("access_token").asText();
-                        expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
-                    } catch (IOException ex) {
-                        throw BaseRuntimeException.getException(ex);
-                    }
+                    final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
+                            .execute().body();
+                    logger.info("access_token:\n{}", jsonNode.toPrettyString());
+                    accessToken = jsonNode.get("access_token").asText();
+                    expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
                 }
             }
         }
         return accessToken;
     }
 
-
-    /**
-     * https://ai.baidu.com/ai-doc/MT/4kqryjku9
-     *
-     * @param str
-     * @param from
-     * @param to
-     * @return
-     */
-    public static JsonNode translation(String str, String from, String to) {
-        try {
-            Map<String, String> map = new HashMap<>();
-            map.put("from", from);
-            map.put("to", to);
-            map.put("q", str);
-            return getBaiduInterface().translation(map).execute().body();
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+    public static JsonNode translation(String str, String from, String to) throws IOException {
+        Map<String, String> map = new HashMap<>();
+        map.put("from", from);
+        map.put("to", to);
+        map.put("q", str);
+        return getBaiduInterface().translation(map).execute().body();
     }
 
-    /**
-     * 识别图片文字(base64格式)
-     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
-     *
-     * @param imagePath
-     * @param languageType
-     * @return
-     */
-    public static JsonNode ocr_imagePath(String imagePath, String languageType) {
-        try {
-            final byte[] bytes = Files.readAllBytes(Paths.get(imagePath));
-            return getBaiduInterface().ocr(Base64.getEncoder().encodeToString(bytes), null, null, null, languageType, null, null, null).execute().body();
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+    public static JsonNode ocr_imagePath(String imagePath, String languageType) throws IOException{
+        return getBaiduInterface().ocr(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null).execute().body();
     }
 
-    /**
-     * 识别图片文字(base64格式)
-     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
-     *
-     * @param imageBase64
-     * @param languageType
-     * @return
-     */
-    public static JsonNode ocr_imageBase64(String imageBase64, String languageType) {
-        try {
-            return getBaiduInterface().ocr(imageBase64, null, null, null, languageType, null, null, null).execute().body();
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+    public static JsonNode ocr_imageBase64(String imageBase64, String languageType) throws IOException {
+        return getBaiduInterface().ocr(imageBase64, null, null, null, languageType, null, null, null).execute().body();
     }
 
-    /**
-     * 识别指定url图片文字
-     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
-     *
-     * @param url
-     * @param languageType
-     * @return
-     */
-    public static JsonNode ocr_url(String url, String languageType) {
-        try {
-            return getBaiduInterface().ocr(null, url, null, null, languageType, null, null, null).execute().body();
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+    public static JsonNode ocr_url(String url, String languageType)  throws IOException {
+        return getBaiduInterface().ocr(null, url, null, null, languageType, null, null, null).execute().body();
     }
 
-    /**
-     * 识别pdf指定页文字
-     * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
-     *
-     * @param pdfFile
-     * @param pdfFileNum
-     * @param languageType
-     * @return
-     */
-    public static JsonNode ocr_pdf(String pdfFile, int pdfFileNum, String languageType) {
-        try {
-            return getBaiduInterface().ocr(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+    public static JsonNode ocr_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException{
+        return getBaiduInterface().ocr(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
+    }
+
+    public static JsonNode ocrDoc_imagePath(String imagePath, String languageType) throws IOException{
+        return getBaiduInterface().ocrDoc(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null,null,null,null).execute().body();
     }
 
     /**
@@ -221,9 +152,13 @@ public class BaiduUtil {
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = ocr_imagePath(pngPath.toString(), languageType);
-                        for (JsonNode words_result : jsonNode.get("words_result")) {
-                            bw.write(words_result.get("words").asText());
+                        jsonNode = ocrDoc_imagePath(pngPath.toString(), languageType);
+//                        for (JsonNode words_result : jsonNode.get("words_result")) {
+//                            bw.write(words_result.get("words").asText());
+//                            bw.newLine();
+//                        }
+                        for (JsonNode result : jsonNode.get("results")) {
+                            bw.write(result.get("words").get("word").asText());
                             bw.newLine();
                         }
                         bw.newLine();
@@ -250,7 +185,7 @@ public class BaiduUtil {
      * @param pdfDirPath
      * @param languageType
      * @param from
-     * @param to 
+     * @param to
      * @throws IOException
      */
     public static void allPdfOcrAndTranslation(String pdfDirPath, String languageType, String from, String to) throws IOException {
@@ -318,8 +253,7 @@ public class BaiduUtil {
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
         allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
-        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
-        System.out.println(translation("啊啊啊", "zh", "en"));
+//        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
 
     }
 }
