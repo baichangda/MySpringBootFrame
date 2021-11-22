@@ -16,7 +16,7 @@ buildscript {
         kafkaVersion = '+'
         flywayVersion = '+'
         lombokVersion = "+"
-        pdfboxVersion = "+"
+        pdfboxVersion = "2.+"
         mavenRepoUrl = 'https://maven.aliyun.com/repository/public/'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
