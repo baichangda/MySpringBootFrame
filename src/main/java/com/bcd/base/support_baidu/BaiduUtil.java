@@ -189,7 +189,13 @@ public class BaiduUtil {
         }
     }
 
-
+    /**
+     * 识别所有pdf下面的文字
+     *
+     * @param pdfDirPath
+     * @param languageType
+     * @throws IOException
+     */
     public static void allPdfOcr(String pdfDirPath, String languageType) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
@@ -238,14 +244,21 @@ public class BaiduUtil {
         }
     }
 
-    public static void allPdfOcrAndTranslation(String pdfDirPath, String languageType) throws IOException {
+    /**
+     * 识别所有pdf下面的文字并翻译
+     *
+     * @param pdfDirPath
+     * @param languageType
+     * @throws IOException
+     */
+    public static void allPdfOcrAndTranslation(String pdfDirPath, String languageType, String from, String to) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
             String pngDirPath = pdfDirPath + "/temp";
             Files.createDirectories(Paths.get(pngDirPath));
-            String resPath1 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-zh.txt";
-            String resPath2 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-en.txt";
+            String resPath1 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-from.txt";
+            String resPath2 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-to.txt";
             Files.deleteIfExists(Paths.get(resPath1));
             Files.deleteIfExists(Paths.get(resPath2));
             Files.createFile(Paths.get(resPath1));
@@ -273,7 +286,7 @@ public class BaiduUtil {
                             sb.append(words_result.get("words").asText());
                             sb.append("\n");
                         }
-                        final String fanyiRes = translation(sb.toString(), "zh", "en").get("trans_result").get(0).get("dst").asText();
+                        final String fanyiRes = translation(sb.toString(), from, to).get("trans_result").get(0).get("dst").asText();
                         bw1.write(sb.toString());
                         bw2.write(fanyiRes);
                         bw1.newLine();
@@ -303,7 +316,7 @@ public class BaiduUtil {
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
         allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
-//        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG");
+        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
         System.out.println(translation("啊啊啊", "zh", "en"));
 
     }
