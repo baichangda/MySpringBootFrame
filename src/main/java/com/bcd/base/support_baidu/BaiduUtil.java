@@ -249,6 +249,8 @@ public class BaiduUtil {
      *
      * @param pdfDirPath
      * @param languageType
+     * @param from
+     * @param to 
      * @throws IOException
      */
     public static void allPdfOcrAndTranslation(String pdfDirPath, String languageType, String from, String to) throws IOException {
