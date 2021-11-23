@@ -66,7 +66,7 @@ public class MyDisruptor<T> {
         MyDisruptor<UserBean> myDisruptor = MyDisruptor.<UserBean>newInstance(t -> {
                     System.out.println(JsonUtil.toJson(t));
                 }, 128)
-                .setProducerType(ProducerType.SINGLE)
+                .setProducerType(ProducerType.MULTI)
                 .setWaitStrategy(new SleepingWaitStrategy())
                 .init();
         final UserBean userBean = new UserBean();
