@@ -10,9 +10,6 @@ import java.util.Map;
 public interface BaiduInterface {
     /**
      * https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu
-     * @param client_id
-     * @param client_secret
-     * @return
      */
     @POST("/oauth/2.0/token?grant_type=client_credentials")
     Call<JsonNode> token(
@@ -22,8 +19,6 @@ public interface BaiduInterface {
 
     /**
      * https://ai.baidu.com/ai-doc/MT/4kqryjku9
-     * @param param
-     * @return
      */
     @Headers({
             "Content-Type:application/json;charset=utf-8"
@@ -34,15 +29,6 @@ public interface BaiduInterface {
 
     /**
      * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
-     * @param image
-     * @param url
-     * @param pdf_file
-     * @param pdf_file_num
-     * @param language_type
-     * @param detect_direction
-     * @param paragraph
-     * @param probability
-     * @return
      */
     @Headers({
             "Content-Type:application/x-www-form-urlencoded"
@@ -61,18 +47,6 @@ public interface BaiduInterface {
 
     /**
      * https://ai.baidu.com/ai-doc/OCR/ykg9c09ji
-     * @param image
-     * @param url
-     * @param pdf_file
-     * @param pdf_file_num
-     * @param language_type
-     * @param result_type
-     * @param detect_direction
-     * @param line_probability
-     * @param words_type
-     * @param layout_analysis
-     * @param erase_seal
-     * @return
      */
     @Headers({
             "Content-Type:application/x-www-form-urlencoded"
@@ -80,14 +54,14 @@ public interface BaiduInterface {
     @POST("/rest/2.0/ocr/v1/doc_analysis_office")
     @FormUrlEncoded
     Call<JsonNode> ocrDoc(@Field("image") String image,
-                       @Field("url") String url,
-                       @Field("pdf_file") String pdf_file,
-                       @Field("pdf_file_num") String pdf_file_num,
-                       @Field("language_type") String language_type,
-                       @Field("result_type") String result_type,
-                       @Field("detect_direction") String detect_direction,
-                       @Field("line_probability") String line_probability,
-                       @Field("words_type") String words_type,
-                       @Field("layout_analysis") String layout_analysis,
-                       @Field("erase_seal") String erase_seal);
+                          @Field("url") String url,
+                          @Field("pdf_file") String pdf_file,
+                          @Field("pdf_file_num") String pdf_file_num,
+                          @Field("language_type") String language_type,
+                          @Field("result_type") String result_type,
+                          @Field("detect_direction") String detect_direction,
+                          @Field("line_probability") String line_probability,
+                          @Field("words_type") String words_type,
+                          @Field("layout_analysis") String layout_analysis,
+                          @Field("erase_seal") String erase_seal);
 }
