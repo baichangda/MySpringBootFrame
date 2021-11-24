@@ -10,7 +10,7 @@ import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
-import com.bcd.sys.task.TaskBuilder;
+import com.bcd.base.support_task.TaskBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

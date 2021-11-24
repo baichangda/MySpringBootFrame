@@ -1,10 +1,10 @@
-package com.bcd.sys.support_task.cluster;
+package com.bcd.base.support_task.cluster;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
-import com.bcd.sys.support_task.Task;
-import com.bcd.sys.support_task.TaskRunnable;
-import com.bcd.sys.support_task.TaskBuilder;
+import com.bcd.base.support_task.Task;
+import com.bcd.base.support_task.TaskRunnable;
+import com.bcd.base.support_task.TaskBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;

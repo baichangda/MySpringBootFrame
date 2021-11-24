@@ -1,7 +1,7 @@
-package com.bcd.sys.support_task.cluster;
+package com.bcd.base.support_task.cluster;
 
-import com.bcd.sys.support_task.*;
-import com.bcd.sys.support_task.TaskBuilder;
+import com.bcd.base.support_task.*;
+import com.bcd.base.support_task.TaskBuilder;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.io.Serializable;

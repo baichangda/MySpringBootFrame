@@ -1,8 +1,8 @@
 package com.bcd;
 
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.TaskFunction;
-import com.bcd.sys.task.TaskRunnable;
+import com.bcd.base.support_task.TaskFunction;
+import com.bcd.base.support_task.TaskRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

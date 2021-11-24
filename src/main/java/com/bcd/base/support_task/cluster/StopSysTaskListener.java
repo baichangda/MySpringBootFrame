@@ -1,10 +1,10 @@
-package com.bcd.sys.support_task.cluster;
+package com.bcd.base.support_task.cluster;
 
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.support_redis.mq.topic.RedisTopicMQ;
-import com.bcd.sys.support_task.Task;
-import com.bcd.sys.support_task.TaskRunnable;
+import com.bcd.base.support_task.Task;
+import com.bcd.base.support_task.TaskRunnable;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.io.Serializable;

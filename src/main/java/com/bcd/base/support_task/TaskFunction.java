@@ -1,4 +1,4 @@
-package com.bcd.sys.support_task;
+package com.bcd.base.support_task;
 
 
 import com.bcd.base.exception.BaseRuntimeException;

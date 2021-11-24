@@ -2,8 +2,8 @@ package com.bcd;
 
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
-import com.bcd.sys.task.TaskBuilder;
-import com.bcd.sys.task.cluster.ClusterTaskBuilder;
+import com.bcd.base.support_task.TaskBuilder;
+import com.bcd.base.support_task.cluster.ClusterTaskBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

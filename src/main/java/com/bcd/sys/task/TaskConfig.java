@@ -1,5 +1,6 @@
-package com.bcd.base.support_task;
+package com.bcd.sys.task;
 
+import com.bcd.base.support_task.TaskBuilder;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 import org.springframework.context.annotation.Bean;

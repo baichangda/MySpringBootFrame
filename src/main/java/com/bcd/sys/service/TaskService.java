@@ -2,10 +2,8 @@ package com.bcd.sys.service;
 
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.TaskBean;
-import com.bcd.sys.task.TaskDao;
+import com.bcd.base.support_task.TaskDao;
 import org.springframework.stereotype.Service;
-
-import java.io.Serializable;
 
 /**
  *
