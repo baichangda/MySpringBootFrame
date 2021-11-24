@@ -12,6 +12,6 @@ public class TaskConfig {
 
     @Bean
     public TaskBuilder<TaskBean,Long> taskBuilder() {
-        return TaskBuilder.newBuilder("common", taskService);
+        return TaskBuilder.newInstance("common", taskService,1);
     }
 }

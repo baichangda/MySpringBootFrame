@@ -60,9 +60,6 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
     @Qualifier("string_string_redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    private UsernamePasswordRealm myShiroRealm;
-
     public static void main(String[] args) {
         String username = "admin";
         String password = "123qwe";
@@ -240,25 +237,6 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("password", encryptPassword(userBean.getUsername(), CommonConst.INITIAL_PASSWORD));
         update(new NumberCondition("id", userId), paramMap);
-    }
-
-    public void runAs(Long... ids) {
-        Subject subject = SecurityUtils.getSubject();
-        if (subject.isRunAs()) {
-            throw BaseRuntimeException.getException("当前用户已经授权过");
-        }
-        List<UserBean> userBeanList = findAllById(ids);
-        SimplePrincipalCollection simplePrincipalCollection = new SimplePrincipalCollection();
-        simplePrincipalCollection.add(userBeanList.stream().map(UserBean::getUsername).collect(Collectors.toList()), myShiroRealm.getName());
-        subject.runAs(simplePrincipalCollection);
-    }
-
-    public void releaseRunAs() {
-        Subject subject = SecurityUtils.getSubject();
-        if (!subject.isRunAs()) {
-            throw BaseRuntimeException.getException("当前用户没有授权过");
-        }
-        subject.releaseRunAs();
     }
 
     /**

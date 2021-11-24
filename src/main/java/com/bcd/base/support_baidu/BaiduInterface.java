@@ -9,6 +9,7 @@ import java.util.Map;
 
 public interface BaiduInterface {
     /**
+     * 获取access_token
      * https://ai.baidu.com/ai-doc/REFERENCE/Ck3dwjhhu
      */
     @POST("/oauth/2.0/token?grant_type=client_credentials")
@@ -18,6 +19,7 @@ public interface BaiduInterface {
 
 
     /**
+     * 翻译
      * https://ai.baidu.com/ai-doc/MT/4kqryjku9
      */
     @Headers({
@@ -28,6 +30,7 @@ public interface BaiduInterface {
 
 
     /**
+     * 高精度图片识别
      * https://ai.baidu.com/ai-doc/OCR/1k3h7y3db
      */
     @Headers({
@@ -46,6 +49,7 @@ public interface BaiduInterface {
 
 
     /**
+     * 办公文档图片识别
      * https://ai.baidu.com/ai-doc/OCR/ykg9c09ji
      */
     @Headers({
@@ -64,4 +68,21 @@ public interface BaiduInterface {
                           @Field("words_type") String words_type,
                           @Field("layout_analysis") String layout_analysis,
                           @Field("erase_seal") String erase_seal);
+
+    /**
+     * 车型识别
+     * https://ai.baidu.com/ai-doc/OCR/ykg9c09ji
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/image-classify/v1/car")
+    @FormUrlEncoded
+    Call<JsonNode> carType(@Field("image") String image,
+                           @Field("url") String url,
+                           @Field("top_num") String top_num);
+
+
+
+
 }

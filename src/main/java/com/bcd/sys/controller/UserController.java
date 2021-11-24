@@ -220,34 +220,5 @@ public class UserController extends BaseController {
         }
     }
 
-    /**
-     * 授予当前登录用户其他身份
-     *
-     * @param ids
-     * @return
-     */
-    @RequiresNotePermissions(NotePermission.user_runAs)
-    @RequestMapping(value = "/runAs", method = RequestMethod.POST)
-    @Operation(description = "授予当前登录用户其他身份")
-    @ApiResponse(responseCode = "200", description = "授权结果")
-    public JsonMessage runAs(@Parameter(description = "要授权身份用户id数组")
-                             @RequestParam Long[] ids) {
-        userService.runAs(ids);
-        return JsonMessage.success().message("授权成功");
-    }
-
-    /**
-     * 解除当前登录用户的其他身份
-     *
-     * @return
-     */
-    @RequiresNotePermissions(NotePermission.user_runAs)
-    @RequestMapping(value = "/releaseRunAs", method = RequestMethod.POST)
-    @Operation(description = "解除当前登录用户的其他身份")
-    @ApiResponse(responseCode = "200", description = "解除授权结果")
-    public JsonMessage releaseRunAs() {
-        userService.releaseRunAs();
-        return JsonMessage.success().message("解除授权成功");
-    }
 
 }

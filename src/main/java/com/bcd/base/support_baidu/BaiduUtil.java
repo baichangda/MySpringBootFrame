@@ -1,25 +1,17 @@
 package com.bcd.base.support_baidu;
 
-import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import okhttp3.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.imageio.ImageIO;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class BaiduUtil {
@@ -31,94 +23,8 @@ public class BaiduUtil {
 
     private final static String clientId = "5GjWi9nxIXvZbqVujPIj8xCl";
     private final static String clientSecret = "v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo";
+    private final static BaiduInstance baiduInstance= BaiduInstance.newInstance(clientId, clientSecret);
 
-    private static String accessToken;
-    private static long expiredInSecond;
-
-    private static Retrofit retrofit;
-    private static BaiduInterface baiduInterface;
-
-    public static Retrofit getRetrofit() {
-        if (retrofit == null) {
-            synchronized (BaiduUtil.class) {
-                if (retrofit == null) {
-                    final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                            .addNetworkInterceptor(chain -> {
-                                final Request request = chain.request();
-                                final HttpUrl url = request.url();
-                                Request newRequest = request;
-                                if (!"/oauth/2.0/token".equals(url.encodedPath())) {
-                                    newRequest = request.newBuilder().url(url.newBuilder().addQueryParameter("access_token", getAccessToken()).build()).build();
-                                }
-//                                logger.info("{}", request.url());
-//                                logger.info("{}", newRequest.url());
-                                return chain.proceed(newRequest);
-                            })
-                            .build();
-                    retrofit = new Retrofit.Builder()
-                            .baseUrl("https://aip.baidubce.com")
-                            .addConverterFactory(JacksonConverterFactory.create(JsonUtil.GLOBAL_OBJECT_MAPPER))
-                            .client(okHttpClient)
-                            .build();
-                }
-            }
-        }
-        return retrofit;
-    }
-
-    public static BaiduInterface getBaiduInterface() {
-        if (baiduInterface == null) {
-            synchronized (BaiduUtil.class) {
-                if (baiduInterface == null) {
-                    baiduInterface = getRetrofit().create(BaiduInterface.class);
-                }
-            }
-        }
-        return baiduInterface;
-    }
-
-    public static String getAccessToken() throws IOException {
-        if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
-            synchronized (BaiduUtil.class) {
-                if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
-                    final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
-                            .execute().body();
-                    logger.info("access_token:\n{}", jsonNode.toPrettyString());
-                    accessToken = jsonNode.get("access_token").asText();
-                    expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
-                }
-            }
-        }
-        return accessToken;
-    }
-
-    public static JsonNode translation(String str, String from, String to) throws IOException {
-        Map<String, String> map = new HashMap<>();
-        map.put("from", from);
-        map.put("to", to);
-        map.put("q", str);
-        return getBaiduInterface().translation(map).execute().body();
-    }
-
-    public static JsonNode ocr_imagePath(String imagePath, String languageType) throws IOException{
-        return getBaiduInterface().ocr(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null).execute().body();
-    }
-
-    public static JsonNode ocr_imageBase64(String imageBase64, String languageType) throws IOException {
-        return getBaiduInterface().ocr(imageBase64, null, null, null, languageType, null, null, null).execute().body();
-    }
-
-    public static JsonNode ocr_url(String url, String languageType)  throws IOException {
-        return getBaiduInterface().ocr(null, url, null, null, languageType, null, null, null).execute().body();
-    }
-
-    public static JsonNode ocr_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException{
-        return getBaiduInterface().ocr(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
-    }
-
-    public static JsonNode ocrDoc_imagePath(String imagePath, String languageType) throws IOException{
-        return getBaiduInterface().ocrDoc(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null,null,null,null).execute().body();
-    }
 
     /**
      * 识别所有pdf下面的文字
@@ -152,7 +58,7 @@ public class BaiduUtil {
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = ocrDoc_imagePath(pngPath.toString(), languageType);
+                        jsonNode = baiduInstance.ocrDoc_imagePath(pngPath.toString(), languageType);
 //                        for (JsonNode words_result : jsonNode.get("words_result")) {
 //                            bw.write(words_result.get("words").asText());
 //                            bw.newLine();
@@ -217,13 +123,13 @@ public class BaiduUtil {
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = ocr_imagePath(pngPath.toString(), languageType);
+                        jsonNode = baiduInstance.ocr_imagePath(pngPath.toString(), languageType);
                         StringBuilder sb = new StringBuilder();
                         for (JsonNode words_result : jsonNode.get("words_result")) {
                             sb.append(words_result.get("words").asText());
                             sb.append("\n");
                         }
-                        final String fanyiRes = translation(sb.toString(), from, to).get("trans_result").get(0).get("dst").asText();
+                        final String fanyiRes = baiduInstance.translation(sb.toString(), from, to).get("trans_result").get(0).get("dst").asText();
                         bw1.write(sb.toString());
                         bw2.write(fanyiRes);
                         bw1.newLine();

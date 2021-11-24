@@ -1,7 +1,10 @@
-package com.bcd.sys.task;
+package com.bcd.sys.task.cluster;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
+import com.bcd.sys.task.Task;
+import com.bcd.sys.task.TaskRunnable;
+import com.bcd.sys.task.TaskBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
@@ -48,7 +51,7 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
         this.queueName = RedisUtil.doWithKey("sysTask:" + name);
         this.boundListOperations = redisTemplate.boundListOps(this.queueName);
         this.taskBuilder = taskBuilder;
-        this.semaphore = new Semaphore(this.taskBuilder.poolSize);
+        this.semaphore = new Semaphore(this.taskBuilder.getPoolSize());
     }
 
 
