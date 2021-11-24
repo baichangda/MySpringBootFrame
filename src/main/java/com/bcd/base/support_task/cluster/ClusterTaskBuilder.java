@@ -1,14 +1,13 @@
-package com.bcd.sys.task.cluster;
+package com.bcd.sys.support_task.cluster;
 
-import com.bcd.sys.task.*;
-import com.bcd.sys.task.TaskBuilder;
+import com.bcd.sys.support_task.*;
+import com.bcd.sys.support_task.TaskBuilder;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> extends TaskBuilder<T, K> {
 

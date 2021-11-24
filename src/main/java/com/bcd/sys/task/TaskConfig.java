@@ -1,4 +1,4 @@
-package com.bcd.sys.task;
+package com.bcd.base.support_task;
 
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
