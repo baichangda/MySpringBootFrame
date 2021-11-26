@@ -79,7 +79,7 @@ public class BaiduInstance {
                 .connectTimeout(Duration.ofSeconds(30))
                 .readTimeout(Duration.ofSeconds(30))
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-                .connectionPool(new ConnectionPool(2,60, TimeUnit.SECONDS))
+                .connectionPool(new ConnectionPool(1,60, TimeUnit.SECONDS))
                 .build();
         return new Retrofit.Builder()
                 .baseUrl("https://aip.baidubce.com")
