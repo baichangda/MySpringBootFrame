@@ -17,6 +17,15 @@ public enum TaskStatus {
         this.name = name;
     }
 
+    public static TaskStatus from(int status) {
+        for (TaskStatus value : values()) {
+            if (value.status == status) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     public int getStatus() {
         return status;
     }
