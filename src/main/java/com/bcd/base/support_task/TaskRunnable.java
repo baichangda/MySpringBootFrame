@@ -64,6 +64,7 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
         } else {
             //如果失败、说明任务正在执行
             if (function.supportStop()) {
+                stop = true;
                 //如果方法支持运行中打断、调用shutdown
                 function.stop(this);
             }
@@ -72,12 +73,13 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
 
     @Override
     public void run() {
-        taskBuilder.taskIdToRunnable.put(task.getId().toString(), this);
         //触发开始方法
         task = taskBuilder.onStarted(task);
         try {
             //执行任务
             final boolean apply = function.execute(this);
+            //执行完毕之后、task可能被更新、此时重新加载
+            task = taskBuilder.getTaskDao().doRead(task.getId());
             if (apply) {
                 task = taskBuilder.onSucceed(task);
             } else {

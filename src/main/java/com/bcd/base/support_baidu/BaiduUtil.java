@@ -58,15 +58,15 @@ public class BaiduUtil {
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = baiduInstance.ocrDoc_imagePath(pngPath.toString(), languageType);
-//                        for (JsonNode words_result : jsonNode.get("words_result")) {
-//                            bw.write(words_result.get("words").asText());
-//                            bw.newLine();
-//                        }
-                        for (JsonNode result : jsonNode.get("results")) {
-                            bw.write(result.get("words").get("word").asText());
+                        jsonNode = baiduInstance.ocr_imagePath(pngPath.toString(), languageType);
+                        for (JsonNode words_result : jsonNode.get("words_result")) {
+                            bw.write(words_result.get("words").asText());
                             bw.newLine();
                         }
+//                        for (JsonNode result : jsonNode.get("results")) {
+//                            bw.write(result.get("words").get("word").asText());
+//                            bw.newLine();
+//                        }
                         bw.newLine();
                         bw.write("================" + (i + 1) + "=================");
                         bw.newLine();
@@ -160,6 +160,7 @@ public class BaiduUtil {
     public static void main(String[] args) throws IOException, NoSuchFieldException {
         allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
 //        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
+//        System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
 
     }
 }

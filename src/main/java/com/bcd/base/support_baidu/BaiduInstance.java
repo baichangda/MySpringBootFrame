@@ -1,10 +1,9 @@
 package com.bcd.base.support_baidu;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
@@ -13,10 +12,13 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class BaiduInstance {
     Logger logger = LoggerFactory.getLogger(BaiduInstance.class);
@@ -34,6 +36,7 @@ public class BaiduInstance {
         this.baiduInterface = newRetrofit().create(BaiduInterface.class);
     }
 
+
     public static BaiduInstance newInstance(String clientId, String clientSecret) {
         return new BaiduInstance(clientId, clientSecret);
     }
@@ -42,15 +45,18 @@ public class BaiduInstance {
         return baiduInterface;
     }
 
-    private String getAccessToken() throws IOException {
+    private String getAccessToken() {
         if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
             synchronized (this) {
                 if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
-                    final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
-                            .execute().body();
-                    logger.info("access_token:\n{}", jsonNode.toPrettyString());
-                    accessToken = jsonNode.get("access_token").asText();
-                    expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
+                    try {
+                        final JsonNode jsonNode =  baiduInterface.token(clientId, clientSecret).execute().body();
+                        logger.info("access_token:\n{}", jsonNode.toPrettyString());
+                        accessToken = jsonNode.get("access_token").asText();
+                        expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
+                    } catch (IOException ex) {
+                        throw BaseRuntimeException.getException(ex);
+                    }
                 }
             }
         }
@@ -70,6 +76,10 @@ public class BaiduInstance {
 //                                logger.info("{}", newRequest.url());
                     return chain.proceed(newRequest);
                 })
+                .connectTimeout(Duration.ofSeconds(30))
+                .readTimeout(Duration.ofSeconds(30))
+                .protocols(Collections.singletonList(Protocol.HTTP_1_1))
+                .connectionPool(new ConnectionPool(2,60, TimeUnit.SECONDS))
                 .build();
         return new Retrofit.Builder()
                 .baseUrl("https://aip.baidubce.com")

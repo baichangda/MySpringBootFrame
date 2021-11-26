@@ -63,7 +63,7 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
     private void fetchAndExecute() throws InterruptedException {
         semaphore.acquire();
         try {
-            Object data = boundListOperations.rightPop(30,TimeUnit.SECONDS);
+            Object data = boundListOperations.rightPop(30, TimeUnit.SECONDS);
             if (data == null) {
                 semaphore.release();
             } else {
@@ -95,6 +95,7 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
     public void onTask(TaskRunnable<T, K> runnable) {
         //初始化环境
         runnable.init();
+        taskBuilder.getTaskIdToRunnable().put(runnable.getTask().getId().toString(), runnable);
         runnable.getExecutor().execute(() -> {
             //使用线程池执行任务
             try {
@@ -163,7 +164,7 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
             while (!workPool.awaitTermination(60, TimeUnit.SECONDS)) {
 
             }
-        }catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             throw BaseRuntimeException.getException(ex);
         }
     }

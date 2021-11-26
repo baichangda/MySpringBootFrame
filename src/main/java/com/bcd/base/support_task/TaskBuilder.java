@@ -83,6 +83,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         //初始化
         TaskRunnable<T, K> runnable = new TaskRunnable<>(task, function, params, this);
         runnable.init();
+        taskIdToRunnable.put(task.getId().toString(), runnable);
         runnable.getExecutor().execute(runnable);
         return t.getId();
 
