@@ -38,8 +38,6 @@ public class BaiduUtil {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
-            String pngDirPath = pdfDirPath + "/temp";
-            Files.createDirectories(Paths.get(pngDirPath));
             String resPath = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + ".txt";
             Files.deleteIfExists(Paths.get(resPath));
             Files.createFile(Paths.get(resPath));
@@ -99,8 +97,6 @@ public class BaiduUtil {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
-            String pngDirPath = pdfDirPath + "/temp";
-            Files.createDirectories(Paths.get(pngDirPath));
             String resPath1 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-from.txt";
             String resPath2 = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-to.txt";
             Files.deleteIfExists(Paths.get(resPath1));
