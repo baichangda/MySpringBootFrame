@@ -1,6 +1,5 @@
 package com.bcd.base.support_baidu;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import okhttp3.*;
@@ -36,7 +35,6 @@ public class BaiduInstance {
         this.baiduInterface = newRetrofit().create(BaiduInterface.class);
     }
 
-
     public static BaiduInstance newInstance(String clientId, String clientSecret) {
         return new BaiduInstance(clientId, clientSecret);
     }
@@ -45,18 +43,15 @@ public class BaiduInstance {
         return baiduInterface;
     }
 
-    private String getAccessToken() {
+    private String getAccessToken() throws IOException {
         if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
             synchronized (this) {
                 if (accessToken == null || expiredInSecond < Instant.now().getEpochSecond()) {
-                    try {
-                        final JsonNode jsonNode =  baiduInterface.token(clientId, clientSecret).execute().body();
-                        logger.info("access_token:\n{}", jsonNode.toPrettyString());
-                        accessToken = jsonNode.get("access_token").asText();
-                        expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
-                    } catch (IOException ex) {
-                        throw BaseRuntimeException.getException(ex);
-                    }
+                    final JsonNode jsonNode = baiduInterface.token(clientId, clientSecret)
+                            .execute().body();
+                    logger.info("access_token:\n{}", jsonNode.toPrettyString());
+                    accessToken = jsonNode.get("access_token").asText();
+                    expiredInSecond = Instant.now().getEpochSecond() + jsonNode.get("expires_in").asLong() - 60;
                 }
             }
         }
@@ -79,7 +74,7 @@ public class BaiduInstance {
                 .connectTimeout(Duration.ofSeconds(30))
                 .readTimeout(Duration.ofSeconds(30))
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
-                .connectionPool(new ConnectionPool(1,60, TimeUnit.SECONDS))
+                .connectionPool(new ConnectionPool(1, 60, TimeUnit.SECONDS))
                 .build();
         return new Retrofit.Builder()
                 .baseUrl("https://aip.baidubce.com")
@@ -95,22 +90,39 @@ public class BaiduInstance {
         map.put("to", to);
         map.put("q", str);
         return baiduInterface.translation(map).execute().body();
+
     }
 
-    public JsonNode ocr_imagePath(String imagePath, String languageType) throws IOException {
-        return baiduInterface.ocr(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null).execute().body();
+    public JsonNode ocrGeneral_imagePath(String imagePath, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null, null).execute().body();
     }
 
-    public JsonNode ocr_imageBase64(String imageBase64, String languageType) throws IOException {
-        return baiduInterface.ocr(imageBase64, null, null, null, languageType, null, null, null).execute().body();
+    public JsonNode ocrGeneral_imageBase64(String imageBase64, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(imageBase64, null, null, null, languageType, null, null, null, null).execute().body();
     }
 
-    public JsonNode ocr_imageUrl(String imageUrl, String languageType) throws IOException {
-        return baiduInterface.ocr(null, imageUrl, null, null, languageType, null, null, null).execute().body();
+    public JsonNode ocrGeneral_imageUrl(String imageUrl, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(null, imageUrl, null, null, languageType, null, null, null, null).execute().body();
     }
 
-    public JsonNode ocr_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
-        return baiduInterface.ocr(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
+    public JsonNode ocrGeneral_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imagePath(String imagePath, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imageBase64(String imageBase64, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(imageBase64, null, null, null, languageType, null, null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imageUrl(String imageUrl, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(null, imageUrl, null, null, languageType, null, null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
     }
 
     public JsonNode ocrDoc_imagePath(String imagePath, String languageType) throws IOException {

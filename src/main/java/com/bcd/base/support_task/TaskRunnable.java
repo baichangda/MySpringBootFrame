@@ -118,4 +118,16 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
     public ThreadPoolExecutor getExecutor() {
         return executor;
     }
+
+    public String getTaskBuilderName() {
+        return taskBuilderName;
+    }
+
+    public TaskBuilder<T, K> getTaskBuilder() {
+        return taskBuilder;
+    }
+
+    public TaskDao<T,K> getTaskDao(){
+        return taskBuilder.taskDao;
+    }
 }

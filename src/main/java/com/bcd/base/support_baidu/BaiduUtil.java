@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 
 
@@ -23,7 +24,7 @@ public class BaiduUtil {
 
     private final static String clientId = "5GjWi9nxIXvZbqVujPIj8xCl";
     private final static String clientSecret = "v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo";
-    private final static BaiduInstance baiduInstance= BaiduInstance.newInstance(clientId, clientSecret);
+    private final static BaiduInstance baiduInstance = BaiduInstance.newInstance(clientId, clientSecret);
 
 
     /**
@@ -50,15 +51,15 @@ public class BaiduUtil {
                 for (int i = 0; i < pageSize; i++) {
                     logger.info("handle pdf[{}] total[{}] pageNum[{}]", pdfPath, pageSize, i + 1);
                     //先提取png
-                    Path pngPath = Paths.get(pngDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-" + (i + 1) + ".png");
-                    Files.deleteIfExists(pngPath);
-                    try (final OutputStream os = Files.newOutputStream(pngPath)) {
+                    final String imageBase64;
+                    try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                         ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
+                        imageBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
                     }
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = baiduInstance.ocr_imagePath(pngPath.toString(), languageType);
+                        jsonNode = baiduInstance.ocrGeneral_imageBase64(imageBase64, languageType);
                         for (JsonNode words_result : jsonNode.get("words_result")) {
                             bw.write(words_result.get("words").asText());
                             bw.newLine();
@@ -115,15 +116,15 @@ public class BaiduUtil {
                 for (int i = 0; i < pageSize; i++) {
                     logger.info("handle pdf[{}] total[{}] pageNum[{}]", pdfPath, pageSize, i + 1);
                     //先提取png
-                    Path pngPath = Paths.get(pngDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + "-" + (i + 1) + ".png");
-                    Files.deleteIfExists(pngPath);
-                    try (final OutputStream os = Files.newOutputStream(pngPath)) {
+                    final String imageBase64;
+                    try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                         ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
+                        imageBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
                     }
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = baiduInstance.ocr_imagePath(pngPath.toString(), languageType);
+                        jsonNode = baiduInstance.ocrGeneral_imageBase64(imageBase64, languageType);
                         StringBuilder sb = new StringBuilder();
                         for (JsonNode words_result : jsonNode.get("words_result")) {
                             sb.append(words_result.get("words").asText());
