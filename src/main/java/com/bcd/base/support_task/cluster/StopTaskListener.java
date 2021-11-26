@@ -3,13 +3,14 @@ package com.bcd.base.support_task.cluster;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.support_redis.mq.topic.RedisTopicMQ;
+import com.bcd.base.support_task.StopRequest;
 import com.bcd.base.support_task.Task;
 import com.bcd.base.support_task.TaskRunnable;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import java.io.Serializable;
 
-public class StopSysTaskListener<T extends Task<K>, K extends Serializable> extends RedisTopicMQ<String[]> {
+public class StopSysTaskListener<T extends Task<K>, K extends Serializable> extends RedisTopicMQ<StopRequest> {
 
     ClusterTaskBuilder<T,K> taskBuilder;
 
@@ -19,8 +20,9 @@ public class StopSysTaskListener<T extends Task<K>, K extends Serializable> exte
     }
 
     @Override
-    public void onMessage(String[] ids) {
+    public void onMessage(StopRequest stopRequest) {
         //依次停止每个任务,将结束的任务记录到结果map中
+        final String[] ids = stopRequest.getIds();
         for (String id : ids) {
             TaskRunnable runnable = taskBuilder.getTaskIdToRunnable().get(id);
             if (runnable != null) {
