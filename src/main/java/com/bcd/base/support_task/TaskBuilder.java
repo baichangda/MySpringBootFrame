@@ -89,18 +89,18 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
 
     }
 
-    public void stopTask(K... ids) {
-        if (ids == null || ids.length == 0) {
-            return;
-        }
-        for (Serializable id : ids) {
-            TaskRunnable<T, K> runnable = taskIdToRunnable.get(id.toString());
-            if (runnable != null) {
-                logger.info("stop{},{}", id, runnable.getExecutor());
-                runnable.stop();
+    public StopResult[] stopTask(K... ids) {
+        StopResult[] stopResults = new StopResult[ids.length];
+        if (ids.length > 0) {
+            for (int i = 0; i < ids.length; i++) {
+                TaskRunnable<T, K> runnable = taskIdToRunnable.get(ids[i].toString());
+                if (runnable != null) {
+                    logger.info("stop{},{}", ids[i], runnable.getExecutor());
+                    stopResults[i] = runnable.stop();
+                }
             }
         }
-
+        return stopResults;
     }
 
     protected T onCreated(T task) {

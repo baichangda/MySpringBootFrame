@@ -54,19 +54,23 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
         return task;
     }
 
-    public void stop() {
+    public StopResult stop() {
         boolean removed = executor.remove(this);
         if (removed) {
             //取消成功
             executor.execute(() -> {
                 task = taskBuilder.onCanceled(task);
             });
+            return StopResult.CANCEL_SUCCEED;
         } else {
             //如果失败、说明任务正在执行
             if (function.supportStop()) {
                 stop = true;
                 //如果方法支持运行中打断、调用shutdown
                 function.stop(this);
+                return StopResult.IN_EXECUTING_INTERRUPT_SUCCEED;
+            }else{
+                return StopResult.IN_EXECUTING_INTERRUPT_NOT_SUPPORT;
             }
         }
     }

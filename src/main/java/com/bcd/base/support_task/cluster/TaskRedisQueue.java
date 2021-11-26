@@ -21,9 +21,9 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
-public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
+public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
-    private final static Logger logger = LoggerFactory.getLogger(SysTaskRedisQueue.class);
+    private final static Logger logger = LoggerFactory.getLogger(TaskRedisQueue.class);
     private String name;
     private String queueName;
 
@@ -45,7 +45,7 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
      */
     private ExecutorService workPool = Executors.newCachedThreadPool();
 
-    public SysTaskRedisQueue(String name, RedisConnectionFactory connectionFactory, TaskBuilder<T, K> taskBuilder) {
+    public TaskRedisQueue(String name, RedisConnectionFactory connectionFactory, TaskBuilder<T, K> taskBuilder) {
         final RedisTemplate<String, Object> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
         this.name = name;
         this.queueName = RedisUtil.doWithKey("sysTask:" + name);
@@ -112,29 +112,29 @@ public class SysTaskRedisQueue<T extends Task<K>, K extends Serializable> {
         boundListOperations.leftPush(runnable);
     }
 
-    public LinkedHashMap<K, Boolean> remove(K... ids) {
+    public boolean[] remove(K... ids) {
         if (ids == null || ids.length == 0) {
-            return new LinkedHashMap<>();
+            return new boolean[0];
         }
+        boolean[] res = new boolean[ids.length];
         LinkedHashMap<K, Boolean> resMap = new LinkedHashMap<>();
         List<TaskRunnable<T, K>> runnableList = boundListOperations.range(0L, -1L);
-        for (K id : ids) {
-            boolean res = false;
+        for (int i = 0; i < ids.length; i++) {
+            K id = ids[i];
             for (TaskRunnable<T, K> runnable : runnableList) {
                 if (id.equals(runnable.getTask().getId())) {
                     Long count = boundListOperations.remove(1, runnable);
                     if (count != null && count == 1) {
-                        res = true;
+                        res[i] = true;
                         break;
                     } else {
-                        res = false;
+                        res[i] = false;
                         break;
                     }
                 }
             }
-            resMap.put(id, res);
         }
-        return resMap;
+        return res;
     }
 
 
