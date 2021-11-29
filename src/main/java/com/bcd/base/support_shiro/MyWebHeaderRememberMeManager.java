@@ -18,7 +18,7 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
     public static final String DEFAULT_REMEMBER_ME_HEADER_KEY_NAME = "rememberMe";
     public static final String DEFAULT_AES_BASE64_KEY = "s2SE9y32PvLeYo+VGFpcKA==";
     private static transient final Logger log = LoggerFactory.getLogger(MyWebHeaderRememberMeManager.class);
-    private String rememberMeHeaderKeyName;
+    private final String rememberMeHeaderKeyName;
 
     public MyWebHeaderRememberMeManager(String rememberMeHeaderKeyName) {
         this.rememberMeHeaderKeyName = rememberMeHeaderKeyName;
@@ -32,10 +32,6 @@ public class MyWebHeaderRememberMeManager extends AbstractRememberMeManager {
 
     public String getRememberMeHeaderKeyName() {
         return rememberMeHeaderKeyName;
-    }
-
-    public void setRememberMeHeaderKeyName(String rememberMeHeaderKeyName) {
-        this.rememberMeHeaderKeyName = rememberMeHeaderKeyName;
     }
 
     @Override

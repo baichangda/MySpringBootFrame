@@ -12,7 +12,7 @@ import org.apache.shiro.spring.security.interceptor.AopAllianceAnnotationsAuthor
  * Created by Administrator on 2017/8/16.
  */
 public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAllianceAnnotationsAuthorizingMethodInterceptor {
-    private AuthorizationHandler authorizationHandler;
+    private final AuthorizationHandler authorizationHandler;
 
     public MyAopAllianceAnnotationsAuthorizingMethodInterceptor(AuthorizationHandler authorizationHandler) {
         super();

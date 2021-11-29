@@ -8,7 +8,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 public class MyUserFilter extends UserFilter {
-    private ExceptionResponseHandler handler;
+    private final ExceptionResponseHandler handler;
 
     public MyUserFilter(ExceptionResponseHandler handler) {
         this.handler = handler;

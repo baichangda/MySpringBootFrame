@@ -38,9 +38,9 @@ import java.io.Serializable;
 @SuppressWarnings("unchecked")
 public class MyAuthenticationFilter extends AuthenticationFilter {
     private static final Logger log = LoggerFactory.getLogger(MyAuthenticationFilter.class);
-    private ExceptionResponseHandler handler;
-    private WebSessionManagerSupport webSessionManagerSupport;
-    private RedisTemplate<String, String> redisTemplate;
+    private final ExceptionResponseHandler handler;
+    private final WebSessionManagerSupport webSessionManagerSupport;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public MyAuthenticationFilter(ExceptionResponseHandler handler, WebSessionManagerSupport webSessionManagerSupport,
                                   RedisTemplate<String, String> redisTemplate) {

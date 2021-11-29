@@ -21,7 +21,7 @@ public class MyShiroFilterFactoryBean extends ShiroFilterFactoryBean {
     /**
      * 忽略的请求结尾的url
      */
-    private Set<String> ignoreExt;
+    private final Set<String> ignoreExt;
 
     public MyShiroFilterFactoryBean() {
         super();

@@ -34,8 +34,8 @@ import java.io.IOException;
  */
 @SuppressWarnings("unchecked")
 public class MyAuthorizationFilter extends PermissionsAuthorizationFilter {
-    private ExceptionResponseHandler handler;
-    private AuthorizationHandler authorizationHandler;
+    private final ExceptionResponseHandler handler;
+    private final AuthorizationHandler authorizationHandler;
 
     public MyAuthorizationFilter(ExceptionResponseHandler handler, AuthorizationHandler authorizationHandler) {
         this.handler = handler;
