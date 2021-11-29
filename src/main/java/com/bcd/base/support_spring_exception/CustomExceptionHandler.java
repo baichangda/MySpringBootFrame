@@ -16,7 +16,7 @@ import java.io.IOException;
 @SuppressWarnings("unchecked")
 public class CustomExceptionHandler extends AbstractHandlerExceptionResolver {
     private final static Logger logger = LoggerFactory.getLogger(CustomExceptionHandler.class);
-    private ExceptionResponseHandler handler;
+    private final ExceptionResponseHandler handler;
 
     public CustomExceptionHandler(ExceptionResponseHandler handler) {
         this.handler = handler;

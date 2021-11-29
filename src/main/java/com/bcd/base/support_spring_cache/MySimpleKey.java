@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 @Getter
 public class MySimpleKey implements Serializable {
-    private String className;
-    private String methodName;
-    private Object[] args;
-    private String json;
-    private int hashCode;
+    private final String className;
+    private final String methodName;
+    private final Object[] args;
+    private final String json;
+    private final int hashCode;
 
     public MySimpleKey(String className, String methodName, Object... args) {
         this.className = className;

@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskBuilder<T extends Task<K>, K extends Serializable> {
 
-    static HashMap<String, TaskBuilder> storage = new HashMap<>();
+    private final static HashMap<String, TaskBuilder> storage = new HashMap<>();
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 

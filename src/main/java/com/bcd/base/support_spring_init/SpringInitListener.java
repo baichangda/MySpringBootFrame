@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Component
 public class SpringInitListener implements ApplicationListener<ContextRefreshedEvent> {
-    Logger logger = LoggerFactory.getLogger(SpringInitListener.class);
+    private final static Logger logger = LoggerFactory.getLogger(SpringInitListener.class);
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

@@ -22,7 +22,7 @@ public class StopTaskListener<T extends Task<K>, K extends Serializable> extends
 
     @Override
     public void init() {
-        this.stopTaskResultListener = taskBuilder.stopTaskResultListener;
+        this.stopTaskResultListener = taskBuilder.getStopTaskResultListener();
         super.init();
     }
 

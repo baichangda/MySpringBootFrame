@@ -13,13 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> extends TaskBuilder<T, K> {
 
-    ConcurrentHashMap<String, HashMap<String, String>> requestIdToResultMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, HashMap<String, String>> requestIdToResultMap = new ConcurrentHashMap<>();
 
     //cluster属性
-    RedisConnectionFactory connectionFactory;
-    TaskRedisQueue<T, K> taskRedisQueue;
-    StopTaskResultListener<T, K> stopTaskResultListener;
-    StopTaskListener<T, K> stopTaskListener;
+    private final RedisConnectionFactory connectionFactory;
+    private TaskRedisQueue<T, K> taskRedisQueue;
+    private StopTaskResultListener<T, K> stopTaskResultListener;
+    private StopTaskListener<T, K> stopTaskListener;
 
     protected ClusterTaskBuilder(String name, TaskDao<T, K> taskDao, int poolSize, RedisConnectionFactory connectionFactory) {
         super(name, taskDao, poolSize);
@@ -139,5 +139,21 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
 
     public ConcurrentHashMap<String, HashMap<String, String>> getRequestIdToResultMap() {
         return requestIdToResultMap;
+    }
+
+    public RedisConnectionFactory getConnectionFactory() {
+        return connectionFactory;
+    }
+
+    public TaskRedisQueue<T, K> getTaskRedisQueue() {
+        return taskRedisQueue;
+    }
+
+    public StopTaskResultListener<T, K> getStopTaskResultListener() {
+        return stopTaskResultListener;
+    }
+
+    public StopTaskListener<T, K> getStopTaskListener() {
+        return stopTaskListener;
     }
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class StopTaskResultListener<T extends Task<K>, K extends Serializable> extends RedisTopicMQ<StopResultRequest> {
 
-    ClusterTaskBuilder<T, K> taskBuilder;
+    private final ClusterTaskBuilder<T, K> taskBuilder;
 
     public StopTaskResultListener(String name, RedisConnectionFactory connectionFactory, ClusterTaskBuilder<T, K> taskBuilder) {
         super(connectionFactory, 1, 1, ValueSerializerType.JACKSON, RedisUtil.doWithKey("stopTaskResult:" + name));
@@ -29,4 +29,7 @@ public class StopTaskResultListener<T extends Task<K>, K extends Serializable> e
         });
     }
 
+    public ClusterTaskBuilder<T, K> getTaskBuilder() {
+        return taskBuilder;
+    }
 }
