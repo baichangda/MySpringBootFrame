@@ -11,12 +11,12 @@ import net.sf.jsqlparser.statement.select.*;
  */
 public class LimitSqlReplaceVisitor extends SelectVisitorAdapter {
 
-    private Statement statement;
+    private final Statement statement;
     /**
      * 从0开始
      */
-    private int pageNum;
-    private int pageSize;
+    private final int pageNum;
+    private final int pageSize;
 
     public LimitSqlReplaceVisitor(Statement statement, int pageNum, int pageSize) {
         this.statement = statement;

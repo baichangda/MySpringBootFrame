@@ -41,10 +41,10 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
     private final Map<String, Object> newParamMap = new LinkedHashMap<>();
     private final List<Object> paramList;
     private final List<Object> newParamList = new ArrayList<>();
-    ItemsListVisitorAdapterForMap itemsListVisitorAdapterForMap = new ItemsListVisitorAdapterForMap();
-    ItemsListVisitorAdapterForList itemsListVisitorAdapterForList = new ItemsListVisitorAdapterForList();
+    private final ItemsListVisitorAdapterForMap itemsListVisitorAdapterForMap = new ItemsListVisitorAdapterForMap();
+    private final ItemsListVisitorAdapterForList itemsListVisitorAdapterForList = new ItemsListVisitorAdapterForList();
     //记录每个条件对应的合并符
-    Map<Expression, BinaryExpression> expressionToConcat = new HashMap<>();
+    private final Map<Expression, BinaryExpression> expressionToConcat = new HashMap<>();
     private PlainSelect selectBody;
 
     NullParamSqlReplaceVisitor(Statement statement, Map<String, Object> paramMap) {

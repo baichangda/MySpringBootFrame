@@ -16,7 +16,7 @@ public class CountSqlReplaceVisitor extends SelectVisitorAdapter {
 
     private final static List<SelectItem> countSelectItems = Collections.singletonList(getCountExpressionItem());
 
-    private Statement statement;
+    private final Statement statement;
 
     public CountSqlReplaceVisitor(Statement statement) {
         this.statement = statement;
