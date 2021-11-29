@@ -37,7 +37,7 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
         super.init();
         //初始化集群组件
         this.stopTaskResultListener = new StopTaskResultListener<>(name, connectionFactory, this);
-        this.stopTaskListener = new StopTaskListener(name, connectionFactory, this);
+        this.stopTaskListener = new StopTaskListener<>(name, connectionFactory, this);
         this.taskRedisQueue = new TaskRedisQueue<>(name, connectionFactory, this);
         taskRedisQueue.init();
         stopTaskListener.init();
@@ -85,7 +85,7 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
             for (int i = 0; i < redisIdList.size(); i++) {
                 final String id = redisIdList.get(i);
                 redisIdArr[i] = id;
-                redisResMap.put(id, "");
+                redisResMap.put(id, null);
             }
             //生成停止的请求用于广播
             final String requestId = RandomStringUtils.randomAlphabetic(32);
@@ -95,13 +95,13 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
             //广播
             stopTaskListener.send(stopRequest);
             //最大等待一定时间、每次接收到停止的结果时候会激活
-            final long total = 30;
-            final long t1 = Instant.now().getEpochSecond();
+            final long total = 30000;
+            final long t1 = Instant.now().toEpochMilli();
             try {
                 //锁住结果map
                 synchronized (redisResMap) {
                     while (true) {
-                        final long spend = Instant.now().getEpochSecond() - t1;
+                        final long spend = Instant.now().toEpochMilli() - t1;
                         if (spend >= total) {
                             //超过最大等待时间、打断循环
                             break;

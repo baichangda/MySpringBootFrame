@@ -32,7 +32,7 @@ public class StopTaskListener<T extends Task<K>, K extends Serializable> extends
         StopResultRequest stopResultRequest = new StopResultRequest(stopRequest.getRequestId());
         final String[] ids = stopRequest.getIds();
         for (String id : ids) {
-            TaskRunnable runnable = taskBuilder.getTaskIdToRunnable().get(id);
+            TaskRunnable<T, K> runnable = taskBuilder.getTaskIdToRunnable().get(id);
             if (runnable != null) {
                 stopResultRequest.getResMap().put(id, runnable.stop().getFlag() + "");
             }

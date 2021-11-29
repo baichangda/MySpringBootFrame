@@ -13,7 +13,6 @@ import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,29 +23,29 @@ import java.util.concurrent.TimeUnit;
 public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
     private final static Logger logger = LoggerFactory.getLogger(TaskRedisQueue.class);
-    private String name;
-    private String queueName;
+    private final String name;
+    private final String queueName;
 
     TaskBuilder<T, K> taskBuilder;
 
-    private Semaphore semaphore;
+    private final Semaphore semaphore;
 
-    private BoundListOperations boundListOperations;
+    private final BoundListOperations<String, TaskRunnable<T, K>> boundListOperations;
 
     private volatile boolean stop;
 
     /**
      * 从redis中遍历数据的线程池
      */
-    private ExecutorService fetchPool = Executors.newSingleThreadExecutor();
+    private final ExecutorService fetchPool = Executors.newSingleThreadExecutor();
 
     /**
      * 执行工作任务的线程池
      */
-    private ExecutorService workPool = Executors.newCachedThreadPool();
+    private final ExecutorService workPool = Executors.newCachedThreadPool();
 
     public TaskRedisQueue(String name, RedisConnectionFactory connectionFactory, TaskBuilder<T, K> taskBuilder) {
-        final RedisTemplate<String, Object> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
+        final RedisTemplate<String, TaskRunnable<T, K>> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
         this.name = name;
         this.queueName = RedisUtil.doWithKey("sysTask:" + name);
         this.boundListOperations = redisTemplate.boundListOps(this.queueName);
@@ -117,19 +116,20 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
             return new boolean[0];
         }
         boolean[] res = new boolean[ids.length];
-        LinkedHashMap<K, Boolean> resMap = new LinkedHashMap<>();
         List<TaskRunnable<T, K>> runnableList = boundListOperations.range(0L, -1L);
-        for (int i = 0; i < ids.length; i++) {
-            K id = ids[i];
-            for (TaskRunnable<T, K> runnable : runnableList) {
-                if (id.equals(runnable.getTask().getId())) {
-                    Long count = boundListOperations.remove(1, runnable);
-                    if (count != null && count == 1) {
-                        res[i] = true;
-                        break;
-                    } else {
-                        res[i] = false;
-                        break;
+        if (runnableList != null) {
+            for (int i = 0; i < ids.length; i++) {
+                K id = ids[i];
+                for (TaskRunnable<T, K> runnable : runnableList) {
+                    if (id.equals(runnable.getTask().getId())) {
+                        Long count = boundListOperations.remove(1, runnable);
+                        if (count != null && count == 1) {
+                            res[i] = true;
+                            break;
+                        } else {
+                            res[i] = false;
+                            break;
+                        }
                     }
                 }
             }

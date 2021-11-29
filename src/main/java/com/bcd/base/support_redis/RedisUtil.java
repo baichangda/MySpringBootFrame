@@ -8,6 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import java.io.Serializable;
 import java.lang.reflect.Type;
 
 @SuppressWarnings("unchecked")
@@ -108,7 +109,7 @@ public class RedisUtil {
      * @param redisConnectionFactory
      * @return
      */
-    public static <V> RedisTemplate<String, V> newString_SerializableRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public static <V extends Serializable> RedisTemplate<String, V> newString_SerializableRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);

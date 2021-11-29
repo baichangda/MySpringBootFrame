@@ -1,8 +1,8 @@
 package com.bcd.base.support_task.cluster;
 
 public class StopRequest {
-    private String requestId;
-    private String[] ids;
+    private final String requestId;
+    private final String[] ids;
 
     public StopRequest(String requestId, String[] ids) {
         this.requestId = requestId;

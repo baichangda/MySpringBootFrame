@@ -22,8 +22,8 @@ public class StopTaskResultListener<T extends Task<K>, K extends Serializable> e
     public void onMessage(StopResultRequest stopRequest) {
         final String requestId = stopRequest.getRequestId();
         Optional.ofNullable(taskBuilder.getRequestIdToResultMap().get(requestId)).ifPresent(e -> {
-            e.putAll(stopRequest.getResMap());
             synchronized (e) {
+                e.putAll(stopRequest.getResMap());
                 e.notify();
             }
         });
