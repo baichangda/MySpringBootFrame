@@ -12,10 +12,10 @@ import java.util.function.Consumer;
 
 public class MyDisruptor<T> {
 
-    Consumer<T> consumer;
-    int maxNum;
-    WaitStrategy waitStrategy = new BlockingWaitStrategy();
-    ProducerType producerType = ProducerType.MULTI;
+    private final Consumer<T> consumer;
+    private final int maxNum;
+    private WaitStrategy waitStrategy = new BlockingWaitStrategy();
+    private ProducerType producerType = ProducerType.MULTI;
 
     Disruptor<Event<T>> disruptor;
     EventTranslatorOneArg<Event<T>, T> eventTranslator = (event, sequence, t) -> event.t = t;

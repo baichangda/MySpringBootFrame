@@ -24,7 +24,7 @@ public class RedisSessionDAO extends EnterpriseCacheSessionDAO {
 
     private final static String SHIRO_SESSION_HASH_KEY = RedisUtil.doWithKey("shiroSession");
     Logger logger = LoggerFactory.getLogger(RedisSessionDAO.class);
-    private HashOperations<String, String, Session> hashOperations;
+    private final HashOperations<String, String, Session> hashOperations;
 
     public RedisSessionDAO(RedisConnectionFactory redisConnectionFactory) {
         hashOperations = RedisUtil.newString_SerializableRedisTemplate(redisConnectionFactory).opsForHash();

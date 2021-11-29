@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unchecked")
 public class LocalCacheManager extends AbstractCacheManager {
-    Duration expired;
+    private final Duration expired;
 
     /**
      * @param expired key过期时间

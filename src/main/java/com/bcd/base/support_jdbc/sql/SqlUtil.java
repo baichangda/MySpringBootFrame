@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class SqlUtil {
 
-    static Logger logger = LoggerFactory.getLogger(SqlUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(SqlUtil.class);
 
     public static void main(String[] args) throws JSQLParserException {
         String sql1 = "SELECT \n" +

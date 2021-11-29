@@ -27,26 +27,26 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
     /**
      * 根据随机数生成的各种val
      */
-    protected String executingVal = "0";
-    protected String successVal = "1";
+    private final String executingVal = "0";
+    private final String successVal = "1";
     /**
      * 任务执行超时时间(请确保任务执行时间不会超过此时间)
      * 在指定超时时间之后,无论任务是否执行完毕都会释放锁
      * 单位(毫秒)
      */
-    private long timeoutInMillis;
+    private final long timeoutInMillis;
     /**
      * 任务执行后锁存活时间
      * 在任务执行后为了让其他终端检测到执行结果,并作出相应的反应
      * 单位(毫秒)
      */
-    private long aliveTimeInMillis;
+    private final long aliveTimeInMillis;
     /**
      * 锁失败循环间隔时间
      * 获取锁失败时候,循环检测执行结果并重新处理的循环时间间隔
      * 单位(毫秒)
      */
-    private long cycleIntervalInMillis;
+    private final long cycleIntervalInMillis;
 
 
     public ClusterFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory,

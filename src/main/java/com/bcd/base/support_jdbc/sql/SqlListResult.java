@@ -3,8 +3,8 @@ package com.bcd.base.support_jdbc.sql;
 import java.util.List;
 
 public class SqlListResult {
-    private String sql;
-    private List<Object> paramList;
+    private final String sql;
+    private final List<Object> paramList;
 
     public SqlListResult(String sql, List<Object> paramList) {
         this.sql = sql;

@@ -25,7 +25,7 @@ public class SingleFailedScheduleHandler extends RedisScheduleHandler {
      * 锁获取后存活时间
      * 单位(毫秒)
      */
-    private long aliveTimeInMillis;
+    private final long aliveTimeInMillis;
 
     public SingleFailedScheduleHandler(String lockId, RedisConnectionFactory redisConnectionFactory, long aliveTime, TimeUnit aliveTimeUnit) {
         super(lockId, redisConnectionFactory);

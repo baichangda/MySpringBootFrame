@@ -26,7 +26,7 @@ import java.io.Serializable;
 public class MyWebHeaderSessionManager extends DefaultSessionManager implements WebSessionManagerSupport {
     private static final Logger log = LoggerFactory.getLogger(MyWebHeaderSessionManager.class);
 
-    private String sessionHeaderKeyName;
+    private final String sessionHeaderKeyName;
 
     public MyWebHeaderSessionManager(String sessionHeaderKeyName) {
         this.sessionHeaderKeyName = sessionHeaderKeyName;

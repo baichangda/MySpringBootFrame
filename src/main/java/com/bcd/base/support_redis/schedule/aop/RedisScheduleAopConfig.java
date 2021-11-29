@@ -31,7 +31,7 @@ public class RedisScheduleAopConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(RedisScheduleAopConfig.class);
 
-    private RedisConnectionFactory redisConnectionFactory;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     public RedisScheduleAopConfig(RedisConnectionFactory redisConnectionFactory) {
         this.redisConnectionFactory = redisConnectionFactory;

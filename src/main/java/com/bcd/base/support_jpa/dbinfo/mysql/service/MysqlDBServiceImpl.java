@@ -27,7 +27,7 @@ import java.util.List;
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
 @Service
 public class MysqlDBServiceImpl implements DBService {
-    private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
+    private final String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public static void main(String[] args) {
 //        MysqlTableServiceImpl tableService=new MysqlTableServiceImpl();

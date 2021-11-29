@@ -22,7 +22,7 @@ public class ShiroLocalCache<K, V> implements Cache<K, V> {
 
     Logger logger = LoggerFactory.getLogger(ShiroLocalCache.class);
 
-    com.github.benmanes.caffeine.cache.Cache<K,V> cache;
+    private final com.github.benmanes.caffeine.cache.Cache<K,V> cache;
 
     public ShiroLocalCache(Duration expired) {
         this.cache = Caffeine.newBuilder()

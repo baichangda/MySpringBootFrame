@@ -14,10 +14,10 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
     private final static long serialVersionUID = 1L;
 
     private T task;
-    private Object[] params;
+    private final Object[] params;
     private volatile boolean stop = false;
-    private String functionName;
-    private String taskBuilderName;
+    private final String functionName;
+    private final String taskBuilderName;
 
     /**
      * {@link #function}、{@link #executor}、{@link #taskBuilder}

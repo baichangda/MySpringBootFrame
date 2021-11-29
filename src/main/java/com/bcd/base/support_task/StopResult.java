@@ -7,8 +7,8 @@ public enum StopResult {
     EXCEPTION(4, "任务异常、停止失败"),
     ;
 
-    private int flag;
-    private String name;
+    private final int flag;
+    private final String name;
 
     StopResult(int flag, String name) {
         this.flag = flag;
@@ -28,15 +28,8 @@ public enum StopResult {
         return flag;
     }
 
-    public void setFlag(int flag) {
-        this.flag = flag;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }

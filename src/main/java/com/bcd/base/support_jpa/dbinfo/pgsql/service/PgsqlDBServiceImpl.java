@@ -27,7 +27,7 @@ import java.util.List;
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "org.postgresql.Driver")
 @Service
 public class PgsqlDBServiceImpl implements DBService {
-    private String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
+    private final String[] headArr = new String[]{"字段名", "数据类型", "能否为空", "默认值", "备注"};
 
     public static void main(String[] args) {
         PgsqlDBServiceImpl dbService = new PgsqlDBServiceImpl();

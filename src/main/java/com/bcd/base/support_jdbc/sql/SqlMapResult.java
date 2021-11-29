@@ -3,8 +3,8 @@ package com.bcd.base.support_jdbc.sql;
 import java.util.Map;
 
 public class SqlMapResult {
-    private String sql;
-    private Map<String, Object> paramMap;
+    private final String sql;
+    private final Map<String, Object> paramMap;
 
     public SqlMapResult(String sql, Map<String, Object> paramMap) {
         this.sql = sql;

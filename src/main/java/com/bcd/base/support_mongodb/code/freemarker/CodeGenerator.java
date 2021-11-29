@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class CodeGenerator {
 
-    static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
 
     /**
      * 生成repository文件
