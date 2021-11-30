@@ -99,7 +99,35 @@ public interface BaiduInterface {
     @FormUrlEncoded
     Call<JsonNode> carType(@Field("image") String image,
                            @Field("url") String url,
-                           @Field("top_num") String top_num);
+                           @Field("top_num") String top_num,
+                           @Field("baike_num") String baike_num);
+
+
+    /**
+     * 车辆损伤识别
+     * https://ai.baidu.com/ai-doc/VEHICLE/fk3hb3f5w
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/image-classify/v1/vehicle_damage")
+    @FormUrlEncoded
+    Call<JsonNode> vehicleDamage(@Field("image") String image,
+                                 @Field("url") String url);
+
+    /**
+     * 人像动漫化
+     * https://cloud.baidu.com/doc/IMAGEPROCESS/s/Mk4i6olx5
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/image-process/v1/selfie_anime")
+    @FormUrlEncoded
+    Call<JsonNode> selfieAnime(@Field("image") String image,
+                               @Field("url") String url,
+                               @Field("type") String type,
+                               @Field("mask_id") String mask_id);
 
 
 }

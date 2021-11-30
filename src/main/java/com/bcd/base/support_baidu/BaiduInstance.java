@@ -131,15 +131,39 @@ public class BaiduInstance {
     }
 
     public JsonNode carType_imageUrl(String imageUrl, int topNum) throws IOException {
-        return baiduInterface.carType(imageUrl, topNum + "", null).execute().body();
+        return baiduInterface.carType(null, imageUrl, topNum + "", null).execute().body();
     }
 
     public JsonNode carType_imageBase64(String imageBase64, int topNum) throws IOException {
-        return baiduInterface.carType(imageBase64, topNum + "", null).execute().body();
+        return baiduInterface.carType(imageBase64, null, topNum + "", null).execute().body();
     }
 
     public JsonNode carType_imagePath(String imagePath, int topNum) throws IOException {
-        return baiduInterface.carType(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), topNum + "", null).execute().body();
+        return baiduInterface.carType(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, topNum + "", null).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imageUrl(String imageUrl) throws IOException {
+        return baiduInterface.vehicleDamage(null, imageUrl).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imageBase64(String imageBase64) throws IOException {
+        return baiduInterface.vehicleDamage(imageBase64, null).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imagePath(String imagePath) throws IOException {
+        return baiduInterface.vehicleDamage(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imageUrl(String imageUrl) throws IOException {
+        return baiduInterface.selfieAnime(null, imageUrl, null, null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imageBase64(String imageBase64) throws IOException {
+        return baiduInterface.selfieAnime(imageBase64, null, null, null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imagePath(String imagePath) throws IOException {
+        return baiduInterface.selfieAnime(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null).execute().body();
     }
 
 }

@@ -19,9 +19,6 @@ public class BaiduUtil {
 
     static Logger logger = LoggerFactory.getLogger(BaiduUtil.class);
 
-//    private final static String clientId = "HXDSSTZbdtEgOnbo94jKfGDH";
-//    private final static String clientSecret = "6fzE3GL7G9I3hjzxnX6QYDSyNaopjvkf";
-
     private final static String clientId = "5GjWi9nxIXvZbqVujPIj8xCl";
     private final static String clientSecret = "v90dNdiApdNXYeLvI5zohSfEZ6EbGvwo";
     private final static BaiduInstance baiduInstance = BaiduInstance.newInstance(clientId, clientSecret);
@@ -158,6 +155,8 @@ public class BaiduUtil {
 //        allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
 //        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
         System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
+
+//        System.out.println(baiduInstance.vehicleDamage_imagePath("/Users/baichangda/Downloads/2.JPG").toPrettyString());
 
     }
 }
