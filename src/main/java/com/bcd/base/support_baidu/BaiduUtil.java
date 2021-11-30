@@ -155,9 +155,9 @@ public class BaiduUtil {
     }
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
-        allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
+//        allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
 //        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
-//        System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
+        System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
 
     }
 }
