@@ -7,8 +7,10 @@ import com.bcd.base.condition.Condition;
  * 当val==null时候忽略此条件
  */
 @SuppressWarnings("unchecked")
-public class DateCondition extends Condition {
-    public Handler handler;
+public class DateCondition implements Condition {
+    public final Handler handler;
+    public final String fieldName;
+    public final Object val;
 
     public DateCondition(String fieldName, Object val, Handler handler) {
         this.fieldName = fieldName;

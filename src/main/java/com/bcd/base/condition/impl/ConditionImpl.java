@@ -9,9 +9,9 @@ import java.util.List;
  * Created by Administrator on 2017/3/23.
  */
 @SuppressWarnings("unchecked")
-public class ConditionImpl extends Condition {
-    public ConcatWay concatWay;
-    public List<Condition> childrenList;
+public class ConditionImpl implements Condition {
+    public final ConcatWay concatWay;
+    public final List<Condition> childrenList;
 
     public ConditionImpl(ConcatWay concatWay, List<Condition> childrenList) {
         this.concatWay = concatWay;

@@ -6,8 +6,9 @@ import com.bcd.base.condition.Condition;
  * 是否为null条件
  * 不依赖val
  */
-public class NullCondition extends Condition {
-    public Handler handler;
+public class NullCondition implements Condition {
+    public final Handler handler;
+    public final String fieldName;
 
     public NullCondition(String fieldName, Handler handler) {
         this.fieldName = fieldName;
