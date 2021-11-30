@@ -20,7 +20,7 @@ public class BeanInfo {
     /**
      * service的实体类
      */
-    public Class clazz;
+    public final Class clazz;
 
     /**
      * 实体类表名
