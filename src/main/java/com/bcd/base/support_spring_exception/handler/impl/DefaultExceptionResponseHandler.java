@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @SuppressWarnings("unchecked")
 public class DefaultExceptionResponseHandler implements ExceptionResponseHandler {
-    private HttpMessageConverter converter;
+    private final HttpMessageConverter converter;
 
     public DefaultExceptionResponseHandler(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         this.converter = mappingJackson2HttpMessageConverter;

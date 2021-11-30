@@ -17,7 +17,7 @@ public class RedisUtil {
     public final static RedisSerializer<Object> JDK_SERIALIZATION_SERIALIZER = RedisSerializer.java();
     public final static RedisSerializer<String> STRING_SERIALIZER = RedisSerializer.string();
     public final static RedisSerializer<byte[]> BYTE_ARRAY_SERIALIZER = RedisSerializer.byteArray();
-    public static String SYSTEM_REDIS_KEY_PRE = "bcd:";
+    public final static String SYSTEM_REDIS_KEY_PRE = "bcd:";
 
     /**
      * 在redis key前面加上系统标识、避免和其他服务公用redis时候因为相同的key导致异常

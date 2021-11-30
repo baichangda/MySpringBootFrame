@@ -9,8 +9,8 @@ public enum TaskStatus {
     CANCELED(5, "任务被取消"),
     STOPPED(6, "任务被终止");
 
-    private int status;
-    private String name;
+    private final int status;
+    private final String name;
 
     TaskStatus(int status, String name) {
         this.status = status;
@@ -30,15 +30,8 @@ public enum TaskStatus {
         return status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }

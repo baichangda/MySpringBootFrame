@@ -26,7 +26,15 @@ import java.util.concurrent.TimeUnit;
 public class RedisQueueMQ<V> {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected String name;
+    protected final String name;
+
+    protected final RedisConnectionFactory connectionFactory;
+
+    protected final ValueSerializerType valueSerializerType;
+
+    protected final int consumerThreadNum;
+
+    protected final int workThreadNum;
 
     protected RedisSerializer<V> valueSerializer;
 
@@ -37,14 +45,6 @@ public class RedisQueueMQ<V> {
     protected ThreadPoolExecutor workExecutor;
 
     protected RedisTemplate<String, byte[]> redisTemplate;
-
-    protected RedisConnectionFactory connectionFactory;
-
-    protected ValueSerializerType valueSerializerType;
-
-    protected int consumerThreadNum;
-
-    protected int workThreadNum;
 
     private volatile boolean stop;
 

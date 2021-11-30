@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 public class StopTaskListener<T extends Task<K>, K extends Serializable> extends RedisTopicMQ<StopRequest> {
 
-    ClusterTaskBuilder<T, K> taskBuilder;
+    final ClusterTaskBuilder<T, K> taskBuilder;
 
     StopTaskResultListener<T, K> stopTaskResultListener;
 

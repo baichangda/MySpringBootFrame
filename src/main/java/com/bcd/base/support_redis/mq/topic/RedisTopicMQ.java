@@ -27,7 +27,15 @@ public class RedisTopicMQ<V> {
 
     protected Logger logger = LoggerFactory.getLogger(RedisTopicMQ.class);
 
-    protected String[] names;
+    protected final RedisConnectionFactory connectionFactory;
+
+    protected final int subscriptionThreadNum;
+
+    protected final int taskThreadNum;
+
+    protected final ValueSerializerType valueSerializerType;
+
+    protected final String[] names;
 
     protected RedisSerializer<V> redisSerializer;
 
@@ -37,16 +45,9 @@ public class RedisTopicMQ<V> {
 
     protected MessageListener messageListener;
 
-    protected RedisConnectionFactory connectionFactory;
-
-    protected int subscriptionThreadNum;
-    protected int taskThreadNum;
-
     protected ThreadPoolExecutor taskExecutor;
 
     protected ThreadPoolExecutor subscriptionExecutor;
-
-    protected ValueSerializerType valueSerializerType;
 
     public RedisTopicMQ(RedisConnectionFactory connectionFactory, int subscriptionThreadNum, int taskThreadNum, ValueSerializerType valueSerializerType, String... names) {
         this.connectionFactory = connectionFactory;

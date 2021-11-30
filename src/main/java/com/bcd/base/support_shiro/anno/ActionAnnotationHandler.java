@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 
 public class ActionAnnotationHandler extends AuthorizingAnnotationHandler {
 
-    private ThreadLocal<String> actionPermission = new ThreadLocal<>();
+    private final ThreadLocal<String> actionPermission = new ThreadLocal<>();
 
     public ActionAnnotationHandler() {
         super(RequiresAction.class);

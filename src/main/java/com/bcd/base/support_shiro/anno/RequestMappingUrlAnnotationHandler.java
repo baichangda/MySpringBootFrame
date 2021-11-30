@@ -10,7 +10,7 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class RequestMappingUrlAnnotationHandler extends AuthorizingAnnotationHandler {
 
-    private ThreadLocal<Set<String>> actionPermission = new ThreadLocal<>();
+    private final ThreadLocal<Set<String>> actionPermission = new ThreadLocal<>();
 
     public RequestMappingUrlAnnotationHandler() {
         super(RequiresRequestMappingUrl.class);

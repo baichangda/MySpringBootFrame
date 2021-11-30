@@ -26,7 +26,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
     private final String name;
     private final String queueName;
 
-    TaskBuilder<T, K> taskBuilder;
+    final TaskBuilder<T, K> taskBuilder;
 
     private final Semaphore semaphore;
 
