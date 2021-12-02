@@ -27,7 +27,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
     protected ExecutorChooser executorChooser;
 
     //任务id和任务对应
-    protected ConcurrentHashMap<String, TaskRunnable<T, K>> taskIdToRunnable = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String, TaskRunnable<T, K>> taskIdToRunnable = new ConcurrentHashMap<>();
 
     protected TaskBuilder(String name, TaskDao<T, K> taskDao, int poolSize) {
         this.name = name;

@@ -28,7 +28,7 @@ public class CodeGenerator {
 
     public final static CodeGenerator PGSQL = new CodeGenerator(new PgsqlDBSupport());
     static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
-    DBSupport dbSupport;
+    final DBSupport dbSupport;
 
     public CodeGenerator(DBSupport dbSupport) {
         this.dbSupport = dbSupport;
