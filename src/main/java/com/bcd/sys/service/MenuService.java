@@ -44,12 +44,11 @@ public class MenuService extends BaseService<MenuBean, Long> {
             String sql = "select * from t_sys_menu";
             menuBeanList = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(MenuBean.class));
         } else {
-            String sql = "SELECT\n" +
-                    "\tc.* \n" +
-                    "FROM\n" +
-                    "\t( SELECT * FROM t_sys_user_role WHERE user_id = ? ) a\n" +
-                    "\tINNER JOIN t_sys_role_menu b ON a.role_id = b.role_id\n" +
-                    "\tINNER JOIN t_sys_menu c ON b.menu_id = c.id";
+            String sql = """
+                    select tc.* from (SELECT * FROM t_sys_user_role WHERE user_id = ?) a
+                    inner join t_sys_role_menu b ON a.role_id = b.role_id
+                    inner join t_sys_menu c ON b.menu_id = c.id
+                    """;
             menuBeanList = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(MenuBean.class), userId);
         }
         return listToTree(menuBeanList);
@@ -61,7 +60,7 @@ public class MenuService extends BaseService<MenuBean, Long> {
         }
         //1、组装菜单树,从顶级菜单开始
         //1.1、转化数据集
-        Map<Long, List<MenuBean>> parentIdToChildrenMap = menuBeanList.stream().collect(Collectors.toMap(e -> e.getParentId(), e -> {
+        Map<Long, List<MenuBean>> parentIdToChildrenMap = menuBeanList.stream().collect(Collectors.toMap(MenuBean::getParentId, e -> {
             List<MenuBean> childrenList = new ArrayList<>();
             childrenList.add(e);
             return childrenList;

@@ -40,7 +40,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         Map<String, Object> beanMap = event.getApplicationContext().getBeansWithAnnotation(Controller.class);
         Set<NotePermission> permissionSet = new LinkedHashSet<>();
         beanMap.values().forEach(e1 -> {
-            Class controllerClass=ClassUtils.getUserClass(e1);
+            Class controllerClass = ClassUtils.getUserClass(e1);
             List<Method> methodList = MethodUtils.getMethodsListWithAnnotation(controllerClass, RequiresNotePermissions.class);
             methodList.forEach(e2 -> {
                 RequiresNotePermissions requiresNotePermissions = e2.getAnnotation(RequiresNotePermissions.class);
@@ -61,12 +61,14 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         ((PermissionService) AopContext.currentProxy()).saveAll(permissionBeanList);
     }
 
-    public List<PermissionBean> findPermissionsByUserId(Long userId){
-        String sql="select d.* from t_sys_user_role a " +
-                "inner join t_sys_role_menu b on b.role_id=a.role_id " +
-                "inner join t_sys_menu_permission c on b.menu_id=c.menu_id " +
-                "inner join t_sys_permission d on c.permission_code=d.code " +
-                "where a.user_id= ?";
+    public List<PermissionBean> findPermissionsByUserId(Long userId) {
+        String sql = """
+                select d.* from t_sys_user_role a
+                inner join t_sys_role_menu b on b.role_id=a.role_id
+                inner join t_sys_menu_permission c on b.menu_id=c.menu_id
+                inner join t_sys_permission d on c.permission_code=d.code
+                where a.user_id= ?
+                """;
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PermissionBean.class), userId);
     }
 

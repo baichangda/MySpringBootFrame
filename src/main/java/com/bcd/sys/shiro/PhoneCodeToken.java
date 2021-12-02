@@ -4,8 +4,8 @@ import org.apache.shiro.authc.AuthenticationToken;
 
 public class PhoneCodeToken implements AuthenticationToken {
 
-    private String phone;
-    private String code;
+    private final String phone;
+    private final String code;
 
     public PhoneCodeToken(String phone, String code) {
         this.phone = phone;
