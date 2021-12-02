@@ -17,13 +17,18 @@ buildscript {
         flywayVersion = '+'
         lombokVersion = "+"
         pdfboxVersion = "2.+"
-        mavenRepoUrl = 'https://maven.aliyun.com/repository/public/'
+        aliyunPublic = 'https://maven.aliyun.com/repository/public/'
+        aliyunGoogle = 'https://maven.aliyun.com/repository/google'
+        aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
+        aliyunSpring = 'https://maven.aliyun.com/repository/spring'
+        aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
-        maven { url "${mavenRepoUrl}" }
+        maven { url "${aliyunGradlePlugin}" }
+        maven { url "${aliyunSpringPlugin}" }
         mavenCentral()
     }
 
@@ -54,7 +59,9 @@ targetCompatibility = 17
 
 repositories {
     mavenLocal()
-    maven { url "${mavenRepoUrl}" }
+    maven { url "${aliyunPublic}" }
+    maven { url "${aliyunGoogle}" }
+    maven { url "${aliyunSpring}" }
     mavenCentral()
 //        maven { url "${incarMavenRepoUrl}" }
 }

@@ -71,7 +71,7 @@ public class MyAuthenticationFilter extends AuthenticationFilter {
             }
         } else {
             //处理session过期异常返回信息
-            handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_EXPIREDSESSIONEXCEPTION.toJsonMessage());
+            handler.handle(WebUtils.toHttp(response), ShiroMessageDefine.ERROR_SHIRO_EXPIRED_SESSION.toJsonMessage());
         }
         return false;
     }
