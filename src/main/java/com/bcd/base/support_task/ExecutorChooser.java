@@ -39,7 +39,7 @@ public interface ExecutorChooser {
         // Use a 'long' counter to avoid non-round-robin behaviour at the 32-bit overflow boundary.
         // The 64-bit long solves this by placing the overflow so far into the future, that no system
         // will encounter this in practice.
-        private final AtomicLong idx = new AtomicLong();
+        private final AtomicInteger idx = new AtomicInteger();
         private final ThreadPoolExecutor[] pools;
 
         public GenericEventExecutorChooser(ThreadPoolExecutor[] pools) {
@@ -48,7 +48,7 @@ public interface ExecutorChooser {
 
         @Override
         public ThreadPoolExecutor next() {
-            return pools[(int) Math.abs(idx.getAndIncrement() % pools.length)];
+            return pools[Math.abs(idx.getAndIncrement() % pools.length)];
         }
     }
 }
