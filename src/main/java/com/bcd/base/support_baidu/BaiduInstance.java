@@ -95,35 +95,35 @@ public class BaiduInstance {
     }
 
     public JsonNode ocrGeneral_imagePath(String imagePath, String languageType) throws IOException {
-        return baiduInterface.ocrGeneral(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null, null).execute().body();
+        return baiduInterface.ocrGeneral(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, "true", null, null, null).execute().body();
     }
 
     public JsonNode ocrGeneral_imageBase64(String imageBase64, String languageType) throws IOException {
-        return baiduInterface.ocrGeneral(imageBase64, null, null, null, languageType, null, null, null, null).execute().body();
+        return baiduInterface.ocrGeneral(imageBase64, null, null, null, languageType, "true", null, null, null).execute().body();
     }
 
     public JsonNode ocrGeneral_imageUrl(String imageUrl, String languageType) throws IOException {
-        return baiduInterface.ocrGeneral(null, imageUrl, null, null, languageType, null, null, null, null).execute().body();
+        return baiduInterface.ocrGeneral(null, imageUrl, null, null, languageType, "true", null, null, null).execute().body();
     }
 
     public JsonNode ocrGeneral_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
-        return baiduInterface.ocrGeneral(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null, null).execute().body();
+        return baiduInterface.ocrGeneral(null, null, pdfFile, pdfFileNum + "", languageType, "true", null, null, null).execute().body();
     }
 
     public JsonNode ocrAccurate_imagePath(String imagePath, String languageType) throws IOException {
-        return baiduInterface.ocrAccurate(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null).execute().body();
+        return baiduInterface.ocrAccurate(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, "true", null, null).execute().body();
     }
 
     public JsonNode ocrAccurate_imageBase64(String imageBase64, String languageType) throws IOException {
-        return baiduInterface.ocrAccurate(imageBase64, null, null, null, languageType, null, null, null).execute().body();
+        return baiduInterface.ocrAccurate(imageBase64, null, null, null, languageType, "true", null, null).execute().body();
     }
 
     public JsonNode ocrAccurate_imageUrl(String imageUrl, String languageType) throws IOException {
-        return baiduInterface.ocrAccurate(null, imageUrl, null, null, languageType, null, null, null).execute().body();
+        return baiduInterface.ocrAccurate(null, imageUrl, null, null, languageType, "true", null, null).execute().body();
     }
 
     public JsonNode ocrAccurate_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
-        return baiduInterface.ocrAccurate(null, null, pdfFile, pdfFileNum + "", languageType, null, null, null).execute().body();
+        return baiduInterface.ocrAccurate(null, null, pdfFile, pdfFileNum + "", languageType, "true", null, null).execute().body();
     }
 
     public JsonNode ocrDoc_imagePath(String imagePath, String languageType) throws IOException {

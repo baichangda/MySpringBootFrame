@@ -2,7 +2,7 @@ package com.bcd.base.support_task;
 
 public enum StopResult {
     CANCEL_SUCCEED(1, "任务取消成功"),
-    IN_EXECUTING_INTERRUPT_NOT_SUPPORT(2, "任务运行中、支持打断"),
+    IN_EXECUTING_INTERRUPT_NOT_SUPPORT(2, "任务运行中、不支持打断"),
     IN_EXECUTING_INTERRUPT_SUCCEED(3, "任务运行中、已请求打断、等待停止"),
     EXCEPTION(4, "任务异常、停止失败"),
     ;
