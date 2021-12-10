@@ -48,13 +48,15 @@ public class BaiduUtil {
                     //先提取png
                     final String imageBase64;
                     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
-                        imageBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
+                        ImageIO.write(renderer.renderImageWithDPI(i, 300), "png", os);
+                        final byte[] bytes = os.toByteArray();
+                        imageBase64 = Base64.getEncoder().encodeToString(bytes);
+//                        Files.write(Paths.get("/Users/baichangda/pdftemp/" + fileName.substring(0, fileName.lastIndexOf(".")) + i + ".png"), bytes);
                     }
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = baiduInstance.ocrGeneral_imageBase64(imageBase64, languageType);
+                        jsonNode = baiduInstance.ocrAccurate_imageBase64(imageBase64, languageType);
                         for (JsonNode words_result : jsonNode.get("words_result")) {
                             bw.write(words_result.get("words").asText());
                             bw.newLine();
@@ -111,13 +113,13 @@ public class BaiduUtil {
                     //先提取png
                     final String imageBase64;
                     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
+                        ImageIO.write(renderer.renderImageWithDPI(i, 300), "png", os);
                         imageBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
                     }
                     //调用百度识别
                     JsonNode jsonNode = null;
                     try {
-                        jsonNode = baiduInstance.ocrGeneral_imageBase64(imageBase64, languageType);
+                        jsonNode = baiduInstance.ocrAccurate_imageBase64(imageBase64, languageType);
                         StringBuilder sb = new StringBuilder();
                         for (JsonNode words_result : jsonNode.get("words_result")) {
                             sb.append(words_result.get("words").asText());
@@ -152,9 +154,9 @@ public class BaiduUtil {
     }
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
-//        allPdfOcr("/Users/baichangda/pdftest", "CHN_ENG");
+        allPdfOcr("/Users/baichangda/pdftemp", "CHN_ENG");
 //        allPdfOcrAndTranslation("/Users/baichangda/pdftest", "CHN_ENG", "zh", "en");
-        System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
+//        System.out.println(baiduInstance.translation("啊啊啊","zh","en"));
 
 //        System.out.println(baiduInstance.vehicleDamage_imagePath("/Users/baichangda/Downloads/2.JPG").toPrettyString());
 
