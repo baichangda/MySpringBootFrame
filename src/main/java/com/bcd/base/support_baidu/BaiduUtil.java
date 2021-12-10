@@ -48,7 +48,7 @@ public class BaiduUtil {
                     //先提取png
                     final String imageBase64;
                     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        ImageIO.write(renderer.renderImageWithDPI(i, 500), "png", os);
+                        ImageIO.write(renderer.renderImageWithDPI(i, 300), "png", os);
                         final byte[] bytes = os.toByteArray();
                         imageBase64 = Base64.getEncoder().encodeToString(bytes);
 //                        Files.write(Paths.get("/Users/baichangda/pdftemp/" + fileName.substring(0, fileName.lastIndexOf(".")) + i + ".png"), bytes);
@@ -113,7 +113,7 @@ public class BaiduUtil {
                     //先提取png
                     final String imageBase64;
                     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        ImageIO.write(renderer.renderImageWithDPI(i, 500), "png", os);
+                        ImageIO.write(renderer.renderImageWithDPI(i, 300), "png", os);
                         imageBase64 = Base64.getEncoder().encodeToString(os.toByteArray());
                     }
                     //调用百度识别
