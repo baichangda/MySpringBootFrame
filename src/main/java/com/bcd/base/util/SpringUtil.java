@@ -14,7 +14,7 @@ public class SpringUtil {
     public static JsonNode[] getSpringProps(String... keys) throws IOException {
         YAMLMapper yamlMapper = YAMLMapper.builder().build();
         final JsonNode base = yamlMapper.readTree(new File(SPRING_PROPERTIES_PATH));
-        final JsonNode suffix = Optional.ofNullable(base.get("spring")).map(e -> e.get("profile")).map(e -> e.get("suffix")).orElse(null);
+        final JsonNode suffix = Optional.ofNullable(base.get("spring")).map(e -> e.get("profiles")).map(e -> e.get("active")).orElse(null);
         JsonNode active = null;
         if (suffix != null) {
             String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix.asText() + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
