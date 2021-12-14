@@ -89,6 +89,46 @@ public interface BaiduInterface {
                           @Field("erase_seal") String erase_seal);
 
     /**
+     * 表格文字识别(同步接口)
+     * https://cloud.baidu.com/doc/OCR/s/ik3h7xyxf
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/ocr/v1/form")
+    @FormUrlEncoded
+    Call<JsonNode> ocrFormSync(@Field("image") String image,
+                                @Field("url") String url,
+                                @Field("table_border") String table_border);
+
+    /**
+     * 表格文字识别(异步接口)
+     * 提交请求接口
+     * https://cloud.baidu.com/doc/OCR/s/Ik3h7y238
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/solution/v1/form_ocr/request")
+    @FormUrlEncoded
+    Call<JsonNode> ocrFormAsync(@Field("image") String image,
+                           @Field("is_sync") String is_sync,
+                           @Field("request_type") String request_type);
+
+    /**
+     * 表格文字识别(异步接口)
+     * 获取结果接口
+     * https://cloud.baidu.com/doc/OCR/s/Ik3h7y238
+     */
+    @Headers({
+            "Content-Type:application/x-www-form-urlencoded"
+    })
+    @POST("/rest/2.0/solution/v1/form_ocr/get_request_result")
+    @FormUrlEncoded
+    Call<JsonNode> ocrFormAsyncResult(@Field("request_id") String request_id,
+                                 @Field("result_type") String result_type);
+
+    /**
      * 车型识别
      * https://ai.baidu.com/ai-doc/OCR/ykg9c09ji
      */
