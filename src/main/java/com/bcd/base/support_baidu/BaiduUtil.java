@@ -2,6 +2,7 @@ package com.bcd.base.support_baidu;
 
 import com.baidu.aip.ocr.AipOcr;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.SpringUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -23,11 +24,6 @@ public class BaiduUtil {
 
     static Logger logger = LoggerFactory.getLogger(BaiduUtil.class);
 
-    private final static String clientId = "sZnWtPyo8VpnG3TPVy6pIgYg";
-    private final static String clientSecret = "bI7HokxcdbvMfpY0I3mL6vB2GqsSlxbk";
-    private final static BaiduInstance baiduInstance = BaiduInstance.newInstance(clientId, clientSecret);
-    private final static AipOcr aipOcr = new AipOcr("test",clientId, clientSecret);
-
     /**
      * 识别所有pdf下面的文字
      *
@@ -35,7 +31,7 @@ public class BaiduUtil {
      * @param languageType
      * @throws IOException
      */
-    public static void allPdfOcr(String pdfDirPath, String languageType) throws IOException {
+    public static void allPdfOcr(AipOcr aipOcr, String pdfDirPath, String languageType) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
@@ -60,9 +56,9 @@ public class BaiduUtil {
                     JSONObject jsonObject = null;
                     try {
                         while (true) {
-                            HashMap<String, String> options =new HashMap<>();
-                            options.put("language_type",languageType);
-                            jsonObject = aipOcr.accurateGeneral(Base64.getDecoder().decode(bytes),options);
+                            HashMap<String, String> options = new HashMap<>();
+                            options.put("language_type", languageType);
+                            jsonObject = aipOcr.accurateGeneral(Base64.getDecoder().decode(bytes), options);
                             if (jsonObject.has("error_code")) {
                                 break;
                             } else {
@@ -74,7 +70,7 @@ public class BaiduUtil {
                                         throw BaseRuntimeException.getException(ex);
                                     }
                                 } else {
-                                    logger.info("handle total[{}] pageNum[{}] call baidu error,skip page:\n{}",  pageSize, i + 1, jsonObject);
+                                    logger.info("handle total[{}] pageNum[{}] call baidu error,skip page:\n{}", pageSize, i + 1, jsonObject);
                                     jsonObject = null;
                                     break;
                                 }
@@ -99,10 +95,15 @@ public class BaiduUtil {
     }
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
-//        allPdfOcr("/Users/baichangda/pdftemp", "CHN_ENG");
+        final JsonNode[] props = SpringUtil.getSpringProps("baidu.secretId", "baidu.secretKey");
+        String secretId = props[0].asText();
+        String secretKey = props[1].asText();
+        AipOcr aipOcr = new AipOcr("test", secretId, secretKey);
+//        final BaiduInstance baiduInstance = BaiduInstance.newInstance(secretId, secretKey);
+//        allPdfOcr(aipOcr,"/Users/baichangda/pdftemp", "CHN_ENG");
 
-        HashMap<String, String> options=new HashMap<>();
-        final JSONObject jsonObject = aipOcr.form("/Users/baichangda/pdftemp/1.PNG",options);
+        HashMap<String, String> options = new HashMap<>();
+        final JSONObject jsonObject = aipOcr.form("/Users/baichangda/pdftemp/1.PNG", options);
         System.out.println(jsonObject);
     }
 }

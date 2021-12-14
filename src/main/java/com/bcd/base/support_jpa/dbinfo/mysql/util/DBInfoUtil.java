@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
 import com.bcd.base.support_jpa.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_jpa.dbinfo.mysql.bean.TablesBean;
+import com.bcd.base.util.SpringUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
@@ -20,46 +21,7 @@ import java.util.Optional;
  */
 public class DBInfoUtil {
 
-    private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
-
     private final static String DB_INFO_SCHEMA = "information_schema";
-
-    public static JsonNode[] getSpringProps(String... keys) throws IOException {
-        YAMLMapper yamlMapper = YAMLMapper.builder().build();
-        final JsonNode base = yamlMapper.readTree(new File(SPRING_PROPERTIES_PATH));
-        final JsonNode suffix = Optional.ofNullable(base.get("spring")).map(e -> e.get("profile")).map(e -> e.get("suffix")).orElse(null);
-        JsonNode active = null;
-        if (suffix != null) {
-            String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix.asText() + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
-            active = yamlMapper.readTree(new File(activePathStr));
-        }
-        JsonNode[] res = new JsonNode[keys.length];
-        A:
-        for (int i = 0; i < keys.length; i++) {
-            String key = keys[i];
-            String[] arr = key.split("\\.");
-            JsonNode temp = active;
-            if (active != null) {
-                for (String s : arr) {
-                    temp = temp.get(s);
-                    if (temp == null) {
-                        break;
-                    }
-                }
-            }
-            if (temp == null) {
-                temp = base;
-                for (String s : arr) {
-                    temp = temp.get(s);
-                    if (temp == null) {
-                        continue A;
-                    }
-                }
-            }
-            res[i] = temp;
-        }
-        return res;
-    }
 
     /**
      * 获取spring配置文件中的数据库信息,并将获取到的url转换成information_schema
@@ -74,7 +36,7 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            final JsonNode[] props = getSpringProps("spring.datasource.url"
+            final JsonNode[] props = SpringUtil.getSpringProps("spring.datasource.url"
                     , "spring.datasource.username"
                     , "spring.datasource.password");
             String url = props[0].asText();

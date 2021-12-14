@@ -1,14 +1,17 @@
 package com.bcd.base.support_jpa.dbinfo.pgsql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.SpringUtil;
 import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
 import com.bcd.base.support_jpa.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.base.support_jpa.dbinfo.pgsql.bean.TablesBean;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class DBInfoUtil {
-    private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
-
     /**
      * 获取对应spring数据库连接
      *
@@ -34,8 +35,9 @@ public class DBInfoUtil {
         }
     }
 
-
     /**
+     * 获取spring配置文件中的数据库信息,并将获取到的url转换成information_schema
+     * <p>
      * 获取配置文件中
      * spring.datasource.url
      * spring.datasource.username
@@ -46,27 +48,12 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            Yaml yaml = new Yaml();
-            //1、加载spring配置
-            LinkedHashMap dataMap = yaml.load(new FileInputStream(Paths.get(SPRING_PROPERTIES_PATH).toFile()));
-            LinkedHashMap springMap = (LinkedHashMap) dataMap.get("spring");
-            LinkedHashMap dataSourceMap = (LinkedHashMap) springMap.get("datasource");
-            //1.1、取出配置文件后缀
-            String suffix = (String) springMap.get("profiles.active");
-            if (!StringUtil.isNullOrEmpty(suffix)) {
-                //1.2、如果有激活的配置文件,则加载
-                String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
-                Path activePath = Paths.get(activePathStr);
-                if (activePath.toFile().exists()) {
-                    dataMap = yaml.load(new FileInputStream(activePath.toFile()));
-                    springMap = (LinkedHashMap) dataMap.get("spring");
-                    dataSourceMap = (LinkedHashMap) springMap.get("datasource");
-                }
-            }
-            //2、取出值
-            String url = dataSourceMap.get("url").toString();
-            String username = dataSourceMap.get("username").toString();
-            String password = dataSourceMap.get("password").toString();
+            final JsonNode[] props = SpringUtil.getSpringProps("spring.datasource.url"
+                    , "spring.datasource.username"
+                    , "spring.datasource.password");
+            String url = props[0].asText();
+            String username = props[0].asText();
+            String password = props[0].asText();
             int index = url.indexOf('?');
             String pre;
             if (index == -1) {
@@ -76,7 +63,8 @@ public class DBInfoUtil {
             }
             String propDbName = pre.substring(pre.lastIndexOf('/') + 1);
             return new DBInfo(url, username, password, propDbName);
-        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
