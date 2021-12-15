@@ -8,6 +8,9 @@ server:
     session:
       timeout: 1800
 spring:
+  # 允许循环依赖
+  main:
+    allow-circular-references: true
   servlet:
     multipart:
       max-file-size: 10MB

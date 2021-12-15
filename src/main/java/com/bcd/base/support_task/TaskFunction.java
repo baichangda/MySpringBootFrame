@@ -4,7 +4,9 @@ package com.bcd.base.support_task;
 import com.bcd.base.exception.BaseRuntimeException;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
     private final static HashMap<String, TaskFunction> storage = new HashMap<>();
@@ -66,5 +68,30 @@ public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
      */
     public void stop(TaskRunnable<T, K> runnable) {
 
+    }
+
+    /**
+     * 在循环中使用更新任务、保证更新的周期不小于 period 参数
+     * 主要是使用在for循环中、避免过快的更新
+     * <p>
+     * 备注:
+     * 需要显式的在for循环中需要保存的地方调用
+     * 需要在for循环外面定义一个map供存储环境变量
+     *
+     * @param runnable
+     * @param period
+     * @param contextMap
+     * @return
+     */
+    protected boolean saveGtePeriod(TaskRunnable<T, K> runnable, Duration period, Map<String, Object> contextMap) {
+        final long prevSaveTs = (long) contextMap.get("prevSaveTs");
+        final long curTs = System.currentTimeMillis();
+        if ((curTs - prevSaveTs) > period.toMillis()) {
+            runnable.getTaskDao().doUpdate(runnable.getTask());
+            contextMap.put("prevSaveTs", curTs);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

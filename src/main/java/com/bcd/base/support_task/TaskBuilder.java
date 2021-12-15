@@ -117,7 +117,8 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         try {
             task.setStatus(TaskStatus.EXECUTING.getStatus());
             task.onStarted();
-            return taskDao.doUpdate(task);
+            taskDao.doUpdate(task);
+            return task;
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onStart error", e);
             return task;
@@ -128,7 +129,8 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         try {
             task.setStatus(TaskStatus.SUCCEED.getStatus());
             task.onSucceed();
-            return taskDao.doUpdate(task);
+            taskDao.doUpdate(task);
+            return task;
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onSucceed error", e);
             return task;
@@ -139,7 +141,8 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         try {
             task.setStatus(TaskStatus.FAILED.getStatus());
             task.onFailed(ex);
-            return taskDao.doUpdate(task);
+            taskDao.doUpdate(task);
+            return task;
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onFailed error", e);
             return task;
@@ -150,7 +153,8 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         try {
             task.setStatus(TaskStatus.CANCELED.getStatus());
             task.onCanceled();
-            return taskDao.doUpdate(task);
+            taskDao.doUpdate(task);
+            return task;
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onCanceled error", e);
             return task;
@@ -161,7 +165,8 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         try {
             task.setStatus(TaskStatus.STOPPED.getStatus());
             task.onStopped();
-            return taskDao.doUpdate(task);
+            taskDao.doUpdate(task);
+            return task;
         } catch (Exception e) {
             logger.error("task[" + task.getId() + "] execute onStop error", e);
             return task;

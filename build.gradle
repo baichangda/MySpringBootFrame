@@ -10,11 +10,11 @@ buildscript {
         easyexcelVersion = '+'
         disruptorVersion = '+'
         springdocVersion = '+'
-        caffeineVersion = '3.+'
+        caffeineVersion = '2.+'
         retrofitJacksonVersion = '+'
         springBootVersion = '2.+'
         kafkaVersion = '+'
-        flywayVersion = '+'
+        flywayVersion = '8.2.1'
         lombokVersion = "+"
         pdfboxVersion = "2.+"
         tencentcloudVersion = "3.+"
@@ -57,13 +57,12 @@ apply plugin: 'maven-publish'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'org.springframework.boot'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenLocal()
     maven { url "${aliyunPublic}" }
-    maven { url "${tencentPubluc}" }
     maven { url "${aliyunGoogle}" }
     maven { url "${aliyunSpring}" }
     mavenCentral()

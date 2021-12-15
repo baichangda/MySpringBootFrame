@@ -21,8 +21,8 @@ public class TaskService extends BaseService<TaskBean, Long> implements TaskDao<
     }
 
     @Override
-    public TaskBean doUpdate(TaskBean task) {
-        return save(task);
+    public void doUpdate(TaskBean task) {
+        save(task);
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class BaiduUtil {
@@ -32,7 +33,7 @@ public class BaiduUtil {
      * @throws IOException
      */
     public static void allPdfOcr(AipOcr aipOcr, String pdfDirPath, String languageType) throws IOException {
-        final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).toList();
+        final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).collect(Collectors.toList());
         for (Path pdfPath : filePathList) {
             final String fileName = pdfPath.getFileName().toString();
             String resPath = pdfDirPath + "/" + fileName.substring(0, fileName.lastIndexOf(".")) + ".txt";

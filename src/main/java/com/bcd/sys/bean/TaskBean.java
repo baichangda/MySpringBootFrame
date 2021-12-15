@@ -37,7 +37,7 @@ public class TaskBean extends SuperBaseBean<Long> implements Task<Long> {
     private String name;
 
     @NotNull(message = "[任务状态]不能为空")
-    @Schema(description = "任务状态(1:等待中;2:执行中;3:任务被终止;4:已完成;5:执行失败)", required = true)
+    @Schema(description = "任务状态(1:等待中;2:执行中;3:执行成功;4:执行失败;5:任务被取消;:6:任务被终止)", required = true)
     private Integer status;
 
     @Schema(description = "任务类型(1:普通任务;2:文件类型任务)", required = true)

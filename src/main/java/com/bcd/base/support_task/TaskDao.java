@@ -24,7 +24,7 @@ public interface TaskDao<T extends Task<K>,K extends Serializable> {
      *
      * @param task
      */
-    T doUpdate(T task);
+    void doUpdate(T task);
 
     /**
      * 删除task

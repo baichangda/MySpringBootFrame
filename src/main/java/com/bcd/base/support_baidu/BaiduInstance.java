@@ -83,4 +83,115 @@ public class BaiduInstance {
                 .client(okHttpClient)
                 .build();
     }
+
+    public JsonNode translation(String str, String from, String to) throws IOException {
+        Map<String, String> map = new HashMap<>();
+        map.put("from", from);
+        map.put("to", to);
+        map.put("q", str);
+        return baiduInterface.translation(map).execute().body();
+
+    }
+
+    public JsonNode ocrGeneral_imagePath(String imagePath, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, "true", null, null, null).execute().body();
+    }
+
+    public JsonNode ocrGeneral_imageBase64(String imageBase64, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(imageBase64, null, null, null, languageType, "true", null, null, null).execute().body();
+    }
+
+    public JsonNode ocrGeneral_imageUrl(String imageUrl, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(null, imageUrl, null, null, languageType, "true", null, null, null).execute().body();
+    }
+
+    public JsonNode ocrGeneral_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
+        return baiduInterface.ocrGeneral(null, null, pdfFile, pdfFileNum + "", languageType, "true", null, null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imagePath(String imagePath, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, "true", null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imageBase64(String imageBase64, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(imageBase64, null, null, null, languageType, "true", null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_imageUrl(String imageUrl, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(null, imageUrl, null, null, languageType, "true", null, null).execute().body();
+    }
+
+    public JsonNode ocrAccurate_pdf(String pdfFile, int pdfFileNum, String languageType) throws IOException {
+        return baiduInterface.ocrAccurate(null, null, pdfFile, pdfFileNum + "", languageType, "true", null, null).execute().body();
+    }
+
+    public JsonNode ocrDoc_imagePath(String imagePath, String languageType) throws IOException {
+        return baiduInterface.ocrDoc(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null, languageType, null, null, null, null, null, null).execute().body();
+    }
+
+    public enum OcrFormAsyncResultType {
+        EXCEL("excel"),
+        JSON("json");
+        String name;
+
+        OcrFormAsyncResultType(String name) {
+            this.name = name;
+        }
+    }
+
+    public JsonNode ocrFormAsync_imageBase64(String imageBase64, boolean isSync, OcrFormAsyncResultType resultType) throws IOException {
+        return baiduInterface.ocrFormAsync(imageBase64, isSync + "", resultType.name).execute().body();
+    }
+
+    public JsonNode ocrFormAsync_imagePath(String imagePath, boolean isSync, OcrFormAsyncResultType resultType) throws IOException {
+        return baiduInterface.ocrFormAsync(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), isSync + "", resultType.name).execute().body();
+    }
+
+    public JsonNode ocrFormSync_imageUrl(String imageUrl) throws IOException {
+        return baiduInterface.ocrFormSync(null, imageUrl,null).execute().body();
+    }
+
+    public JsonNode ocrFormSync_imageBase64(String imageBase64) throws IOException {
+        return baiduInterface.ocrFormSync(imageBase64, null, null).execute().body();
+    }
+
+    public JsonNode ocrFormSync_imagePath(String imagePath) throws IOException {
+        return baiduInterface.ocrFormSync(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null,null).execute().body();
+    }
+
+    public JsonNode carType_imageUrl(String imageUrl, int topNum) throws IOException {
+        return baiduInterface.carType(null, imageUrl, topNum + "", null).execute().body();
+    }
+
+    public JsonNode carType_imageBase64(String imageBase64, int topNum) throws IOException {
+        return baiduInterface.carType(imageBase64, null, topNum + "", null).execute().body();
+    }
+
+    public JsonNode carType_imagePath(String imagePath, int topNum) throws IOException {
+        return baiduInterface.carType(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, topNum + "", null).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imageUrl(String imageUrl) throws IOException {
+        return baiduInterface.vehicleDamage(null, imageUrl).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imageBase64(String imageBase64) throws IOException {
+        return baiduInterface.vehicleDamage(imageBase64, null).execute().body();
+    }
+
+    public JsonNode vehicleDamage_imagePath(String imagePath) throws IOException {
+        return baiduInterface.vehicleDamage(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imageUrl(String imageUrl) throws IOException {
+        return baiduInterface.selfieAnime(null, imageUrl, null, null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imageBase64(String imageBase64) throws IOException {
+        return baiduInterface.selfieAnime(imageBase64, null, null, null).execute().body();
+    }
+
+    public JsonNode selfieAnime_imagePath(String imagePath) throws IOException {
+        return baiduInterface.selfieAnime(Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imagePath))), null, null, null).execute().body();
+    }
 }

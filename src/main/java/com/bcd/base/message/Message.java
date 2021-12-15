@@ -2,7 +2,6 @@ package com.bcd.base.message;
 
 import org.slf4j.helpers.MessageFormatter;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
