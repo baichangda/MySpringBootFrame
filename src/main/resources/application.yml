@@ -135,7 +135,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-
 baidu:
   secretId: xx
   secretKey: xx
