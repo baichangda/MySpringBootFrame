@@ -129,7 +129,7 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
             //最后处理异常情况
             for (int i = 0; i < stopResults.length; i++) {
                 if (stopResults[i] == null) {
-                    stopResults[i] = StopResult.EXCEPTION;
+                    stopResults[i] = StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND;
                 }
             }
         }

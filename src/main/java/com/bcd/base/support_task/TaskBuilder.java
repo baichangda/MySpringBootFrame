@@ -94,7 +94,10 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         if (ids.length > 0) {
             for (int i = 0; i < ids.length; i++) {
                 TaskRunnable<T, K> runnable = taskIdToRunnable.get(ids[i].toString());
-                if (runnable != null) {
+                if (runnable == null) {
+                    //此时找不到任务
+                    stopResults[i] = StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND;
+                }else{
                     logger.info("stop{},{}", ids[i], runnable.getExecutor());
                     stopResults[i] = runnable.stop();
                 }
