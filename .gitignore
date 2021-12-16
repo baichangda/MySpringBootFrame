@@ -1,8 +1,12 @@
 *.class
 *.iml
+*.log
+*.log.*
+*.lst
 
 .gradle/
 .idea/
+logs/
 
 **/logs/
 **/build/
