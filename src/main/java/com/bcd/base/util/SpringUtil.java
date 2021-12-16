@@ -2,14 +2,26 @@ package com.bcd.base.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-public class SpringUtil {
+@Component
+public class SpringUtil implements ApplicationListener<ContextRefreshedEvent> {
+
+    public static ApplicationContext applicationContext;
 
     private final static String SPRING_PROPERTIES_PATH = System.getProperty("user.dir") + "/src/main/resources/application.yml";
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        applicationContext=event.getApplicationContext();
+    }
 
     public static JsonNode[] getSpringProps(String... keys) throws IOException {
         YAMLMapper yamlMapper = YAMLMapper.builder().build();
