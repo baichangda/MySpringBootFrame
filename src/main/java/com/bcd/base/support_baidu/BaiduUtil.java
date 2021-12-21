@@ -59,10 +59,8 @@ public class BaiduUtil {
                         while (true) {
                             HashMap<String, String> options = new HashMap<>();
                             options.put("language_type", languageType);
-                            jsonObject = aipOcr.accurateGeneral(Base64.getDecoder().decode(bytes), options);
+                            jsonObject = aipOcr.accurateGeneral(bytes, options);
                             if (jsonObject.has("error_code")) {
-                                break;
-                            } else {
                                 if (jsonObject.getInt("error_code") == 18) {
                                     logger.info("handle total[{}] pageNum[{}] call baidu error,sleep 5s and retry:\n{}", pageSize, i + 1, jsonObject);
                                     try {
@@ -75,6 +73,8 @@ public class BaiduUtil {
                                     jsonObject = null;
                                     break;
                                 }
+                            } else {
+                                break;
                             }
                         }
                         bw.newLine();
@@ -103,8 +103,7 @@ public class BaiduUtil {
 //        final BaiduInstance baiduInstance = BaiduInstance.newInstance(secretId, secretKey);
 //        allPdfOcr(aipOcr,"/Users/baichangda/pdftemp", "CHN_ENG");
 
-        HashMap<String, String> options = new HashMap<>();
-        final JSONObject jsonObject = aipOcr.form("/Users/baichangda/pdftemp/1.PNG", options);
+        final JSONObject jsonObject = aipOcr.tableRecognizeToExcelUrl("/Users/baichangda/pdftemp/1.PNG", 100000);
         System.out.println(jsonObject);
     }
 }

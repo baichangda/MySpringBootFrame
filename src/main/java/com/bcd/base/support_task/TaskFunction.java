@@ -2,6 +2,8 @@ package com.bcd.base.support_task;
 
 
 import com.bcd.base.exception.BaseRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -9,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
+    protected Logger logger= LoggerFactory.getLogger(this.getClass());
+
     private final static HashMap<String, TaskFunction> storage = new HashMap<>();
 
     public static <T extends Task<K>, K extends Serializable> TaskFunction<T, K> from(String name) {
