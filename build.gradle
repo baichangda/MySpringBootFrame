@@ -8,7 +8,7 @@ buildscript {
         commonsPool2 = '+'
         shiroVersion = '+'
         easyexcelVersion = '+'
-        disruptorVersion = '+'
+        disruptorVersion = '3.+'
         springdocVersion = '+'
         caffeineVersion = '2.+'
         retrofitJacksonVersion = '+'
