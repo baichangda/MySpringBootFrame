@@ -14,22 +14,22 @@ buildscript {
         retrofitJacksonVersion = '+'
         springBootVersion = '2.+'
         kafkaVersion = '+'
-        flywayVersion = '8.2.1'
+        flywayVersion = '8.+'
         lombokVersion = "+"
         pdfboxVersion = "2.+"
-        tencentcloudVersion = "3.+"
+        tencentcloudVersion = "3.1.431"
         baiduVersion = "4.+"
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
         aliyunGoogle = 'https://maven.aliyun.com/repository/google'
         aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
         aliyunSpring = 'https://maven.aliyun.com/repository/spring'
         aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
-        tencentPubluc = 'https://mirrors.tencent.com/nexus/repository/maven-public/'
 //        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
+        maven { url "${aliyunPublic}" }
         maven { url "${aliyunGradlePlugin}" }
         maven { url "${aliyunSpringPlugin}" }
         mavenCentral()
@@ -66,7 +66,11 @@ repositories {
     maven { url "${aliyunGoogle}" }
     maven { url "${aliyunSpring}" }
     mavenCentral()
-//    maven { url "${incarMavenRepoUrl}" }
+//    maven {
+//        url "${incarMavenRepoUrl}"
+//        //允许http依赖库
+//        allowInsecureProtocol = true
+//    }
 }
 
 //下载源码和文档
