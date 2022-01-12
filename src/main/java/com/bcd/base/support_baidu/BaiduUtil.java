@@ -6,6 +6,7 @@ import com.bcd.base.util.SpringUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,9 @@ public class BaiduUtil {
                     //先提取png
                     final byte[] bytes;
                     try (final ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        ImageIO.write(renderer.renderImageWithDPI(i, 300), "png", os);
+                        ImageIO.write(renderer.renderImageWithDPI(i, 96), "png", os);
                         bytes = os.toByteArray();
-//                        Files.write(Paths.get("/Users/baichangda/pdftemp/" + fileName.substring(0, fileName.lastIndexOf(".")) + i + ".png"), bytes);
+                        Files.write(Paths.get("/Users/baichangda/pdftemp/" + fileName.substring(0, fileName.lastIndexOf(".")) + i + ".png"), bytes);
                     }
                     //调用百度识别
                     JSONObject jsonObject = null;
@@ -59,7 +60,7 @@ public class BaiduUtil {
                         while (true) {
                             HashMap<String, String> options = new HashMap<>();
                             options.put("language_type", languageType);
-                            jsonObject = aipOcr.accurateGeneral(bytes, options);
+                            jsonObject = aipOcr.basicAccurateGeneral(bytes, options);
                             if (jsonObject.has("error_code")) {
                                 if (jsonObject.getInt("error_code") == 18) {
                                     logger.info("handle total[{}] pageNum[{}] call baidu error,sleep 5s and retry:\n{}", pageSize, i + 1, jsonObject);
@@ -75,6 +76,13 @@ public class BaiduUtil {
                                 }
                             } else {
                                 break;
+                            }
+                        }
+                        if (jsonObject != null) {
+                            final JSONArray words_result = jsonObject.getJSONArray("words_result");
+                            for (int j = 0; j < words_result.length(); j++) {
+                                bw.write(words_result.getJSONObject(j).getString("words"));
+                                bw.newLine();
                             }
                         }
                         bw.newLine();
