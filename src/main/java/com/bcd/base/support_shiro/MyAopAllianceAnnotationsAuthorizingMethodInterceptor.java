@@ -25,9 +25,7 @@ public class MyAopAllianceAnnotationsAuthorizingMethodInterceptor extends AopAll
 
     /**
      * 跳过admin的权限验证
-     *
      * @param methodInvocation
-     * @throws AuthorizationException
      */
     @Override
     protected void assertAuthorized(MethodInvocation methodInvocation) {
