@@ -5,6 +5,7 @@ import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.WorkbookWriteHandler;
+import com.alibaba.excel.write.handler.context.CellWriteHandlerContext;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
@@ -256,8 +257,10 @@ public class SwaggerApiScanner {
         CellStyle cellStyle2;
 
         @Override
-        public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<WriteCellData<?>> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
+        public void afterCellDispose(CellWriteHandlerContext context) {
+            final Cell cell = context.getCell();
             int y = cell.getColumnIndex();
+            context.setIgnoreFillStyle(true);
             if (y == 0) {
                 //设置标头列样式
                 if (cellStyle1 == null) {
