@@ -89,6 +89,5 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         rewriteCheckMethodAnnotation();
-
     }
 }
