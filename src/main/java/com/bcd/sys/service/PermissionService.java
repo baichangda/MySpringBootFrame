@@ -1,8 +1,8 @@
 package com.bcd.sys.service;
 
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.support_spring_init.SpringInitializable;
-import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
-import com.bcd.base.support_shiro.data.NotePermission;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -41,9 +41,9 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         Set<NotePermission> permissionSet = new LinkedHashSet<>();
         beanMap.values().forEach(e1 -> {
             Class controllerClass = ClassUtils.getUserClass(e1);
-            List<Method> methodList = MethodUtils.getMethodsListWithAnnotation(controllerClass, RequiresNotePermissions.class);
+            List<Method> methodList = MethodUtils.getMethodsListWithAnnotation(controllerClass, SaCheckNotePermissions.class);
             methodList.forEach(e2 -> {
-                RequiresNotePermissions requiresNotePermissions = e2.getAnnotation(RequiresNotePermissions.class);
+                SaCheckNotePermissions requiresNotePermissions = e2.getAnnotation(SaCheckNotePermissions.class);
                 permissionSet.addAll(Arrays.stream(requiresNotePermissions.value()).collect(Collectors.toSet()));
             });
         });

@@ -25,7 +25,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
     @Override
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
         Throwable realException = ExceptionUtil.parseRealException(throwable);
-        ErrorMessage errorMessage = ShiroConst.EXCEPTION_ERROR_MESSAGE_MAP.get(realException.getClass().getName());
+        ErrorMessage errorMessage = ShiroConst.EXCEPTION_ERROR_MESSAGE_MAP.get(realException.getClass());
         JsonMessage result;
         if (errorMessage == null) {
             result = ExceptionUtil.toJsonMessage(realException);

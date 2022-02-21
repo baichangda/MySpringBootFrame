@@ -1,22 +1,20 @@
 package com.bcd.sys.controller;
 
-import com.bcd.base.support_spring_cache.anno.LocalCacheable;
+import cn.dev33.satoken.stp.StpUtil;
+import com.bcd.base.support_satoken.SaTokenUtil;
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
-import com.bcd.base.support_shiro.data.NotePermission;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
-import com.bcd.sys.shiro.ShiroUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +37,7 @@ public class UserController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.user_search)
+    @SaCheckNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
@@ -79,7 +77,7 @@ public class UserController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.user_search)
+    @SaCheckNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @Operation(description = "查询用户分页")
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
@@ -120,7 +118,7 @@ public class UserController extends BaseController {
      * @param user
      * @return
      */
-    @RequiresNotePermissions(NotePermission.user_edit)
+    @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
@@ -136,7 +134,7 @@ public class UserController extends BaseController {
      * @param ids
      * @return
      */
-    @RequiresNotePermissions(NotePermission.user_edit)
+    @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
@@ -173,10 +171,9 @@ public class UserController extends BaseController {
     @Operation(description = "用户注销")
     @ApiResponse(responseCode = "200", description = "注销结果")
     public JsonMessage<?> logout() {
-        Subject currentUser = SecurityUtils.getSubject();
         JsonMessage<?> jsonMessage = JsonMessage.success().message("注销成功");
         //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
-        currentUser.logout();
+        StpUtil.logout();
         return jsonMessage;
     }
 
@@ -186,7 +183,7 @@ public class UserController extends BaseController {
      * @param userId
      * @return
      */
-    @RequiresNotePermissions(NotePermission.user_edit)
+    @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @Operation(description = "重置密码")
     @ApiResponse(responseCode = "200", description = "重制密码结果")
@@ -211,7 +208,7 @@ public class UserController extends BaseController {
             @RequestParam String oldPassword,
             @Parameter(description = "新密码")
             @RequestParam String newPassword) {
-        UserBean userBean = ShiroUtil.getCurrentUser();
+        UserBean userBean = SaTokenUtil.getLoginUser_cache();
         boolean flag = userService.updatePassword(userBean.getId(), oldPassword, newPassword);
         if (flag) {
             return JsonMessage.success().message("修改成功");

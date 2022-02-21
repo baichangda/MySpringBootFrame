@@ -1,38 +1,21 @@
 package com.bcd.sys.service;
 
+import cn.dev33.satoken.secure.SaBase64Util;
+import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.support_spring_init.SpringInitializable;
-import com.bcd.base.support_shiro.realm.MyAuthorizingRealm;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
-import com.bcd.sys.shiro.PhoneCodeToken;
-import com.bcd.sys.shiro.ShiroUtil;
-import com.bcd.sys.shiro.UsernamePasswordRealm;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.codec.Hex;
-import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +24,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/4/18.
@@ -60,21 +40,27 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
     @Qualifier("string_string_redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
+
+    public UserBean getUser(String username) {
+        return findOne(new StringCondition("username", username));
+    }
+
+
     public static void main(String[] args) {
         String username = "admin";
         String password = "123qwe";
         // 加密
-        String encodedText = Hex.encodeToString(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
+        String encodedText = SaBase64Util.encodeBytesToString(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
 
-        logger.info("encodedHex: {}", encodedText);
+        logger.info("encodedBase64: {}", encodedText);
 
         //数据库密码
-        String dbPwd = new Md5Hash(password, username).toHex();
+        String dbPwd = SaSecureUtil.md5BySalt(password, username);
 
         logger.info("dbPwd: {}", dbPwd);
 
         // 解密
-        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, Hex.decode(encodedText));
+        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, SaBase64Util.decodeStringToBytes(encodedText));
 
         logger.info("decodedText: {}", decodedText);
     }
@@ -106,10 +92,9 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
      * @return
      */
     public UserBean login_phone(String phone, String phoneCode) {
-        PhoneCodeToken token = new PhoneCodeToken(phone, phoneCode);
-        return login(token, () -> {
-            return findOne(new StringCondition("phone", phone));
-        });
+        final UserBean userBean = findOne(new StringCondition("phone", phone));
+        StpUtil.login(userBean.getUsername(), "phone");
+        return userBean;
     }
 
     /**
@@ -150,31 +135,29 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
      * @return
      */
     public UserBean login(String username, String encryptPassword) {
-        UsernamePasswordToken token;
-        //根据是否加密处理选择不同处理方式
-        if (CommonConst.IS_PASSWORD_ENCODED) {
-            //使用私钥解密密码
-            PrivateKey privateKey = KeysConst.PRIVATE_KEY;
-            String password = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword));
-            //构造登录对象
-            token = new UsernamePasswordToken(username, password);
+        final UserBean userBean = getUser(username);
+        if (userBean == null) {
+            throw BaseRuntimeException.getException("用户不存在");
         } else {
-            token = new UsernamePasswordToken(username, encryptPassword);
+            //根据是否加密处理选择不同处理方式
+            String password;
+            if (CommonConst.IS_PASSWORD_ENCODED) {
+                //使用私钥解密密码
+                PrivateKey privateKey = KeysConst.PRIVATE_KEY;
+                password = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword));
+            } else {
+                password = encryptPassword;
+            }
+            //验证密码
+            final String md5Password = SaSecureUtil.md5BySalt(password, username);
+            final String dbPassword = userBean.getPassword();
+            if (md5Password.equals(dbPassword)) {
+                StpUtil.login(userBean.getUsername(), "web");
+                return userBean;
+            } else {
+                throw BaseRuntimeException.getException("密码错误");
+            }
         }
-        return login(token, () -> {
-            return findOne(new StringCondition("username", username));
-        });
-    }
-
-    private UserBean login(AuthenticationToken token, Supplier<UserBean> supplier) {
-        //获取当前subject
-        Subject subject = SecurityUtils.getSubject();
-        //进行登录操作
-        subject.login(token);
-        //设置用户信息到session中
-        UserBean user = supplier.get();
-        subject.getSession().setAttribute("user", user);
-        return user;
     }
 
     /**
@@ -224,7 +207,7 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
      */
     public String encryptPassword(String username, String password) {
         if (CommonConst.IS_PASSWORD_ENCODED) {
-            return new Md5Hash(password, username).toHex();
+            return SaSecureUtil.md5BySalt(password, username);
         } else {
             return password;
         }
@@ -245,64 +228,22 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
      *
      * @param username
      * @param phone
-     * @param kickMessage
      */
-    public void kickUser(String username, String phone, String kickMessage) {
-        if (username == null && phone == null) {
+    public void kickUser(String username, String phone) {
+        UserBean userBean = null;
+        if (username != null) {
+            userBean = getUser(username);
+        }
+
+        if (userBean == null && phone != null) {
+            userBean = findOne(new StringCondition("phone", phone));
+        }
+
+        if (userBean == null) {
             return;
         }
-        UserBean curUser = ShiroUtil.getCurrentUser();
-        if(curUser!=null&& (
-                (username!=null&&username.equals(curUser.getUsername()))||
-                (phone!=null&&phone.equals(curUser.getPhone()))
-        )){
-            throw BaseRuntimeException.getException("不能踢掉自己");
-        }
-        Serializable curSessionId = SecurityUtils.getSubject().getSession().getId();
-        DefaultWebSecurityManager securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
-        DefaultWebSessionManager sessionManager = (DefaultWebSessionManager) securityManager.getSessionManager();
-        SessionDAO sessionDAO = sessionManager.getSessionDAO();
-        Collection<Session> sessionCollection = sessionDAO.getActiveSessions();
-        Collection<Realm> realms = securityManager.getRealms();
-        //清除session
-        Set<String> kickSessionSet = new HashSet<>();
-        Set<PrincipalCollection> principalCollectionSet = new HashSet<>();
-        sessionCollection.forEach(e -> {
-            //忽略踢出自己
-            if (!e.getId().equals(curSessionId)) {
-                UserBean userBean = (UserBean) e.getAttribute("user");
-                //忽略未登陆session
-                if (userBean == null) {
-                    return;
-                }
-                if ((username != null && username.equals(userBean.getUsername())) ||
-                        (phone != null && phone.equals(userBean.getPhone()))) {
-                    //清除session
-                    sessionDAO.delete(e);
-                    kickSessionSet.add(e.getId().toString());
-                    //判断当前session用户名是否是当前登陆用户名,是则添加进入set,用于清除权限缓存
-                    PrincipalCollection principalCollection = (PrincipalCollection) e.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-                    principalCollectionSet.add(principalCollection);
-                }
-            }
-        });
-        //清除对应realm的缓存信息
-        principalCollectionSet.forEach(principalCollection -> {
-            realms.forEach(realm -> {
-                if (principalCollection.getRealmNames().contains(realm.getName())) {
-                    ((MyAuthorizingRealm) realm).clearCachedAuthenticationInfo(principalCollection);
-                    ((MyAuthorizingRealm) realm).clearCachedAuthorizationInfo(principalCollection);
-                }
-            });
-        });
 
-        //记录踢出用户的sessionId到redis中,便于其他用户如果检测到属于被踢出的,返回对应的错误信息
-        if (!kickSessionSet.isEmpty()) {
-            for (String s : kickSessionSet) {
-                redisTemplate.opsForValue().set(CommonConst.KICK_SESSION_ID_PRE + s, kickMessage
-                        , CommonConst.KICK_SESSION_EXPIRE_IN_SECOND, TimeUnit.SECONDS);
-            }
-        }
+        StpUtil.kickout(userBean.getUsername());
     }
 
     public void saveUser(UserBean user) {

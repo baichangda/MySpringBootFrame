@@ -1,13 +1,15 @@
 package com.bcd.sys.controller;
 
-import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
-import com.bcd.base.support_shiro.data.NotePermission;
+import cn.dev33.satoken.stp.StpUtil;
+import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.MenuService;
-import com.bcd.sys.shiro.ShiroUtil;
+import com.bcd.sys.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,13 +27,16 @@ public class MenuController extends BaseController {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * 保存菜单
      *
      * @param menu
      * @return
      */
-    @RequiresNotePermissions(NotePermission.menu_edit)
+    @SaCheckNotePermissions(NotePermission.menu_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存菜单")
     @ApiResponse(responseCode = "200", description = "保存结果")
@@ -47,7 +52,7 @@ public class MenuController extends BaseController {
      * @param ids
      * @return
      */
-    @RequiresNotePermissions(NotePermission.menu_edit)
+    @SaCheckNotePermissions(NotePermission.menu_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除菜单")
     @ApiResponse(responseCode = "200", description = "删除结果")
@@ -61,7 +66,7 @@ public class MenuController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.menu_authorize)
+    @SaCheckNotePermissions(NotePermission.menu_authorize)
     @RequestMapping(value = "/adminMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询当前用户所属组织的admin拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
@@ -76,12 +81,12 @@ public class MenuController extends BaseController {
      * @param userId
      * @return
      */
-    @RequiresNotePermissions(NotePermission.menu_authorize)
+    @SaCheckNotePermissions(NotePermission.menu_authorize)
     @RequestMapping(value = "/userMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询用户拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage<List<MenuBean>> userMenuTree(@Parameter(description = "用户id")
-                                    @RequestParam(required = false) Long userId) {
+                                                    @RequestParam(required = false) Long userId) {
         List<MenuBean> menuBeanList = menuService.userMenuTree(userId);
         return JsonMessage.success(menuBeanList);
     }
@@ -91,12 +96,12 @@ public class MenuController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.menu_search)
+    @SaCheckNotePermissions(NotePermission.menu_search)
     @RequestMapping(value = "/selfMenuTree", method = RequestMethod.POST)
     @Operation(description = "查询当前用户拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage<List<MenuBean>> selfMenuTree() {
-        UserBean userBean = ShiroUtil.getCurrentUser();
+        UserBean userBean = userService.findOne(new StringCondition("username", StpUtil.getLoginIdAsString()));
         List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.getId());
         return JsonMessage.success(menuBeanList);
     }
