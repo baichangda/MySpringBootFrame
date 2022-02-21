@@ -2,6 +2,7 @@ package com.bcd.sys.aop;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.support_jpa.bean.BaseBean;
+import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.CacheService;
 import com.bcd.sys.service.UserService;
@@ -49,7 +50,7 @@ public class EntityAopConfig {
     @Before("savePointCut()")
     public void doBeforeDAOSave(JoinPoint pjp) {
         Object[] paramArr = pjp.getArgs();
-        UserBean user = cacheService.getUser(StpUtil.getLoginIdAsString());
+        UserBean user = SaTokenUtil.getLoginUser_cache();
         Arrays.stream(paramArr).forEach(param -> {
             if (param == null) {
                 return;

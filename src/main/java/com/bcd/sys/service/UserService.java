@@ -144,14 +144,13 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
             if (CommonConst.IS_PASSWORD_ENCODED) {
                 //使用私钥解密密码
                 PrivateKey privateKey = KeysConst.PRIVATE_KEY;
-                password = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword));
+                password = SaSecureUtil.md5BySalt(RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword)),username);
             } else {
                 password = encryptPassword;
             }
             //验证密码
-            final String md5Password = SaSecureUtil.md5BySalt(password, username);
             final String dbPassword = userBean.getPassword();
-            if (md5Password.equals(dbPassword)) {
+            if (password.equals(dbPassword)) {
                 StpUtil.login(userBean.getUsername(), "web");
                 return userBean;
             } else {

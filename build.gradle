@@ -173,7 +173,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
     implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "${saTokenVersion}"
-    implementation group: 'cn.dev33', name: 'sa-token-spring-aop', version: "${saTokenVersion}"
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "${saTokenVersion}"
 
 

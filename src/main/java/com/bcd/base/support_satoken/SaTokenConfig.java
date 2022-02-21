@@ -2,6 +2,8 @@ package com.bcd.base.support_satoken;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.*;
+import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.strategy.SaStrategy;
 import com.bcd.base.support_satoken.anno.NotePermission;
@@ -12,13 +14,24 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Configuration
-public class SaTokenConfig implements ApplicationListener<ContextRefreshedEvent> {
+public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<ContextRefreshedEvent> {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册Sa-Token的路由拦截器
+        // 登陆拦截器
+        registry.addInterceptor(new SaRouteInterceptor()).addPathPatterns("/**").excludePathPatterns("/api/sys/user/login", "/api/anno");
+        // 注解权限拦截器
+        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
+    }
 
     private void rewriteCheckMethodAnnotation() {
         //重写aop注解式鉴权、实现自定义注解

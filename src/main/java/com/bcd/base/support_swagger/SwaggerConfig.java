@@ -1,9 +1,10 @@
 package com.bcd.base.support_swagger;
 
+import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.util.SaTokenConsts;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
-import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ public class SwaggerConfig {
     public OpenApiCustomiser openApiCustomiser() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
-                    operation.addParametersItem(new HeaderParameter().name(ShiroHttpSession.DEFAULT_SESSION_ID_NAME).description("shiro session id"));
+                    operation.addParametersItem(new HeaderParameter().name("saToken").description("session id"));
                 });
     }
 }
