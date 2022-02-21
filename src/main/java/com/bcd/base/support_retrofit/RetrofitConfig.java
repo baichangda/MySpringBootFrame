@@ -10,7 +10,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 @Configuration
 public class RetrofitConfig {
 
-    @Value("${server.port:8888}")
+    @Value("${server.port}")
     int port;
 
     @Bean
