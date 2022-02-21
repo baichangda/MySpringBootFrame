@@ -33,6 +33,9 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
         registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
     }
 
+    /**
+     * 自定义注解
+     */
     private void rewriteCheckMethodAnnotation() {
         //重写aop注解式鉴权、实现自定义注解
         SaStrategy.me.checkMethodAnnotation = method -> {

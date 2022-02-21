@@ -19,8 +19,8 @@ public enum NotePermission {
     sysTask_stop("sysTask:stop", "系统任务停止"),
     ;
 
-    private String code;
-    private String note;
+    private final String code;
+    private final String note;
 
     NotePermission(String code, String note) {
         this.code = code;
