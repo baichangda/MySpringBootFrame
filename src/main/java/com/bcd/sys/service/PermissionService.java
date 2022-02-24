@@ -5,6 +5,7 @@ import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
+import com.bcd.sys.define.CommonConst;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,12 +63,16 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
     }
 
     public List<PermissionBean> findPermissionsByUserId(Long userId) {
-        String sql = "select d.* from t_sys_user_role a " +
-                "inner join t_sys_role_menu b on b.role_id=a.role_id " +
-                "inner join t_sys_menu_permission c on b.menu_id=c.menu_id " +
-                "inner join t_sys_permission d on c.permission_code=d.code " +
-                "where a.user_id= ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PermissionBean.class), userId);
+        if (CommonConst.ADMIN_ID == userId) {
+            return findAll();
+        } else {
+            String sql = "select d.* from t_sys_user_role a " +
+                    "inner join t_sys_role_menu b on b.role_code=a.role_code " +
+                    "inner join t_sys_menu_permission c on b.menu_id=c.menu_id " +
+                    "inner join t_sys_permission d on c.permission_code=d.code " +
+                    "where a.user_id= ?";
+            return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(PermissionBean.class), userId);
+        }
     }
 
 }

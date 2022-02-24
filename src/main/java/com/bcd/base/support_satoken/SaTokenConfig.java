@@ -28,9 +28,10 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册Sa-Token的路由拦截器
         // 登陆拦截器
-        registry.addInterceptor(new SaRouteInterceptor()).addPathPatterns("/**").excludePathPatterns("/api/sys/user/login", "/api/anno");
+        registry.addInterceptor(new SaRouteInterceptor()).addPathPatterns("/api/**")
+                .excludePathPatterns("/api/sys/user/login", "/api/anno");
         // 注解权限拦截器
-        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/api/**");
     }
 
     /**
