@@ -2,10 +2,27 @@ package com.bcd.base.support_baidu;
 
 import com.baidu.aip.ocr.AipOcr;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.SpringUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.fontbox.ttf.TrueTypeCollection;
+import org.apache.fontbox.ttf.TrueTypeFont;
+import org.apache.logging.log4j.util.Strings;
+import org.apache.pdfbox.contentstream.PDContentStream;
+import org.apache.pdfbox.contentstream.operator.Operator;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.cos.COSString;
+import org.apache.pdfbox.pdfparser.PDFStreamParser;
+import org.apache.pdfbox.pdfwriter.ContentStreamWriter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -16,9 +33,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -26,12 +42,26 @@ public class BaiduUtil {
 
     static Logger logger = LoggerFactory.getLogger(BaiduUtil.class);
 
+    public static void pdfText(String pdfPath) throws IOException {
+        PDDocument doc = PDDocument.load(Paths.get(pdfPath).toFile());
+        PDFTextStripper pdfTextStripper = new PDFTextStripper(){
+            @Override
+            protected void processTextPosition(TextPosition text) {
+                super.processTextPosition(text);
+                System.out.print(text);
+            }
+        };
+        final String text = pdfTextStripper.getText(doc);
+        logger.info("======={}",text);
+    }
+
     /**
      * 识别所有pdf下面的文字
      *
-     * @param pdfDirPath
-     * @param languageType
-     * @throws IOException
+     * @param aipOcr 百度ocr对象
+     * @param pdfDirPath pdf文件夹路径
+     * @param languageType 识别语言
+     *
      */
     public static void allPdfOcr(AipOcr aipOcr, String pdfDirPath, String languageType) throws IOException {
         final List<Path> filePathList = Files.list(Paths.get(pdfDirPath)).filter(e -> e.getFileName().toString().endsWith(".pdf")).collect(Collectors.toList());
@@ -65,7 +95,7 @@ public class BaiduUtil {
                                 if (jsonObject.getInt("error_code") == 18) {
                                     logger.info("handle total[{}] pageNum[{}] call baidu error,sleep 5s and retry:\n{}", pageSize, i + 1, jsonObject);
                                     try {
-                                        Thread.sleep(5000);
+                                        TimeUnit.SECONDS.sleep(5);
                                     } catch (InterruptedException ex) {
                                         throw BaseRuntimeException.getException(ex);
                                     }
@@ -104,14 +134,17 @@ public class BaiduUtil {
     }
 
     public static void main(String[] args) throws IOException, NoSuchFieldException {
-        final JsonNode[] props = SpringUtil.getSpringProps("baidu.secretId", "baidu.secretKey");
-        String secretId = props[0].asText();
-        String secretKey = props[1].asText();
-        AipOcr aipOcr = new AipOcr("test", secretId, secretKey);
+//        final JsonNode[] props = SpringUtil.getSpringProps("baidu.secretId", "baidu.secretKey");
+//        String secretId = props[0].asText();
+//        String secretKey = props[1].asText();
+//        AipOcr aipOcr = new AipOcr("test", secretId, secretKey);
 //        final BaiduInstance baiduInstance = BaiduInstance.newInstance(secretId, secretKey);
 //        allPdfOcr(aipOcr,"/Users/baichangda/pdftemp", "CHN_ENG");
 
-        final JSONObject jsonObject = aipOcr.tableRecognizeToExcelUrl("/Users/baichangda/pdftemp/1.PNG", 100000);
-        System.out.println(jsonObject);
+//        final JSONObject jsonObject = aipOcr.tableRecognizeToExcelUrl("/Users/baichangda/pdftemp/1.PNG", 100000);
+//        System.out.println(jsonObject);
+
+        pdfText("/Users/baichangda/pdftemp/1.pdf");
+
     }
 }
