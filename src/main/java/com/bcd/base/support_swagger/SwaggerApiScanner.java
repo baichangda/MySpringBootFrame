@@ -1,14 +1,11 @@
 package com.bcd.base.support_swagger;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.metadata.Head;
-import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.WorkbookWriteHandler;
 import com.alibaba.excel.write.handler.context.CellWriteHandlerContext;
-import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
-import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,9 +28,6 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked")
 public class SwaggerApiScanner {
 
-
-
-    static MyWorkbookWriteHandler workbookWriteHandler = new MyWorkbookWriteHandler();
 
     /**
      * 获取方法下面所有方法名称和注释的map
@@ -157,9 +151,9 @@ public class SwaggerApiScanner {
      *
      * @return
      */
-    public static void scanApiAndExport(OutputStream os, Consumer<List<List>> doBeforeWrite, String... packageNames) throws IOException, ClassNotFoundException {
+    public static void scanApiAndExport(OutputStream os, Consumer<List<List>> doBeforeWrite, int type, String... packageNames) throws IOException, ClassNotFoundException {
         //1、获取所有controller
-        final List<Class> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class,packageNames);
+        final List<Class> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
         //2、循环controller
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (Class controllerClass : classesWithAnno) {
@@ -202,35 +196,71 @@ public class SwaggerApiScanner {
         }
         //准备导入excel的数据
         List<List> excelList = new ArrayList<>();
-        dataList.forEach(e -> {
-            String comment = e.get("comment").toString();
-            String path = e.get("path").toString();
-            String method = e.get("method").toString();
-            String params = e.get("params").toString();
-            String response = e.get("response").toString();
+        switch (type) {
+            case 1: {
+                dataList.forEach(e -> {
+                    String comment = e.get("comment").toString();
+                    String path = e.get("path").toString();
+                    String method = e.get("method").toString();
+                    String params = e.get("params").toString();
+                    String response = e.get("response").toString();
 
-            excelList.add(Arrays.asList("接口说明", comment));
-            excelList.add(Arrays.asList("接口调用方式", method));
-            excelList.add(Arrays.asList("接口路径", path));
-            excelList.add(Arrays.asList("接口输入", params));
-            excelList.add(Arrays.asList("接口返回", response));
-            excelList.add(Arrays.asList());
-        });
+                    excelList.add(Arrays.asList("接口说明", comment));
+                    excelList.add(Arrays.asList("接口调用方式", method));
+                    excelList.add(Arrays.asList("接口路径", path));
+                    excelList.add(Arrays.asList("接口输入", params));
+                    excelList.add(Arrays.asList("接口返回", response));
+                    excelList.add(Arrays.asList());
+                });
+                if (doBeforeWrite != null) {
+                    doBeforeWrite.accept(excelList);
+                }
 
-        if (doBeforeWrite != null) {
-            doBeforeWrite.accept(excelList);
+                //生成excel
+                //准备样式
+                EasyExcel.write(os).sheet("接口设计")
+                        .registerWriteHandler(MyWorkbookWriteHandler1.instance)
+                        .registerWriteHandler(new MyCellWriteHandler1())
+                        .doWrite(excelList);
+                break;
+            }
+            case 2: {
+                excelList.add(Arrays.asList("接口说明", "接口调用方式", "接口路径", "接口输入", "接口返回"));
+                dataList.forEach(e -> {
+                    String comment = e.get("comment").toString();
+                    String path = e.get("path").toString();
+                    String method = e.get("method").toString();
+                    String params = e.get("params").toString();
+                    String response = e.get("response").toString();
+
+                    excelList.add(Arrays.asList(comment, method, path, params, response));
+                    excelList.add(Arrays.asList());
+                });
+
+                if (doBeforeWrite != null) {
+                    doBeforeWrite.accept(excelList);
+                }
+
+                //生成excel
+                //准备样式
+                EasyExcel.write(os).sheet("接口设计")
+                        .registerWriteHandler(MyWorkbookWriteHandler2.instance)
+                        .registerWriteHandler(new MyCellWriteHandler2())
+                        .doWrite(excelList);
+
+                break;
+            }
+            default: {
+                throw BaseRuntimeException.getException("type[{}] not support", type);
+            }
         }
 
-        //生成excel
-        //准备样式
-        MyCellWriteHandler cellWriteHandler = new MyCellWriteHandler();
-        EasyExcel.write(os).sheet("接口设计")
-                .registerWriteHandler(workbookWriteHandler)
-                .registerWriteHandler(cellWriteHandler)
-                .doWrite(excelList);
+
     }
 
-    static class MyWorkbookWriteHandler implements WorkbookWriteHandler {
+    static class MyWorkbookWriteHandler1 implements WorkbookWriteHandler {
+        final static MyWorkbookWriteHandler1 instance = new MyWorkbookWriteHandler1();
+
         @Override
         public void beforeWorkbookCreate() {
 
@@ -252,14 +282,80 @@ public class SwaggerApiScanner {
         }
     }
 
-    static class MyCellWriteHandler implements CellWriteHandler {
+    static class MyWorkbookWriteHandler2 implements WorkbookWriteHandler {
+        final static MyWorkbookWriteHandler2 instance = new MyWorkbookWriteHandler2();
+
+        @Override
+        public void beforeWorkbookCreate() {
+
+        }
+
+        @Override
+        public void afterWorkbookCreate(WriteWorkbookHolder writeWorkbookHolder) {
+
+        }
+
+        @Override
+        public void afterWorkbookDispose(WriteWorkbookHolder writeWorkbookHolder) {
+            int sheetNum = writeWorkbookHolder.getCachedWorkbook().getNumberOfSheets();
+            for (int i = 0; i < sheetNum; i++) {
+                Sheet sheet = writeWorkbookHolder.getCachedWorkbook().getSheetAt(i);
+                sheet.setColumnWidth(0, 256 * 50 + 184);
+                sheet.setColumnWidth(1, 256 * 15 + 184);
+                sheet.setColumnWidth(2, 256 * 80 + 184);
+                sheet.setColumnWidth(3, 256 * 100 + 184);
+                sheet.setColumnWidth(4, 256 * 15 + 184);
+            }
+        }
+    }
+
+
+    static class MyCellWriteHandler1 implements CellWriteHandler {
+        CellStyle cellStyle1;
+        CellStyle cellStyle2;
+        @Override
+        public void afterCellDispose(CellWriteHandlerContext context) {
+            final Cell cell = context.getCell();
+            int y = cell.getColumnIndex();
+            context.setIgnoreFillStyle(true);
+            if (y == 0) {
+                //设置标头列样式
+                if (cellStyle1 == null) {
+                    cellStyle1 = cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle1.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                    cellStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle1.setBorderLeft(BorderStyle.THIN);
+                    cellStyle1.setBorderBottom(BorderStyle.THIN);
+                    cellStyle1.setBorderTop(BorderStyle.THIN);
+                    cellStyle1.setBorderRight(BorderStyle.THIN);
+                    cellStyle1.setWrapText(true);
+                    cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+                }
+                cell.setCellStyle(cellStyle1);
+            } else {
+                //设置内容列样式
+                if (cellStyle2 == null) {
+                    cellStyle2 = cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2.setBorderLeft(BorderStyle.THIN);
+                    cellStyle2.setBorderBottom(BorderStyle.THIN);
+                    cellStyle2.setBorderTop(BorderStyle.THIN);
+                    cellStyle2.setBorderRight(BorderStyle.THIN);
+                    cellStyle2.setWrapText(true);
+
+                }
+                cell.setCellStyle(cellStyle2);
+            }
+        }
+    }
+
+    static class MyCellWriteHandler2 implements CellWriteHandler {
         CellStyle cellStyle1;
         CellStyle cellStyle2;
 
         @Override
         public void afterCellDispose(CellWriteHandlerContext context) {
             final Cell cell = context.getCell();
-            int y = cell.getColumnIndex();
+            int y = cell.getRowIndex();
             context.setIgnoreFillStyle(true);
             if (y == 0) {
                 //设置标头列样式
@@ -311,8 +407,8 @@ public class SwaggerApiScanner {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        try(final OutputStream os = Files.newOutputStream(Paths.get("/Users/baichangda/msbf.xlsx"))){
-            scanApiAndExport(os,null,"com.bcd");
+        try (final OutputStream os = Files.newOutputStream(Paths.get("/Users/baichangda/gbdatachecker.xlsx"))) {
+            scanApiAndExport(os, null, 2, "com.bcd");
         }
     }
 }
