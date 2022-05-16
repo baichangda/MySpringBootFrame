@@ -3,6 +3,7 @@ package com.bcd.base.support_redis.register;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.DateZoneUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@ConditionalOnProperty(value = "provider")
 @EnableConfigurationProperties(ProviderProp.class)
 @Component
 public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent> {

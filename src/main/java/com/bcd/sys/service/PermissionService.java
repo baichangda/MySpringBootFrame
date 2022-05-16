@@ -2,13 +2,13 @@ package com.bcd.sys.service;
 
 import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
-import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
  *
  */
 @Service
-public class PermissionService extends BaseService<PermissionBean, Long> implements SpringInitializable {
+public class PermissionService extends BaseService<PermissionBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public void init(ContextRefreshedEvent event) {
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         initNotePermission(event);
     }
 

@@ -56,7 +56,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDate.from(DATE_TIME_FORMATTER_DAY.parse(dateStr)).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
+        return Date.from(LocalDate.parse(dateStr, DATE_TIME_FORMATTER_DAY).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
     }
 
     /**
@@ -67,7 +67,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDateTime.from(DATE_TIME_FORMATTER_SECOND.parse(dateStr)).toInstant(ZONE_OFFSET));
+        return Date.from(LocalDateTime.parse(dateStr,DATE_TIME_FORMATTER_SECOND).toInstant(ZONE_OFFSET));
     }
 
     /**

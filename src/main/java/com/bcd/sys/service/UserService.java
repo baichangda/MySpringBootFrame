@@ -5,7 +5,6 @@ import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.base.support_jpa.service.BaseService;
@@ -20,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<UserBean, Long> implements SpringInitializable {
+public class UserService extends BaseService<UserBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -45,6 +45,24 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         return findOne(new StringCondition("username", username));
     }
 
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        UserBean userBean = findById(CommonConst.ADMIN_ID);
+        if (userBean == null) {
+            userBean = new UserBean();
+            userBean.setId(CommonConst.ADMIN_ID);
+            userBean.setUsername(CommonConst.ADMIN_USERNAME);
+            String password;
+            if (CommonConst.IS_PASSWORD_ENCODED) {
+                password = encryptPassword(CommonConst.ADMIN_USERNAME, CommonConst.INITIAL_PASSWORD);
+            } else {
+                password = CommonConst.INITIAL_PASSWORD;
+            }
+            userBean.setPassword(password);
+            userBean.setStatus(1);
+            save(userBean);
+        }
+    }
 
     public static void main(String[] args) {
         String username = "admin";
@@ -63,25 +81,6 @@ public class UserService extends BaseService<UserBean, Long> implements SpringIn
         String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, SaBase64Util.decodeStringToBytes(encodedText));
 
         logger.info("decodedText: {}", decodedText);
-    }
-
-    @Override
-    public void init(ContextRefreshedEvent event) {
-        UserBean userBean = findById(CommonConst.ADMIN_ID);
-        if (userBean == null) {
-            userBean = new UserBean();
-            userBean.setId(CommonConst.ADMIN_ID);
-            userBean.setUsername(CommonConst.ADMIN_USERNAME);
-            String password;
-            if (CommonConst.IS_PASSWORD_ENCODED) {
-                password = encryptPassword(CommonConst.ADMIN_USERNAME, CommonConst.INITIAL_PASSWORD);
-            } else {
-                password = CommonConst.INITIAL_PASSWORD;
-            }
-            userBean.setPassword(password);
-            userBean.setStatus(1);
-            save(userBean);
-        }
     }
 
     /**
