@@ -16,7 +16,7 @@ public class ProducerUtil {
         ProducerUtil.producerProp = producerProp;
     }
 
-    public static Producer<String, byte[]> getProducer() {
+    public static Producer<String, byte[]> getProducer(ProducerProp producerProp) {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProp.bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
