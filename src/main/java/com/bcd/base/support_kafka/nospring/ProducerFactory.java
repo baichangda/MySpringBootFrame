@@ -6,17 +6,17 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Properties;
 
-public class ProducerUtil {
+public class ProducerFactory {
 
-    static ThreadLocal<Producer<String, byte[]>> producers = new ThreadLocal<>();
+    final ThreadLocal<Producer<String, byte[]>> producers = new ThreadLocal<>();
 
-    static ProducerProp producerProp;
+    final ProducerProp producerProp;
 
-    public void setKafkaProperties(ProducerProp producerProp) {
-        ProducerUtil.producerProp = producerProp;
+    public ProducerFactory(ProducerProp producerProp) {
+        this.producerProp=producerProp;
     }
 
-    public static Producer<String, byte[]> getProducer(ProducerProp producerProp) {
+    public static Producer<String, byte[]> newProducer(ProducerProp producerProp) {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProp.bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
@@ -31,10 +31,10 @@ public class ProducerUtil {
     /**
      * 获取producer并绑定到线程上
      */
-    public static Producer<String, byte[]> getProducerInThreadLocal() {
+    public Producer<String, byte[]> getProducerInThreadLocal() {
         Producer<String, byte[]> producer = producers.get();
         if (producer == null) {
-            producer = ProducerUtil.getProducer();
+            producer = newProducer(producerProp);
             producers.set(producer);
         }
         return producer;
