@@ -158,36 +158,6 @@ dependencies {
 //    }
 //}
 
-//生成jar时打包源码
-task sourceJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
-    classifier "sources"
-}
-
-jar {
-    enabled = true
-}
-
-//发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
-//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            artifact(sourceJar)
-        }
-    }
-    repositories {
-        maven {
-            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
-            credentials {
-                username 'deployment'
-                password 'deploy123456'
-            }
-        }
-    }
-}
-
 /**
  * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
  */
@@ -222,8 +192,6 @@ bootRun {
  * ----------------------------------------------------------------------------
  */
 
-apply plugin: 'org.flywaydb.flyway'
-
 flyway {
     def subLocations = []
     //mysql
@@ -238,13 +206,10 @@ flyway {
 //    subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
 
     flyway.locations = subLocations
-}
 
-flywayMigrate {
     //是否允许无序的迁移
     outOfOrder = true
 }
-
 /**
  * ----------------------------------------------------------------------------
  */

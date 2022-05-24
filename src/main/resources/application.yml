@@ -125,22 +125,12 @@ spring:
     password:
     default-encoding: UTF-8
 
-  #flyway配置
-  #注意如果使用druid数据源、脚本中不能带 . 字符、否则会导致启动执行脚本失败
-#   flyway:
-#     enabled: true
 springdoc:
   packages-to-scan:
     - com.bcd
   swagger-ui:
     path: /swagger-ui.html
 
-baidu:
-  secretId: xx
-  secretKey: xx
-tencent:
-  secretId: xx
-  secretKey: xx
 
 # Sa-Token配置
 sa-token:
