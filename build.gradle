@@ -1,30 +1,11 @@
 buildscript {
     ext {
-        guavaVersion = '+'
-        mysqlVersion = '8.+'
-        pgsqlVersion = '42.+'
-        jsqlparserVersion = '+'
-        freemarkerVersion = '+'
-        commonsPool2 = '+'
-        saTokenVersion = '+'
-        easyexcelVersion = '+'
-        disruptorVersion = '3.+'
-        springdocVersion = '+'
-        caffeineVersion = '3.+'
-        retrofitJacksonVersion = '+'
-        springBootVersion = '2.+'
-        kafkaVersion = '+'
-        flywayVersion = '8.4.+'
-        lombokVersion = "+"
-        pdfboxVersion = "2.+"
-        tencentcloudVersion = "3.1.431"
-        baiduVersion = "4.+"
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
         aliyunGoogle = 'https://maven.aliyun.com/repository/google'
         aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
         aliyunSpring = 'https://maven.aliyun.com/repository/spring'
         aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
-//        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
+        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
@@ -34,31 +15,28 @@ buildscript {
         maven { url "${aliyunSpringPlugin}" }
         mavenCentral()
     }
-
-    dependencies {
-        //使用springboot框架
-        classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springBootVersion}"
-        //使用flyway插件
-        classpath group: 'org.flywaydb', name: 'flyway-gradle-plugin', version: "${flywayVersion}"
-    }
 }
+
+plugins{
+    id 'java-library'
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id "org.flywaydb.flyway" version "8.+"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id 'org.springframework.boot' version "2.+"
+}
+
+
 
 /**
  * ----------------------------------------------------------------------------
  */
-
 group 'com.bcd'
 version '1.0'
-apply plugin: 'java-library'
-apply plugin: 'java'
-apply plugin: 'idea'
-//加入maven发布依赖
-apply plugin: 'maven-publish'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.springframework.boot'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 18
+targetCompatibility = 18
 
 repositories {
     mavenLocal()
@@ -91,13 +69,14 @@ configurations.all {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
+
     // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
     implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    implementation group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+    implementation group: 'com.google.guava', name: 'guava', version: "+"
 
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
@@ -113,20 +92,20 @@ dependencies {
     //springboot log4j2支持
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
     //disruptor(log4j2异步日志需要用到)
-    implementation group: 'com.lmax', name: 'disruptor', version: "${disruptorVersion}"
+    implementation group: 'com.lmax', name: 'disruptor', version: "3.+"
 
     //springboot jpa支持
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     //springboot jdbc支持
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
-    implementation("com.github.jsqlparser:jsqlparser:${jsqlparserVersion}")
+    implementation("com.github.jsqlparser:jsqlparser:+")
     //邮件支持
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.apache.commons:commons-pool2:${commonsPool2}")
+    implementation("org.apache.commons:commons-pool2:+")
     //springboot validation支持
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
@@ -134,49 +113,50 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:${kafkaVersion}")
+    implementation("org.springframework.kafka:spring-kafka:+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-    implementation group: 'com.alibaba', name: 'easyexcel', version: "${easyexcelVersion}"
+    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+"){
+        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
+    }
 
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "${springdocVersion}"
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "+"
 
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "${caffeineVersion}"
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "+"
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
-    implementation group: 'org.freemarker', name: 'freemarker', version: "${freemarkerVersion}"
+    implementation group: 'org.freemarker', name: 'freemarker', version: "+"
 
 
     //mysql驱动包
-    runtimeOnly "mysql:mysql-connector-java:${mysqlVersion}"
+    runtimeOnly "mysql:mysql-connector-java:8.+"
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "${pgsqlVersion}"
+    runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "42.+"
 
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitJacksonVersion}"
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "+"
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
-    // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: "${pdfboxVersion}"
-
-    // https://mvnrepository.com/artifact/com.tencentcloudapi/tencentcloud-sdk-java
-    implementation group: 'com.tencentcloudapi', name: 'tencentcloud-sdk-java', version: "${tencentcloudVersion}"
-
-    // https://mvnrepository.com/artifact/com.baidu.aip/java-sdk
-    implementation("com.baidu.aip:java-sdk:${baiduVersion}") {
-        exclude group: "org.slf4j", module: "slf4j-simple"
-    }
-
     // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
-    implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "${saTokenVersion}"
-    implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "${saTokenVersion}"
+    implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "+"
+    implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
 
 
 }
+
+//把classpath添加到module path中、建立module-info.java后使用
+//compileJava {
+//    doFirst {
+//        options.compilerArgs += [
+//                '--module-path', classpath.asPath
+//        ]
+//        classpath = files()
+//    }
+//}
 
 //生成jar时打包源码
 task sourceJar(type: Jar) {

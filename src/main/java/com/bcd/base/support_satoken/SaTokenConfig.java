@@ -4,6 +4,7 @@ import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.*;
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
 import cn.dev33.satoken.interceptor.SaRouteInterceptor;
+import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.strategy.SaStrategy;
 import com.bcd.base.support_satoken.anno.NotePermission;

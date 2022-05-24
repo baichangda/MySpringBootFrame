@@ -2,13 +2,13 @@ package com.bcd.sys.keys;
 
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.RSAUtil;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 
 public class KeysConst {
     /**
@@ -69,11 +69,11 @@ public class KeysConst {
                 Object[] keys = RSAUtil.generateKey(1024);
                 KeysConst.PUBLIC_KEY = (RSAPublicKey) keys[0];
                 KeysConst.PRIVATE_KEY = (RSAPrivateKey) keys[1];
-                KeysConst.PUBLIC_KEY_BASE64 = Base64.encodeBase64String(KeysConst.PUBLIC_KEY.getEncoded());
-                KeysConst.PRIVATE_KEY_BASE64 = Base64.encodeBase64String(KeysConst.PRIVATE_KEY.getEncoded());
+                KeysConst.PUBLIC_KEY_BASE64 = Base64.getEncoder().encodeToString(KeysConst.PUBLIC_KEY.getEncoded());
+                KeysConst.PRIVATE_KEY_BASE64 = Base64.getEncoder().encodeToString(KeysConst.PRIVATE_KEY.getEncoded());
             } else {
-                KeysConst.PUBLIC_KEY = RSAUtil.restorePublicKey(Base64.decodeBase64(KeysConst.PUBLIC_KEY_BASE64));
-                KeysConst.PRIVATE_KEY = RSAUtil.restorePrivateKey(Base64.decodeBase64(KeysConst.PRIVATE_KEY_BASE64));
+                KeysConst.PUBLIC_KEY = RSAUtil.restorePublicKey(Base64.getDecoder().decode(KeysConst.PUBLIC_KEY_BASE64));
+                KeysConst.PRIVATE_KEY = RSAUtil.restorePrivateKey(Base64.getDecoder().decode(KeysConst.PRIVATE_KEY_BASE64));
             }
         }
     }

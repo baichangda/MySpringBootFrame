@@ -158,4 +158,5 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: false
-
+  # 同一账号可同时在线的最大数量
+  max-login-count: -1
