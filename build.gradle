@@ -1,24 +1,5 @@
 buildscript {
     ext {
-        guavaVersion = '+'
-        mysqlVersion = '8.+'
-        pgsqlVersion = '42.+'
-        jsqlparserVersion = '+'
-        freemarkerVersion = '+'
-        commonsPool2 = '+'
-        shiroVersion = '+'
-        easyexcelVersion = '+'
-        disruptorVersion = '3.+'
-        springdocVersion = '+'
-        caffeineVersion = '2.+'
-        retrofitJacksonVersion = '+'
-        springBootVersion = '2.+'
-        kafkaVersion = '+'
-        flywayVersion = '8.+'
-        lombokVersion = "+"
-        pdfboxVersion = "2.+"
-        tencentcloudVersion = "3.1.431"
-        baiduVersion = "4.+"
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
         aliyunGoogle = 'https://maven.aliyun.com/repository/google'
         aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
@@ -35,12 +16,17 @@ buildscript {
         mavenCentral()
     }
 
-    dependencies {
-        //使用springboot框架
-        classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springBootVersion}"
-        //使用flyway插件
-        classpath group: 'org.flywaydb', name: 'flyway-gradle-plugin', version: "${flywayVersion}"
-    }
+
+}
+
+plugins{
+    id 'java-library'
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id "org.flywaydb.flyway" version "8.+"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id 'org.springframework.boot' version "2.+"
 }
 
 /**
@@ -137,7 +123,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka:+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-    implementation group: 'com.alibaba', name: 'easyexcel', version: "+"{
+    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+"){
         exclude group: 'org.apache.poi',module: 'poi-ooxml-schemas'
     }
 
