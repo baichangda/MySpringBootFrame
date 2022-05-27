@@ -655,7 +655,7 @@ public class SqlUtil {
             throw BaseRuntimeException.getException("no column");
         }
         String sql = generateUpdateSql(filterColumnValueMap.keySet(), null, table);
-        return new UpdateSqlResult(sql, new ArrayList(filterColumnValueMap.values()));
+        return new UpdateSqlResult(sql, new ArrayList<>(filterColumnValueMap.values()));
     }
 
 }

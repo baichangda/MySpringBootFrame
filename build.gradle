@@ -118,9 +118,13 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka:+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+"){
-        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
-    }
+    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+")
+//            {
+//        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
+//    }
+    // https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans
+//    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.0.3'
+
 
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "+"
