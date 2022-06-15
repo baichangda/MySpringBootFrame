@@ -35,7 +35,6 @@ public abstract class AbstractConsumer {
      * @param groupId                      消费组id
      * @param workThreadNum                工作线程个数
      * @param maxBlockingNum               最大阻塞
-     * @param consumeAllTopicPartitionsEnd 是否消费最新的数据、忽略历史
      * @param autoReleaseBlockingNum       在work完以后、自动释放blockingNum
      * @param topics                       消费的topic
      */
