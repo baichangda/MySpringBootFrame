@@ -27,32 +27,28 @@ public abstract class AbstractConsumer {
     public final AtomicInteger blockingNum;
     private final int maxBlockingNum;
 
-    private final boolean consumeAllTopicPartitionsEnd;
     //是否自动释放阻塞、适用于工作内容为同步处理的逻辑
     private final boolean autoReduceBlockingNum;
 
     /**
-     *
-     * @param consumerProp 消费者属性
-     * @param groupId 消费组id
-     * @param workThreadNum 工作线程个数
-     * @param maxBlockingNum 最大阻塞
+     * @param consumerProp                 消费者属性
+     * @param groupId                      消费组id
+     * @param workThreadNum                工作线程个数
+     * @param maxBlockingNum               最大阻塞
      * @param consumeAllTopicPartitionsEnd 是否消费最新的数据、忽略历史
-     * @param autoReleaseBlockingNum  在work完以后、自动释放blockingNum
-     * @param topics 消费的topic
+     * @param autoReleaseBlockingNum       在work完以后、自动释放blockingNum
+     * @param topics                       消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
                             String groupId,
                             int workThreadNum,
                             int maxBlockingNum,
-                            boolean consumeAllTopicPartitionsEnd,
                             boolean autoReleaseBlockingNum,
                             String... topics) {
         this.consumerProp = consumerProp;
         this.groupId = groupId;
         this.consumerPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         this.maxBlockingNum = maxBlockingNum;
-        this.consumeAllTopicPartitionsEnd = consumeAllTopicPartitionsEnd;
         this.autoReduceBlockingNum = autoReleaseBlockingNum;
         this.topics = topics;
         this.blockingNum = new AtomicInteger(0);
@@ -106,29 +102,25 @@ public abstract class AbstractConsumer {
                     .map(item -> new TopicPartition(item.topic(), item.partition())).toList());
         }
         consumer.assign(topicPartitions);
-        Map<TopicPartition, Long> topicPartitionLongMap = consumer.endOffsets(topicPartitions);
-        for (TopicPartition partition : topicPartitions) {
-            consumer.seek(partition, topicPartitionLongMap.get(partition));
-        }
+        consumer.seekToEnd(topicPartitions);
+        consumer.commitSync();
     }
 
     /**
      * 在构造消费者后、设置消费者
+     *
      * @param consumer
      */
     protected void afterNewConsumer(Consumer<String, byte[]> consumer) {
-        if (consumeAllTopicPartitionsEnd){
-            consumeAllTopicPartitionsEnd(consumer);
-        }else{
-            consumer.subscribe(Arrays.asList(topics));
-        }
+        consumer.subscribe(Arrays.asList(topics));
     }
 
     /**
      * 用于在消费之后计数、主要用于性能统计
+     *
      * @param count
      */
-    protected void countAfterConsume(int count){
+    protected void countAfterConsume(int count) {
         blockingNum.addAndGet(count);
     }
 
