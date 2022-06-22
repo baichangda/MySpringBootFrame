@@ -70,6 +70,7 @@ public class ProviderUtil {
         final ConcurrentHashMap<String, ArrayList<String>> typeToHosts = new ConcurrentHashMap<>();
         final ConcurrentHashMap<String, BoundHashOperations<String, String, String>> operationsMap = new ConcurrentHashMap<>();
 
+
         public ArrayList<String> hosts(String type) {
             final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, k -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(RedisUtil.doWithKey("provider:" + type)));
             return typeToHosts.computeIfAbsent(type, k -> {
@@ -85,9 +86,7 @@ public class ProviderUtil {
                             list.add(entry.getKey());
                         }
                     }
-                    //排序
                     list.sort(String::compareTo);
-                    //trim
                     list.trimToSize();
                     return list;
                 }
@@ -95,11 +94,11 @@ public class ProviderUtil {
         }
 
         Singleton() {
+            //启动定时任务、刷新本地可用服务缓存
             final long l = providerProp.expired.toMillis() / 2 + 1000;
             consumerPool.scheduleAtFixedRate(() -> {
                 operationsMap.forEach((k, v) -> {
                     final Map<String, String> entries = v.entries();
-                    final ArrayList<String> local = typeToHosts.get(k);
                     final ArrayList<String> remote = new ArrayList<>();
                     for (Map.Entry<String, String> entry : entries.entrySet()) {
                         final long diff = DateZoneUtil.stringToDate_second(entry.getValue()).getTime() - System.currentTimeMillis();
@@ -107,26 +106,9 @@ public class ProviderUtil {
                             remote.add(entry.getKey());
                         }
                     }
-                    if (local.size() == remote.size()) {
-                        remote.sort(String::compareTo);
-                        boolean allMatch = true;
-                        for (int i = 0; i < local.size(); i++) {
-                            if (!local.get(i).equals(remote.get(i))) {
-                                allMatch = false;
-                                break;
-                            }
-                        }
-                        if (!allMatch) {
-                            remote.trimToSize();
-                            typeToHosts.put(k, remote);
-                        }
-                    } else {
-                        remote.sort(String::compareTo);
-                        remote.trimToSize();
-                        typeToHosts.put(k, remote);
-                    }
-
-
+                    remote.sort(String::compareTo);
+                    remote.trimToSize();
+                    typeToHosts.put(k, remote);
                 });
             }, l, l, TimeUnit.MILLISECONDS);
         }

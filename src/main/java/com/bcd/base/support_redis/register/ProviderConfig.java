@@ -52,8 +52,9 @@ public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent
         }
         providerPool = Executors.newSingleThreadScheduledExecutor();
         providerPool.scheduleAtFixedRate(() -> {
+            final String s = DateZoneUtil.dateToString_second(new Date());
             for (BoundHashOperations<String, String, String> boundHashOperation : boundHashOperations) {
-                boundHashOperation.put(providerProp.host, DateZoneUtil.dateToString_second(new Date()));
+                boundHashOperation.put(providerProp.host, s);
             }
         }, 0, providerProp.reportPeriod.toMillis(), TimeUnit.MILLISECONDS);
     }
