@@ -6,6 +6,8 @@ buildscript {
         aliyunSpring = 'https://maven.aliyun.com/repository/spring'
         aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
         incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
+
+
     }
 
     repositories {
