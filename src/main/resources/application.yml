@@ -8,6 +8,10 @@ server:
     session:
       timeout: 1800
 spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
   # 允许循环依赖
   main:
     allow-circular-references: true

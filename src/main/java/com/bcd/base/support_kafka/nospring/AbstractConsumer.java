@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,28 +24,44 @@ public abstract class AbstractConsumer {
     private final ExecutorService workPool;
     public final AtomicInteger blockingNum;
     private final int maxBlockingNum;
-
     //是否自动释放阻塞、适用于工作内容为同步处理的逻辑
     private final boolean autoReduceBlockingNum;
 
+    private final int maxConsumeSpeed;
+
+    private final ScheduledExecutorService resetConsumeCountPool;
+
+    private final AtomicInteger consumeCount;
+
     /**
-     * @param consumerProp                 消费者属性
-     * @param groupId                      消费组id
-     * @param workThreadNum                工作线程个数
-     * @param maxBlockingNum               最大阻塞
-     * @param autoReleaseBlockingNum       在work完以后、自动释放blockingNum
-     * @param topics                       消费的topic
+     * @param consumerProp           消费者属性
+     * @param groupId                消费组id
+     * @param workThreadNum          工作线程个数
+     * @param maxBlockingNum         最大阻塞
+     * @param maxConsumeSpeed        最大消费速度每秒(-1代表不限制)、不能设置的过小、因为每次从kafka消费是一批数据、如果设置过小、可能会导致阻塞死
+     *                               至少大于一批数据大小
+     * @param autoReleaseBlockingNum 在work完以后、自动释放blockingNum
+     * @param topics                 消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
                             String groupId,
                             int workThreadNum,
                             int maxBlockingNum,
+                            int maxConsumeSpeed,
                             boolean autoReleaseBlockingNum,
                             String... topics) {
         this.consumerProp = consumerProp;
         this.groupId = groupId;
         this.consumerPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         this.maxBlockingNum = maxBlockingNum;
+        this.maxConsumeSpeed = maxConsumeSpeed;
+        if (maxConsumeSpeed > 0) {
+            consumeCount = new AtomicInteger();
+            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
+        } else {
+            consumeCount = null;
+            resetConsumeCountPool = null;
+        }
         this.autoReduceBlockingNum = autoReleaseBlockingNum;
         this.topics = topics;
         this.blockingNum = new AtomicInteger(0);
@@ -129,15 +143,30 @@ public abstract class AbstractConsumer {
      * @return
      */
     public ConsumerRecords<String, byte[]> consume() throws InterruptedException {
+        //检查阻塞
         if (blockingNum.get() >= maxBlockingNum) {
-            Thread.sleep(500L);
+            TimeUnit.MILLISECONDS.sleep(500);
             return null;
         }
+
         ConsumerRecords<String, byte[]> res = getConsumer().poll(Duration.ofSeconds(1));
         final int count;
         if (res != null && (count = res.count()) > 0) {
+            //消费成功后统计计数
             countAfterConsume(count);
-            return res;
+            //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
+            final int curConsumeCount = consumeCount.addAndGet(count);
+            if (curConsumeCount < maxConsumeSpeed) {
+                return res;
+            } else {
+                while (true) {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                    if (consumeCount.get() < maxConsumeSpeed) {
+                        break;
+                    }
+                }
+                return res;
+            }
         } else {
             return null;
         }
@@ -176,7 +205,10 @@ public abstract class AbstractConsumer {
                 }
             });
         }
-    }
 
+        if (maxConsumeSpeed > 0) {
+            resetConsumeCountPool.scheduleAtFixedRate(() -> consumeCount.set(0), 1, 1, TimeUnit.SECONDS);
+        }
+    }
 }
 
