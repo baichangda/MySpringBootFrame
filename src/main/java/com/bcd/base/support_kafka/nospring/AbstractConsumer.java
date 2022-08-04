@@ -154,17 +154,21 @@ public abstract class AbstractConsumer {
         if (res != null && (count = res.count()) > 0) {
             //消费成功后统计计数
             countAfterConsume(count);
-            //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
-            final int curConsumeCount = consumeCount.addAndGet(count);
-            if (curConsumeCount < maxConsumeSpeed) {
-                return res;
-            } else {
-                while (true) {
-                    TimeUnit.MILLISECONDS.sleep(50);
-                    if (consumeCount.get() < maxConsumeSpeed) {
-                        break;
+            if (maxConsumeSpeed > 0) {
+                //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
+                final int curConsumeCount = consumeCount.addAndGet(count);
+                if (curConsumeCount < maxConsumeSpeed) {
+                    return res;
+                } else {
+                    while (true) {
+                        TimeUnit.MILLISECONDS.sleep(50);
+                        if (consumeCount.get() < maxConsumeSpeed) {
+                            break;
+                        }
                     }
+                    return res;
                 }
+            } else {
                 return res;
             }
         } else {
