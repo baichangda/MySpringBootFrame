@@ -1,7 +1,7 @@
 package com.bcd.base.support_jpa.code;
 
+import cn.hutool.core.util.ReUtil;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.code.data.BeanField;
 import lombok.Getter;
 import lombok.Setter;
@@ -95,7 +95,7 @@ public class CodeGeneratorContext {
             String springSrcPath = springSrcPathSb.toString();
             String targetDirPath = tableConfig.getConfig().getTargetDirPath();
             if (targetDirPath.contains(springSrcPath)) {
-                packagePre = targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
+                packagePre = targetDirPath.split(ReUtil.escape(springSrcPath))[1].replaceAll(ReUtil.escape(File.separator), ".");
             } else {
                 throw BaseRuntimeException.getException("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
             }

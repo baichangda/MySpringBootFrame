@@ -5,9 +5,7 @@ buildscript {
         aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
         aliyunSpring = 'https://maven.aliyun.com/repository/spring'
         aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
-        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
-
-
+        incarMavenRepoUrl = 'https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
@@ -19,7 +17,7 @@ buildscript {
     }
 }
 
-plugins{
+plugins {
     id 'java-library'
     id 'java'
     id 'idea'
@@ -28,9 +26,6 @@ plugins{
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id 'org.springframework.boot' version "2.+"
 }
-
-
-
 
 
 /**
@@ -120,7 +115,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka:+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+")
+    implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
 //            {
 //        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
 //    }
@@ -153,6 +148,8 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "+"
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
 
+    implementation "cn.hutool:hutool-all:+"
+
 
 }
 
@@ -180,7 +177,7 @@ bootJar {
 //生成jar时打包源码
 task sourceJar(type: Jar) {
     from sourceSets.main.java.srcDirs
-    archiveClassifier= "sources"
+    archiveClassifier = "sources"
 }
 
 /**

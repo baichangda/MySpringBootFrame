@@ -23,7 +23,7 @@ public class SpringUtil implements ApplicationListener<ContextRefreshedEvent> {
         applicationContext=event.getApplicationContext();
     }
 
-    public static JsonNode[] getSpringProps(String... keys) throws IOException {
+    public static JsonNode[] getSpringPropsInYml(String... keys) throws IOException {
         YAMLMapper yamlMapper = YAMLMapper.builder().build();
         final JsonNode base = yamlMapper.readTree(new File(SPRING_PROPERTIES_PATH));
         final JsonNode suffix = Optional.ofNullable(base.get("spring")).map(e -> e.get("profiles")).map(e -> e.get("active")).orElse(null);

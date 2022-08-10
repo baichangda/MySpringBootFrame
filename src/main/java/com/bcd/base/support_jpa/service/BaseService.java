@@ -1,13 +1,12 @@
 package com.bcd.base.support_jpa.service;
 
+import cn.hutool.core.text.StrFormatter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.anno.Unique;
 import com.bcd.base.support_jpa.bean.info.BeanInfo;
 import com.bcd.base.support_jpa.repository.BaseRepository;
 import com.bcd.base.support_jpa.util.ConditionUtil;
-import com.google.common.collect.Iterators;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -296,7 +295,7 @@ public class BaseService<T, K extends Serializable> {
      */
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
-        return StringUtil.format(anno.value(),field.getName());
+        return StrFormatter.format(anno.value(),field.getName());
     }
 
     /**

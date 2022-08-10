@@ -1,8 +1,8 @@
 package com.bcd.base.support_mongodb.service;
 
+import cn.hutool.core.text.StrFormatter;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.info.BeanInfo;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
@@ -99,7 +99,7 @@ public class BaseService<T, K extends Serializable> {
      */
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
-        return StringUtil.format(anno.value(),field.getName());
+        return StrFormatter.format(anno.value(),field.getName());
     }
 
     /**

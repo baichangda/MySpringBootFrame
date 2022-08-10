@@ -1,7 +1,7 @@
 package com.bcd.base.support_jdbc.sql;
 
+import cn.hutool.core.util.StrUtil;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
@@ -442,7 +442,7 @@ public class SqlUtil {
                 return;
             }
             String fieldName = field.getName();
-            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
+            String columnName = StrUtil.toCamelCase(fieldName, '_');
             if (ignoreSet.contains(fieldName) || ignoreSet.contains(columnName)) {
                 return;
             }
@@ -514,7 +514,7 @@ public class SqlUtil {
                 return;
             }
             String fieldName = field.getName();
-            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
+            String columnName = StrUtil.toCamelCase(fieldName, '_');
             if (whereSet.contains(fieldName) || whereSet.contains(columnName)) {
                 field.setAccessible(true);
                 whereColumnToFieldMap.put(columnName, field);
@@ -603,7 +603,7 @@ public class SqlUtil {
                 return;
             }
             String fieldName = field.getName();
-            String columnName = StringUtil.toFirstSplitWithUpperCase(fieldName, '_');
+            String columnName = StrUtil.toCamelCase(fieldName, '_');
             if (ignoreSet.contains(fieldName) || ignoreSet.contains(columnName)) {
                 return;
             }

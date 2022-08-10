@@ -1,9 +1,8 @@
 package com.bcd.base.exception;
 
+import cn.hutool.core.text.StrFormatter;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.util.StringUtil;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * 建造此异常类的目的:
@@ -33,12 +32,14 @@ public class BaseRuntimeException extends RuntimeException {
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
      *
+     * 转义字符参考{@link StrFormatter#format(String, Object...)}
+     *
      * @param message
      * @param params
      * @return
      */
     public static BaseRuntimeException getException(String message, Object... params) {
-        return new BaseRuntimeException(StringUtil.format(message,params));
+        return new BaseRuntimeException(StrFormatter.format(message,params));
     }
 
     public static BaseRuntimeException getException(Throwable e) {
