@@ -6,6 +6,8 @@
 
     <!--变量配置-->
     <Properties>
+        <Property name="APP_NAME">data</Property>
+        <Property name="LOG_DIR">logs</Property>
         <!-- 格式化输出：%date表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
         <Property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"/>
     </Properties>
@@ -18,16 +20,19 @@
         </Console>
 
         <RollingFile name="RollingFile"
-                     filename="logs/data.log"
-                     filePattern="logs/data-%d{yyyy-MM-dd}-%i.log">
+                     filename="${LOG_DIR}/${APP_NAME}.log"
+                     filePattern="${LOG_DIR}/${APP_NAME}-%d{yyyyMMdd}.log">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <!-- Policies :日志滚动策略-->
             <Policies>
-                <!-- SizeBasedTriggeringPolicy :文件大小滚动策略-->
-                <SizeBasedTriggeringPolicy size="100 MB"/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
-            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
-            <DefaultRolloverStrategy max="20"/>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOG_DIR}" maxDepth="1">
+                    <IfFileName glob="${APP_NAME}-*.log"/>
+                    <IfLastModified age="1d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
         </RollingFile>
 
     </Appenders>
@@ -37,20 +42,20 @@
     <Loggers>
         <!-- show parameters for hibernate sql 专为 Hibernate 定制 -->
         <!-- jpa参数绑定日志 -->
-<!--        <Logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />-->
+        <!--        <Logger name="org.hibernate.type.descriptor.sql.BasicBinder"  level="TRACE" />-->
         <!-- jpa解析日志 -->
-<!--        <Logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="TRACE" />-->
+        <!--        <Logger name="org.hibernate.type.descriptor.sql.BasicExtractor"  level="TRACE" />-->
         <!-- jpa sql -->
         <logger name="org.hibernate.SQL" level="DEBUG"/>
 
         <!-- show parameters for jdbcTemplate sql 专为 jdbcTemplate 定制 -->
         <!-- spring jdbc参数绑定日志 -->
-<!--        <Logger name="org.springframework.jdbc.core.StatementCreatorUtils" additivity="true" level="TRACE" />-->
+        <!--        <Logger name="org.springframework.jdbc.core.StatementCreatorUtils" additivity="true" level="TRACE" />-->
         <!-- spring jdbc sql -->
         <Logger name="org.springframework.jdbc.core" additivity="true" level="DEBUG"/>
 
         <!-- mongodb日志开启 -->
-<!--        <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>-->
+        <!--        <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>-->
 
         <!-- 日志输出级别 -->
         <Root level="INFO">
