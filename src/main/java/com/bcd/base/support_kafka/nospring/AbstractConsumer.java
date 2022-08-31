@@ -125,7 +125,7 @@ public abstract class AbstractConsumer {
      * @param consumer
      */
     protected void afterNewConsumer(Consumer<String, byte[]> consumer) {
-        consumer.subscribe(Arrays.asList(topics));
+        consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
     }
 
     /**
@@ -216,25 +216,25 @@ public abstract class AbstractConsumer {
     }
 }
 
-class ConsumerRebalanceLogger implements ConsumerRebalanceListener{
-    static Logger logger=LoggerFactory.getLogger(ConsumerRebalanceLogger.class);
+class ConsumerRebalanceLogger implements ConsumerRebalanceListener {
+    static Logger logger = LoggerFactory.getLogger(ConsumerRebalanceLogger.class);
 
     Consumer consumer;
 
     public ConsumerRebalanceLogger(Consumer consumer) {
-        this.consumer=consumer;
+        this.consumer = consumer;
     }
 
     @Override
     public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-        String msg= partitions.stream().map(e->e.topic()+":"+e.partition()).reduce((e1,e2)-> e1+";"+e2).orElse("");
-        logger.info("consumer[{}] onPartitionsRevoked [{}]",consumer.toString(),msg);
+        String msg = partitions.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + ";" + e2).orElse("");
+        logger.info("consumer[{}] onPartitionsRevoked [{}]", consumer.toString(), msg);
     }
 
     @Override
     public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-        String msg= partitions.stream().map(e->e.topic()+":"+e.partition()).reduce((e1,e2)-> e1+";"+e2).orElse("");
-        logger.info("consumer[{}] onPartitionsAssigned [{}]",consumer.toString(),msg);
+        String msg = partitions.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + ";" + e2).orElse("");
+        logger.info("consumer[{}] onPartitionsAssigned [{}]", consumer.toString(), msg);
     }
 }
 
