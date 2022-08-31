@@ -8,15 +8,11 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class ProviderUtil {
-
     static RedisConnectionFactory redisConnectionFactory;
 
     static ProviderProp providerProp;
@@ -27,16 +23,6 @@ public class ProviderUtil {
     }
 
     /**
-     * 获取所有可用的host
-     *
-     * @param type
-     * @return
-     */
-    public static ArrayList<String> hosts(String type) {
-        return Singleton.instance.hosts(type);
-    }
-
-    /**
      * 根据序号轮询方式获取host
      *
      * @param type
@@ -44,7 +30,7 @@ public class ProviderUtil {
      * @return
      */
     public static String host(String type, int no) {
-        final ArrayList<String> hosts = Singleton.instance.hosts(type);
+        final ArrayList<String> hosts = hosts(type);
         if (hosts.isEmpty()) {
             return null;
         }
@@ -64,53 +50,55 @@ public class ProviderUtil {
     }
 
 
-    enum Singleton {
-        instance;
-        final ScheduledExecutorService consumerPool = Executors.newSingleThreadScheduledExecutor();
-        final ConcurrentHashMap<String, ArrayList<String>> typeToHosts = new ConcurrentHashMap<>();
-        final ConcurrentHashMap<String, BoundHashOperations<String, String, String>> operationsMap = new ConcurrentHashMap<>();
+    static class ProviderInfo {
+        long lastUpdateTs;
+        ArrayList<String> hosts = new ArrayList<>();
 
+    }
 
-        public ArrayList<String> hosts(String type) {
-            final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, k -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(RedisUtil.doWithKey("provider:" + type)));
-            return typeToHosts.computeIfAbsent(type, k -> {
-                final Map<String, String> entries = boundHashOperations.entries();
-                if (entries.isEmpty()) {
-                    return new ArrayList<>();
-                } else {
-                    ArrayList<String> list = new ArrayList<>();
-                    for (Map.Entry<String, String> entry : entries.entrySet()) {
-                        final String value = entry.getValue();
-                        final long diff = DateZoneUtil.stringToDate_second(value).getTime() - System.currentTimeMillis();
-                        if (diff <= providerProp.expired.toMillis()) {
-                            list.add(entry.getKey());
-                        }
+    final static HashMap<String, ProviderInfo> typeToProvider = new HashMap<>();
+    final static HashMap<String, BoundHashOperations<String, String, String>> operationsMap = new HashMap<>();
+
+    /**
+     * 获取可用host
+     *
+     * @param type
+     * @return
+     */
+    public static ArrayList<String> hosts(String type) {
+        final long curTs = System.currentTimeMillis();
+        final long checkTs = curTs - providerProp.expired.toMillis();
+        //从缓存中获取提供者信息
+        ProviderInfo providerInfo = typeToProvider.get(type);
+        //检查信息是否过期
+        if (providerInfo == null || providerInfo.lastUpdateTs < checkTs) {
+            //过期则从redis中读取
+            synchronized (type.intern()) {
+                if (providerInfo == null || providerInfo.lastUpdateTs < checkTs) {
+                    if (providerInfo == null) {
+                        providerInfo = new ProviderInfo();
                     }
-                    list.sort(String::compareTo);
-                    list.trimToSize();
-                    return list;
+                    providerInfo.lastUpdateTs = curTs;
+
+                    //从redis中加载
+                    final ArrayList<String> hosts = new ArrayList<>();
+                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(RedisUtil.doWithKey("provider:" + type)));
+                    final Map<String, String> entries = boundHashOperations.entries();
+                    if (!entries.isEmpty()) {
+                        for (Map.Entry<String, String> entry : entries.entrySet()) {
+                            final String value = entry.getValue();
+                            if (DateZoneUtil.stringToDate_second(value).getTime() >= checkTs) {
+                                hosts.add(entry.getKey());
+                            }
+                        }
+                        hosts.sort(String::compareTo);
+                        hosts.trimToSize();
+                        return hosts;
+                    }
+                    providerInfo.hosts = hosts;
                 }
-            });
+            }
         }
-
-        Singleton() {
-            //启动定时任务、刷新本地可用服务缓存
-            final long l = providerProp.expired.toMillis() / 2 + 1000;
-            consumerPool.scheduleAtFixedRate(() -> {
-                operationsMap.forEach((k, v) -> {
-                    final Map<String, String> entries = v.entries();
-                    final ArrayList<String> remote = new ArrayList<>();
-                    for (Map.Entry<String, String> entry : entries.entrySet()) {
-                        final long diff = DateZoneUtil.stringToDate_second(entry.getValue()).getTime() - System.currentTimeMillis();
-                        if (diff <= providerProp.expired.toMillis()) {
-                            remote.add(entry.getKey());
-                        }
-                    }
-                    remote.sort(String::compareTo);
-                    remote.trimToSize();
-                    typeToHosts.put(k, remote);
-                });
-            }, l, l, TimeUnit.MILLISECONDS);
-        }
+        return providerInfo.hosts;
     }
 }
