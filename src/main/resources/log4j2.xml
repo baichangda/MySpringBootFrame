@@ -30,7 +30,7 @@
             <DefaultRolloverStrategy>
                 <Delete basePath="${LOG_DIR}" maxDepth="1">
                     <IfFileName glob="${APP_NAME}-*.log"/>
-                    <IfLastModified age="1d"/>
+                    <IfLastModified age="30d"/>
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>

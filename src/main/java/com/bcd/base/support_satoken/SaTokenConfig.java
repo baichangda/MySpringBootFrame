@@ -2,10 +2,9 @@ package com.bcd.base.support_satoken;
 
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.*;
-import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
-import cn.dev33.satoken.interceptor.SaRouteInterceptor;
-import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaStrategy;
 import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckAction;
@@ -22,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<ContextRefreshedEvent> {
 
@@ -29,10 +29,12 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册Sa-Token的路由拦截器
         // 登陆拦截器
-        registry.addInterceptor(new SaRouteInterceptor()).addPathPatterns("/api/**")
+        registry.addInterceptor(new SaInterceptor(e -> StpUtil.checkLogin()).isAnnotation(false))
+                .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/sys/user/login", "/api/anno");
-        // 注解权限拦截器
-        registry.addInterceptor(new SaAnnotationInterceptor()).addPathPatterns("/api/**");
+
+        // 注解拦截器
+        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/**");
     }
 
     /**
