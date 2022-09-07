@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.rowmapper;
 
-import cn.hutool.core.util.StrUtil;
+import com.bcd.base.util.StringUtil;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 public class MyColumnMapRowMapper extends ColumnMapRowMapper {
@@ -8,6 +8,6 @@ public class MyColumnMapRowMapper extends ColumnMapRowMapper {
 
     @Override
     protected String getColumnKey(String columnName) {
-        return StrUtil.toCamelCase(columnName,'_');
+        return StringUtil.toFirstUpperCaseWithSplit(columnName, '_');
     }
 }

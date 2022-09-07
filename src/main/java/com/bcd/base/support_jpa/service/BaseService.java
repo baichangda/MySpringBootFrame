@@ -7,6 +7,7 @@ import com.bcd.base.support_jpa.anno.Unique;
 import com.bcd.base.support_jpa.bean.info.BeanInfo;
 import com.bcd.base.support_jpa.repository.BaseRepository;
 import com.bcd.base.support_jpa.util.ConditionUtil;
+import com.bcd.base.util.StringUtil;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -295,7 +296,7 @@ public class BaseService<T, K extends Serializable> {
      */
     private String getUniqueMessage(Field field) {
         Unique anno = field.getAnnotation(Unique.class);
-        return StrFormatter.format(anno.value(),field.getName());
+        return StringUtil.format(anno.value(),field.getName());
     }
 
     /**

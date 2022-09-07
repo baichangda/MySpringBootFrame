@@ -1,18 +1,18 @@
 package com.bcd.sys.service;
 
+import cn.dev33.satoken.secure.SaBase64Util;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.digest.MD5;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.RSAUtil;
 import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
 
+import java.util.Base64;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -68,8 +68,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         String username = "admin";
         String password = "123qwe";
         // 加密
-
-        String encodedText = KeysConst.RSA.encryptBase64(password.getBytes(), KeyType.PublicKey);
+        String encodedText = SaBase64Util.encodeBytesToString(RSAUtil.encode(KeysConst.PUBLIC_KEY, password.getBytes()));
 
         logger.info("encodedBase64: {}", encodedText);
 
@@ -79,7 +78,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         logger.info("dbPwd: {}", dbPwd);
 
         // 解密
-        String decodedText = KeysConst.RSA.decryptStr(encodedText,KeyType.PrivateKey);
+        String decodedText = RSAUtil.decode(KeysConst.PRIVATE_KEY, SaBase64Util.decodeStringToBytes(encodedText));
 
         logger.info("decodedText: {}", decodedText);
     }
@@ -142,7 +141,9 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             //根据是否加密处理选择不同处理方式
             String password;
             if (CommonConst.IS_PASSWORD_ENCODED) {
-                password = SaSecureUtil.md5BySalt(KeysConst.RSA.decryptStr(encryptPassword,KeyType.PrivateKey),username);
+                //使用私钥解密密码
+                PrivateKey privateKey = KeysConst.PRIVATE_KEY;
+                password = SaSecureUtil.md5BySalt(RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword)),username);
             } else {
                 password = encryptPassword;
             }
@@ -169,10 +170,11 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         UserBean userBean = findById(userId);
         //2、根据是否加密处理选择不同处理方式
         if (CommonConst.IS_PASSWORD_ENCODED) {
+            //2.1、获取私钥
+            PrivateKey privateKey = KeysConst.PRIVATE_KEY;
             //2.2、解密密码
-
-            String oldPassword = KeysConst.RSA.decryptStr(encryptOldPassword,KeyType.PrivateKey);
-            String newPassword = KeysConst.RSA.decryptStr(encryptNewPassword,KeyType.PrivateKey);
+            String oldPassword = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptOldPassword));
+            String newPassword = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptNewPassword));
             //2.3、将原始密码MD5加密后与数据库中进行对比
             if (userBean.getPassword().equals(encryptPassword(userBean.getUsername(), oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名

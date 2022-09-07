@@ -1,6 +1,5 @@
 package com.bcd.base.support_spring_paramconverter;
 
-import cn.hutool.core.util.StrUtil;
 import com.bcd.base.util.DateUtil;
 import com.bcd.base.util.DateZoneUtil;
 import org.springframework.core.convert.converter.Converter;
@@ -21,7 +20,7 @@ public class StringToDateConverter implements Converter<String, Date> {
 
     @Override
     public Date convert(String source) {
-        if (StrUtil.isEmpty(source)) {
+        if (source.isEmpty()) {
             return null;
         } else {
             if (source.charAt(0) == 's') {

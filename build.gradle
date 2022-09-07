@@ -148,9 +148,8 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "+"
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
 
-    implementation "cn.hutool:hutool-all:+"
-
-
+    // https://mvnrepository.com/artifact/io.netty/netty-buffer
+    implementation group: 'io.netty', name: 'netty-buffer', version: "4.+"
 }
 
 //把classpath添加到module path中、建立module-info.java后使用

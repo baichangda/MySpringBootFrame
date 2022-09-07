@@ -1,12 +1,12 @@
 package com.bcd.base.support_swagger;
 
-import cn.hutool.core.util.ClassUtil;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.WorkbookWriteHandler;
 import com.alibaba.excel.write.handler.context.CellWriteHandlerContext;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.ClassUtil;
 import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -153,10 +153,7 @@ public class SwaggerApiScanner {
      */
     public static void scanApiAndExport(OutputStream os, Consumer<List<List>> doBeforeWrite, int type, String... packageNames) throws IOException, ClassNotFoundException {
         //1、获取所有controller
-        final List<Class> classesWithAnno = new ArrayList<>();
-        for (String packageName : packageNames) {
-            classesWithAnno.addAll(ClassUtil.scanPackageByAnnotation(packageName, RestController.class));
-        }
+        final List<Class> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
         //2、循环controller
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (Class controllerClass : classesWithAnno) {
