@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 此类要求提供 kafka-client即可、不依赖spring-kafka
@@ -112,7 +113,7 @@ public abstract class AbstractConsumer {
         List<TopicPartition> topicPartitions = new ArrayList<>();
         for (String topic : topics) {
             topicPartitions.addAll(consumer.partitionsFor(topic).stream()
-                    .map(item -> new TopicPartition(item.topic(), item.partition())).toList());
+                    .map(item -> new TopicPartition(item.topic(), item.partition())).collect(Collectors.toList()));
         }
         consumer.assign(topicPartitions);
         consumer.seekToEnd(topicPartitions);
