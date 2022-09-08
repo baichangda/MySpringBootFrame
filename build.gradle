@@ -139,9 +139,6 @@ dependencies {
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "42.+"
 
 
-    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "+"
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
@@ -150,6 +147,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/io.netty/netty-buffer
     implementation group: 'io.netty', name: 'netty-buffer', version: "4.+"
+
+    // define a BOM and its version
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 }
 
 //把classpath添加到module path中、建立module-info.java后使用
@@ -176,7 +179,7 @@ bootJar {
 //生成jar时打包源码
 task sourceJar(type: Jar) {
     from sourceSets.main.java.srcDirs
-    archiveClassifier = "sources"
+    archiveClassifier.set("sources")
 }
 
 /**
