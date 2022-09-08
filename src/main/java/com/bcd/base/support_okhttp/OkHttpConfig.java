@@ -1,17 +1,12 @@
-package com.bcd.base.support_retrofit;
+package com.bcd.base.support_okhttp;
 
 import com.bcd.base.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Configuration
 public class RetrofitConfig {
-
-    @Value("${server.port}")
-    int port;
 
     @Bean
     public Retrofit localRetrofit() {
