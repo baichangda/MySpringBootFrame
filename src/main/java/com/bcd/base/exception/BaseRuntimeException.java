@@ -3,7 +3,6 @@ package com.bcd.base.exception;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.StringUtil;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
  * 建造此异常类的目的:

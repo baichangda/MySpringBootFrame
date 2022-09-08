@@ -5,7 +5,7 @@ buildscript {
         aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
         aliyunSpring = 'https://maven.aliyun.com/repository/spring'
         aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
-//        incarMavenRepoUrl='https://repository.incarcloud.com/content/repositories/snapshots/'
+        incarMavenRepoUrl = 'https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
@@ -15,11 +15,9 @@ buildscript {
         maven { url "${aliyunSpringPlugin}" }
         mavenCentral()
     }
-
-
 }
 
-plugins{
+plugins {
     id 'java-library'
     id 'java'
     id 'idea'
@@ -29,22 +27,15 @@ plugins{
     id 'org.springframework.boot' version "2.+"
 }
 
+
 /**
  * ----------------------------------------------------------------------------
  */
-
 group 'com.bcd'
 version '1.0'
-apply plugin: 'java-library'
-apply plugin: 'java'
-apply plugin: 'idea'
-//加入maven发布依赖
-apply plugin: 'maven-publish'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'org.springframework.boot'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 17
+targetCompatibility = 17
 
 repositories {
     mavenLocal()
@@ -79,6 +70,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
+
     // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
     implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
 
@@ -123,19 +115,19 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka:+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
-    implementation (group: 'com.alibaba', name: 'easyexcel', version: "+"){
-        exclude group: 'org.apache.poi',module: 'poi-ooxml-schemas'
-    }
+    implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
+//            {
+//        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
+//    }
+    // https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans
+//    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.0.3'
 
-    //shiro权限框架集成
-    implementation("org.apache.shiro:shiro-spring:+")
-    implementation("org.apache.shiro:shiro-ehcache:+")
 
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "+"
 
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "2.+"
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "+"
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     implementation group: 'org.freemarker', name: 'freemarker', version: "+"
@@ -152,37 +144,23 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+    // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
+    implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "+"
+    implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
+
+    // https://mvnrepository.com/artifact/io.netty/netty-buffer
+    implementation group: 'io.netty', name: 'netty-buffer', version: "4.+"
 }
 
-//生成jar时打包源码
-task sourceJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
-    classifier "sources"
-}
-
-jar {
-    enabled = true
-}
-
-//发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
-//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
-            artifact(sourceJar)
-        }
-    }
-    repositories {
-        maven {
-            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
-            credentials {
-                username 'deployment'
-                password 'deploy123456'
-            }
-        }
-    }
-}
+//把classpath添加到module path中、建立module-info.java后使用
+//compileJava {
+//    doFirst {
+//        options.compilerArgs += [
+//                '--module-path', classpath.asPath
+//        ]
+//        classpath = files()
+//    }
+//}
 
 /**
  * SpringBoot 2开始,使用gradle bootJar进行打包,并要配置入口类
@@ -195,6 +173,11 @@ bootJar {
     }
 }
 
+//生成jar时打包源码
+task sourceJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    archiveClassifier = "sources"
+}
 
 /**
  * ----------------------------------------------------------------------------
@@ -218,8 +201,6 @@ bootRun {
  * ----------------------------------------------------------------------------
  */
 
-apply plugin: 'org.flywaydb.flyway'
-
 flyway {
     def subLocations = []
     //mysql
@@ -234,13 +215,10 @@ flyway {
 //    subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
 
     flyway.locations = subLocations
-}
 
-flywayMigrate {
     //是否允许无序的迁移
     outOfOrder = true
 }
-
 /**
  * ----------------------------------------------------------------------------
  */

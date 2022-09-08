@@ -1,10 +1,11 @@
 package com.bcd.sys.keys;
 
-import com.bcd.base.support_spring_init.SpringInitializable;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.RSAUtil;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.util.Base64;
+
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,9 +16,10 @@ import java.security.PublicKey;
 
 @SuppressWarnings("unchecked")
 @Component
-public class RedisKeysInit implements SpringInitializable {
+public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent> {
+
     @Override
-    public void init(ContextRefreshedEvent event) {
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         //1、判断是否是集群环境
         if (KeysConst.IS_CLUSTER) {
             //2、如果是集群环境则从redis中取出公钥私钥

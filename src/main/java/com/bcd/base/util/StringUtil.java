@@ -10,10 +10,6 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public class StringUtil {
 
-    public static boolean isNullOrEmpty(String o){
-        return o==null||o.isEmpty();
-    }
-
     /**
      * 将一串包含特殊字符串的换成驼峰模式
      * example:

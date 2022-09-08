@@ -4,8 +4,8 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
-import com.bcd.base.support_shiro.data.NotePermission;
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.TaskBean;
@@ -41,7 +41,7 @@ public class TaskController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.sysTask_search)
+    @SaCheckNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询系统任务列表")
     @ApiResponse(responseCode = "200", description = "任务列表")
@@ -79,7 +79,7 @@ public class TaskController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.sysTask_search)
+    @SaCheckNotePermissions(NotePermission.sysTask_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @Operation(description = "查询系统任务列表")
     @ApiResponse(responseCode = "200", description = "任务分页结果集")
@@ -121,7 +121,7 @@ public class TaskController extends BaseController {
      * @param ids
      * @return
      */
-    @RequiresNotePermissions(NotePermission.sysTask_stop)
+    @SaCheckNotePermissions(NotePermission.sysTask_stop)
     @RequestMapping(value = "/stop", method = RequestMethod.POST)
     @Operation(description = "停止系统任务")
     @ApiResponse(responseCode = "200", description = "停止系统任务结果")

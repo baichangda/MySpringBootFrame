@@ -1,8 +1,8 @@
 package com.bcd.sys.bean;
 
+import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.support_jpa.bean.SuperBaseBean;
-import com.bcd.sys.shiro.ShiroUtil;
 import com.bcd.base.support_task.Task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -89,7 +89,7 @@ public class TaskBean extends SuperBaseBean<Long> implements Task<Long> {
     @Override
     public void onCreated() {
         createTime = new Date();
-        UserBean userBean = ShiroUtil.getCurrentUser();
+        UserBean userBean = SaTokenUtil.getLoginUser_cache();
         if (userBean != null) {
             createUserId = userBean.getId();
             createUserName = userBean.getRealName();

@@ -1,8 +1,8 @@
 package com.bcd.base.support_jpa.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.code.data.BeanField;
+import com.bcd.base.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 

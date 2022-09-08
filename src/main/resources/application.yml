@@ -8,6 +8,10 @@ server:
     session:
       timeout: 1800
 spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
   # 允许循环依赖
   main:
     allow-circular-references: true
@@ -33,10 +37,10 @@ spring:
     username: root
     password: 123456
     #pgsql
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://127.0.0.1:5432/msbf
-#    username: root
-#    password: 123456
+  #    driver-class-name: org.postgresql.Driver
+  #    url: jdbc:postgresql://127.0.0.1:5432/msbf
+  #    username: root
+  #    password: 123456
 
   #  jpa配置
   jpa:
@@ -85,19 +89,19 @@ spring:
         maxWait: -1
       shutdown-timeout: 100ms
     #主从配置
-#     sentinel:
-#       master: myMaster
-#       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
-#    #集群配置
-#     cluster:
-#       maxRedirects: 3
-#       nodes:
-#         - 114.116.107.184:7001
-#         - 114.116.107.184:7002
-#         - 114.116.107.184:7003
-#         - 114.115.141.139:7004
-#         - 114.115.141.139:7005
-#         - 114.115.141.139:7006
+    #     sentinel:
+    #       master: myMaster
+    #       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
+    #    #集群配置
+    #     cluster:
+    #       maxRedirects: 3
+    #       nodes:
+    #         - 114.116.107.184:7001
+    #         - 114.116.107.184:7002
+    #         - 114.116.107.184:7003
+    #         - 114.115.141.139:7004
+    #         - 114.115.141.139:7005
+    #         - 114.115.141.139:7006
 
     #单机配置
     host: 127.0.0.1
@@ -106,15 +110,15 @@ spring:
   #  kafka配置
   kafka:
     consumer:
-#      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
-#      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
+      #      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+      #      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
       bootstrap-servers: '10.0.11.50:9092'
       group-id: bcd
       key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
     producer:
-#      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
-#      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
+      #      bootstrap-servers: kafka-test-1:9092,kafka-test-2:9093,kafka-test-3:9094
+      #      bootstrap-servers: kafka-dev-1:9092,kafka-dev-2:9093,kafka-dev-3:9094
       bootstrap-servers: '10.0.11.50:9092'
       key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
@@ -125,19 +129,28 @@ spring:
     password:
     default-encoding: UTF-8
 
-  #flyway配置
-  #注意如果使用druid数据源、脚本中不能带 . 字符、否则会导致启动执行脚本失败
-#   flyway:
-#     enabled: true
 springdoc:
   packages-to-scan:
     - com.bcd
   swagger-ui:
     path: /swagger-ui.html
 
-baidu:
-  secretId: xx
-  secretKey: xx
-tencent:
-  secretId: xx
-  secretKey: xx
+
+# Sa-Token配置
+sa-token:
+  # token名称 (同时也是cookie名称)、在前面加上前缀、可以区分系统、影响存储到redis中的key
+  token-name: bcd-satoken
+  # token有效期，单位s 默认30天, -1代表永不过期
+  timeout: 2592000
+  # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+  activity-timeout: -1
+  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  is-share: false
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+  # 同一账号可同时在线的最大数量
+  max-login-count: -1

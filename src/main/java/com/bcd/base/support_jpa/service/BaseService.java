@@ -2,12 +2,11 @@ package com.bcd.base.support_jpa.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.anno.Unique;
 import com.bcd.base.support_jpa.bean.info.BeanInfo;
 import com.bcd.base.support_jpa.repository.BaseRepository;
 import com.bcd.base.support_jpa.util.ConditionUtil;
-import com.google.common.collect.Iterators;
+import com.bcd.base.util.StringUtil;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;

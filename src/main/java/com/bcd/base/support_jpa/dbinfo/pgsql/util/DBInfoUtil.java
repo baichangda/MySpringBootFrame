@@ -2,22 +2,15 @@ package com.bcd.base.support_jpa.dbinfo.pgsql.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.SpringUtil;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_jpa.dbinfo.data.DBInfo;
 import com.bcd.base.support_jpa.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.base.support_jpa.dbinfo.pgsql.bean.TablesBean;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class DBInfoUtil {
@@ -48,7 +41,7 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            final JsonNode[] props = SpringUtil.getSpringProps("spring.datasource.url"
+            final JsonNode[] props = SpringUtil.getSpringPropsInYml("spring.datasource.url"
                     , "spring.datasource.username"
                     , "spring.datasource.password");
             String url = props[0].asText();

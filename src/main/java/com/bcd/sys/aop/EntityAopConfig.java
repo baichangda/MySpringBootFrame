@@ -1,12 +1,16 @@
 package com.bcd.sys.aop;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.support_jpa.bean.BaseBean;
+import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.sys.bean.UserBean;
-import com.bcd.sys.shiro.ShiroUtil;
+import com.bcd.sys.service.CacheService;
+import com.bcd.sys.service.UserService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -20,6 +24,11 @@ import java.util.Iterator;
 @Aspect
 @Component
 public class EntityAopConfig {
+
+
+    @Autowired
+    CacheService cacheService;
+
     /**
      * 切面:
      * 1、所有 Repository 层的save开头的方法
@@ -41,7 +50,7 @@ public class EntityAopConfig {
     @Before("savePointCut()")
     public void doBeforeDAOSave(JoinPoint pjp) {
         Object[] paramArr = pjp.getArgs();
-        UserBean user = ShiroUtil.getCurrentUser();
+        UserBean user = SaTokenUtil.getLoginUser_cache();
         Arrays.stream(paramArr).forEach(param -> {
             if (param == null) {
                 return;

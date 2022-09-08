@@ -2,11 +2,11 @@ package com.bcd.base.support_mongodb.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.StringUtil;
 import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.info.BeanInfo;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
+import com.bcd.base.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -101,7 +101,6 @@ public class BaseService<T, K extends Serializable> {
         Unique anno = field.getAnnotation(Unique.class);
         return StringUtil.format(anno.value(),field.getName());
     }
-
     /**
      * 保存前进行唯一性验证
      * 在并发保存情况下无法保证数据一致性、需要根据业务情况加锁

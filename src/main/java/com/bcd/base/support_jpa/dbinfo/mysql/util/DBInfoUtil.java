@@ -6,15 +6,12 @@ import com.bcd.base.support_jpa.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_jpa.dbinfo.mysql.bean.TablesBean;
 import com.bcd.base.util.SpringUtil;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 此帮助类的所有api均会读取application-*.yml的数据库配置,并将数据库切换为information_schema
@@ -36,7 +33,7 @@ public class DBInfoUtil {
      */
     public static DBInfo getDBProps() {
         try {
-            final JsonNode[] props = SpringUtil.getSpringProps("spring.datasource.url"
+            final JsonNode[] props = SpringUtil.getSpringPropsInYml("spring.datasource.url"
                     , "spring.datasource.username"
                     , "spring.datasource.password");
             String url = props[0].asText();

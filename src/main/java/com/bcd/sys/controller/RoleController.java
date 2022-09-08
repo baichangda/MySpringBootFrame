@@ -3,8 +3,8 @@ package com.bcd.sys.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.support_shiro.anno.RequiresNotePermissions;
-import com.bcd.base.support_shiro.data.NotePermission;
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.bean.RoleBean;
@@ -34,7 +34,7 @@ public class RoleController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.role_search)
+    @SaCheckNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(description = "查询角色列表")
     @ApiResponse(responseCode = "200", description = "角色列表")
@@ -60,7 +60,7 @@ public class RoleController extends BaseController {
      *
      * @return
      */
-    @RequiresNotePermissions(NotePermission.role_search)
+    @SaCheckNotePermissions(NotePermission.role_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @Operation(description = "查询角色列表")
     @ApiResponse(responseCode = "200", description = "角色分页结果集")
@@ -89,7 +89,7 @@ public class RoleController extends BaseController {
      * @param role
      * @return
      */
-    @RequiresNotePermissions(NotePermission.role_edit)
+    @SaCheckNotePermissions(NotePermission.role_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(description = "保存角色")
     @ApiResponse(responseCode = "200", description = "保存结果")
@@ -105,7 +105,7 @@ public class RoleController extends BaseController {
      * @param ids
      * @return
      */
-    @RequiresNotePermissions(NotePermission.role_edit)
+    @SaCheckNotePermissions(NotePermission.role_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除角色")
     @ApiResponse(responseCode = "200", description = "删除结果")
