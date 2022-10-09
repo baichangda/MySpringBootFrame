@@ -25,7 +25,7 @@ public class TestRedisTopicMQ extends RedisTopicMQ<TestBean[]> implements Applic
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        watch();
+        init();
         TestBean testBean = new TestBean();
         testBean.setId(1);
         testBean.setName("呵呵");

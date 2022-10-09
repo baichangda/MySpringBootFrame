@@ -36,6 +36,10 @@ public class NumberCondition implements Condition {
          */
         EQUAL,
         /**
+         * 不等于
+         */
+        NOT_EQUAL,
+        /**
          * 小于
          */
         LT,
@@ -51,10 +55,6 @@ public class NumberCondition implements Condition {
          * 大于等于
          */
         GE,
-        /**
-         * 不等于
-         */
-        NOT_EQUAL,
         /**
          * 在...之内
          */

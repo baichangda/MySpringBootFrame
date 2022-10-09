@@ -23,7 +23,7 @@ public class ConditionUtil {
         CONDITION_CONVERTER_MAP.put(StringCondition.class, new StringConditionConverter());
         CONDITION_CONVERTER_MAP.put(DateCondition.class, new DateConditionConverter());
         CONDITION_CONVERTER_MAP.put(NullCondition.class, new NullConditionConverter());
-        CONDITION_CONVERTER_MAP.put(ConditionImpl.class, new ConditionImplConverter());
+        CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
     public static Query toQuery(Condition condition) {

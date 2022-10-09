@@ -1,8 +1,8 @@
 package com.bcd.base.support_redis.mq.queue;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
@@ -26,34 +26,35 @@ import java.util.concurrent.TimeUnit;
 public class RedisQueueMQ<V> {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected final String name;
+    private final String name;
 
-    protected final RedisConnectionFactory connectionFactory;
+    private final int consumerThreadNum;
 
-    protected final ValueSerializerType valueSerializerType;
+    private final int workThreadNum;
 
-    protected final int consumerThreadNum;
+    private RedisSerializer<V> valueSerializer;
 
-    protected final int workThreadNum;
+    private BoundListOperations<String, byte[]> boundListOperations;
 
-    protected RedisSerializer<V> valueSerializer;
+    private ThreadPoolExecutor consumeExecutor;
 
-    protected BoundListOperations<String, byte[]> boundListOperations;
+    private ThreadPoolExecutor workExecutor;
 
-    protected ThreadPoolExecutor consumeExecutor;
+    private RedisTemplate<String, byte[]> redisTemplate;
 
-    protected ThreadPoolExecutor workExecutor;
+    private boolean stop;
 
-    protected RedisTemplate<String, byte[]> redisTemplate;
+    private boolean consumerAvailable;
 
-    private volatile boolean stop;
 
     public RedisQueueMQ(String name, RedisConnectionFactory connectionFactory, ValueSerializerType valueSerializerType, int consumerThreadNum, int workThreadNum) {
         this.name = name;
-        this.connectionFactory = connectionFactory;
-        this.valueSerializerType = valueSerializerType;
         this.consumerThreadNum = consumerThreadNum;
         this.workThreadNum = workThreadNum;
+
+        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
+        this.boundListOperations = redisTemplate.boundListOps(name);
+        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
     }
 
     public String getName() {
@@ -103,28 +104,38 @@ public class RedisQueueMQ<V> {
     }
 
     public void init() {
-        this.stop = false;
-        this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
-        this.boundListOperations = redisTemplate.boundListOps(name);
-        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
-        this.consumeExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(consumerThreadNum);
-        this.workExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(workThreadNum);
-        start();
+        if (!consumerAvailable) {
+            synchronized (this) {
+                if (!consumerAvailable) {
+                    this.stop = false;
+                    this.consumeExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(consumerThreadNum);
+                    this.workExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(workThreadNum);
+                    start();
+                }
+            }
+        }
     }
 
     public void destroy() {
-        this.stop = true;
-        try {
-            consumeExecutor.shutdown();
-            while (!consumeExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+        if (consumerAvailable) {
+            synchronized (this) {
+                if (consumerAvailable) {
+                    this.stop = true;
+                    try {
+                        consumeExecutor.shutdown();
+                        while (!consumeExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
 
-            }
-            workExecutor.shutdown();
-            while (!workExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                        }
+                        workExecutor.shutdown();
+                        while (!workExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
 
+                        }
+                    } catch (InterruptedException ex) {
+                        throw BaseRuntimeException.getException(ex);
+                    }
+                    consumerAvailable = false;
+                }
             }
-        } catch (InterruptedException ex) {
-            throw BaseRuntimeException.getException(ex);
         }
     }
 
@@ -133,7 +144,7 @@ public class RedisQueueMQ<V> {
         logger.info(data.toString());
     }
 
-    protected void onMessageFromRedis(byte[] data) {
+    private void onMessageFromRedis(byte[] data) {
         onMessage(valueSerializer.deserialize(unCompress(data)));
     }
 

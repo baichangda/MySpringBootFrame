@@ -1,8 +1,8 @@
 package com.bcd.base.support_redis.mq.topic;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
@@ -19,7 +19,9 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -27,34 +29,35 @@ public class RedisTopicMQ<V> {
 
     protected Logger logger = LoggerFactory.getLogger(RedisTopicMQ.class);
 
-    protected final RedisConnectionFactory connectionFactory;
+    private final RedisConnectionFactory connectionFactory;
 
-    protected final int subscriptionThreadNum;
+    private final int subscriptionThreadNum;
 
-    protected final int taskThreadNum;
+    private final int taskThreadNum;
+    private final String[] names;
 
-    protected final ValueSerializerType valueSerializerType;
+    private RedisSerializer<V> redisSerializer;
 
-    protected final String[] names;
+    private RedisTemplate<String, byte[]> redisTemplate;
 
-    protected RedisSerializer<V> redisSerializer;
+    private RedisMessageListenerContainer redisMessageListenerContainer;
 
-    protected RedisTemplate<String, byte[]> redisTemplate;
+    private MessageListener messageListener;
 
-    protected RedisMessageListenerContainer redisMessageListenerContainer;
+    private ThreadPoolExecutor taskExecutor;
 
-    protected MessageListener messageListener;
+    private ThreadPoolExecutor subscriptionExecutor;
 
-    protected ThreadPoolExecutor taskExecutor;
-
-    protected ThreadPoolExecutor subscriptionExecutor;
+    private boolean consumerAvailable;
 
     public RedisTopicMQ(RedisConnectionFactory connectionFactory, int subscriptionThreadNum, int taskThreadNum, ValueSerializerType valueSerializerType, String... names) {
         this.connectionFactory = connectionFactory;
         this.subscriptionThreadNum = subscriptionThreadNum;
         this.taskThreadNum = taskThreadNum;
-        this.valueSerializerType = valueSerializerType;
         this.names = names;
+
+        redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
+        redisSerializer = getDefaultRedisSerializer(valueSerializerType);
 
     }
 
@@ -126,55 +129,51 @@ public class RedisTopicMQ<V> {
         return data;
     }
 
-    public void watch() {
-        this.redisMessageListenerContainer.addMessageListener(this.messageListener, Arrays.stream(this.names).map(ChannelTopic::new).collect(Collectors.toList()));
-    }
-
-    public void unWatch() {
-        this.redisMessageListenerContainer.removeMessageListener(this.messageListener);
-    }
-
     public void init() {
-        taskExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(taskThreadNum);
-        subscriptionExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(subscriptionThreadNum);
-
-        redisMessageListenerContainer = new RedisMessageListenerContainer();
-        redisMessageListenerContainer.setConnectionFactory(connectionFactory);
-        redisMessageListenerContainer.setTaskExecutor(taskExecutor);
-        redisMessageListenerContainer.setSubscriptionExecutor(subscriptionExecutor);
-        redisMessageListenerContainer.afterPropertiesSet();
-        redisMessageListenerContainer.start();
-
-        redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
-        redisSerializer = getDefaultRedisSerializer(valueSerializerType);
-
-        messageListener = getMessageListener();
-
-        watch();
+        if (!consumerAvailable) {
+            synchronized (this) {
+                if (!consumerAvailable) {
+                    taskExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(taskThreadNum);
+                    subscriptionExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(subscriptionThreadNum);
+                    redisMessageListenerContainer = new RedisMessageListenerContainer();
+                    redisMessageListenerContainer.setConnectionFactory(connectionFactory);
+                    redisMessageListenerContainer.setTaskExecutor(taskExecutor);
+                    redisMessageListenerContainer.setSubscriptionExecutor(subscriptionExecutor);
+                    redisMessageListenerContainer.afterPropertiesSet();
+                    redisMessageListenerContainer.start();
+                    messageListener = getMessageListener();
+                    redisMessageListenerContainer.addMessageListener(this.messageListener, Arrays.stream(this.names).map(ChannelTopic::new).collect(Collectors.toList()));
+                }
+            }
+        }
     }
 
     public void destroy() {
-        unWatch();
+        if (consumerAvailable) {
+            synchronized (this) {
+                if (consumerAvailable) {
+                    this.redisMessageListenerContainer.removeMessageListener(this.messageListener);
+                    try {
+                        redisMessageListenerContainer.destroy();
+                    } catch (Exception ex) {
+                        throw BaseRuntimeException.getException(ex);
+                    }
+                    try {
+                        subscriptionExecutor.shutdown();
+                        while (!subscriptionExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
 
-        try {
-            redisMessageListenerContainer.destroy();
-        } catch (Exception ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+                        }
+                        taskExecutor.shutdown();
+                        while (!taskExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
 
-        try {
-            subscriptionExecutor.shutdown();
-            while (!subscriptionExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
+                        }
+                    } catch (InterruptedException ex) {
+                        throw BaseRuntimeException.getException(ex);
+                    }
+                    consumerAvailable = false;
+                }
             }
-            taskExecutor.shutdown();
-            while (!taskExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
-            }
-        } catch (InterruptedException ex) {
-            throw BaseRuntimeException.getException(ex);
         }
-
     }
 
     public void onMessage(V data) {

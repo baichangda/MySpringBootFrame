@@ -1,7 +1,7 @@
 package com.bcd.base.condition;
 
 
-import com.bcd.base.condition.impl.ConditionImpl;
+import com.bcd.base.condition.impl.ConcatCondition;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public interface Condition extends Serializable {
     static Condition and(List<Condition> conditionList) {
-        return new ConditionImpl(ConditionImpl.ConcatWay.AND, conditionList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        return new ConcatCondition(ConcatCondition.ConcatWay.AND, conditionList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     static Condition and(Condition... conditionArr) {
@@ -23,7 +23,7 @@ public interface Condition extends Serializable {
     }
 
     static Condition or(List<Condition> conditionList) {
-        return new ConditionImpl(ConditionImpl.ConcatWay.OR, conditionList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+        return new ConcatCondition(ConcatCondition.ConcatWay.OR, conditionList.stream().filter(Objects::nonNull).collect(Collectors.toList()));
     }
 
     static Condition or(Condition... conditionArr) {

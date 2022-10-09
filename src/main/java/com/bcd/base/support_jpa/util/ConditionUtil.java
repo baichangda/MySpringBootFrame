@@ -23,7 +23,7 @@ public class ConditionUtil {
         JPA_CONDITION_CONVERTER_MAP.put(StringCondition.class, new StringConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(DateCondition.class, new DateConditionConverter());
         JPA_CONDITION_CONVERTER_MAP.put(NullCondition.class, new NullConditionConverter());
-        JPA_CONDITION_CONVERTER_MAP.put(ConditionImpl.class, new ConditionImplConverter());
+        JPA_CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
     public static <T> Path parseRootPath(Root<T> root, String attrName) {

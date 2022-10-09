@@ -9,19 +9,19 @@ import java.util.List;
  * Created by Administrator on 2017/3/23.
  */
 @SuppressWarnings("unchecked")
-public class ConditionImpl implements Condition {
+public class ConcatCondition implements Condition {
     public final ConcatWay concatWay;
-    public final List<Condition> childrenList;
+    public final List<Condition> conditions;
 
-    public ConditionImpl(ConcatWay concatWay, List<Condition> childrenList) {
+    public ConcatCondition(ConcatWay concatWay, List<Condition> conditions) {
         this.concatWay = concatWay;
-        this.childrenList = childrenList;
+        this.conditions = conditions;
     }
 
     @Override
     public String toAnalysis() {
         List<String> list = new ArrayList<>();
-        for (Condition condition : childrenList) {
+        for (Condition condition : conditions) {
             String cur = condition.toAnalysis();
             if (cur != null) {
                 list.add(cur);

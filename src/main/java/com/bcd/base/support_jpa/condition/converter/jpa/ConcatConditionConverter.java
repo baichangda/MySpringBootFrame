@@ -2,7 +2,7 @@ package com.bcd.base.support_jpa.condition.converter.jpa;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
-import com.bcd.base.condition.impl.ConditionImpl;
+import com.bcd.base.condition.impl.ConcatCondition;
 import com.bcd.base.support_jpa.util.ConditionUtil;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -16,11 +16,11 @@ import java.util.Objects;
  * Created by Administrator on 2017/9/15.
  */
 @SuppressWarnings("unchecked")
-public class ConditionImplConverter implements Converter<ConditionImpl, Predicate> {
+public class ConcatConditionConverter implements Converter<ConcatCondition, Predicate> {
     @Override
-    public Predicate convert(ConditionImpl condition, Object... exts) {
-        List<Condition> childrenList = condition.childrenList;
-        ConditionImpl.ConcatWay concatWay = condition.concatWay;
+    public Predicate convert(ConcatCondition condition, Object... exts) {
+        List<Condition> childrenList = condition.conditions;
+        ConcatCondition.ConcatWay concatWay = condition.concatWay;
         Root root = (Root) exts[0];
         CriteriaQuery query = (CriteriaQuery) exts[1];
         CriteriaBuilder cb = (CriteriaBuilder) exts[2];
