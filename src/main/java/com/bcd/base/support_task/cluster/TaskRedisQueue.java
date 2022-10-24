@@ -5,6 +5,7 @@ import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_task.Task;
 import com.bcd.base.support_task.TaskRunnable;
 import com.bcd.base.support_task.TaskBuilder;
+import com.bcd.base.util.ExecutorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
@@ -155,18 +156,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
     public void destroy() {
         stop = true;
-        fetchPool.shutdown();
-        workPool.shutdown();
-        try {
-            while (!fetchPool.awaitTermination(60, TimeUnit.SECONDS)) {
-
-            }
-            while (!workPool.awaitTermination(60, TimeUnit.SECONDS)) {
-
-            }
-        } catch (InterruptedException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+        ExecutorUtil.shutdownAllThenAwaitAll(fetchPool, workPool);
     }
 
 

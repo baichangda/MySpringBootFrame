@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
+import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
@@ -158,18 +159,7 @@ public class RedisTopicMQ<V> {
                     } catch (Exception ex) {
                         throw BaseRuntimeException.getException(ex);
                     }
-                    try {
-                        subscriptionExecutor.shutdown();
-                        while (!subscriptionExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
-                        }
-                        taskExecutor.shutdown();
-                        while (!taskExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
-                        }
-                    } catch (InterruptedException ex) {
-                        throw BaseRuntimeException.getException(ex);
-                    }
+                    ExecutorUtil.shutdownThenAwaitOneByOne(subscriptionExecutor, taskExecutor);
                     consumerAvailable = false;
                 }
             }

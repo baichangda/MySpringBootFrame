@@ -12,7 +12,7 @@ public class TestTaskFunction2 extends TaskFunction<TaskBean,Long> {
     Logger logger = LoggerFactory.getLogger(TestTaskFunction2.class);
 
     @Override
-    public boolean execute(TaskRunnable<TaskBean,Long> runnable) {
+    public void execute(TaskRunnable<TaskBean,Long> runnable) {
         try {
             TimeUnit.SECONDS.sleep(10);
             logger.info("{}", getName());
@@ -20,6 +20,5 @@ public class TestTaskFunction2 extends TaskFunction<TaskBean,Long> {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return true;
     }
 }

@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
+import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
@@ -121,18 +122,7 @@ public class RedisQueueMQ<V> {
             synchronized (this) {
                 if (consumerAvailable) {
                     this.stop = true;
-                    try {
-                        consumeExecutor.shutdown();
-                        while (!consumeExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
-                        }
-                        workExecutor.shutdown();
-                        while (!workExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-
-                        }
-                    } catch (InterruptedException ex) {
-                        throw BaseRuntimeException.getException(ex);
-                    }
+                    ExecutorUtil.shutdownThenAwaitOneByOne(consumeExecutor, workExecutor);
                     consumerAvailable = false;
                 }
             }

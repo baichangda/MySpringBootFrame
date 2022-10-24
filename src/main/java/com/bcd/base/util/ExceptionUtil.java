@@ -65,7 +65,7 @@ public class ExceptionUtil {
                     .code(((BaseRuntimeException) realException).getCode())
                     .message(realException.getMessage());
         }else {
-            return JsonMessage.fail().message(realException.getMessage());
+            return JsonMessage.fail().message(realException.toString());
         }
     }
 
@@ -77,7 +77,7 @@ public class ExceptionUtil {
         if (realException instanceof BaseRuntimeException) {
             return realException.getMessage();
         } else {
-            return realException.getMessage();
+            return realException.toString();
         }
     }
 
