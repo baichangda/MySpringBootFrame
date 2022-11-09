@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -185,6 +186,9 @@ public class CodeGenerator {
     public static List<BeanField> initBeanField(CollectionConfig config) {
         List<Field> fieldList = FieldUtils.getAllFieldsList(config.getClazz()).stream().filter(e -> {
             if (e.getAnnotation(Transient.class) != null) {
+                return false;
+            }
+            if(Modifier.isStatic(e.getModifiers())){
                 return false;
             }
             if ("id".equals(e.getName())) {
