@@ -1,6 +1,7 @@
 package com.bcd.base.support_redis;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_redis.serializer.IntegerRedisSerializer;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,6 +17,8 @@ public class RedisUtil {
 
     public final static RedisSerializer<Object> JDK_SERIALIZATION_SERIALIZER = RedisSerializer.java();
     public final static RedisSerializer<String> STRING_SERIALIZER = RedisSerializer.string();
+
+    public final static RedisSerializer<Integer> INTEGER_SERIALIZER = new IntegerRedisSerializer();
     public final static RedisSerializer<byte[]> BYTE_ARRAY_SERIALIZER = RedisSerializer.byteArray();
     public final static String SYSTEM_REDIS_KEY_PRE = "bcd:";
 
@@ -42,8 +45,8 @@ public class RedisUtil {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         Jackson2JsonRedisSerializer<V> redisSerializer = newJackson2JsonRedisSerializer(type);
         redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
-        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setValueSerializer(redisSerializer);
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(redisSerializer);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
@@ -59,8 +62,8 @@ public class RedisUtil {
         RedisTemplate<String, byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
-        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setValueSerializer(RedisSerializer.byteArray());
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(RedisSerializer.byteArray());
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
@@ -96,9 +99,26 @@ public class RedisUtil {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
-        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setValueSerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+
+    /**
+     * 获取String_String的RedisTemplate
+     *
+     * @param redisConnectionFactory
+     * @return
+     */
+    public static RedisTemplate<String, Integer> newString_IntegerRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Integer> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setValueSerializer(RedisUtil.INTEGER_SERIALIZER);
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
+        redisTemplate.setHashValueSerializer(RedisUtil.INTEGER_SERIALIZER);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
@@ -113,8 +133,8 @@ public class RedisUtil {
         RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(RedisUtil.STRING_SERIALIZER);
-        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setValueSerializer(JDK_SERIALIZATION_SERIALIZER);
+        redisTemplate.setHashKeySerializer(RedisUtil.STRING_SERIALIZER);
         redisTemplate.setHashValueSerializer(JDK_SERIALIZATION_SERIALIZER);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
