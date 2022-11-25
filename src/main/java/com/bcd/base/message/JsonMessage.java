@@ -14,25 +14,20 @@ import java.io.Serializable;
 @SuppressWarnings("unchecked")
 public class JsonMessage<T> implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Schema(description = "Api是否调用成功(true/false)")
-    private boolean result;
+
+    @Schema(description = "Api调用编码(0:成功;1:通用错误;其他代表各种业务定义的错误)")
+    private int code;
     @Schema(description = "Api调用失败时提示信息")
     private String message;
-    @Schema(description = "Api调用失败时错误编码")
-    private String code;
     @Schema(description = "Api调用返回的数据")
     private T data;
 
     public JsonMessage() {
     }
 
-    public JsonMessage(boolean result,T data) {
-        this.result=result;
+    public JsonMessage(int code, T data) {
+        this.code = code;
         this.data = data;
-    }
-
-    public boolean isResult() {
-        return result;
     }
 
     public String getMessage() {
@@ -44,36 +39,40 @@ public class JsonMessage<T> implements Serializable {
         return this;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public JsonMessage<T> code(String code) {
+    public JsonMessage<T> message(int code) {
         this.code = code;
         return this;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     public T getData() {
         return data;
     }
 
-    public static JsonMessage<?> success(){
-        return new JsonMessage<>(true,null);
+    public static JsonMessage<?> success() {
+        return new JsonMessage<>(0, null);
     }
 
-    public static JsonMessage<?> fail(){
-        return new JsonMessage<>(false,null);
+    public static <R> JsonMessage<R> success(R data) {
+        return new JsonMessage<>(0, data);
     }
 
-    public static <R> JsonMessage<R> success(R data){
-        return new JsonMessage<>(true,data);
+    public static JsonMessage<?> fail() {
+        return new JsonMessage<>(1, null);
     }
 
-    public static <R> JsonMessage<R> fail(R data){
-        return new JsonMessage<>(false,data);
+    public static <R> JsonMessage<R> fail(int code) {
+        return new JsonMessage<>(code, null);
     }
 
-    public String toJson(){
+    public static <R> JsonMessage<R> fail(int code,R data) {
+        return new JsonMessage<>(code, data);
+    }
+
+    public String toJson() {
         return JsonUtil.toJson(this);
     }
 

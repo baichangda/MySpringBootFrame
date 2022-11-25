@@ -22,7 +22,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id "org.flywaydb.flyway" version "9.+"
+    id "org.flywaydb.flyway" version "9.7.+"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id 'org.springframework.boot' version "2.+"
 }
@@ -112,7 +112,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:+")
+    implementation("org.springframework.kafka:spring-kafka:2.+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")

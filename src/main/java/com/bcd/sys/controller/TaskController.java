@@ -8,6 +8,7 @@ import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.base.support_task.StopResult;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.sys.service.TaskService;
 import com.bcd.base.support_task.TaskBuilder;
@@ -34,7 +35,7 @@ public class TaskController extends BaseController {
     private TaskService taskService;
 
     @Autowired
-    private TaskBuilder<TaskBean,Long> taskBuilder;
+    private TaskBuilder<TaskBean, Long> taskBuilder;
 
     /**
      * 查询系统任务列表
@@ -125,11 +126,13 @@ public class TaskController extends BaseController {
     @RequestMapping(value = "/stop", method = RequestMethod.POST)
     @Operation(description = "停止系统任务")
     @ApiResponse(responseCode = "200", description = "停止系统任务结果")
-    public JsonMessage stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
+    public JsonMessage<StopResult[]> stop(@Parameter(description = "系统任务id数组") @RequestParam Long[] ids) {
         if (ids != null && ids.length > 0) {
-            taskBuilder.stopTask(ids);
+            final StopResult[] stopResults = taskBuilder.stopTask(ids);
+            return JsonMessage.success(stopResults);
+        } else {
+            return JsonMessage.success(null);
         }
-        return JsonMessage.success().message("停止成功");
     }
 
 }

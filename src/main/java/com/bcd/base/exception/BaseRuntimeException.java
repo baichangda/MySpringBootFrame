@@ -13,7 +13,7 @@ import com.bcd.base.util.StringUtil;
  * 如果是用作第一种用途,则所有继承自Throwable的方法都是针对解析出来的真实异常,解析规则参考 {@link ExceptionUtil#parseRealException}
  */
 public class BaseRuntimeException extends RuntimeException {
-    protected String code;
+    protected int code;
 
     private BaseRuntimeException(String message) {
         super(message);
@@ -44,7 +44,7 @@ public class BaseRuntimeException extends RuntimeException {
         return new BaseRuntimeException(e);
     }
 
-    public static BaseRuntimeException getException(Throwable e, String code) {
+    public static BaseRuntimeException getException(Throwable e, int code) {
         return new BaseRuntimeException(e).code(code);
     }
 
@@ -52,7 +52,7 @@ public class BaseRuntimeException extends RuntimeException {
         throw BaseRuntimeException.getException("[{}]-[{}]", null, 100000);
     }
 
-    public String getCode() {
+    public int getCode() {
         return code;
     }
 
@@ -60,7 +60,7 @@ public class BaseRuntimeException extends RuntimeException {
         return ExceptionUtil.toJsonMessage(this);
     }
 
-    public BaseRuntimeException code(String code) {
+    public BaseRuntimeException code(int code) {
         this.code = code;
         return this;
     }

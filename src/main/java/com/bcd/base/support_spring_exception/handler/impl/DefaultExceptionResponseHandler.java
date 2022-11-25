@@ -1,7 +1,6 @@
 package com.bcd.base.support_spring_exception.handler.impl;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import com.bcd.base.message.ErrorMessage;
 import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.support_spring_exception.handler.ExceptionResponseHandler;
@@ -24,7 +23,7 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
 
     public static JsonMessage checkNotLoginException(Throwable throwable) {
         if (throwable instanceof NotLoginException && ((NotLoginException) throwable).getType().equals(NotLoginException.NOT_TOKEN)) {
-            return JsonMessage.fail().message(NotLoginException.DEFAULT_MESSAGE).code("401");
+            return JsonMessage.fail(401).message(NotLoginException.DEFAULT_MESSAGE);
         } else {
             return null;
         }
