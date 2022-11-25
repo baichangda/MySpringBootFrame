@@ -5,6 +5,7 @@ import com.bcd.base.util.JsonUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by dave on 16/2/13.
