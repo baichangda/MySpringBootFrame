@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class DateConditionConverter implements Converter<DateCondition, Criteria> {
     @Override
     public Criteria convert(DateCondition condition, Object... exts) {

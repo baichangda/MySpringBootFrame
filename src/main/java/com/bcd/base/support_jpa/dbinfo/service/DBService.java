@@ -8,7 +8,6 @@ import java.io.OutputStream;
 
 
 @Service
-@SuppressWarnings("unchecked")
 public interface DBService {
     /**
      * 导出application.yml中配置的url中指定数据库配置

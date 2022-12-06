@@ -24,8 +24,6 @@ public class DynamicJdbcUtil {
 
     /**
      * 数据源最大connection激活数量
-     *
-     *
      */
     private final static int DATA_SOURCE_MAX_ACTIVE = 3;
     static Logger logger = LoggerFactory.getLogger(DynamicJdbcUtil.class);

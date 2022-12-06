@@ -8,7 +8,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class NullConditionConverter implements Converter<NullCondition, Criteria> {
     @Override
     public Criteria convert(NullCondition condition, Object... exts) {

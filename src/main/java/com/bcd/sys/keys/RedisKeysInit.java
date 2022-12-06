@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-@SuppressWarnings("unchecked")
 @Component
 public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -33,7 +32,7 @@ public class RedisKeysInit implements ApplicationListener<ContextRefreshedEvent>
                 keys[0] = Base64.getEncoder().encodeToString(((PublicKey) objects[0]).getEncoded());
                 keys[1] = Base64.getEncoder().encodeToString(((PrivateKey) objects[1]).getEncoded());
                 //3.1、如果插入失败,则说明在生成过程中redis中已经被存储了一份,此时再取出redis公钥私钥
-                boolean res = redisTemplate.opsForValue().setIfAbsent(KeysConst.REDIS_KEY_NAME, keys);
+                boolean res = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(KeysConst.REDIS_KEY_NAME, keys));
                 if (!res) {
                     keys = redisTemplate.opsForValue().get(KeysConst.REDIS_KEY_NAME);
                 }

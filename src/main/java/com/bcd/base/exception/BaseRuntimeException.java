@@ -31,7 +31,6 @@ public class BaseRuntimeException extends RuntimeException {
      * 将异常信息转换为格式化
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
-     *
      * @param message
      * @param params
      * @return
