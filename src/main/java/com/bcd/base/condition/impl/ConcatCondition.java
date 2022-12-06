@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/3/23.
  */
-@SuppressWarnings("unchecked")
 public class ConcatCondition implements Condition {
     public final ConcatWay concatWay;
     public final List<Condition> conditions;
