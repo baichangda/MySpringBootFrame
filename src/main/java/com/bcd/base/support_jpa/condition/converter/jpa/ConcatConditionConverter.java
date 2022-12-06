@@ -15,7 +15,6 @@ import java.util.Objects;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class ConcatConditionConverter implements Converter<ConcatCondition, Predicate> {
     @Override
     public Predicate convert(ConcatCondition condition, Object... exts) {
