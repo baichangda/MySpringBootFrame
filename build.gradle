@@ -112,7 +112,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:2.+")
+    implementation("org.springframework.kafka:spring-kafka:2.9.3")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
