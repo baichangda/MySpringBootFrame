@@ -39,8 +39,7 @@ public abstract class AbstractConsumer {
      * @param groupId                消费组id
      * @param workThreadNum          工作线程个数
      * @param maxBlockingNum         最大阻塞
-     * @param maxConsumeSpeed        最大消费速度每秒(-1代表不限制)、不能设置的过小、因为每次从kafka消费是一批数据、如果设置过小、可能会导致阻塞死
-     *                               至少大于一批数据大小
+     * @param maxConsumeSpeed        最大消费速度每秒(-1代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
      * @param autoReleaseBlockingNum 在work完以后、自动释放blockingNum
      * @param topics                 消费的topic
      */
@@ -150,7 +149,7 @@ public abstract class AbstractConsumer {
             return null;
         }
 
-        ConsumerRecords<String, byte[]> res = getConsumer().poll(Duration.ofSeconds(1));
+        ConsumerRecords<String, byte[]> res = getConsumer().poll(Duration.ofSeconds(60));
         final int count;
         if (res != null && (count = res.count()) > 0) {
             //消费成功后统计计数
@@ -161,12 +160,9 @@ public abstract class AbstractConsumer {
                 if (curConsumeCount < maxConsumeSpeed) {
                     return res;
                 } else {
-                    while (true) {
+                    do {
                         TimeUnit.MILLISECONDS.sleep(50);
-                        if (consumeCount.get() < maxConsumeSpeed) {
-                            break;
-                        }
-                    }
+                    } while (consumeCount.get() >= maxConsumeSpeed);
                     return res;
                 }
             } else {

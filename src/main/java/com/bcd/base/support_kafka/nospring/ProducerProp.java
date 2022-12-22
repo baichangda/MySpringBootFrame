@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
-@Getter
-@Setter
 public class ProducerProp {
     @NotBlank
     public String bootstrapServers;

@@ -6,6 +6,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutorUtil {
+
+    public static void sleep_ms(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
     /**
      * 一个一个关闭等待
      *

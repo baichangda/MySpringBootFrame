@@ -1,13 +1,8 @@
 package com.bcd.base.support_kafka.nospring;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.validation.constraints.NotEmpty;
 import java.time.Duration;
 
-@Getter
-@Setter
 public class ConsumerProp {
     @NotEmpty
     public String bootstrapServers;
