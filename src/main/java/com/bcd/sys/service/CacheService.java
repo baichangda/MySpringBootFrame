@@ -51,7 +51,7 @@ public class CacheService {
                         if (user == null) {
                             return Collections.emptyList();
                         } else {
-                            return roleService.findRolesByUserId(user.getId()).stream().map(RoleBean::getCode).collect(Collectors.toList());
+                            return roleService.findRolesByUserId(user.id).stream().map(e->e.code).collect(Collectors.toList());
                         }
                     });
                 }
@@ -69,7 +69,7 @@ public class CacheService {
                         if (user == null) {
                             return Collections.emptyList();
                         } else {
-                            return permissionService.findPermissionsByUserId(user.getId()).stream().map(PermissionBean::getCode).collect(Collectors.toList());
+                            return permissionService.findPermissionsByUserId(user.id).stream().map(e->e.code).collect(Collectors.toList());
                         }
                     });
                 }

@@ -45,8 +45,8 @@ public class SqlUtil {
         paramList1.add(null);
         paramList1.add(null);
         SqlListResult sqlListResult = replace_nullParam(sql1, paramList1.toArray());
-        System.out.println(sqlListResult.getSql());
-        sqlListResult.getParamList().forEach(e -> System.out.print(e + "    "));
+        System.out.println(sqlListResult.sql);
+        sqlListResult.paramList.forEach(e -> System.out.print(e + "    "));
 
 
         System.out.println();
@@ -65,8 +65,8 @@ public class SqlUtil {
         paramMap2.put("type", Arrays.asList(1, null, 3));
         paramMap2.put("phone", new Object[]{null, null});
         SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2, true, 1, 100);
-        System.out.println(sqlMapResult.getSql());
-        sqlMapResult.getParamMap().forEach((k, v) -> {
+        System.out.println(sqlMapResult.sql);
+        sqlMapResult.paramMap.forEach((k, v) -> {
             if (v.getClass().isArray()) {
                 Object[] arr = (Object[]) v;
                 System.out.print(k + ":" + Arrays.asList(arr) + "    ");
@@ -275,7 +275,7 @@ public class SqlUtil {
                     }
                     NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramMap);
                     visitor.parse();
-                    newParamMap = visitor.getNewParamMap();
+                    newParamMap = visitor.newParamMap;
                 } else {
                     newParamMap.putAll(paramMap);
                 }
@@ -310,8 +310,8 @@ public class SqlUtil {
      * @param pageSize null代表不开启limit offset添加
      * @param params   不会改变
      * @return
-     * @see SqlListResult#getSql()  格式化后的sql
-     * @see SqlListResult#getParamList()  去除Null后的paramList,总是生成新的ArrayList
+     * @see SqlListResult#sql  格式化后的sql
+     * @see SqlListResult#paramList  去除Null后的paramList,总是生成新的ArrayList
      */
     public static SqlListResult replace_nullParam_count_limit(String sql, Boolean count, Integer pageNum, Integer pageSize, Object... params) {
         Objects.requireNonNull(sql);
@@ -348,7 +348,7 @@ public class SqlUtil {
                     NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramList);
                     visitor.parse();
                     //设置新的参数集合
-                    newParamList = visitor.getNewParamList();
+                    newParamList = visitor.newParamList;
                 } else {
                     newParamList = new ArrayList<>(paramList);
                 }

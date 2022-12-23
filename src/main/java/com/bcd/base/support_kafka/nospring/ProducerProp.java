@@ -1,8 +1,5 @@
 package com.bcd.base.support_kafka.nospring;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.validation.constraints.NotBlank;
 
 public class ProducerProp {

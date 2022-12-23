@@ -27,18 +27,18 @@ public class MysqlDBSupport implements DBSupport {
 
     @Override
     public List<BeanField> getTableBeanFieldList(TableConfig config, Connection connection) {
-        String tableName = config.getTableName();
-        List<ColumnsBean> res = DBInfoUtil.findColumns(connection, config.getConfig().getDbInfo().getDb(), tableName);
+        String tableName = config.tableName;
+        List<ColumnsBean> res = DBInfoUtil.findColumns(connection, config.config.dbInfo.db, tableName);
         return res.stream().map(e -> {
             MysqlDBColumn mysqlDbColumn = new MysqlDBColumn();
-            mysqlDbColumn.setName(e.getColumn_name());
-            mysqlDbColumn.setType(e.getData_type());
-            mysqlDbColumn.setComment(e.getColumn_comment());
-            mysqlDbColumn.setIsNull(e.getIs_nullable());
-            mysqlDbColumn.setStrLen(e.getCharacter_maximum_length().intValue());
+            mysqlDbColumn.name = e.column_name;
+            mysqlDbColumn.type = e.data_type;
+            mysqlDbColumn.comment = e.column_comment;
+            mysqlDbColumn.isNull = e.is_nullable;
+            mysqlDbColumn.strLen = e.character_maximum_length.intValue();
             BeanField beanField = mysqlDbColumn.toBeanField();
             if (beanField == null) {
-                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.getTableName(), mysqlDbColumn.getName(), mysqlDbColumn.getType());
+                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.tableName, mysqlDbColumn.name, mysqlDbColumn.type);
             }
             return beanField;
         }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -46,8 +46,8 @@ public class MysqlDBSupport implements DBSupport {
 
     @Override
     public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
-        ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.getConfig().getDbInfo().getDb(), config.getTableName());
-        switch (pk.getData_type()) {
+        ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.config.dbInfo.db, config.tableName);
+        switch (pk.data_type) {
             case "int": {
                 return CodeConst.PkType.Integer;
             }
@@ -58,7 +58,7 @@ public class MysqlDBSupport implements DBSupport {
                 return CodeConst.PkType.String;
             }
             default: {
-                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.getTable_name(), pk.getColumn_name(), pk.getData_type());
+                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.table_name, pk.column_name, pk.data_type);
             }
         }
     }

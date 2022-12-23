@@ -55,8 +55,8 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         //3、转换成实体类并保存
         List<PermissionBean> permissionBeanList = permissionSet.stream().map(e -> {
             PermissionBean permissionBean = new PermissionBean();
-            permissionBean.setCode(e.getCode());
-            permissionBean.setName(e.getNote());
+            permissionBean.code=e.code;
+            permissionBean.name=e.note;
             return permissionBean;
         }).collect(Collectors.toList());
         ((PermissionService) AopContext.currentProxy()).saveAll(permissionBeanList);

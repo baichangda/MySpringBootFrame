@@ -50,16 +50,16 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         UserBean userBean = findById(CommonConst.ADMIN_ID);
         if (userBean == null) {
             userBean = new UserBean();
-            userBean.setId(CommonConst.ADMIN_ID);
-            userBean.setUsername(CommonConst.ADMIN_USERNAME);
+            userBean.id = CommonConst.ADMIN_ID;
+            userBean.username = CommonConst.ADMIN_USERNAME;
             String password;
             if (CommonConst.IS_PASSWORD_ENCODED) {
                 password = encryptPassword(CommonConst.ADMIN_USERNAME, CommonConst.INITIAL_PASSWORD);
             } else {
                 password = CommonConst.INITIAL_PASSWORD;
             }
-            userBean.setPassword(password);
-            userBean.setStatus(1);
+            userBean.password = password;
+            userBean.status = 1;
             save(userBean);
         }
     }
@@ -92,7 +92,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
      */
     public UserBean login_phone(String phone, String phoneCode) {
         final UserBean userBean = findOne(new StringCondition("phone", phone));
-        StpUtil.login(userBean.getUsername(), "phone");
+        StpUtil.login(userBean.username, "phone");
         return userBean;
     }
 
@@ -143,14 +143,14 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             if (CommonConst.IS_PASSWORD_ENCODED) {
                 //使用私钥解密密码
                 PrivateKey privateKey = KeysConst.PRIVATE_KEY;
-                password = SaSecureUtil.md5BySalt(RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword)),username);
+                password = SaSecureUtil.md5BySalt(RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptPassword)), username);
             } else {
                 password = encryptPassword;
             }
             //验证密码
-            final String dbPassword = userBean.getPassword();
+            final String dbPassword = userBean.password;
             if (password.equals(dbPassword)) {
-                StpUtil.login(userBean.getUsername(), "web");
+                StpUtil.login(userBean.username, "web");
                 return userBean;
             } else {
                 throw BaseRuntimeException.getException("密码错误");
@@ -176,9 +176,9 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             String oldPassword = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptOldPassword));
             String newPassword = RSAUtil.decode(privateKey, Base64.getDecoder().decode(encryptNewPassword));
             //2.3、将原始密码MD5加密后与数据库中进行对比
-            if (userBean.getPassword().equals(encryptPassword(userBean.getUsername(), oldPassword))) {
+            if (userBean.password.equals(encryptPassword(userBean.username, oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名
-                userBean.setPassword(encryptPassword(userBean.getUsername(), newPassword));
+                userBean.password = encryptPassword(userBean.username, newPassword);
                 save(userBean);
                 return true;
             } else {
@@ -186,8 +186,8 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             }
         } else {
             //3、如果不加密,则直接对比
-            if (userBean.getPassword().equals(encryptOldPassword)) {
-                userBean.setPassword(encryptNewPassword);
+            if (userBean.password.equals(encryptOldPassword)) {
+                userBean.password = encryptNewPassword;
                 save(userBean);
                 return true;
             } else {
@@ -215,9 +215,8 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         //1、重置密码
         UserBean userBean = findById(userId);
         //2、设置默认密码
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("password", encryptPassword(userBean.getUsername(), CommonConst.INITIAL_PASSWORD));
-        update(new NumberCondition("id", userId), paramMap);
+        userBean.username = CommonConst.INITIAL_PASSWORD;
+        saveUser(userBean);
     }
 
     /**
@@ -241,17 +240,17 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             return;
         }
 
-        StpUtil.kickout(userBean.getUsername());
+        StpUtil.kickout(userBean.username);
     }
 
     public void saveUser(UserBean user) {
-        if (user.getId() == null) {
-            user.setPassword(encryptPassword(user.getUsername(), CommonConst.INITIAL_PASSWORD));
-            user.setStatus(1);
+        if (user.id == null) {
+            user.password = encryptPassword(user.username, CommonConst.INITIAL_PASSWORD);
+            user.status = 1;
             save(user);
         } else {
-            UserBean dbUser = findById(user.getId());
-            user.setPassword(dbUser.getPassword());
+            UserBean dbUser = findById(user.id);
+            user.password = dbUser.password;
             save(user);
         }
     }

@@ -36,20 +36,20 @@ public class JdbcTemplateUtil {
     public Page<Map<String, Object>> pageBySql(String sql, Pageable pageable, Object... params) {
         SqlListResult countSql = SqlUtil.replace_nullParam_count(sql, params);
         Integer count;
-        if (countSql.getParamList().isEmpty()) {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
+        if (countSql.paramList.isEmpty()) {
+            count = jdbcTemplate.queryForObject(countSql.sql, Integer.class);
         } else {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
+            count = jdbcTemplate.queryForObject(countSql.sql, Integer.class, countSql.paramList.toArray(new Object[0]));
         }
         if (count == 0) {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         } else {
             SqlListResult dataSql = SqlUtil.replace_nullParam_limit(sql, pageable.getPageNumber(), pageable.getPageSize(), params);
             List<Map<String, Object>> dataList;
-            if (dataSql.getParamList().isEmpty()) {
-                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER);
+            if (dataSql.paramList.isEmpty()) {
+                dataList = jdbcTemplate.query(dataSql.sql, MyColumnMapRowMapper.ROW_MAPPER);
             } else {
-                dataList = jdbcTemplate.query(dataSql.getSql(), MyColumnMapRowMapper.ROW_MAPPER, dataSql.getParamList().toArray(new Object[0]));
+                dataList = jdbcTemplate.query(dataSql.sql, MyColumnMapRowMapper.ROW_MAPPER, dataSql.paramList.toArray(new Object[0]));
             }
             return new PageImpl<>(dataList, pageable, count);
         }
@@ -66,20 +66,20 @@ public class JdbcTemplateUtil {
     public <T> Page<T> pageBySql(String sql, Pageable pageable, Class<T> clazz, Object... params) {
         SqlListResult countSql = SqlUtil.replace_nullParam_count(sql, params);
         Integer count;
-        if (countSql.getParamList().isEmpty()) {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class);
+        if (countSql.paramList.isEmpty()) {
+            count = jdbcTemplate.queryForObject(countSql.sql, Integer.class);
         } else {
-            count = jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParamList().toArray(new Object[0]));
+            count = jdbcTemplate.queryForObject(countSql.sql, Integer.class, countSql.paramList.toArray(new Object[0]));
         }
         if (count == 0) {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         } else {
             SqlListResult dataSql = SqlUtil.replace_nullParam_limit(sql, pageable.getPageNumber(), pageable.getPageSize(), params);
             List<T> dataList;
-            if (dataSql.getParamList().isEmpty()) {
-                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz));
+            if (dataSql.paramList.isEmpty()) {
+                dataList = jdbcTemplate.query(dataSql.sql, new BeanPropertyRowMapper<>(clazz));
             } else {
-                dataList = jdbcTemplate.query(dataSql.getSql(), new BeanPropertyRowMapper<>(clazz), dataSql.getParamList().toArray(new Object[0]));
+                dataList = jdbcTemplate.query(dataSql.sql, new BeanPropertyRowMapper<>(clazz), dataSql.paramList.toArray(new Object[0]));
             }
             return new PageImpl<>(dataList, pageable, count);
         }
@@ -101,7 +101,7 @@ public class JdbcTemplateUtil {
         //忽略主键字段、主键一般为自增
         ignoreFieldSet.add(pkFieldName);
         BatchCreateSqlResult batchCreateSqlResult = SqlUtil.generateBatchCreateResult(list, tableName, null, ignoreFieldSet.toArray(new String[0]));
-        jdbcTemplate.batchUpdate(batchCreateSqlResult.getSql(), batchCreateSqlResult.getParamList());
+        jdbcTemplate.batchUpdate(batchCreateSqlResult.sql, batchCreateSqlResult.paramList);
     }
 
     /**
@@ -119,7 +119,7 @@ public class JdbcTemplateUtil {
         //忽略主键字段
         ignoreFieldSet.add(pkFieldName);
         BatchUpdateSqlResult batchUpdateSqlResult = SqlUtil.generateBatchUpdateResult(list, tableName, null, ignoreFieldSet.toArray(new String[0]));
-        jdbcTemplate.batchUpdate(batchUpdateSqlResult.getSql(), batchUpdateSqlResult.getParamList());
+        jdbcTemplate.batchUpdate(batchUpdateSqlResult.sql, batchUpdateSqlResult.paramList);
     }
 
     /**

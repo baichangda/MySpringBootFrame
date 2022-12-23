@@ -111,7 +111,7 @@ public class RoleController extends BaseController {
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
         //验证删除权限
-        roleService.deleteAllByIdInBatch(ids);
+        roleService.deleteAllById(ids);
         return JsonMessage.success().message("删除成功");
     }
 

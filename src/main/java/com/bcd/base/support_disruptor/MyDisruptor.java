@@ -70,7 +70,7 @@ public class MyDisruptor<T> {
                 .setWaitStrategy(new SleepingWaitStrategy())
                 .init();
         final UserBean userBean = new UserBean();
-        userBean.setRealName("test1");
+        userBean.realName="test1";
         myDisruptor.publish(userBean);
         myDisruptor.destroy();
     }

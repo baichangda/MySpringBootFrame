@@ -1,35 +1,28 @@
 package com.bcd.base.support_jpa.dbinfo.mysql.bean;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import java.util.Date;
 
-@Accessors(chain = true)
-@Getter
-@Setter
 public class TablesBean {
-    private String table_catalog;
-    private String table_schema;
-    private String table_name;
-    private String table_type;
-    private String engine;
-    private Long version;
-    private String row_format;
-    private Long table_rows;
-    private Long avg_row_length;
-    private Long data_length;
-    private Long max_data_length;
-    private Long index_length;
-    private Long data_free;
-    private Long auto_increment;
-    private Date create_time;
-    private Date update_time;
-    private Date check_time;
-    private String table_collation;
-    private Long checksum;
-    private String create_options;
-    private String table_comment;
+    public String table_catalog;
+    public String table_schema;
+    public String table_name;
+    public String table_type;
+    public String engine;
+    public Long version;
+    public String row_format;
+    public Long table_rows;
+    public Long avg_row_length;
+    public Long data_length;
+    public Long max_data_length;
+    public Long index_length;
+    public Long data_free;
+    public Long auto_increment;
+    public Date create_time;
+    public Date update_time;
+    public Date check_time;
+    public String table_collation;
+    public Long checksum;
+    public String create_options;
+    public String table_comment;
 
 }

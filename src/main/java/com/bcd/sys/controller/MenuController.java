@@ -57,7 +57,7 @@ public class MenuController extends BaseController {
     @Operation(description = "删除菜单")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
-        menuService.deleteAllByIdInBatch(ids);
+        menuService.deleteAllById(ids);
         return JsonMessage.success().message("删除成功");
     }
 
@@ -102,7 +102,7 @@ public class MenuController extends BaseController {
     @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage<List<MenuBean>> selfMenuTree() {
         UserBean userBean = userService.findOne(new StringCondition("username", StpUtil.getLoginIdAsString()));
-        List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.getId());
+        List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.id);
         return JsonMessage.success(menuBeanList);
     }
 

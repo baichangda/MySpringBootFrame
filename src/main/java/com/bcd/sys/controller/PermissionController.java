@@ -111,7 +111,7 @@ public class PermissionController extends BaseController {
     @Operation(description = "删除权限")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
-        permissionService.deleteAllByIdInBatch(ids);
+        permissionService.deleteAllById(ids);
         return JsonMessage.success().message("删除成功");
     }
 

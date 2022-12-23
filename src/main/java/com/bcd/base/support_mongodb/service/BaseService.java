@@ -1,12 +1,9 @@
 package com.bcd.base.support_mongodb.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.info.BeanInfo;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
-import com.bcd.base.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -91,83 +88,11 @@ public class BaseService<T, K extends Serializable> {
         return mongoTemplate.findOne(query, (Class<T>) getBeanInfo().clazz);
     }
 
-    /**
-     * 获取唯一注解字段的message值
-     *
-     * @param field
-     * @return
-     */
-    private String getUniqueMessage(Field field) {
-        Unique anno = field.getAnnotation(Unique.class);
-        return StringUtil.format(anno.value(),field.getName());
-    }
-    /**
-     * 保存前进行唯一性验证
-     * 在并发保存情况下无法保证数据一致性、需要根据业务情况加锁
-     *
-     * @param t
-     */
-    public void validateUniqueBeforeSave(T t) {
-        //1、循环集合,验证每个唯一字段是否在数据库中有重复值
-        try {
-            for (Field f : getBeanInfo().uniqueFieldList) {
-                Object val = f.get(t);
-                if (!isUnique(f.getName(), val, (K) getBeanInfo().pkField.get(t))) {
-                    throw BaseRuntimeException.getException(getUniqueMessage(f));
-                }
-            }
-        } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-    /**
-     * 保存前进行批量唯一性验证
-     * 在并发保存情况下无法保证数据一致性、需要根据业务情况加锁
-     *
-     * @param iterable
-     */
-    public void validateUniqueBeforeSave(Iterable<T> iterable) {
-        //1、循环集合,看传入的参数集合中唯一字段是否有重复的值
-        try {
-            Map<String, Set<Object>> fieldValueSetMap = new HashMap<>();
-            for (T t : iterable) {
-                for (Field f : getBeanInfo().uniqueFieldList) {
-                    String fieldName = f.getName();
-                    Object val = f.get(t);
-                    Set<Object> valueSet = fieldValueSetMap.get(fieldName);
-                    if (valueSet == null) {
-                        valueSet = new HashSet<>();
-                        fieldValueSetMap.put(fieldName, valueSet);
-                    } else {
-                        if (valueSet.contains(val)) {
-                            throw BaseRuntimeException.getException(getUniqueMessage(f));
-                        }
-                    }
-                    valueSet.add(val);
-                }
-            }
-            //3、循环集合,验证每个唯一字段是否在数据库中有重复值
-            for (T t : iterable) {
-                for (Field f : getBeanInfo().uniqueFieldList) {
-                    Object val = f.get(t);
-                    if (!isUnique(f.getName(), val, (K) getBeanInfo().pkField.get(t))) {
-                        throw BaseRuntimeException.getException(getUniqueMessage(f));
-                    }
-                }
-            }
-        } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
     public T save(T t) {
-        validateUniqueBeforeSave(t);
         return repository.save(t);
     }
 
     public List<T> saveAll(Iterable<T> iterable) {
-        validateUniqueBeforeSave(iterable);
         return repository.saveAll(iterable);
     }
 
@@ -188,9 +113,6 @@ public class BaseService<T, K extends Serializable> {
         System.arraycopy(ids, 0, newIds, 0, ids.length);
         Query query = new Query(Criteria.where(getBeanInfo().pkFieldName).in(newIds));
         mongoTemplate.remove(query, getBeanInfo().clazz);
-//        for(int i=0;i<=ids.length-1;i++){
-//            repository.deleteById(ids[i]);
-//        }
     }
 
     public void deleteAll() {
@@ -200,30 +122,5 @@ public class BaseService<T, K extends Serializable> {
     public void delete(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         mongoTemplate.remove(query, getBeanInfo().clazz);
-    }
-
-    /**
-     * 字段唯一性验证
-     *
-     * @param fieldName  属性名称
-     * @param val        属性值
-     * @param excludeIds 排除id数组
-     * @return
-     */
-    public boolean isUnique(String fieldName, Object val, K... excludeIds) {
-        Query query = new Query(Criteria.where(fieldName).is(val));
-        List<T> resultList = mongoTemplate.find(query, getBeanInfo().clazz);
-        if (excludeIds == null || excludeIds.length == 0) {
-            return resultList.isEmpty();
-        } else {
-            Set<K> idSet = Arrays.stream(excludeIds).collect(Collectors.toSet());
-            return resultList.stream().allMatch(e -> {
-                try {
-                    return idSet.contains(getBeanInfo().pkField.get(e));
-                } catch (IllegalAccessException ex) {
-                    throw BaseRuntimeException.getException(ex);
-                }
-            });
-        }
     }
 }

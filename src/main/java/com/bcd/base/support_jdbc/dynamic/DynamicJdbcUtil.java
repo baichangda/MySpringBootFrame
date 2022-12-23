@@ -31,7 +31,7 @@ public class DynamicJdbcUtil {
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
             .<String, DynamicJdbcData>evictionListener((k,v,c) -> {
                 //移除数据源时候关闭数据源
-                HikariDataSource dataSource = (HikariDataSource) v.getJdbcTemplate().getDataSource();
+                HikariDataSource dataSource = (HikariDataSource) v.jdbcTemplate.getDataSource();
                 logger.info("dataSource[{}] [{}] start remove", k, dataSource.hashCode());
                 dataSource.close();
                 logger.info("dataSource[{}] [{}] finish remove", k, dataSource.hashCode());
@@ -87,10 +87,10 @@ public class DynamicJdbcUtil {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        List<Map<String, Object>> dataList1 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
-        List<Map<String, Object>> dataList2 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList1 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList2 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
         TimeUnit.SECONDS.sleep(10);
-        List<Map<String, Object>> dataList3 = getTest().getJdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList3 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
 

@@ -67,13 +67,6 @@ configurations.all {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
-
-    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
-    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
-
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "+"
 

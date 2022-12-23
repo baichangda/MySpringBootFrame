@@ -13,20 +13,11 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-
-
 import javax.persistence.*;
 
 /**
  *  ${moduleNameCN}
  */
-@Accessors(chain = true)
-@Getter
-@Setter
 @Entity
 @Table(name = "${tableName}")
 public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {
@@ -48,21 +39,7 @@ public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBea
     @NotNull(message = "[${field.commentPre}]不能为空")
         </#if>
       </#if>
-    private ${field.type} ${field.name};
+    public ${field.type} ${field.name};
 
     </#list>
-
-
-<#--
-    //method
-    <#list fieldList as field>
-    public ${field.type} get${(field.name)?cap_first}(){
-        return ${field.name};
-    }
-
-    public void set${(field.name)?cap_first}(${field.type} ${field.name}){
-        this.${field.name}=${field.name};
-    }
-    </#list>
--->
 }

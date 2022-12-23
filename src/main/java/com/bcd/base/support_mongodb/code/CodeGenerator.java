@@ -1,12 +1,13 @@
-package com.bcd.base.support_mongodb.code.freemarker;
+package com.bcd.base.support_mongodb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.support_mongodb.bean.BaseBean;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
-import com.bcd.base.support_mongodb.code.freemarker.data.*;
+import com.bcd.base.support_mongodb.code.data.*;
 import com.bcd.base.support_mongodb.test.bean.TestBean;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,7 +54,9 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateRepository.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -79,7 +82,9 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateService.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -105,7 +110,9 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateController.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }

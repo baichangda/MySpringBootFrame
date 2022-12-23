@@ -60,12 +60,12 @@ public class MysqlDBServiceImpl implements DBService {
         }
         List<TablesBean> tablesList = DBInfoUtil.findTables(connection, dbName);
         for (TablesBean table : tablesList) {
-            String tableName = table.getTable_name();
+            String tableName = table.table_name;
             //如果是flyway的版本信息表,则跳过
             if (tableName.equalsIgnoreCase("flyway_schema_history")) {
                 continue;
             }
-            String tableComment = table.getTable_comment();
+            String tableComment = table.table_comment;
             List define = new ArrayList();
             List head = new ArrayList();
             define.add(tableName + "(" + tableComment + ")");
@@ -82,11 +82,11 @@ public class MysqlDBServiceImpl implements DBService {
             dataList.add(head);
             columnsList.forEach(column -> {
                 List data = new ArrayList();
-                data.add(column.getColumn_name());
-                data.add(column.getColumn_type());
-                data.add(column.getIs_nullable());
-                data.add(column.getColumn_default());
-                data.add(column.getColumn_comment());
+                data.add(column.column_name);
+                data.add(column.column_type);
+                data.add(column.is_nullable);
+                data.add(column.column_default);
+                data.add(column.column_comment);
                 dataList.add(data);
             });
             dataList.add(emptyList);

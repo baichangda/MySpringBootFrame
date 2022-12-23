@@ -37,8 +37,8 @@ public class DBInfoUtil {
                     , "spring.datasource.username"
                     , "spring.datasource.password");
             String url = props[0].asText();
-            String username = props[0].asText();
-            String password = props[0].asText();
+            String username = props[1].asText();
+            String password = props[2].asText();
             int index = url.indexOf('?');
             String pre;
             if (index == -1) {
@@ -65,7 +65,7 @@ public class DBInfoUtil {
     public static Connection getSpringConn() {
         DBInfo dbInfo = getDBProps();
         try {
-            return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
+            return DriverManager.getConnection(dbInfo.url, dbInfo.username, dbInfo.password);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }

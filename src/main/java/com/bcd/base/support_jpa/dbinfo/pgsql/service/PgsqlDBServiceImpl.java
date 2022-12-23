@@ -59,12 +59,12 @@ public class PgsqlDBServiceImpl implements DBService {
         }
         List<TablesBean> tablesList = DBInfoUtil.findTables(connection, dbName);
         for (TablesBean table : tablesList) {
-            String tableName = table.getTable_name();
+            String tableName = table.table_name;
             //如果是flyway的版本信息表,则跳过
             if (tableName.equalsIgnoreCase("flyway_schema_history")) {
                 continue;
             }
-            String tableComment = table.getTable_comment();
+            String tableComment = table.table_comment;
             List define = new ArrayList();
             List head = new ArrayList();
             define.add(tableName + "(" + tableComment + ")");
@@ -81,15 +81,15 @@ public class PgsqlDBServiceImpl implements DBService {
             dataList.add(head);
             columnsList.forEach(column -> {
                 List data = new ArrayList();
-                data.add(column.getColumn_name());
-                if (column.getUdt_name().equals("varchar")) {
-                    data.add(column.getUdt_name() + "(" + column.getCharacter_maximum_length() + ")");
+                data.add(column.column_name);
+                if (column.udt_name.equals("varchar")) {
+                    data.add(column.udt_name + "(" + column.character_maximum_length + ")");
                 } else {
-                    data.add(column.getUdt_name());
+                    data.add(column.udt_name);
                 }
-                data.add(column.getIs_nullable());
-                data.add(column.getColumn_default());
-                data.add(column.getDescription());
+                data.add(column.is_nullable);
+                data.add(column.column_default);
+                data.add(column.description);
                 dataList.add(data);
             });
             dataList.add(emptyList);

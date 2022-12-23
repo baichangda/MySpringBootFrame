@@ -22,7 +22,7 @@ public class DBInfoUtil {
     public static Connection getSpringConn() {
         DBInfo dbInfo = getDBProps();
         try {
-            return DriverManager.getConnection(dbInfo.getUrl(), dbInfo.getUsername(), dbInfo.getPassword());
+            return DriverManager.getConnection(dbInfo.url, dbInfo.username, dbInfo.password);
         } catch (SQLException e) {
             throw BaseRuntimeException.getException(e);
         }

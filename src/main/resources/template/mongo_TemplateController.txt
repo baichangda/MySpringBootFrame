@@ -25,8 +25,6 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @Autowired
     private ${moduleName?cap_first}Service ${moduleName?uncap_first}Service;
 
-
-
     /**
      * 查询${moduleNameCN}列表
      * @return

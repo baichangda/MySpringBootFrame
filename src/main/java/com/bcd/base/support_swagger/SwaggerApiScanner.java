@@ -10,8 +10,6 @@ import com.bcd.base.util.ClassUtil;
 import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.*;
@@ -388,12 +386,10 @@ public class SwaggerApiScanner {
         }
     }
 
-    @Setter
-    @Getter
     static class ApiParamData {
-        private String name;
-        private String desc;
-        private boolean required;
+        public final String name;
+        public final String desc;
+        public final boolean required;
 
         public ApiParamData(String name, String desc, boolean required) {
             this.name = name;

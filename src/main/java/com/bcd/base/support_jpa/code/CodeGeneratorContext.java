@@ -3,27 +3,23 @@ package com.bcd.base.support_jpa.code;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jpa.code.data.BeanField;
 import com.bcd.base.util.StringUtil;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.File;
 import java.sql.Connection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
 public class CodeGeneratorContext {
-    private TableConfig tableConfig;
-    private DBSupport dbSupport;
-    private Connection connection;
+    public final TableConfig tableConfig;
+    public final DBSupport dbSupport;
+    public final Connection connection;
 
 
     //以下是cache字段
-    private String pkType;
-    private List<BeanField> allBeanFields;
-    private List<BeanField> declaredBeanFields;
-    private String packagePre;
+    public String pkType;
+    public List<BeanField> allBeanFields;
+    public List<BeanField> declaredBeanFields;
+    public String packagePre;
 
 
     public CodeGeneratorContext(TableConfig tableConfig, DBSupport dbSupport, Connection connection) {
@@ -48,11 +44,11 @@ public class CodeGeneratorContext {
     public List<BeanField> getDeclaredBeanFields() {
         if (declaredBeanFields == null) {
             declaredBeanFields = getAllBeanFields().stream().filter(e -> {
-                if ("id".equals(e.getName())) {
+                if ("id".equals(e.name)) {
                     return false;
                 } else {
-                    if (tableConfig.isNeedCreateInfo()) {
-                        if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.getName())) {
+                    if (tableConfig.needCreateInfo) {
+                        if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.name)) {
                             return false;
                         } else {
                             return true;
@@ -93,7 +89,7 @@ public class CodeGeneratorContext {
             springSrcPathSb.append("java");
             springSrcPathSb.append(File.separatorChar);
             String springSrcPath = springSrcPathSb.toString();
-            String targetDirPath = tableConfig.getConfig().getTargetDirPath();
+            String targetDirPath = tableConfig.config.targetDirPath;
             if (targetDirPath.contains(springSrcPath)) {
                 packagePre = targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
             } else {

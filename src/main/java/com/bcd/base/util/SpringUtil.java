@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Component
@@ -20,7 +22,7 @@ public class SpringUtil implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        applicationContext=event.getApplicationContext();
+        applicationContext = event.getApplicationContext();
     }
 
     public static JsonNode[] getSpringPropsInYml(String... keys) throws IOException {
@@ -30,7 +32,9 @@ public class SpringUtil implements ApplicationListener<ContextRefreshedEvent> {
         JsonNode active = null;
         if (suffix != null) {
             String activePathStr = SPRING_PROPERTIES_PATH.substring(0, SPRING_PROPERTIES_PATH.lastIndexOf('.')) + "-" + suffix.asText() + "." + SPRING_PROPERTIES_PATH.substring(SPRING_PROPERTIES_PATH.indexOf('.') + 1);
-            active = yamlMapper.readTree(new File(activePathStr));
+            if (Files.exists(Paths.get(activePathStr))) {
+                active = yamlMapper.readTree(new File(activePathStr));
+            }
         }
         JsonNode[] res = new JsonNode[keys.length];
         A:

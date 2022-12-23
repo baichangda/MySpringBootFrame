@@ -139,7 +139,7 @@ public class UserController extends BaseController {
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
-        userService.deleteAllByIdInBatch(ids);
+        userService.deleteAllById(ids);
         return JsonMessage.success().message("删除成功");
     }
 
@@ -209,7 +209,7 @@ public class UserController extends BaseController {
             @Parameter(description = "新密码")
             @RequestParam String newPassword) {
         UserBean userBean = SaTokenUtil.getLoginUser_cache();
-        boolean flag = userService.updatePassword(userBean.getId(), oldPassword, newPassword);
+        boolean flag = userService.updatePassword(userBean.id, oldPassword, newPassword);
         if (flag) {
             return JsonMessage.success().message("修改成功");
         } else {

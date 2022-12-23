@@ -27,18 +27,18 @@ public class PgsqlDBSupport implements DBSupport {
 
     @Override
     public List<BeanField> getTableBeanFieldList(TableConfig config, Connection connection) {
-        String tableName = config.getTableName();
-        List<ColumnsBean> res = DBInfoUtil.findColumns(connection, config.getConfig().getDbInfo().getDb(), tableName);
+        String tableName = config.tableName;
+        List<ColumnsBean> res = DBInfoUtil.findColumns(connection, config.config.dbInfo.db, tableName);
         return res.stream().map(e -> {
             PgsqlDBColumn pgsqlDBColumn = new PgsqlDBColumn();
-            pgsqlDBColumn.setName(e.getColumn_name());
-            pgsqlDBColumn.setType(e.getUdt_name());
-            pgsqlDBColumn.setComment(e.getDescription());
-            pgsqlDBColumn.setIsNull(e.getIs_nullable());
-            pgsqlDBColumn.setStrLen(e.getCharacter_maximum_length());
+            pgsqlDBColumn.name = e.column_name;
+            pgsqlDBColumn.type = e.udt_name;
+            pgsqlDBColumn.comment = e.description;
+            pgsqlDBColumn.isNull = e.is_nullable;
+            pgsqlDBColumn.strLen = e.character_maximum_length;
             BeanField beanField = pgsqlDBColumn.toBeanField();
             if (beanField == null) {
-                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.getTableName(), pgsqlDBColumn.getName(), pgsqlDBColumn.getType());
+                logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.tableName, pgsqlDBColumn.name, pgsqlDBColumn.type);
             }
             return beanField;
         }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -46,8 +46,8 @@ public class PgsqlDBSupport implements DBSupport {
 
     @Override
     public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
-        ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.getConfig().getDbInfo().getDb(), config.getTableName());
-        switch (pk.getUdt_name()) {
+        ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.config.dbInfo.db, config.tableName);
+        switch (pk.udt_name) {
             case "int2":
             case "int4": {
                 return CodeConst.PkType.Integer;
@@ -59,7 +59,7 @@ public class PgsqlDBSupport implements DBSupport {
                 return CodeConst.PkType.String;
             }
             default: {
-                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.getTable_name(), pk.getColumn_name(), pk.getUdt_name());
+                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.table_name, pk.column_name, pk.udt_name);
             }
         }
     }

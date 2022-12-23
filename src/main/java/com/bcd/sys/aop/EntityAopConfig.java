@@ -77,20 +77,20 @@ public class EntityAopConfig {
      */
     private void setValueBeforeSave(BaseBean bean, UserBean user) {
         //1、判断主键id是否为null,因此判断其为新增还是修改
-        Object id = bean.getId();
+        Object id = bean.id;
         //2、属性注入
         if (id == null) {
-            bean.setCreateTime(new Date());
+            bean.createTime=new Date();
             if (user != null) {
-                bean.setCreateUserId(user.getId());
-                bean.setCreateUserName(user.getRealName());
+                bean.createUserId=user.id;
+                bean.createUserName=user.realName;
 
             }
         } else {
-            bean.setUpdateTime(new Date());
+            bean.updateTime=new Date();
             if (user != null) {
-                bean.setUpdateUserId(user.getId());
-                bean.setUpdateUserName(user.getRealName());
+                bean.updateUserId=user.id;
+                bean.updateUserName=user.realName;
             }
         }
     }

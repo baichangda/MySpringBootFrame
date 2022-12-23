@@ -13,7 +13,7 @@ public class MyIdentityGenerator extends IdentityGenerator {
     @Override
     public Serializable generate(SharedSessionContractImplementor s, Object obj) {
         if (obj instanceof SuperBaseBean) {
-            Serializable id = ((SuperBaseBean) obj).getId();
+            Serializable id = ((SuperBaseBean) obj).id;
             if (id == null) {
                 return super.generate(s, obj);
             } else {

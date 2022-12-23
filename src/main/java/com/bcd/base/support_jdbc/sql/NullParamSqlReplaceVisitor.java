@@ -1,7 +1,6 @@
 package com.bcd.base.support_jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import lombok.Getter;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
  * 线程安全方面:
  * 非线程安全
  */
-@Getter
 @SuppressWarnings("unchecked")
 public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
 
@@ -38,9 +36,9 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
     private final static Expression falseExpression = getSqlExpressionForFalse();
     private final Statement statement;
     private final Map<String, Object> paramMap;
-    private final Map<String, Object> newParamMap = new LinkedHashMap<>();
+    public final Map<String, Object> newParamMap = new LinkedHashMap<>();
     private final List<Object> paramList;
-    private final List<Object> newParamList = new ArrayList<>();
+    public final List<Object> newParamList = new ArrayList<>();
     private final ItemsListVisitorAdapterForMap itemsListVisitorAdapterForMap = new ItemsListVisitorAdapterForMap();
     private final ItemsListVisitorAdapterForList itemsListVisitorAdapterForList = new ItemsListVisitorAdapterForList();
     //记录每个条件对应的合并符

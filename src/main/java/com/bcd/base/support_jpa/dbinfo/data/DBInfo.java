@@ -1,13 +1,15 @@
 package com.bcd.base.support_jpa.dbinfo.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
 public class DBInfo {
-    private String url;
-    private String username;
-    private String password;
-    private String db;
+    public final String url;
+    public final String username;
+    public final String password;
+    public final String db;
+
+    public DBInfo(String url, String username, String password, String db) {
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        this.db = db;
+    }
 }

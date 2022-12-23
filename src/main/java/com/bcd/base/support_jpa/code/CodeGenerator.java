@@ -7,7 +7,9 @@ import com.bcd.base.support_jpa.code.data.RepositoryData;
 import com.bcd.base.support_jpa.code.data.ServiceData;
 import com.bcd.base.support_jpa.code.mysql.MysqlDBSupport;
 import com.bcd.base.support_jpa.code.pgsql.PgsqlDBSupport;
+import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.slf4j.Logger;
@@ -37,18 +39,17 @@ public class CodeGenerator {
     public static void main(String[] args) {
         String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/src/main/java/com/bcd/base/support_jpa/code";
 //        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
-        List<TableConfig> tableConfigs = TableConfig.newHelper()
-                .setNeedCreateBeanFile(true)
-                .setNeedCreateRepositoryFile(true)
-                .setNeedCreateServiceFile(true)
-                .setNeedCreateControllerFile(true)
-                .setNeedValidateBeanField(true)
-                .setNeedValidateSaveParam(true)
-                .setNeedCreateInfo(true)
-                .addModule("User", "用户", "t_sys_user")
-                .addModule("Permission", "权限", "t_sys_permission")
-                .toTableConfigs();
-        Config config = Config.newConfig(path).addTableConfig(tableConfigs);
+        final TableConfig.Helper helper = TableConfig.newHelper();
+        helper.needCreateBeanFile = true;
+        helper.needCreateRepositoryFile = true;
+        helper.needCreateServiceFile = true;
+        helper.needCreateControllerFile = true;
+        helper.needValidateBeanField = true;
+        helper.needValidateSaveParam = true;
+        helper.needCreateInfo = true;
+        helper.addModule("User", "用户", "t_sys_user")
+                .addModule("Permission", "权限", "t_sys_permission");
+        Config config = Config.newConfig(path).addTableConfig(helper.toTableConfigs());
         CodeGenerator.MYSQL.generate(config);
 //        CodeGenerator.PGSQL.generate(config);
     }
@@ -68,11 +69,13 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Bean.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Bean.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateBean.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -94,11 +97,13 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateRepository.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -120,11 +125,13 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateService.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -146,11 +153,13 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateController.txt");
-            template.process(data, out);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            objectWrapper.setExposeFields(true);
+            template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -165,13 +174,13 @@ public class CodeGenerator {
      */
     public BeanData initBeanData(CodeGeneratorContext context) {
         BeanData data = new BeanData();
-        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
-        data.setModuleName(context.getTableConfig().getModuleName());
-        data.setPackagePre(context.getPackagePre());
-        data.setTableName(context.getTableConfig().getTableName());
-        data.setPkType(context.getPkType());
-        data.setSuperBeanType(context.getTableConfig().isNeedCreateInfo() ? 1 : 2);
-        data.setFieldList(context.getDeclaredBeanFields());
+        data.moduleNameCN = context.tableConfig.moduleNameCN;
+        data.moduleName = context.tableConfig.moduleName;
+        data.packagePre = context.getPackagePre();
+        data.tableName = context.tableConfig.tableName;
+        data.pkType = context.getPkType();
+        data.superBeanType = context.tableConfig.needCreateInfo ? 1 : 2;
+        data.fieldList = context.getDeclaredBeanFields();
         return data;
     }
 
@@ -182,11 +191,12 @@ public class CodeGenerator {
      * @return
      */
     public RepositoryData initRepositoryData(CodeGeneratorContext context) {
+        final TableConfig tableConfig = context.tableConfig;
         RepositoryData data = new RepositoryData();
-        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
-        data.setModuleName(context.getTableConfig().getModuleName());
-        data.setPackagePre(context.getPackagePre());
-        data.setPkType(context.getPkType());
+        data.moduleNameCN = tableConfig.moduleNameCN;
+        data.moduleName = tableConfig.moduleName;
+        data.packagePre = context.getPackagePre();
+        data.pkType = context.getPkType();
         return data;
     }
 
@@ -197,11 +207,12 @@ public class CodeGenerator {
      * @return
      */
     public ServiceData initServiceData(CodeGeneratorContext context) {
+        final TableConfig tableConfig = context.tableConfig;
         ServiceData data = new ServiceData();
-        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
-        data.setModuleName(context.getTableConfig().getModuleName());
-        data.setPackagePre(context.getPackagePre());
-        data.setPkType(context.getPkType());
+        data.moduleNameCN = tableConfig.moduleNameCN;
+        data.moduleName = tableConfig.moduleName;
+        data.packagePre = context.getPackagePre();
+        data.pkType = context.getPkType();
         return data;
     }
 
@@ -212,14 +223,15 @@ public class CodeGenerator {
      * @return
      */
     public ControllerData initControllerData(CodeGeneratorContext context) {
+        final TableConfig tableConfig = context.tableConfig;
         ControllerData data = new ControllerData();
-        data.setModuleNameCN(context.getTableConfig().getModuleNameCN());
-        data.setModuleName(context.getTableConfig().getModuleName());
-        data.setPackagePre(context.getPackagePre());
-        data.setPkType(context.getPkType());
-        data.setFieldList(context.getAllBeanFields());
-        data.setValidateSaveParam(context.getTableConfig().isNeedValidateSaveParam());
-        data.setRequestMappingPre(context.getRequestMappingPre());
+        data.moduleNameCN = tableConfig.moduleNameCN;
+        data.moduleName = tableConfig.moduleName;
+        data.packagePre = context.getPackagePre();
+        data.pkType = context.getPkType();
+        data.fieldList = context.getAllBeanFields();
+        data.validateSaveParam = tableConfig.needValidateSaveParam;
+        data.requestMappingPre = context.getRequestMappingPre();
         return data;
     }
 
@@ -232,10 +244,10 @@ public class CodeGenerator {
      */
     private void initConfig(Config config) {
         //如果配置了dbInfo、则不读取spring yml配置
-        if (config.getDbInfo() == null) {
-            config.setDbInfo(dbSupport.getSpringDBConfig());
+        if (config.dbInfo == null) {
+            config.dbInfo = dbSupport.getSpringDBConfig();
         }
-        config.setTemplateDirPath(Paths.get(config.getTemplateDirPath() == null ? CodeConst.TEMPLATE_DIR_PATH : config.getTemplateDirPath()).toString());
+        config.templateDirPath = Paths.get(config.templateDirPath == null ? CodeConst.TEMPLATE_DIR_PATH : config.templateDirPath).toString();
     }
 
     /**
@@ -245,24 +257,24 @@ public class CodeGenerator {
      */
     public void generate(Config config) {
         initConfig(config);
-        try (Connection connection = getConnection(config.getDbInfo().getUrl(), config.getDbInfo().getUsername(), config.getDbInfo().getPassword())) {
-            for (TableConfig tableConfig : config.getTableConfigs()) {
+        try (Connection connection = getConnection(config.dbInfo.url, config.dbInfo.username, config.dbInfo.password)) {
+            for (TableConfig tableConfig : config.tableConfigs) {
                 CodeGeneratorContext context = new CodeGeneratorContext(tableConfig, dbSupport, connection);
-                if (tableConfig.isNeedCreateBeanFile()) {
+                if (tableConfig.needCreateBeanFile) {
                     BeanData beanData = initBeanData(context);
-                    generateBean(beanData, config.getTemplateDirPath(), config.getTargetDirPath());
+                    generateBean(beanData, config.templateDirPath, config.targetDirPath);
                 }
-                if (tableConfig.isNeedCreateRepositoryFile()) {
+                if (tableConfig.needCreateRepositoryFile) {
                     RepositoryData repositoryData = initRepositoryData(context);
-                    generateRepository(repositoryData, config.getTemplateDirPath(), config.getTargetDirPath());
+                    generateRepository(repositoryData, config.templateDirPath, config.targetDirPath);
                 }
-                if (tableConfig.isNeedCreateServiceFile()) {
+                if (tableConfig.needCreateServiceFile) {
                     ServiceData serviceData = initServiceData(context);
-                    generateService(serviceData, config.getTemplateDirPath(), config.getTargetDirPath());
+                    generateService(serviceData, config.templateDirPath, config.targetDirPath);
                 }
-                if (tableConfig.isNeedCreateControllerFile()) {
+                if (tableConfig.needCreateControllerFile) {
                     ControllerData controllerData = initControllerData(context);
-                    generateController(controllerData, config.getTemplateDirPath(), config.getTargetDirPath());
+                    generateController(controllerData, config.templateDirPath, config.targetDirPath);
                 }
             }
         } catch (SQLException ex) {

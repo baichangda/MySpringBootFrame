@@ -25,8 +25,6 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @Autowired
     private ${moduleName?cap_first}Service ${moduleName?uncap_first}Service;
 
-
-
     /**
      * 查询${moduleNameCN}列表
      * @return
@@ -120,7 +118,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @Operation(description = "删除${moduleNameCN}")
     @ApiResponse(responseCode = "200",description = "删除结果")
     public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
-        ${moduleName?uncap_first}Service.deleteById(ids);
+        ${moduleName?uncap_first}Service.deleteAllById(ids);
         return JsonMessage.success();
     }
 

@@ -1,30 +1,23 @@
 package com.bcd.base.support_jpa.code.data;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
-@Accessors(chain = true)
-@Getter
-@Setter
 public class RepositoryData {
     /**
      * 模块名
      */
-    private String moduleName;
+    public String moduleName;
 
     /**
      * 模块中文名
      */
-    private String moduleNameCN;
+    public String moduleNameCN;
 
     /**
      * 包路径
      */
-    private String packagePre;
+    public String packagePre;
 
     /**
      * 主键类型
      */
-    private String pkType;
+    public String pkType;
 }

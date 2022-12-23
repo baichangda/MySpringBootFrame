@@ -77,7 +77,7 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
             // 校验 @SaCheckNotePermissions 注解
             final SaCheckNotePermissions sacheckNotePermissions = method.getAnnotation(SaCheckNotePermissions.class);
             if (sacheckNotePermissions != null) {
-                String[] perms = Arrays.stream(sacheckNotePermissions.value()).map(NotePermission::getCode).toArray(String[]::new);
+                String[] perms = Arrays.stream(sacheckNotePermissions.value()).map(e->e.note).toArray(String[]::new);
                 final StpLogic stpLogic = SaManager.getStpLogic(sacheckNotePermissions.type());
                 if (perms.length == 1) {
                     stpLogic.checkPermission(perms[0]);

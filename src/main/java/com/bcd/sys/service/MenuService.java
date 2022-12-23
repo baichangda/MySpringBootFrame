@@ -58,7 +58,7 @@ public class MenuService extends BaseService<MenuBean, Long> {
         }
         //1、组装菜单树,从顶级菜单开始
         //1.1、转化数据集
-        Map<Long, List<MenuBean>> parentIdToChildrenMap = menuBeanList.stream().collect(Collectors.toMap(MenuBean::getParentId, e -> {
+        Map<Long, List<MenuBean>> parentIdToChildrenMap = menuBeanList.stream().collect(Collectors.toMap(e -> e.parentId, e -> {
             List<MenuBean> childrenList = new ArrayList<>();
             childrenList.add(e);
             return childrenList;
@@ -72,15 +72,15 @@ public class MenuService extends BaseService<MenuBean, Long> {
             return Collections.emptyList();
         }
         //1.3、排序
-        rootList.sort(Comparator.comparing(MenuBean::getOrderNum));
+        rootList.sort(Comparator.comparing(e -> e.orderNum));
         //1.4、循环填充
         List<MenuBean> tempList = new ArrayList<>(rootList);
         for (int i = 0; i <= tempList.size() - 1; i++) {
             MenuBean cur = tempList.get(i);
-            List<MenuBean> curChildren = parentIdToChildrenMap.get(cur.getId());
+            List<MenuBean> curChildren = parentIdToChildrenMap.get(cur.id);
             if (curChildren != null) {
-                curChildren.sort(Comparator.comparing(MenuBean::getOrderNum));
-                cur.setChildren(curChildren);
+                curChildren.sort(Comparator.comparing(e -> e.orderNum));
+                cur.children = curChildren;
                 tempList.addAll(curChildren);
             }
         }

@@ -1,9 +1,6 @@
 package com.bcd.base.support_jpa.code.pgsql;
 
 import com.bcd.base.support_jpa.code.data.BeanField;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +10,6 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/7/31.
  */
-@Accessors(chain = true)
-@Getter
-@Setter
 public class PgsqlDBColumn {
 
     public final static Map<String, String> DB_TYPE_TO_JAVA_TYPE = new HashMap<>();
@@ -34,11 +28,11 @@ public class PgsqlDBColumn {
     }
 
     Logger logger = LoggerFactory.getLogger(PgsqlDBColumn.class);
-    private String name;
-    private String type;
-    private String comment;
-    private String isNull;
-    private Integer strLen;
+    public String name;
+    public String type;
+    public String comment;
+    public String isNull;
+    public Integer strLen;
 
     public BeanField toBeanField() {
         String javaType = DB_TYPE_TO_JAVA_TYPE.get(type);
@@ -54,11 +48,11 @@ public class PgsqlDBColumn {
                     jName.substring(curIndex + 2);
         }
         BeanField beanField = new BeanField();
-        beanField.setName(jName);
-        beanField.setType(javaType);
+        beanField.name = jName;
+        beanField.type = javaType;
         beanField.setComment(comment);
-        beanField.setNullable(!isNull.equals("NO"));
-        beanField.setStrLen(strLen);
+        beanField.nullable = !isNull.equals("NO");
+        beanField.strLen = strLen;
         return beanField;
     }
 }

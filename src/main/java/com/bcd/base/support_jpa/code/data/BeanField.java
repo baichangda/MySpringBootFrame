@@ -1,21 +1,15 @@
 package com.bcd.base.support_jpa.code.data;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
-@Accessors(chain = true)
-@Getter
-@Setter
 public class BeanField {
-    private String name;
-    private String type;
-    private String comment;
-    private String commentPre;
-    private boolean nullable = true;
+    public String name;
+    public String type;
+    public String comment;
+    public String commentPre;
+    public boolean nullable = true;
     //type="String"时候才有效
-    private Integer strLen;
+    public Integer strLen;
 
     public BeanField setComment(String comment) {
         this.comment = comment;

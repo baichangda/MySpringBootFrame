@@ -10,7 +10,7 @@ import java.util.Set;
  * Created by Administrator on 2017/8/14.
  */
 public class CodeConst {
-    public final static Version FREEMARKER_VERSION = Configuration.VERSION_2_3_30;
+    public final static Version FREEMARKER_VERSION = Configuration.VERSION_2_3_31;
 
     public final static String TEMPLATE_DIR_PATH = System.getProperty("user.dir") + "/src/main/resources/template";
 

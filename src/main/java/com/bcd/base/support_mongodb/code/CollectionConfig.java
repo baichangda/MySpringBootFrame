@@ -1,8 +1,8 @@
-package com.bcd.base.support_mongodb.code.freemarker;
+package com.bcd.base.support_mongodb.code;
 
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_mongodb.code.freemarker.data.CodeConst;
+import com.bcd.base.support_mongodb.code.data.CodeConst;
 
 import java.nio.file.Paths;
 

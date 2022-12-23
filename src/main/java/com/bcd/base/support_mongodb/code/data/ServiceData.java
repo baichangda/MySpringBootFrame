@@ -1,4 +1,4 @@
-package com.bcd.base.support_mongodb.code.freemarker.data;
+package com.bcd.base.support_mongodb.code.data;
 
 
 public class ServiceData {
