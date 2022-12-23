@@ -3,15 +3,9 @@ package com.bcd.base.support_mongodb.code.freemarker;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_mongodb.code.freemarker.data.CodeConst;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import java.nio.file.Paths;
 
-@Accessors(chain = true)
-@Getter
-@Setter
 public class CollectionConfig {
     //模版文件夹路径
     public String templateDirPath;
@@ -31,8 +25,6 @@ public class CollectionConfig {
     public boolean needCreateControllerFile = true;
     //是否需要加上controller save方法的验证注解
     public boolean needValidateSaveParam = false;
-    //当前生成controller requestMapping匹配路径前缀
-    public String requestMappingPre;
 
     public CollectionConfig(String moduleName, String moduleNameCN, Class clazz) {
         this.moduleName = moduleName;
@@ -55,28 +47,6 @@ public class CollectionConfig {
             throw BaseRuntimeException.getException("parseTargetDirPath failed,class path[" + classFilePath + "] not support");
         }
         targetDirPath = Paths.get(beanPath).getParent().toString();
-    }
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public CollectionConfig setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-        return this;
-    }
-
-    public String getModuleNameCN() {
-        return moduleNameCN;
-    }
-
-    public CollectionConfig setModuleNameCN(String moduleNameCN) {
-        this.moduleNameCN = moduleNameCN;
-        return this;
-    }
-
-    public Class getClazz() {
-        return clazz;
     }
 
     public CollectionConfig setClazz(Class clazz) {

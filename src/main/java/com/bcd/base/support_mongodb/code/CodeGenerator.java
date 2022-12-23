@@ -49,7 +49,7 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Repository.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateRepository.txt");
@@ -75,7 +75,7 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Service.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateService.txt");
@@ -101,7 +101,7 @@ public class CodeGenerator {
         } catch (IOException e) {
             throw BaseRuntimeException.getException(e);
         }
-        String destBeanPath = fileDir + "/" + data.getModuleName().substring(0, 1).toUpperCase() + data.getModuleName().substring(1) + "Controller.java";
+        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("mongo_TemplateController.txt");
@@ -121,10 +121,10 @@ public class CodeGenerator {
      */
     public static RepositoryData initRepositoryData(CollectionConfig config) {
         RepositoryData data = new RepositoryData();
-        data.setModuleNameCN(config.getModuleNameCN());
-        data.setModuleName(config.getModuleName());
-        data.setPackagePre(initPackagePre(config));
-        data.setPkType(initPkType(config));
+        data.moduleNameCN = config.moduleNameCN;
+        data.moduleName = config.moduleName;
+        data.packagePre = initPackagePre(config);
+        data.pkType = initPkType(config);
         return data;
     }
 
@@ -136,10 +136,10 @@ public class CodeGenerator {
      */
     public static ServiceData initServiceData(CollectionConfig config) {
         ServiceData data = new ServiceData();
-        data.setModuleNameCN(config.getModuleNameCN());
-        data.setModuleName(config.getModuleName());
-        data.setPackagePre(initPackagePre(config));
-        data.setPkType(initPkType(config));
+        data.moduleNameCN = config.moduleNameCN;
+        data.moduleName = config.moduleName;
+        data.packagePre = initPackagePre(config);
+        data.pkType = initPkType(config);
         return data;
     }
 
@@ -151,13 +151,13 @@ public class CodeGenerator {
      */
     public static ControllerData initControllerData(CollectionConfig config) {
         ControllerData data = new ControllerData();
-        data.setModuleNameCN(config.getModuleNameCN());
-        data.setModuleName(config.getModuleName());
-        data.setPackagePre(initPackagePre(config));
-        data.setPkType(initPkType(config));
-        data.setFieldList(initBeanField(config));
-        data.setValidateSaveParam(config.isNeedValidateSaveParam());
-        data.setRequestMappingPre(initRequestMappingPre(data.getPackagePre()));
+        data.moduleNameCN = config.moduleNameCN;
+        data.moduleName = config.moduleName;
+        data.packagePre = initPackagePre(config);
+        data.pkType = initPkType(config);
+        data.fieldList=initBeanField(config);
+        data.validateSaveParam=config.needValidateSaveParam;
+        data.requestMappingPre=initRequestMappingPre(data.packagePre);
         return data;
     }
 
@@ -168,7 +168,7 @@ public class CodeGenerator {
      * @throws Exception
      */
     private static String initPkType(CollectionConfig config) {
-        return getPKType(config.getClazz()).getSimpleName();
+        return getPKType(config.clazz).getSimpleName();
     }
 
     private static Class getPKType(Class beanClass) {
@@ -184,11 +184,11 @@ public class CodeGenerator {
      * @param config
      */
     public static List<BeanField> initBeanField(CollectionConfig config) {
-        List<Field> fieldList = FieldUtils.getAllFieldsList(config.getClazz()).stream().filter(e -> {
+        List<Field> fieldList = FieldUtils.getAllFieldsList(config.clazz).stream().filter(e -> {
             if (e.getAnnotation(Transient.class) != null) {
                 return false;
             }
-            if(Modifier.isStatic(e.getModifiers())){
+            if (Modifier.isStatic(e.getModifiers())) {
                 return false;
             }
             if ("id".equals(e.getName())) {
@@ -207,21 +207,21 @@ public class CodeGenerator {
             String fieldName = f.getName();
             Class fieldType;
             if ("id".equals(fieldName)) {
-                fieldType = getPKType(config.getClazz());
+                fieldType = getPKType(config.clazz);
             } else {
                 fieldType = f.getType();
             }
 
             BeanField beanField = new BeanField();
-            beanField.setName(fieldName);
-            beanField.setType(fieldType.getSimpleName());
+            beanField.name=fieldName;
+            beanField.type=fieldType.getSimpleName();
             Schema schema = f.getAnnotation(Schema.class);
             if (schema != null) {
                 beanField.setComment(schema.description());
             }
             return beanField;
         }).collect(Collectors.toMap(
-                e -> e.getName(),
+                e -> e.name,
                 e -> e,
                 (e1, e2) -> e1,
                 () -> new LinkedHashMap<>()
@@ -246,7 +246,7 @@ public class CodeGenerator {
         springSrcPathSb.append("java");
         springSrcPathSb.append(File.separatorChar);
         String springSrcPath = springSrcPathSb.toString();
-        String targetDirPath = config.getTargetDirPath();
+        String targetDirPath = config.targetDirPath;
         if (targetDirPath.contains(springSrcPath)) {
             return targetDirPath.split(springSrcPath)[1].replaceAll(File.separator, ".");
         } else {
@@ -272,7 +272,7 @@ public class CodeGenerator {
      * @param config
      */
     private static void initConfig(CollectionConfig config) {
-        config.setTemplateDirPath(Paths.get(config.getTemplateDirPath() == null ? CodeConst.TEMPLATE_DIR_PATH : config.getTemplateDirPath()).toString());
+        config.templateDirPath=Paths.get(config.templateDirPath == null ? CodeConst.TEMPLATE_DIR_PATH : config.templateDirPath).toString();
     }
 
     /**
@@ -282,26 +282,26 @@ public class CodeGenerator {
      */
     public static void generate(CollectionConfig config) {
         initConfig(config);
-        if (config.isNeedCreateRepositoryFile()) {
+        if (config.needCreateRepositoryFile) {
             RepositoryData repositoryData = initRepositoryData(config);
-            generateRepository(repositoryData, config.getTemplateDirPath(), config.getTargetDirPath());
+            generateRepository(repositoryData, config.templateDirPath, config.targetDirPath);
         }
-        if (config.isNeedCreateServiceFile()) {
+        if (config.needCreateServiceFile) {
             ServiceData serviceData = initServiceData(config);
-            generateService(serviceData, config.getTemplateDirPath(), config.getTargetDirPath());
+            generateService(serviceData, config.templateDirPath, config.targetDirPath);
         }
-        if (config.isNeedCreateControllerFile()) {
+        if (config.needCreateControllerFile) {
             ControllerData controllerData = initControllerData(config);
-            generateController(controllerData, config.getTemplateDirPath(), config.getTargetDirPath());
+            generateController(controllerData, config.templateDirPath, config.targetDirPath);
         }
     }
 
     public static void main(String[] args) {
-        CollectionConfig config = new CollectionConfig("Test", "测试", TestBean.class)
-                .setNeedCreateControllerFile(true)
-                .setNeedCreateServiceFile(true)
-                .setNeedCreateRepositoryFile(true)
-                .setNeedValidateSaveParam(true);
+        CollectionConfig config = new CollectionConfig("Test", "测试", TestBean.class);
+        config.needCreateControllerFile=true;
+        config.needCreateServiceFile=true;
+        config.needCreateRepositoryFile=true;
+        config.needValidateSaveParam=true;
         CodeGenerator.generate(config);
     }
 
