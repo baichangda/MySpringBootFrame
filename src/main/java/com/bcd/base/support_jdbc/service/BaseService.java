@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -51,6 +52,7 @@ public class BaseService<T extends BaseBean> {
 
     /**
      * 查询所有数据
+     *
      * @return
      */
     public List<T> findAll() {
@@ -59,6 +61,7 @@ public class BaseService<T extends BaseBean> {
 
     /**
      * 查询所有数据
+     *
      * @return
      */
     public List<T> findAll(Condition condition) {
@@ -67,6 +70,7 @@ public class BaseService<T extends BaseBean> {
 
     /**
      * 查询所有数据
+     *
      * @return
      */
     public List<T> findAll(Sort sort) {
@@ -87,6 +91,7 @@ public class BaseService<T extends BaseBean> {
 
     /**
      * 分页查询
+     *
      * @return
      */
     public Page<T> findAll(Pageable pageable) {
@@ -140,7 +145,7 @@ public class BaseService<T extends BaseBean> {
         if (id == null) {
             insert(t);
         } else {
-            update(t);
+            updateById(t);
         }
     }
 
@@ -162,15 +167,45 @@ public class BaseService<T extends BaseBean> {
     }
 
     /**
-     * 更新
+     * 根据id更新
      *
      * @param t
      */
-    public void update(T t) {
+    public void updateById(T t) {
         final String sql = beanInfo.updateSql + " where id=?";
         final List<Object> args = beanInfo.getValues(t);
         args.add(t.id);
         jdbcTemplate.update(sql, args.toArray());
+    }
+
+    /**
+     * 通过condition更新
+     *
+     * @param condition 更新条件
+     * @param vals      更新的字段名称和值、奇数位置必须为字段名、偶数位置必须为值
+     */
+    public void update(Condition condition, Object... vals) {
+        final StringBuilder sql = new StringBuilder("update ");
+        sql.append(beanInfo.tableName);
+        sql.append(" set ");
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < vals.length; i += 2) {
+            final String name = (String) vals[i];
+            final Object val = vals[i + 1];
+            if (i != 0) {
+                sql.append(",");
+            }
+            sql.append(beanInfo.toColumnName(name));
+            sql.append("=?");
+            args.add(val);
+        }
+        final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
+        if (convertRes != null) {
+            sql.append(" where ");
+            sql.append(convertRes.sql);
+            args.addAll(convertRes.paramList);
+        }
+        jdbcTemplate.update(sql.toString(), args.toArray());
     }
 
     /**
@@ -246,22 +281,22 @@ public class BaseService<T extends BaseBean> {
 
     /**
      * 统计所有数量
+     *
      * @return
      */
-    public int count(){
-        return count((ConvertRes)null);
+    public int count() {
+        return count((ConvertRes) null);
     }
 
     /**
      * 统计数量
+     *
      * @param condition
      * @return
      */
     public int count(Condition condition) {
         return count(ConditionUtil.convertCondition(condition, beanInfo));
     }
-
-
 
     private int count(ConvertRes convertRes) {
         final StringBuilder sql = new StringBuilder();

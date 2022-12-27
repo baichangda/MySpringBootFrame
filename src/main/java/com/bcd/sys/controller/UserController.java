@@ -215,6 +215,4 @@ public class UserController extends BaseController {
             return JsonMessage.fail().message("密码错误");
         }
     }
-
-
 }
