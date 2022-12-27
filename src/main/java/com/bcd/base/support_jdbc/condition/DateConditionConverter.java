@@ -16,37 +16,39 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
         final Object val = condition.val;
         final String fieldName = condition.fieldName;
         final DateCondition.Handler handler = condition.handler;
+        final BeanInfo beanInfo = (BeanInfo)exts[0];
+        final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
-        List paramList = new ArrayList<>();
+        List<Object> paramList = new ArrayList<>();
         paramList.add(val);
         if (val != null) {
             switch (handler) {
                 case EQUAL: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("=");
                     sql.append("?");
                     break;
                 }
                 case LE: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("<=");
                     sql.append("?");
                     break;
                 }
                 case LT: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("<");
                     sql.append("?");
                     break;
                 }
                 case GE: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append(">=");
                     sql.append("?");
                     break;
                 }
                 case GT: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append(">");
                     sql.append("?");
                     break;

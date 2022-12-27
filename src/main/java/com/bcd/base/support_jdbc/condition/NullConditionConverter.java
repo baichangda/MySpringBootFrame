@@ -15,15 +15,17 @@ public class NullConditionConverter implements Converter<NullCondition, ConvertR
     public ConvertRes convert(NullCondition condition, Object... exts) {
         final String fieldName = condition.fieldName;
         final NullCondition.Handler handler = condition.handler;
+        final BeanInfo beanInfo = (BeanInfo)exts[0];
+        final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         switch (handler) {
             case NULL: {
-                sql.append(fieldName);
+                sql.append(columnName);
                 sql.append("is null");
                 break;
             }
             case NOT_NULL: {
-                sql.append(fieldName);
+                sql.append(columnName);
                 sql.append("is not null");
                 break;
             }

@@ -1,14 +1,14 @@
 package com.bcd.base.support_jdbc.condition;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Transient;
+import com.bcd.base.util.StringUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -21,42 +21,85 @@ public class BeanInfo<T> {
     /**
      * 实体类表名
      */
-    public String tableName;
+    public final String tableName;
 
-    public String insertSql;
-    public String updateSql;
-    public List<Field> fieldList;
+    /**
+     * 所有表列对应的字段
+     */
+    private final List<FieldInfo> columnFieldList = new ArrayList<>();
+    private final Map<String, String> nameToColumnField = new HashMap<>();
 
+    /**
+     * 新增的sql
+     * <p>
+     * insert into tableName(?,...) values(?,...)
+     */
+    public final String insertSql;
+
+    /**
+     * 更新的sql
+     * <p>
+     * update tableName set xxx=? ... where id=?
+     */
+    public final String updateSql;
 
     public BeanInfo(Class clazz) {
         this.clazz = clazz;
-        init();
-    }
 
-    private void init() {
-        initTableName();
-        initSql();
-    }
+        Table table = (Table) clazz.getAnnotation(Table.class);
+        this.tableName = table == null ? null : table.value();
 
-
-    private void initSql() {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
-        fieldList = Arrays.stream(allFields).filter(e -> !e.getName().equals("id") && e.getAnnotation(Transient.class) == null && !Modifier.isStatic(e.getModifiers())).collect(Collectors.toList());
+        for (Field f : allFields) {
+            final String fieldName = f.getName();
+            if (!fieldName.equals("id") && f.getAnnotation(Transient.class) == null && !Modifier.isStatic(f.getModifiers())) {
+                final FieldInfo fieldInfo = new FieldInfo(f);
+                columnFieldList.add(fieldInfo);
+                nameToColumnField.put(fieldInfo.fieldName, fieldInfo.columnName);
+                nameToColumnField.put(fieldInfo.columnName, fieldInfo.columnName);
+            }
+        }
+
         StringJoiner sj1 = new StringJoiner(",");
         StringJoiner sj2 = new StringJoiner(",");
         StringJoiner sj3 = new StringJoiner(",");
-        for (Field field : fieldList) {
-            sj1.add(field.getName());
+        for (FieldInfo fieldInfo : columnFieldList) {
+            final String columnName = fieldInfo.columnName;
+            sj1.add(columnName);
             sj2.add("?");
-            sj3.add(field.getName() + "=?");
+            sj3.add(columnName + "=?");
         }
         insertSql = "insert into " + tableName + "(" + sj1 + ") values(" + sj2 + ")";
         updateSql = "update " + tableName + " set " + sj3;
     }
 
-    private void initTableName() {
-        Table table = clazz.getAnnotation(Table.class);
-        this.tableName = table == null ? null : table.value();
+    public static class FieldInfo {
+        public final String fieldName;
+        public final String columnName;
+
+        public final Field field;
+
+        public FieldInfo(Field field) {
+            this.field = field;
+            this.fieldName = field.getName();
+            this.columnName = StringUtil.toFirstSplitWithUpperCase(this.fieldName, '_');
+        }
     }
 
+    public List<Object> getValues(T t) {
+        try {
+            List<Object> args = new ArrayList<>();
+            for (FieldInfo fieldInfo : columnFieldList) {
+                final Object v = fieldInfo.field.get(t);
+                args.add(v);
+            }
+            return args;
+        } catch (IllegalAccessException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public String toColumnName(String name) {
+        return nameToColumnField.get(name);
+    }
 }

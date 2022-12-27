@@ -13,15 +13,17 @@ import java.util.Objects;
 public class ConcatConditionConverter implements Converter<ConcatCondition, ConvertRes> {
     @Override
     public ConvertRes convert(ConcatCondition condition, Object... exts) {
-        ConvertRes[] arr = condition.conditions.stream().map(e -> ConditionUtil.convertCondition(e)).filter(Objects::nonNull).toArray(ConvertRes[]::new);
+        final BeanInfo beanInfo = (BeanInfo)exts[0];
+        ConvertRes[] arr = condition.conditions.stream().map(e -> ConditionUtil.convertCondition(e,beanInfo)).filter(Objects::nonNull).toArray(ConvertRes[]::new);
         ConcatCondition.ConcatWay concatWay = condition.concatWay;
+
         if (arr.length == 0) {
             return null;
         } else if (arr.length == 1) {
             return arr[0];
         } else {
             StringBuilder sql = new StringBuilder();
-            List paramList = new ArrayList();
+            List<Object> paramList = new ArrayList<>();
             for (int i = 0; i < arr.length; i++) {
                 if (i == 0) {
                     sql.append(arr[i].sql);

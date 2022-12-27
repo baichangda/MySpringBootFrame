@@ -17,50 +17,52 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
         final Object val = condition.val;
         final String fieldName = condition.fieldName;
         final NumberCondition.Handler handler = condition.handler;
+        final BeanInfo beanInfo = (BeanInfo) exts[0];
+        final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
-        List paramList = new ArrayList<>();
+        List<Object> paramList = new ArrayList<>();
         if (val != null) {
             switch (handler) {
                 case EQUAL: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("=?");
                     paramList.add(val);
                     break;
                 }
                 case LT: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("<?");
                     paramList.add(val);
                     break;
                 }
                 case LE: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("<=?");
                     paramList.add(val);
                     break;
                 }
                 case GT: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append(">?");
                     paramList.add(val);
                     break;
                 }
                 case GE: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append(">=?");
                     paramList.add(val);
                     break;
                 }
                 case NOT_EQUAL: {
-                    sql.append(fieldName);
+                    sql.append(columnName);
                     sql.append("<>?");
                     paramList.add(val);
                     break;
                 }
                 case IN: {
                     if (val instanceof Collection) {
-                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                        sql.append(fieldName);
+                        List notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                        sql.append(columnName);
                         sql.append("in (");
                         StringJoiner sj = new StringJoiner(",");
                         for (int i = 0; i < notEmptyList.size(); i++) {
@@ -76,8 +78,8 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                 }
                 case NOT_IN: {
                     if (val instanceof Collection) {
-                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
-                        sql.append(fieldName);
+                        List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                        sql.append(columnName);
                         sql.append("not in (");
                         StringJoiner sj = new StringJoiner(",");
                         for (int i = 0; i < notEmptyList.size(); i++) {
@@ -95,8 +97,8 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                     throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
-            return new ConvertRes(sql.toString(),paramList);
-        }else{
+            return new ConvertRes(sql.toString(), paramList);
+        } else {
             return null;
         }
 

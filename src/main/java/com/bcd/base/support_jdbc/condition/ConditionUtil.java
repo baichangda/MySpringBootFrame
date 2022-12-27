@@ -22,7 +22,7 @@ public class ConditionUtil {
         JDBC_CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
-    public static ConvertRes convertCondition(Condition condition) {
+    public static ConvertRes convertCondition(Condition condition,BeanInfo beanInfo) {
         if (condition == null) {
             return null;
         }
@@ -30,7 +30,7 @@ public class ConditionUtil {
         if (converter == null) {
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
         } else {
-            return (ConvertRes)converter.convert(condition);
+            return (ConvertRes)converter.convert(condition,beanInfo);
         }
     }
 }

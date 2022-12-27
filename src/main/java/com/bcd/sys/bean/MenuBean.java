@@ -26,7 +26,7 @@ public class MenuBean extends BaseBean {
 
     @NotBlank(message = "[菜单名称]不能为空")
     @Size(max = 50, message = "[菜单名称]长度不能超过50")
-    @Schema(description = "菜单名称", required = true, maxLength = 50)
+    @Schema(description = "菜单名称", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = 50)
     public String name;
 
     @Size(max = 256, message = "[url地址]长度不能超过256")
@@ -38,7 +38,7 @@ public class MenuBean extends BaseBean {
     public String icon;
 
     @NotNull(message = "[排序]不能为空")
-    @Schema(description = "排序", required = true)
+    @Schema(description = "排序", requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer orderNum;
 
     @Transient

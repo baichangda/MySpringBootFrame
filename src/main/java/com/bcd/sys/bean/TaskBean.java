@@ -29,14 +29,14 @@ public class TaskBean extends BaseBean implements Task<Long> {
     //field
     @NotBlank(message = "[任务名称]不能为空")
     @Size(max = 50, message = "[任务名称]长度不能超过50")
-    @Schema(description = "任务名称", maxLength = 50, required = true)
+    @Schema(description = "任务名称", maxLength = 50, requiredMode = Schema.RequiredMode.REQUIRED)
     public String name;
 
     @NotNull(message = "[任务状态]不能为空")
-    @Schema(description = "任务状态(1:等待中;2:执行中;3:执行成功;4:执行失败;5:任务被取消;:6:任务被终止)", required = true)
+    @Schema(description = "任务状态(1:等待中;2:执行中;3:执行成功;4:执行失败;5:任务被取消;:6:任务被终止)", requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer status;
 
-    @Schema(description = "任务类型(1:普通任务;2:文件类型任务)", required = true)
+    @Schema(description = "任务类型(1:普通任务;2:文件类型任务)", requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer type;
 
     @Size(max = 255, message = "[任务信息]长度不能超过255")

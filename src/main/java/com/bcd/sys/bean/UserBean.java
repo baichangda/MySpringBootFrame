@@ -24,7 +24,7 @@ public class UserBean extends BaseBean {
     //field
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50, message = "[用户名]长度不能超过50")
-    @Schema(description = "用户名", maxLength = 50, required = true)
+    @Schema(description = "用户名", maxLength = 50, requiredMode = Schema.RequiredMode.REQUIRED)
     public String username;
 
     @JsonIgnore
@@ -55,6 +55,6 @@ public class UserBean extends BaseBean {
     public String cardNumber;
 
     @NotNull(message = "[是否可用]不能为空")
-    @Schema(description = "是否可用(0:禁用,1:可用)", required = true)
+    @Schema(description = "是否可用(0:禁用,1:可用)")
     public Integer status;
 }
