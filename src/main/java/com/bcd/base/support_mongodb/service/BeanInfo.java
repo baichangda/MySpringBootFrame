@@ -1,4 +1,4 @@
-package com.bcd.base.support_mongodb.bean.info;
+package com.bcd.base.support_mongodb.service;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.annotation.Id;

@@ -56,7 +56,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("mongo_TemplateRepository.txt");
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -84,7 +84,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("mongo_TemplateService.txt");
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -112,7 +112,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("mongo_TemplateController.txt");
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -131,7 +131,6 @@ public class CodeGenerator {
         data.moduleNameCN = config.moduleNameCN;
         data.moduleName = config.moduleName;
         data.packagePre = initPackagePre(config);
-        data.pkType = initPkType(config);
         return data;
     }
 
@@ -146,7 +145,6 @@ public class CodeGenerator {
         data.moduleNameCN = config.moduleNameCN;
         data.moduleName = config.moduleName;
         data.packagePre = initPackagePre(config);
-        data.pkType = initPkType(config);
         return data;
     }
 
@@ -161,26 +159,10 @@ public class CodeGenerator {
         data.moduleNameCN = config.moduleNameCN;
         data.moduleName = config.moduleName;
         data.packagePre = initPackagePre(config);
-        data.pkType = initPkType(config);
-        data.fieldList=initBeanField(config);
-        data.validateSaveParam=config.needValidateSaveParam;
-        data.requestMappingPre=initRequestMappingPre(data.packagePre);
+        data.fieldList = initBeanField(config);
+        data.validateSaveParam = config.needValidateSaveParam;
+        data.requestMappingPre = initRequestMappingPre(data.packagePre);
         return data;
-    }
-
-    /**
-     * 初始化主键类型
-     *
-     * @param config
-     * @throws Exception
-     */
-    private static String initPkType(CollectionConfig config) {
-        return getPKType(config.clazz).getSimpleName();
-    }
-
-    private static Class getPKType(Class beanClass) {
-        Type parentType = ClassUtil.getParentUntil(beanClass, SuperBaseBean.class, BaseBean.class);
-        return (Class) ((ParameterizedType) parentType).getActualTypeArguments()[0];
     }
 
     /**
@@ -212,16 +194,10 @@ public class CodeGenerator {
 
         Map<String, BeanField> beanFieldMap = fieldList.stream().map(f -> {
             String fieldName = f.getName();
-            Class fieldType;
-            if ("id".equals(fieldName)) {
-                fieldType = getPKType(config.clazz);
-            } else {
-                fieldType = f.getType();
-            }
-
+            Class fieldType = f.getType();
             BeanField beanField = new BeanField();
-            beanField.name=fieldName;
-            beanField.type=fieldType.getSimpleName();
+            beanField.name = fieldName;
+            beanField.type = fieldType.getSimpleName();
             Schema schema = f.getAnnotation(Schema.class);
             if (schema != null) {
                 beanField.setComment(schema.description());
@@ -279,7 +255,7 @@ public class CodeGenerator {
      * @param config
      */
     private static void initConfig(CollectionConfig config) {
-        config.templateDirPath=Paths.get(config.templateDirPath == null ? CodeConst.TEMPLATE_DIR_PATH : config.templateDirPath).toString();
+        config.templateDirPath = Paths.get(config.templateDirPath == null ? CodeConst.TEMPLATE_DIR_PATH : config.templateDirPath).toString();
     }
 
     /**
@@ -305,10 +281,10 @@ public class CodeGenerator {
 
     public static void main(String[] args) {
         CollectionConfig config = new CollectionConfig("Test", "测试", TestBean.class);
-        config.needCreateControllerFile=true;
-        config.needCreateServiceFile=true;
-        config.needCreateRepositoryFile=true;
-        config.needValidateSaveParam=true;
+        config.needCreateControllerFile = true;
+        config.needCreateServiceFile = true;
+        config.needCreateRepositoryFile = true;
+        config.needValidateSaveParam = true;
         CodeGenerator.generate(config);
     }
 

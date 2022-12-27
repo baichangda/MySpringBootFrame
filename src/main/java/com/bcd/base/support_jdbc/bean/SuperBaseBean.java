@@ -1,4 +1,4 @@
-package com.bcd.base.support_mongodb.bean;
+package com.bcd.base.support_jdbc.bean;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,9 +15,8 @@ import java.io.Serializable;
 @Setter
 public abstract class SuperBaseBean implements Serializable {
     @Schema(description = "主键(唯一标识符,自动生成)", accessMode = Schema.AccessMode.READ_ONLY)
-    @Id
     //主键
-    public String id;
+    public Long id;
 
     @Override
     public int hashCode() {

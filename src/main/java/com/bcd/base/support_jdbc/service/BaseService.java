@@ -16,8 +16,8 @@ import java.lang.reflect.ParameterizedType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -134,19 +134,6 @@ public class BaseService<T extends BaseBean> {
     }
 
     /**
-     * 批量保存
-     *
-     * @param list
-     * @return
-     */
-    public List<T> saveAll(List<T> list) {
-        for (T t : list) {
-            save(t);
-        }
-        return list;
-    }
-
-    /**
      * 新增
      * 会更新对象、设置id
      *
@@ -216,19 +203,14 @@ public class BaseService<T extends BaseBean> {
     }
 
     /**
-     * 根据id批量删除、使用in语法
+     * 根据id批量删除、使用批量删除
      *
      * @param ids
      */
     public void deleteByIds(Long... ids) {
-        final StringJoiner sj = new StringJoiner(",");
-        final Object[] params = new Object[ids.length];
-        for (int i = 0; i < ids.length; i++) {
-            sj.add("?");
-            params[i] = ids[i];
-        }
-        final String sql = "delete from " + beanInfo.tableName + " where id in(" + sj + ")";
-        jdbcTemplate.update(sql, params);
+        final List<Object[]> argList = Arrays.stream(ids).map(e -> new Object[]{e}).collect(Collectors.toList());
+        final String sql = "delete from " + beanInfo.tableName + " where id =?";
+        jdbcTemplate.batchUpdate(sql,argList);
     }
 
     /**
