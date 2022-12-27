@@ -1,9 +1,7 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.bean.BaseBean;
-import com.bcd.base.support_jdbc.condition.BeanInfo;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,10 +94,10 @@ public class BaseService<T extends BaseBean> {
         final int total = count(convertRes);
         final int offset = pageable.getPageNumber() * pageable.getPageSize();
         if (total > offset) {
-            final List<T> content = findAll(convertRes, pageable.getSort(), offset, pageable.getPageNumber());
+            final List<T> content = findAll(convertRes, pageable.getSort(), offset, pageable.getPageSize());
             return new PageImpl<>(content, pageable, total);
         } else {
-            return new PageImpl<>(new ArrayList<>());
+            return new PageImpl<>(new ArrayList<>(), pageable, total);
         }
     }
 
@@ -280,7 +278,7 @@ public class BaseService<T extends BaseBean> {
         if (paramList != null && !paramList.isEmpty()) {
             return jdbcTemplate.queryForObject(sql.toString(), Integer.class, paramList.toArray());
         } else {
-            return jdbcTemplate.queryForObject(sql.toString(), Integer.class, new BeanPropertyRowMapper<>(beanInfo.clazz));
+            return jdbcTemplate.queryForObject(sql.toString(), Integer.class);
         }
     }
 

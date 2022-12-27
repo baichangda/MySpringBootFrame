@@ -1,4 +1,4 @@
-package com.bcd.base.support_jdbc.condition;
+package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.anno.Table;

@@ -5,14 +5,14 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ConditionUtil {
 
-    private final static Map<Class, Converter> JDBC_CONDITION_CONVERTER_MAP = new HashMap<>();
+    public final static Map<Class, Converter> JDBC_CONDITION_CONVERTER_MAP = new HashMap<>();
 
     static {
         JDBC_CONDITION_CONVERTER_MAP.put(NumberCondition.class, new NumberConditionConverter());
@@ -22,7 +22,11 @@ public class ConditionUtil {
         JDBC_CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
-    public static ConvertRes convertCondition(Condition condition,BeanInfo beanInfo) {
+    public static ConvertRes convertCondition(Condition condition, BeanInfo beanInfo) {
+        return convertCondition(condition, beanInfo, true);
+    }
+
+    public static ConvertRes convertCondition(Condition condition, BeanInfo beanInfo, boolean root) {
         if (condition == null) {
             return null;
         }
@@ -30,7 +34,7 @@ public class ConditionUtil {
         if (converter == null) {
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
         } else {
-            return (ConvertRes)converter.convert(condition,beanInfo);
+            return (ConvertRes) converter.convert(condition, beanInfo, root);
         }
     }
 }

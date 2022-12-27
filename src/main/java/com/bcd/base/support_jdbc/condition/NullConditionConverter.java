@@ -3,6 +3,7 @@ package com.bcd.base.support_jdbc.condition;
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NullCondition;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.util.Collections;
 
@@ -21,12 +22,12 @@ public class NullConditionConverter implements Converter<NullCondition, ConvertR
         switch (handler) {
             case NULL: {
                 sql.append(columnName);
-                sql.append("is null");
+                sql.append(" is null");
                 break;
             }
             case NOT_NULL: {
                 sql.append(columnName);
-                sql.append("is not null");
+                sql.append(" is not null");
                 break;
             }
             default: {
