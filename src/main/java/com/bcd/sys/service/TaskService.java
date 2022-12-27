@@ -18,7 +18,7 @@ public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBe
 
     @Override
     public TaskBean doRead(Long id) {
-        return findById(id);
+        return get(id);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBe
 
     @Override
     public void doDelete(TaskBean task) {
-        deleteByIds(task.getId());
+        delete(task.getId());
     }
 }

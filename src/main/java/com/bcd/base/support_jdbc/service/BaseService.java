@@ -18,7 +18,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -40,9 +39,9 @@ public class BaseService<T extends BaseBean> {
      * @param condition
      * @return
      */
-    public T findOne(Condition condition) {
+    public T get(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
-        final List<T> list = findAll(convertRes, null, -1, -1);
+        final List<T> list = list(convertRes, null, -1, -1);
         if (list.isEmpty()) {
             return null;
         } else {
@@ -55,8 +54,8 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> findAll() {
-        return findAll(null, (Sort) null);
+    public List<T> list() {
+        return list(null, (Sort) null);
     }
 
     /**
@@ -64,8 +63,8 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> findAll(Condition condition) {
-        return findAll(condition, (Sort) null);
+    public List<T> list(Condition condition) {
+        return list(condition, (Sort) null);
     }
 
     /**
@@ -73,8 +72,8 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> findAll(Sort sort) {
-        return findAll(null, sort);
+    public List<T> list(Sort sort) {
+        return list(null, sort);
     }
 
     /**
@@ -84,9 +83,9 @@ public class BaseService<T extends BaseBean> {
      * @param sort      排序、可以为null
      * @return
      */
-    public List<T> findAll(Condition condition, Sort sort) {
+    public List<T> list(Condition condition, Sort sort) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
-        return findAll(convertRes, sort, -1, -1);
+        return list(convertRes, sort, -1, -1);
     }
 
     /**
@@ -94,8 +93,8 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public Page<T> findAll(Pageable pageable) {
-        return findAll(null, pageable);
+    public Page<T> page(Pageable pageable) {
+        return page(null, pageable);
     }
 
     /**
@@ -105,12 +104,12 @@ public class BaseService<T extends BaseBean> {
      * @param pageable
      * @return
      */
-    public Page<T> findAll(Condition condition, Pageable pageable) {
+    public Page<T> page(Condition condition, Pageable pageable) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final int total = count(convertRes);
         final int offset = pageable.getPageNumber() * pageable.getPageSize();
         if (total > offset) {
-            final List<T> content = findAll(convertRes, pageable.getSort(), offset, pageable.getPageSize());
+            final List<T> content = list(convertRes, pageable.getSort(), offset, pageable.getPageSize());
             return new PageImpl<>(content, pageable, total);
         } else {
             return new PageImpl<>(new ArrayList<>(), pageable, total);
@@ -123,7 +122,7 @@ public class BaseService<T extends BaseBean> {
      * @param id
      * @return
      */
-    public T findById(long id) {
+    public T get(long id) {
         final String sql = "select * from " + beanInfo.tableName + " where id=?";
         final List<T> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(beanInfo.clazz), id);
         if (list.isEmpty()) {
@@ -145,7 +144,7 @@ public class BaseService<T extends BaseBean> {
         if (id == null) {
             insert(t);
         } else {
-            updateById(t);
+            update(t);
         }
     }
 
@@ -171,7 +170,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param t
      */
-    public void updateById(T t) {
+    public void update(T t) {
         final String sql = beanInfo.updateSql + " where id=?";
         final List<Object> args = beanInfo.getValues(t);
         args.add(t.id);
@@ -243,23 +242,31 @@ public class BaseService<T extends BaseBean> {
      *
      * @param ids
      */
-    public void deleteByIds(Long... ids) {
-        final List<Object[]> argList = Arrays.stream(ids).map(e -> new Object[]{e}).collect(Collectors.toList());
-        final String sql = "delete from " + beanInfo.tableName + " where id =?";
-        jdbcTemplate.batchUpdate(sql, argList);
+    public void delete(long... ids) {
+        if (ids.length == 0) {
+
+        } else if (ids.length == 1) {
+            final String sql = "delete from " + beanInfo.tableName + " where id =?";
+            jdbcTemplate.update(sql, ids[0]);
+        } else {
+            final List<Object[]> argList = Arrays.stream(ids).mapToObj(e -> new Object[]{e}).collect(Collectors.toList());
+            final String sql = "delete from " + beanInfo.tableName + " where id =?";
+            jdbcTemplate.batchUpdate(sql, argList);
+        }
+
     }
 
     /**
      * 删除所有数据
      */
-    public void deleteAll() {
-        deleteAll(null);
+    public void delete() {
+        delete((Condition) null);
     }
 
     /**
      * 根据条件删除
      */
-    public void deleteAll(Condition condition) {
+    public void delete(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final StringBuilder sql = new StringBuilder();
         sql.append("delete from ");
@@ -318,7 +325,7 @@ public class BaseService<T extends BaseBean> {
         }
     }
 
-    private List<T> findAll(ConvertRes convertRes, Sort sort, int offset, int limit) {
+    private List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select * from ");
         sql.append(beanInfo.tableName);

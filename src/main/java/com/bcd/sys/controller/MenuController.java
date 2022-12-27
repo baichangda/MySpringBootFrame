@@ -56,8 +56,8 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除菜单")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
-        menuService.deleteByIds(ids);
+    public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam long[] ids) {
+        menuService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }
 
@@ -101,7 +101,7 @@ public class MenuController extends BaseController {
     @Operation(description = "查询当前用户拥有的权限的菜单树")
     @ApiResponse(responseCode = "200", description = "菜单树")
     public JsonMessage<List<MenuBean>> selfMenuTree() {
-        UserBean userBean = userService.findOne(new StringCondition("username", StpUtil.getLoginIdAsString()));
+        UserBean userBean = userService.get(new StringCondition("username", StpUtil.getLoginIdAsString()));
         List<MenuBean> menuBeanList = menuService.userMenuTree(userBean.id);
         return JsonMessage.success(menuBeanList);
     }

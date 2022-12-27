@@ -69,7 +69,7 @@ public class UserController extends BaseController {
                 new NumberCondition("type", type, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(userService.findAll(condition));
+        return JsonMessage.success(userService.list(condition));
     }
 
     /**
@@ -109,7 +109,7 @@ public class UserController extends BaseController {
                 new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
                 new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(userService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(userService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -137,8 +137,8 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
-        userService.deleteByIds(ids);
+    public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam long[] ids) {
+        userService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }
 

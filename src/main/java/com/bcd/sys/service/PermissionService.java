@@ -6,7 +6,6 @@ import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -50,7 +49,7 @@ public class PermissionService extends BaseService<PermissionBean> implements Ap
         });
 
         //2、清空权限表
-        deleteAll();
+        delete();
 
         //3、转换成实体类并保存
         List<PermissionBean> permissionBeanList = permissionSet.stream().map(e -> {
@@ -64,7 +63,7 @@ public class PermissionService extends BaseService<PermissionBean> implements Ap
 
     public List<PermissionBean> findPermissionsByUserId(Long userId) {
         if (CommonConst.ADMIN_ID == userId) {
-            return findAll();
+            return list();
         } else {
             String sql = "select d.* from t_sys_user_role a " +
                     "inner join t_sys_role_menu b on b.role_code=a.role_code " +

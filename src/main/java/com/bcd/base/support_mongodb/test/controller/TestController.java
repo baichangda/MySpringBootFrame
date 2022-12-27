@@ -44,7 +44,7 @@ public class TestController extends BaseController {
            new DateCondition("time",timeEnd, DateCondition.Handler.LE),
            new StringCondition("id",id)
         );
-        return JsonMessage.success(testService.findAll(condition));
+        return JsonMessage.success(testService.list(condition));
     }
 
     /**
@@ -68,7 +68,7 @@ public class TestController extends BaseController {
            new DateCondition("time",timeEnd, DateCondition.Handler.LE),
            new StringCondition("id",id)
         );
-        return JsonMessage.success(testService.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success(testService.page(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
@@ -94,7 +94,7 @@ public class TestController extends BaseController {
     @Operation(description = "删除测试")
     @ApiResponse(responseCode = "200",description = "删除结果")
     public JsonMessage delete(@Parameter(description = "测试id数组") @RequestParam String[] ids){
-        testService.deleteById(ids);
+        testService.delete(ids);
         return JsonMessage.success();
     }
 

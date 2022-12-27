@@ -24,7 +24,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,12 +40,12 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
 
 
     public UserBean getUser(String username) {
-        return findOne(new StringCondition("username", username));
+        return get(new StringCondition("username", username));
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        UserBean userBean = findById(CommonConst.ADMIN_ID);
+        UserBean userBean = get(CommonConst.ADMIN_ID);
         if (userBean == null) {
             userBean = new UserBean();
             userBean.id = CommonConst.ADMIN_ID;
@@ -90,7 +89,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
      * @return
      */
     public UserBean login_phone(String phone, String phoneCode) {
-        final UserBean userBean = findOne(new StringCondition("phone", phone));
+        final UserBean userBean = get(new StringCondition("phone", phone));
         StpUtil.login(userBean.username, "phone");
         return userBean;
     }
@@ -166,7 +165,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
      */
     public boolean updatePassword(Long userId, String encryptOldPassword, String encryptNewPassword) {
         //1、查找当前用户
-        UserBean userBean = findById(userId);
+        UserBean userBean = get(userId);
         //2、根据是否加密处理选择不同处理方式
         if (CommonConst.IS_PASSWORD_ENCODED) {
             //2.1、获取私钥
@@ -212,7 +211,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
 
     public void resetPassword(Long userId) {
         //1、重置密码
-        UserBean userBean = findById(userId);
+        UserBean userBean = get(userId);
         //2、设置默认密码
         userBean.username = CommonConst.INITIAL_PASSWORD;
         saveUser(userBean);
@@ -232,7 +231,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         }
 
         if (userBean == null && phone != null) {
-            userBean = findOne(new StringCondition("phone", phone));
+            userBean = get(new StringCondition("phone", phone));
         }
 
         if (userBean == null) {
@@ -248,7 +247,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
             user.status = 1;
             save(user);
         } else {
-            UserBean dbUser = findById(user.id);
+            UserBean dbUser = get(user.id);
             user.password = dbUser.password;
             save(user);
         }

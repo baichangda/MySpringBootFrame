@@ -20,7 +20,7 @@ public class RoleService extends BaseService<RoleBean> {
 
     public List<RoleBean> findRolesByUserId(Long userId){
         if (CommonConst.ADMIN_ID == userId) {
-            return findAll();
+            return list();
         }else {
             String sql = "select b.* from t_sys_user_role a inner join t_sys_role b on a.role_code=b.code where a.user_id=?";
             return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(RoleBean.class), userId);
