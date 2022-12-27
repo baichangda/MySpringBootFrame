@@ -50,36 +50,47 @@ public class BaseService<T extends BaseBean> {
     }
 
     /**
-     * 查询表中所有数据
-     *
+     * 查询所有数据
      * @return
      */
     public List<T> findAll() {
-        final String sql = "select * from " + beanInfo.tableName;
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(beanInfo.clazz));
+        return findAll(null, (Sort) null);
     }
 
     /**
-     * 根据条件查询
-     *
-     * @param condition
+     * 查询所有数据
      * @return
      */
     public List<T> findAll(Condition condition) {
-        final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
-        return findAll(convertRes, null, -1, -1);
+        return findAll(condition, (Sort) null);
+    }
+
+    /**
+     * 查询所有数据
+     * @return
+     */
+    public List<T> findAll(Sort sort) {
+        return findAll(null, sort);
     }
 
     /**
      * 根据条件查询并排序
      *
-     * @param condition
-     * @param sort
+     * @param condition 条件、可以为null
+     * @param sort      排序、可以为null
      * @return
      */
     public List<T> findAll(Condition condition, Sort sort) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         return findAll(convertRes, sort, -1, -1);
+    }
+
+    /**
+     * 分页查询
+     * @return
+     */
+    public Page<T> findAll(Pageable pageable) {
+        return findAll(null, pageable);
     }
 
     /**
@@ -193,16 +204,6 @@ public class BaseService<T extends BaseBean> {
     }
 
     /**
-     * 根据id删除
-     *
-     * @param id
-     */
-    public void deleteById(long id) {
-        final String sql = "delete from " + beanInfo.tableName + " where id=?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    /**
      * 根据id批量删除、使用批量删除
      *
      * @param ids
@@ -210,15 +211,14 @@ public class BaseService<T extends BaseBean> {
     public void deleteByIds(Long... ids) {
         final List<Object[]> argList = Arrays.stream(ids).map(e -> new Object[]{e}).collect(Collectors.toList());
         final String sql = "delete from " + beanInfo.tableName + " where id =?";
-        jdbcTemplate.batchUpdate(sql,argList);
+        jdbcTemplate.batchUpdate(sql, argList);
     }
 
     /**
      * 删除所有数据
      */
     public void deleteAll() {
-        final String sql = "delete from " + beanInfo.tableName;
-        jdbcTemplate.update(sql);
+        deleteAll(null);
     }
 
     /**
@@ -243,6 +243,25 @@ public class BaseService<T extends BaseBean> {
             jdbcTemplate.update(sql.toString());
         }
     }
+
+    /**
+     * 统计所有数量
+     * @return
+     */
+    public int count(){
+        return count((ConvertRes)null);
+    }
+
+    /**
+     * 统计数量
+     * @param condition
+     * @return
+     */
+    public int count(Condition condition) {
+        return count(ConditionUtil.convertCondition(condition, beanInfo));
+    }
+
+
 
     private int count(ConvertRes convertRes) {
         final StringBuilder sql = new StringBuilder();
