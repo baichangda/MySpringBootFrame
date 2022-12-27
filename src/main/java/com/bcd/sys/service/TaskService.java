@@ -1,6 +1,6 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.support_jpa.service.BaseService;
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.sys.bean.TaskBean;
 import com.bcd.base.support_task.TaskDao;
 import org.springframework.stereotype.Service;
@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class TaskService extends BaseService<TaskBean, Long> implements TaskDao<TaskBean,Long> {
+public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBean, Long> {
     @Override
     public TaskBean doCreate(TaskBean task) {
-        return save(task);
+        save(task);
+        return task;
     }
 
     @Override
@@ -27,6 +28,6 @@ public class TaskService extends BaseService<TaskBean, Long> implements TaskDao<
 
     @Override
     public void doDelete(TaskBean task) {
-        delete(task);
+        deleteById(task.getId());
     }
 }

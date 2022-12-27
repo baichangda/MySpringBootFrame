@@ -1,11 +1,12 @@
 package com.bcd.sys.bean;
 
-import com.bcd.base.support_jpa.bean.BaseBean;
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -14,9 +15,10 @@ import java.util.Date;
 /**
  * 用户基础信息表
  */
-@Entity
-@Table(name = "t_sys_user")
-public class UserBean extends BaseBean<Long> {
+@Getter
+@Setter
+@Table("t_sys_user")
+public class UserBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
     //field

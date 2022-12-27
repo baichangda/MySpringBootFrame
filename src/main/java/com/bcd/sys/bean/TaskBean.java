@@ -1,16 +1,17 @@
 package com.bcd.sys.bean;
 
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
+import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.base.util.ExceptionUtil;
-import com.bcd.base.support_jpa.bean.SuperBaseBean;
 import com.bcd.base.support_task.Task;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.annotation.Lazy;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,9 +20,10 @@ import java.util.Date;
 /**
  * 系统任务处理表
  */
-@Entity
-@Table(name = "t_sys_task")
-public class TaskBean extends SuperBaseBean<Long> implements Task<Long> {
+@Getter
+@Setter
+@Table("t_sys_task")
+public class TaskBean extends BaseBean implements Task<Long> {
 
 
     //field
@@ -47,7 +49,6 @@ public class TaskBean extends SuperBaseBean<Long> implements Task<Long> {
 
     @Size(max = 65535, message = "[失败堆栈信息]长度不能超过65535")
     @Schema(hidden = true, description = "失败堆栈信息(失败时后台异常堆栈信息)", maxLength = 65535)
-    @Column(columnDefinition = "TEXT")
     @Lazy
     @JsonIgnore
     public String stackMessage;

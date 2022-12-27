@@ -1,19 +1,21 @@
 package com.bcd.sys.bean;
 
-import com.bcd.base.support_jpa.bean.BaseBean;
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
  * 角色表
  */
-@Entity
-@Table(name = "t_sys_role")
-public class RoleBean extends BaseBean<Long> {
+@Getter
+@Setter
+@Table("t_sys_role")
+public class RoleBean extends BaseBean {
     //field
     @NotBlank(message = "[角色名称]不能为空")
     @Size(max = 20, message = "[角色名称]长度不能超过20")

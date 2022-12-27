@@ -1,6 +1,6 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.support_jpa.service.BaseService;
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.define.CommonConst;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Administrator on 2017/4/11.
  */
 @Service
-public class RoleService extends BaseService<RoleBean, Long> {
+public class RoleService extends BaseService<RoleBean> {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

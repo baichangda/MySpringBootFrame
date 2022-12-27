@@ -123,7 +123,6 @@ public class UserController extends BaseController {
     @Operation(description = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
-
         userService.saveUser(user);
         return JsonMessage.success().message("保存成功");
     }
@@ -139,7 +138,7 @@ public class UserController extends BaseController {
     @Operation(description = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam Long[] ids) {
-        userService.deleteAllById(ids);
+        userService.deleteByIds(ids);
         return JsonMessage.success().message("删除成功");
     }
 

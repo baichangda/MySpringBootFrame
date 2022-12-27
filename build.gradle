@@ -24,7 +24,7 @@ plugins {
     id 'maven-publish'
     id "org.flywaydb.flyway" version "9.7.+"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
-    id 'org.springframework.boot' version "2.+"
+    id 'org.springframework.boot' version "2.7.6"
 }
 
 
@@ -67,6 +67,13 @@ configurations.all {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
+
+    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
+    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "+"
 
@@ -86,8 +93,6 @@ dependencies {
     //disruptor(log4j2异步日志需要用到)
     implementation group: 'com.lmax', name: 'disruptor', version: "3.+"
 
-    //springboot jpa支持
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     //springboot jdbc支持
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("com.github.jsqlparser:jsqlparser:+")

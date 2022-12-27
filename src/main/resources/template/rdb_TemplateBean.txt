@@ -1,26 +1,26 @@
 package ${packagePre}.bean;
 
-<#if superBeanType == 1>
-import com.bcd.base.support_jpa.bean.BaseBean;
-<#else>
-import com.bcd.base.support_jpa.bean.SuperBaseBean;
-</#if>
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 
 /**
  *  ${moduleNameCN}
  */
-@Entity
-@Table(name = "${tableName}")
-public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {
+@Accessors(chain = true)
+@Getter
+@Setter
+@Table("${tableName}")
+public class ${moduleName?cap_first}Bean extends BaseBean {
     //field
     <#list fieldList as field>
       <#if field.type == "String">

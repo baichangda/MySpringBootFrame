@@ -1,8 +1,8 @@
 package com.bcd.sys.service;
 
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
-import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  *
  */
 @Service
-public class PermissionService extends BaseService<PermissionBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
+public class PermissionService extends BaseService<PermissionBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -50,7 +50,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         });
 
         //2、清空权限表
-        deleteAllInBatch();
+        deleteAll();
 
         //3、转换成实体类并保存
         List<PermissionBean> permissionBeanList = permissionSet.stream().map(e -> {
@@ -59,7 +59,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
             permissionBean.name=e.note;
             return permissionBean;
         }).collect(Collectors.toList());
-        ((PermissionService) AopContext.currentProxy()).saveAll(permissionBeanList);
+        insertBatch(permissionBeanList);
     }
 
     public List<PermissionBean> findPermissionsByUserId(Long userId) {

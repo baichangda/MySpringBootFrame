@@ -42,23 +42,6 @@ spring:
   #    username: root
   #    password: 123456
 
-  #  jpa配置
-  jpa:
-    # 是否允许jpa session在view依然开启,主要用于懒加载由于session关闭而在view层导致获取值异常
-    open-in-view: false
-    hibernate:
-      # Hibernate DDL  auto: onCreate, onCreate-drop, update, validate
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-        #mysql
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        #pgsql
-        #dialect: org.hibernate.dialect.PostgreSQL95Dialect
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
-
-
   #  jdbcTemplate配置
   jdbc:
     template:

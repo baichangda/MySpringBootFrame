@@ -57,7 +57,7 @@ public class MenuController extends BaseController {
     @Operation(description = "删除菜单")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "菜单id数组") @RequestParam Long[] ids) {
-        menuService.deleteAllById(ids);
+        menuService.deleteByIds(ids);
         return JsonMessage.success().message("删除成功");
     }
 

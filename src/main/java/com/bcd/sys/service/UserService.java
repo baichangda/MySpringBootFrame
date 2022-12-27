@@ -3,11 +3,10 @@ package com.bcd.sys.service;
 import cn.dev33.satoken.secure.SaBase64Util;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.util.RSAUtil;
-import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
@@ -32,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<UserBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
+public class UserService extends BaseService<UserBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 
