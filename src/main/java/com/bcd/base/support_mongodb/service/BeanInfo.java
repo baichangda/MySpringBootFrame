@@ -13,13 +13,13 @@ public class BeanInfo {
     /**
      * service的实体类
      */
-    public Class clazz;
+    public final Class clazz;
 
     /**
      * 主键字段
      */
-    public Field pkField;
-    public String pkFieldName;
+    public final Field pkField;
+    public final String pkFieldName;
 
     /**
      * bean所属collection
@@ -29,26 +29,11 @@ public class BeanInfo {
 
     public BeanInfo(Class clazz) {
         this.clazz = clazz;
-        init();
-    }
 
-    private void init() {
-        initPkField();
-        initCollection();
-    }
-
-    public void initCollection() {
-        collection = ((Document) clazz.getAnnotation(Document.class)).collection();
-    }
-
-
-    /**
-     * 初始化主键字段
-     */
-    public void initPkField() {
         pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
         pkFieldName = pkField.getName();
-    }
 
+        collection = ((Document) clazz.getAnnotation(Document.class)).collection();
+    }
 }
