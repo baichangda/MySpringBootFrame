@@ -55,6 +55,6 @@ public class UserBean extends BaseBean {
     public String cardNumber;
 
     @NotNull(message = "[是否可用]不能为空")
-    @Schema(description = "是否可用(0:禁用,1:可用)")
+    @Schema(description = "是否可用(0:禁用,1:可用)",requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer status;
 }

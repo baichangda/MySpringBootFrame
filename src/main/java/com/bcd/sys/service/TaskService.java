@@ -28,6 +28,6 @@ public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBe
 
     @Override
     public void doDelete(TaskBean task) {
-        deleteById(task.getId());
+        deleteByIds(task.getId());
     }
 }
