@@ -9,7 +9,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public class BeanInfo<T> {
@@ -26,8 +26,8 @@ public class BeanInfo<T> {
     /**
      * 所有表列对应的字段
      */
-    private final List<FieldInfo> columnFieldList = new ArrayList<>();
-    private final Map<String, String> nameToColumnField = new HashMap<>();
+    private final List<FieldInfo> columnFieldList;
+    private final Map<String, String> fieldNameOrColumnName_columnName;
 
     /**
      * 新增的sql
@@ -44,20 +44,34 @@ public class BeanInfo<T> {
     public final String updateSql;
 
     public BeanInfo(Class clazz) {
+        this(clazz, null);
+    }
+
+    public BeanInfo(Class clazz, Function<List<FieldInfo>, List<FieldInfo>> function) {
         this.clazz = clazz;
 
         Table table = (Table) clazz.getAnnotation(Table.class);
-        this.tableName = table == null ? null : table.value();
+        tableName = table == null ? null : table.value();
 
+        final List<FieldInfo> tempList = new ArrayList<>();
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         for (Field f : allFields) {
             final String fieldName = f.getName();
             if (!fieldName.equals("id") && f.getAnnotation(Transient.class) == null && !Modifier.isStatic(f.getModifiers())) {
                 final FieldInfo fieldInfo = new FieldInfo(f);
-                columnFieldList.add(fieldInfo);
-                nameToColumnField.put(fieldInfo.fieldName, fieldInfo.columnName);
-                nameToColumnField.put(fieldInfo.columnName, fieldInfo.columnName);
+                tempList.add(fieldInfo);
             }
+        }
+        if (function == null) {
+            columnFieldList = tempList;
+        } else {
+            columnFieldList = function.apply(tempList);
+        }
+
+        fieldNameOrColumnName_columnName = new HashMap<>();
+        for (FieldInfo fieldInfo : columnFieldList) {
+            fieldNameOrColumnName_columnName.put(fieldInfo.fieldName, fieldInfo.columnName);
+            fieldNameOrColumnName_columnName.put(fieldInfo.columnName, fieldInfo.columnName);
         }
 
         StringJoiner sj1 = new StringJoiner(",");
@@ -99,7 +113,11 @@ public class BeanInfo<T> {
         }
     }
 
-    public String toColumnName(String name) {
-        return nameToColumnField.get(name);
+    public String toColumnName(String fieldNameOrColumnName) {
+        final String columnName = fieldNameOrColumnName_columnName.get(fieldNameOrColumnName);
+        if (columnName == null) {
+            throw BaseRuntimeException.getException("bean[{}] tableName[{}] toColumnName[{}] null", clazz.getName(), tableName, fieldNameOrColumnName);
+        }
+        return columnName;
     }
 }
