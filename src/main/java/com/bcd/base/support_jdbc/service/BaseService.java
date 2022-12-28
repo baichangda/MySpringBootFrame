@@ -55,7 +55,7 @@ public class BaseService<T extends BaseBean> {
      * @return
      */
     public List<T> list() {
-        return list(null, (Sort) null);
+        return list(null, null);
     }
 
     /**
@@ -64,7 +64,7 @@ public class BaseService<T extends BaseBean> {
      * @return
      */
     public List<T> list(Condition condition) {
-        return list(condition, (Sort) null);
+        return list(condition, null);
     }
 
     /**
@@ -243,17 +243,14 @@ public class BaseService<T extends BaseBean> {
      * @param ids
      */
     public void delete(long... ids) {
-        if (ids.length == 0) {
-
-        } else if (ids.length == 1) {
+        if (ids.length == 1) {
             final String sql = "delete from " + beanInfo.tableName + " where id =?";
             jdbcTemplate.update(sql, ids[0]);
-        } else {
+        } else if (ids.length > 1) {
             final List<Object[]> argList = Arrays.stream(ids).mapToObj(e -> new Object[]{e}).collect(Collectors.toList());
             final String sql = "delete from " + beanInfo.tableName + " where id =?";
             jdbcTemplate.batchUpdate(sql, argList);
         }
-
     }
 
     /**

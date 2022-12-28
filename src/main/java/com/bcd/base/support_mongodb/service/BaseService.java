@@ -57,10 +57,15 @@ public class BaseService<T> {
 
     public Page<T> page(Condition condition, Pageable pageable) {
         Query query = ConditionUtil.toQuery(condition);
-        long count = mongoTemplate.count(query, beanInfo.clazz);
-        query.with(pageable);
-        List<T> list = mongoTemplate.find(query, beanInfo.clazz);
-        return new PageImpl<>(list, pageable, count);
+        final long total = mongoTemplate.count(query, beanInfo.clazz);
+        final int offset = pageable.getPageNumber() * pageable.getPageSize();
+        if (total > offset) {
+            query.with(pageable);
+            List<T> list = mongoTemplate.find(query, beanInfo.clazz);
+            return new PageImpl<>(list, pageable, total);
+        } else {
+            return new PageImpl<>(new ArrayList<>(), pageable, total);
+        }
     }
 
     public long count(Condition condition) {
@@ -98,10 +103,9 @@ public class BaseService<T> {
      * @param ids
      */
     public void delete(String... ids) {
-        if (ids.length == 0) {
-        } else if (ids.length == 1) {
+        if (ids.length == 1) {
             repository.deleteById(ids[0]);
-        } else {
+        } else if (ids.length > 1) {
             Object[] newIds = new Object[ids.length];
             System.arraycopy(ids, 0, newIds, 0, ids.length);
             Query query = new Query(Criteria.where(beanInfo.pkFieldName).in(newIds));
@@ -111,6 +115,7 @@ public class BaseService<T> {
 
     /**
      * 根据条件删除
+     *
      * @param condition
      */
     public void delete(Condition condition) {
