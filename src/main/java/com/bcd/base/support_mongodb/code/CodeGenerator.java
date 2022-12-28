@@ -1,9 +1,6 @@
 package com.bcd.base.support_mongodb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.util.ClassUtil;
-import com.bcd.base.support_mongodb.bean.BaseBean;
-import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.code.data.*;
 import com.bcd.base.support_mongodb.test.bean.TestBean;
 import freemarker.template.Configuration;
@@ -21,8 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;

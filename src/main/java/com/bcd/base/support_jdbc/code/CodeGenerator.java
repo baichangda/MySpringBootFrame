@@ -5,7 +5,6 @@ import com.bcd.base.support_jdbc.code.data.BeanData;
 import com.bcd.base.support_jdbc.code.data.ControllerData;
 import com.bcd.base.support_jdbc.code.data.ServiceData;
 import com.bcd.base.support_jdbc.code.mysql.MysqlDBSupport;
-import com.bcd.base.support_mongodb.code.data.RepositoryData;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -68,35 +67,7 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateBean.txt");
-            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
-            objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
-        } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
-        logger.info("{} generate succeed", destBeanPath);
-    }
-
-    /**
-     * 生成repository文件
-     *
-     * @param data
-     * @param templateDir
-     * @param destDir
-     */
-    public void generateRepository(RepositoryData data, String templateDir, String destDir) {
-        Configuration configuration = new Configuration(CodeConst.FREEMARKER_VERSION);
-        String fileDir = destDir + "/repository";
-        try {
-            Files.createDirectories(Paths.get(fileDir));
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
-        try (FileWriter out = new FileWriter(destBeanPath)) {
-            configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("rdb_TemplateRepository.txt");
-            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
