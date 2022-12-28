@@ -33,7 +33,6 @@ public interface DBSupport {
      */
     CodeConst.PkType getTablePkType(TableConfig config, Connection connection);
 
-
 }
 
 

@@ -16,8 +16,4 @@ public class ServiceData {
      */
     public String packagePre;
 
-    /**
-     * 主键类型
-     */
-    public String pkType;
 }

@@ -16,7 +16,6 @@ public class CodeGeneratorContext {
 
 
     //以下是cache字段
-    public String pkType;
     public List<BeanField> allBeanFields;
     public List<BeanField> declaredBeanFields;
     public String packagePre;
@@ -26,16 +25,6 @@ public class CodeGeneratorContext {
         this.tableConfig = tableConfig;
         this.dbSupport = dbSupport;
         this.connection = connection;
-    }
-
-    /**
-     * 初始化主键类型
-     */
-    public String getPkType() {
-        if (pkType == null) {
-            pkType = dbSupport.getTablePkType(tableConfig, connection).toString();
-        }
-        return pkType;
     }
 
     /**

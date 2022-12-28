@@ -144,7 +144,6 @@ public class CodeGenerator {
         data.moduleName = context.tableConfig.moduleName;
         data.packagePre = context.getPackagePre();
         data.tableName = context.tableConfig.tableName;
-        data.pkType = context.getPkType();
         data.superBeanType = context.tableConfig.needCreateInfo ? 1 : 2;
         data.fieldList = context.getDeclaredBeanFields();
         return data;
@@ -162,7 +161,6 @@ public class CodeGenerator {
         data.moduleNameCN = tableConfig.moduleNameCN;
         data.moduleName = tableConfig.moduleName;
         data.packagePre = context.getPackagePre();
-        data.pkType = context.getPkType();
         return data;
     }
 

@@ -28,11 +28,6 @@ public class BeanData {
     public int superBeanType;
 
     /**
-     * 主键类型
-     */
-    public String pkType;
-
-    /**
      * 映射数据库表名
      */
     public String tableName;
