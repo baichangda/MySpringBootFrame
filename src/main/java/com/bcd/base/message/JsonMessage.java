@@ -12,7 +12,6 @@ import java.util.Date;
  *
  * @param <T>
  */
-@SuppressWarnings("unchecked")
 public class JsonMessage<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 

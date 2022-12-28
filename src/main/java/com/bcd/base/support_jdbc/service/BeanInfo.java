@@ -11,7 +11,6 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 
-@SuppressWarnings("unchecked")
 public class BeanInfo<T> {
     /**
      * service的实体类
