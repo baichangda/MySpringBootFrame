@@ -22,8 +22,8 @@ public class BeanData {
 
     /**
      * 父类
-     * 1: #{@link com.bcd.base.support_jpa.bean.BaseBean}
-     * 2: #{@link com.bcd.base.support_jpa.bean.SuperBaseBean}
+     * 1: #{@link com.bcd.base.support_jdbc.bean.BaseBean}
+     * 2: #{@link com.bcd.base.support_jdbc.bean.SuperBaseBean}
      */
     public int superBeanType;
 

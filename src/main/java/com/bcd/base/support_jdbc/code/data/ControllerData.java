@@ -33,9 +33,4 @@ public class ControllerData {
      */
     public boolean validateSaveParam = true;
 
-    /**
-     * 主键类型
-     */
-    public String pkType;
-
 }
