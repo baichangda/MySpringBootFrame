@@ -28,34 +28,34 @@ public class BaseService<T> {
     private final BeanInfo beanInfo;
 
     public BaseService() {
-        final Class beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        beanInfo = new BeanInfo(beanClass);
+        final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        beanInfo = new BeanInfo<>(beanClass);
     }
 
-    public List<T> list() {
+    public final List<T> list() {
         return repository.findAll();
     }
 
-    public List<T> list(Condition condition) {
+    public final List<T> list(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         return mongoTemplate.find(query, beanInfo.clazz);
     }
 
-    public List<T> list(Sort sort) {
+    public final List<T> list(Sort sort) {
         return repository.findAll(sort);
     }
 
-    public List<T> list(Condition condition, Sort sort) {
+    public final List<T> list(Condition condition, Sort sort) {
         Query query = ConditionUtil.toQuery(condition);
         query.with(sort);
         return mongoTemplate.find(query, beanInfo.clazz);
     }
 
-    public Page<T> page(Pageable pageable) {
+    public final Page<T> page(Pageable pageable) {
         return repository.findAll(pageable);
     }
 
-    public Page<T> page(Condition condition, Pageable pageable) {
+    public final Page<T> page(Condition condition, Pageable pageable) {
         Query query = ConditionUtil.toQuery(condition);
         final long total = mongoTemplate.count(query, beanInfo.clazz);
         final int offset = pageable.getPageNumber() * pageable.getPageSize();
@@ -68,32 +68,32 @@ public class BaseService<T> {
         }
     }
 
-    public long count(Condition condition) {
+    public final long count(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         return mongoTemplate.count(query, beanInfo.clazz);
     }
 
-    public T get(String id) {
+    public final T get(String id) {
         return repository.findById(id).orElse(null);
     }
 
-    public T get(Condition condition) {
+    public final T get(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         return mongoTemplate.findOne(query, (Class<T>) beanInfo.clazz);
     }
 
-    public T save(T t) {
+    public final T save(T t) {
         return repository.save(t);
     }
 
-    public List<T> save(Iterable<T> iterable) {
+    public final List<T> save(Iterable<T> iterable) {
         return repository.saveAll(iterable);
     }
 
     /**
      * 删除所有数据
      */
-    public void delete() {
+    public final void delete() {
         repository.deleteAll();
     }
 
@@ -102,7 +102,7 @@ public class BaseService<T> {
      *
      * @param ids
      */
-    public void delete(String... ids) {
+    public final void delete(String... ids) {
         if (ids.length == 1) {
             repository.deleteById(ids[0]);
         } else if (ids.length > 1) {
@@ -118,7 +118,7 @@ public class BaseService<T> {
      *
      * @param condition
      */
-    public void delete(Condition condition) {
+    public final void delete(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         mongoTemplate.remove(query, beanInfo.clazz);
     }

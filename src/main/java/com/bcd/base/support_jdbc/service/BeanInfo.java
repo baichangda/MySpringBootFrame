@@ -11,7 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 
-public class BeanInfo<T> {
+public final class BeanInfo<T> {
     /**
      * service的实体类
      */
@@ -42,14 +42,14 @@ public class BeanInfo<T> {
      */
     public final String updateSql;
 
-    public BeanInfo(Class clazz) {
+    public BeanInfo(Class<T> clazz) {
         this(clazz, null);
     }
 
-    public BeanInfo(Class clazz, Function<List<FieldInfo>, List<FieldInfo>> function) {
+    public BeanInfo(Class<T> clazz, Function<List<FieldInfo>, List<FieldInfo>> function) {
         this.clazz = clazz;
 
-        Table table = (Table) clazz.getAnnotation(Table.class);
+        Table table = clazz.getAnnotation(Table.class);
         tableName = table == null ? null : table.value();
 
         final List<FieldInfo> tempList = new ArrayList<>();

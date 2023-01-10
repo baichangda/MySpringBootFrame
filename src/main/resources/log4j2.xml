@@ -13,15 +13,13 @@
     </Properties>
 
     <Appenders>
-
         <Console name="Console" target="SYSTEM_OUT">
             <!--输出日志的格式-->
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
-
         <RollingFile name="RollingFile"
                      filename="${LOG_DIR}/${APP_NAME}.log"
-                     filePattern="${LOG_DIR}/${APP_NAME}-%d{yyyyMMdd}.log">
+                     filePattern="${LOG_DIR}/${APP_NAME}-%d{yyyyMMdd}.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <!-- Policies :日志滚动策略-->
             <Policies>
@@ -29,12 +27,12 @@
             </Policies>
             <DefaultRolloverStrategy>
                 <Delete basePath="${LOG_DIR}" maxDepth="1">
-                    <IfFileName glob="${APP_NAME}-*.log"/>
+                    <!-- 删除所有匹配正则的文件 -->
+                    <IfFileName glob="${APP_NAME}-*.log.gz"/>
                     <IfLastModified age="30d"/>
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-
     </Appenders>
 
     <!--Logger节点用来单独指定日志的形式，比如要为指定包下的class指定不同的日志级别等。-->

@@ -8,12 +8,11 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
-public class BeanInfo {
+public final class BeanInfo<T> {
     /**
      * service的实体类
      */
-    public final Class clazz;
+    public final Class<T> clazz;
 
     /**
      * 主键字段
@@ -24,16 +23,16 @@ public class BeanInfo {
     /**
      * bean所属collection
      */
-    public String collection;
+    public final String collection;
 
 
-    public BeanInfo(Class clazz) {
+    public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
 
         pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
         pkField.setAccessible(true);
         pkFieldName = pkField.getName();
 
-        collection = ((Document) clazz.getAnnotation(Document.class)).collection();
+        collection = clazz.getAnnotation(Document.class).collection();
     }
 }

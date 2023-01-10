@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class BaseService<T extends BaseBean> {
 
     @Autowired
@@ -28,8 +29,8 @@ public class BaseService<T extends BaseBean> {
     public final BeanInfo<T> beanInfo;
 
     public BaseService() {
-        final Class beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        beanInfo = new BeanInfo(beanClass);
+        final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+        beanInfo = new BeanInfo<>(beanClass);
     }
 
     /**
@@ -38,7 +39,7 @@ public class BaseService<T extends BaseBean> {
      * @param condition
      * @return
      */
-    public T get(Condition condition) {
+    public final T get(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final List<T> list = list(convertRes, null, -1, -1);
         if (list.isEmpty()) {
@@ -53,7 +54,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> list() {
+    public final List<T> list() {
         return list(null, null);
     }
 
@@ -62,7 +63,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> list(Condition condition) {
+    public final List<T> list(Condition condition) {
         return list(condition, null);
     }
 
@@ -71,7 +72,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public List<T> list(Sort sort) {
+    public final List<T> list(Sort sort) {
         return list(null, sort);
     }
 
@@ -82,7 +83,7 @@ public class BaseService<T extends BaseBean> {
      * @param sort      排序、可以为null
      * @return
      */
-    public List<T> list(Condition condition, Sort sort) {
+    public final List<T> list(Condition condition, Sort sort) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         return list(convertRes, sort, -1, -1);
     }
@@ -92,7 +93,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public Page<T> page(Pageable pageable) {
+    public final Page<T> page(Pageable pageable) {
         return page(null, pageable);
     }
 
@@ -103,7 +104,7 @@ public class BaseService<T extends BaseBean> {
      * @param pageable
      * @return
      */
-    public Page<T> page(Condition condition, Pageable pageable) {
+    public final Page<T> page(Condition condition, Pageable pageable) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final int total = count(convertRes);
         final int offset = pageable.getPageNumber() * pageable.getPageSize();
@@ -121,7 +122,7 @@ public class BaseService<T extends BaseBean> {
      * @param id
      * @return
      */
-    public T get(long id) {
+    public final T get(long id) {
         final String sql = "select * from " + beanInfo.tableName + " where id=?";
         final List<T> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(beanInfo.clazz), id);
         if (list.isEmpty()) {
@@ -138,7 +139,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param t
      */
-    public void save(T t) {
+    public final void save(T t) {
         final Long id = t.id;
         if (id == null) {
             insert(t);
@@ -153,7 +154,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param t
      */
-    public void insert(T t) {
+    public final void insert(T t) {
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(conn -> {
             final PreparedStatement ps = conn.prepareStatement(beanInfo.insertSql, Statement.RETURN_GENERATED_KEYS);
@@ -169,7 +170,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param t
      */
-    public void update(T t) {
+    public final void update(T t) {
         final String sql = beanInfo.updateSql + " where id=?";
         final List<Object> args = beanInfo.getValues(t);
         args.add(t.id);
@@ -182,7 +183,7 @@ public class BaseService<T extends BaseBean> {
      * @param condition 更新条件
      * @param vals      更新的字段名称和值、奇数位置必须为字段名、偶数位置必须为值
      */
-    public void update(Condition condition, Object... vals) {
+    public final void update(Condition condition, Object... vals) {
         final StringBuilder sql = new StringBuilder("update ");
         sql.append(beanInfo.tableName);
         sql.append(" set ");
@@ -212,7 +213,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param list
      */
-    public void insertBatch(List<T> list) {
+    public final void insertBatch(List<T> list) {
         final List<Object[]> argList = list.stream().map(e1 -> beanInfo.getValues(e1).toArray()).collect(Collectors.toList());
         jdbcTemplate.batchUpdate(beanInfo.insertSql, argList);
     }
@@ -222,10 +223,8 @@ public class BaseService<T extends BaseBean> {
      *
      * @param list
      */
-    public void updateBatch(List<T> list) {
-        final StringBuilder sql = new StringBuilder();
-        sql.append(beanInfo.updateSql);
-        sql.append(" where id=?");
+    public final void updateBatch(List<T> list) {
+        String sql = beanInfo.updateSql + " where id=?";
 
         final List<Object[]> argList = list.stream().map(e1 -> {
             final List<Object> args = beanInfo.getValues(e1);
@@ -233,7 +232,7 @@ public class BaseService<T extends BaseBean> {
             return args.toArray();
         }).collect(Collectors.toList());
 
-        jdbcTemplate.batchUpdate(sql.toString(), argList);
+        jdbcTemplate.batchUpdate(sql, argList);
     }
 
     /**
@@ -241,7 +240,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @param ids
      */
-    public void delete(long... ids) {
+    public final void delete(long... ids) {
         if (ids.length == 1) {
             final String sql = "delete from " + beanInfo.tableName + " where id =?";
             jdbcTemplate.update(sql, ids[0]);
@@ -255,14 +254,14 @@ public class BaseService<T extends BaseBean> {
     /**
      * 删除所有数据
      */
-    public void delete() {
+    public final void delete() {
         delete((Condition) null);
     }
 
     /**
      * 根据条件删除
      */
-    public void delete(Condition condition) {
+    public final void delete(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final StringBuilder sql = new StringBuilder();
         sql.append("delete from ");
@@ -287,7 +286,7 @@ public class BaseService<T extends BaseBean> {
      *
      * @return
      */
-    public int count() {
+    public final int count() {
         return count((ConvertRes) null);
     }
 
@@ -297,11 +296,11 @@ public class BaseService<T extends BaseBean> {
      * @param condition
      * @return
      */
-    public int count(Condition condition) {
+    public final int count(Condition condition) {
         return count(ConditionUtil.convertCondition(condition, beanInfo));
     }
 
-    private int count(ConvertRes convertRes) {
+    private final int count(ConvertRes convertRes) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select count(*) from ");
         sql.append(beanInfo.tableName);
@@ -321,7 +320,7 @@ public class BaseService<T extends BaseBean> {
         }
     }
 
-    private List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
+    private final List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select * from ");
         sql.append(beanInfo.tableName);
