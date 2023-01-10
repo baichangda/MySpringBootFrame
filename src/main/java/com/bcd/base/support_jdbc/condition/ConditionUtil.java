@@ -10,6 +10,7 @@ import com.bcd.base.support_jdbc.service.BeanInfo;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class ConditionUtil {
 
     public final static Map<Class, Converter> JDBC_CONDITION_CONVERTER_MAP = new HashMap<>();

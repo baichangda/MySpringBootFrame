@@ -1,6 +1,5 @@
 package com.bcd.base.support_task.cluster;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_task.Task;
 import com.bcd.base.support_task.TaskRunnable;
@@ -23,11 +22,11 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unchecked")
 public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
-    private final static Logger logger = LoggerFactory.getLogger(TaskRedisQueue.class);
+    static Logger logger = LoggerFactory.getLogger(TaskRedisQueue.class);
     private final String name;
     private final String queueName;
 
-    final TaskBuilder<T, K> taskBuilder;
+    private final TaskBuilder<T, K> taskBuilder;
 
     private final Semaphore semaphore;
 

@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.PreparedStatement;
@@ -25,6 +26,9 @@ public class BaseService<T extends BaseBean> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    TransactionTemplate transactionTemplate;
 
     public final BeanInfo<T> beanInfo;
 
