@@ -300,7 +300,7 @@ public class BaseService<T extends BaseBean> {
         return count(ConditionUtil.convertCondition(condition, beanInfo));
     }
 
-    private final int count(ConvertRes convertRes) {
+    private int count(ConvertRes convertRes) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select count(*) from ");
         sql.append(beanInfo.tableName);
@@ -320,7 +320,7 @@ public class BaseService<T extends BaseBean> {
         }
     }
 
-    private final List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
+    private List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select * from ");
         sql.append(beanInfo.tableName);
