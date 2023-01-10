@@ -3,6 +3,7 @@ package com.bcd.base.support_satoken;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.*;
 import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaStrategy;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,14 +30,17 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册Sa-Token的路由拦截器
-        // 登陆拦截器
-        registry.addInterceptor(new SaInterceptor(e -> StpUtil.checkLogin()).isAnnotation(false))
-                .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/sys/user/login", "/api/anno");
-
-        // 注解拦截器
-        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/**");
+        /**
+         * 开启了
+         * 1、/** 的注解鉴权、即所有controller接口都会被注解鉴权
+         * 2、路由匹配的登陆验证
+         * 具体逻辑查看 {@link  SaInterceptor#preHandle(HttpServletRequest, HttpServletResponse, Object)}
+         */
+        registry.addInterceptor(new SaInterceptor(handler -> {
+            SaRouter.match("/**")
+                    .notMatch("/api/sys/user/login", "/api/anno")
+                    .check(r -> StpUtil.checkLogin());
+        })).addPathPatterns("/**");
     }
 
     /**
@@ -77,7 +83,7 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
             // 校验 @SaCheckNotePermissions 注解
             final SaCheckNotePermissions sacheckNotePermissions = method.getAnnotation(SaCheckNotePermissions.class);
             if (sacheckNotePermissions != null) {
-                String[] perms = Arrays.stream(sacheckNotePermissions.value()).map(e->e.code).toArray(String[]::new);
+                String[] perms = Arrays.stream(sacheckNotePermissions.value()).map(e -> e.code).toArray(String[]::new);
                 final StpLogic stpLogic = SaManager.getStpLogic(sacheckNotePermissions.type());
                 if (perms.length == 1) {
                     stpLogic.checkPermission(perms[0]);
