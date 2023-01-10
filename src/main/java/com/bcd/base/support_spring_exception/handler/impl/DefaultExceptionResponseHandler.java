@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -27,8 +26,8 @@ public class DefaultExceptionResponseHandler implements ExceptionResponseHandler
     public enum ExceptionCode {
         not_login(401,"请先登陆"),
         arg_error(501,"参数错误、请联系开发人员");
-        int code;
-        String msg;
+        final int code;
+        final String msg;
 
         ExceptionCode(int code, String msg) {
             this.code = code;
