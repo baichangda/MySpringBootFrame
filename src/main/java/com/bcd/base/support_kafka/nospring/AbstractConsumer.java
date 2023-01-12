@@ -1,5 +1,9 @@
 package com.bcd.base.support_kafka.nospring;
 
+import com.bcd.base.support_disruptor.MyDisruptor;
+import com.bcd.base.util.ExecutorUtil;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.dsl.ProducerType;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
@@ -15,58 +19,132 @@ import java.util.stream.Collectors;
  * 此类要求提供 kafka-client即可、不依赖spring-kafka
  */
 public abstract class AbstractConsumer {
-
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final ThreadLocal<Consumer<String, byte[]>> consumers = new ThreadLocal<>();
+    private Consumer<String, byte[]> consumer;
     private final String[] topics;
     private final String groupId;
     private final ConsumerProp consumerProp;
-    private final ThreadPoolExecutor consumerPool;
-    private final ExecutorService workPool;
-    public final AtomicInteger blockingNum;
-    private final int maxBlockingNum;
-    //是否自动释放阻塞、适用于工作内容为同步处理的逻辑
-    private final boolean autoReduceBlockingNum;
-
-    private final int maxConsumeSpeed;
-
-    private final ScheduledExecutorService resetConsumeCountPool;
-
-    private final AtomicInteger consumeCount;
+    /**
+     * 消费线程池、默认一个
+     */
+    private ExecutorService consumerExecutor;
+    /**
+     * 工作线程数量
+     */
+    private final int workThreadNum;
 
     /**
-     * @param consumerProp           消费者属性
-     * @param groupId                消费组id
-     * @param workThreadNum          工作线程个数
-     * @param maxBlockingNum         最大阻塞
-     * @param maxConsumeSpeed        最大消费速度每秒(-1代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
-     * @param autoReleaseBlockingNum 在work完以后、自动释放blockingNum
-     * @param topics                 消费的topic
+     * 最大阻塞(0代表不阻塞)
+     */
+    private final int maxBlockingNum;
+    /**
+     * 是否自动释放阻塞、适用于工作内容为同步处理的逻辑
+     */
+    private boolean autoReleaseBlockingNum;
+    /**
+     * 当前阻塞数量
+     */
+    public AtomicInteger blockingNum = new AtomicInteger();
+    ;
+
+    /**
+     * 最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
+     */
+    private int maxConsumeSpeed;
+    private ScheduledExecutorService resetConsumeCountPool;
+    private AtomicInteger consumeCount;
+
+    private long startTimeTs;
+    private long endTimeTs;
+
+
+    private MyDisruptor<ConsumerRecord> myDisruptor;
+
+    /**
+     * @param consumerProp   消费者属性
+     * @param groupId        消费组id
+     * @param maxBlockingNum 最大阻塞数量、必需是2的倍数、如果不是向上取2的倍数
+     * @param workThreadNum  工作线程个数
+     * @param topics         消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
                             String groupId,
                             int workThreadNum,
                             int maxBlockingNum,
-                            int maxConsumeSpeed,
-                            boolean autoReleaseBlockingNum,
                             String... topics) {
         this.consumerProp = consumerProp;
         this.groupId = groupId;
-        this.consumerPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        this.topics = topics;
+        this.workThreadNum = workThreadNum;
         this.maxBlockingNum = maxBlockingNum;
-        this.maxConsumeSpeed = maxConsumeSpeed;
+    }
+
+
+    public void init() {
+        this.consumerExecutor = Executors.newSingleThreadExecutor();
+
         if (maxConsumeSpeed > 0) {
             consumeCount = new AtomicInteger();
             resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
-        } else {
-            consumeCount = null;
-            resetConsumeCountPool = null;
         }
-        this.autoReduceBlockingNum = autoReleaseBlockingNum;
-        this.topics = topics;
-        this.blockingNum = new AtomicInteger(0);
-        this.workPool = Executors.newFixedThreadPool(workThreadNum);
 
+        //初始化消费者
+        consumer = new KafkaConsumer<>(consumerProperties(consumerProp, groupId));
+        afterNewConsumer(consumer);
+
+        //初始化disruptor
+        myDisruptor = new MyDisruptor<>(maxBlockingNum, ProducerType.SINGLE, new BlockingWaitStrategy());
+        for (int i = 0; i < workThreadNum; i++) {
+            myDisruptor.handle(this::onMessageInternal);
+        }
+
+        //启动
+        myDisruptor.init();
+        consumerExecutor.execute(this::consume);
+        if (maxConsumeSpeed > 0) {
+            resetConsumeCountPool.scheduleAtFixedRate(() -> consumeCount.set(0), 1, 1, TimeUnit.SECONDS);
+        }
+    }
+
+    public void destroy() {
+        //停止消费线程
+        ExecutorUtil.shutdownThenAwaitOneByOne(consumerExecutor);
+
+        if(maxConsumeSpeed > 0){
+            ExecutorUtil.shutdownThenAwaitOneByOne(resetConsumeCountPool);
+        }
+        //disruptor
+        myDisruptor.destroy();
+    }
+
+    /**
+     * @return
+     */
+    public AbstractConsumer autoRelease() {
+        this.autoReleaseBlockingNum = true;
+        return this;
+    }
+
+    /**
+     * @param maxConsumeSpeed 最大消费速度每秒(-1代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
+     * @return
+     */
+    public AbstractConsumer maxConsumeSpeed(int maxConsumeSpeed) {
+        this.maxConsumeSpeed = maxConsumeSpeed;
+        return this;
+    }
+
+    /**
+     * 配置消费时间范围
+     *
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public AbstractConsumer timeRange(Date startDate, Date endDate) {
+        this.startTimeTs = startDate.getTime();
+        this.endTimeTs = endDate.getTime();
+        return this;
     }
 
     private Properties consumerProperties(ConsumerProp consumerProp, String groupId) {
@@ -86,46 +164,23 @@ public abstract class AbstractConsumer {
     }
 
     /**
-     * 获取消费者
-     *
-     * @return
-     */
-    private Consumer<String, byte[]> getConsumer() {
-        Consumer<String, byte[]> consumer = consumers.get();
-        if (consumer == null) {
-            consumer = new KafkaConsumer<>(consumerProperties(consumerProp, groupId));
-            afterNewConsumer(consumer);
-            consumers.set(consumer);
-        }
-        return consumer;
-    }
-
-    /**
-     * 从所有topic的所有分区最新开始消费、忽略历史数据
-     * <p>
-     * 替换{@link #afterNewConsumer(Consumer)}中的内容
-     *
-     * @param consumer
-     */
-    protected final void consumeAllTopicPartitionsEnd(Consumer<String, byte[]> consumer) {
-        logger.info("consumeAllTopicPartitionsEnd topics[{}]", Arrays.toString(topics));
-        List<TopicPartition> topicPartitions = new ArrayList<>();
-        for (String topic : topics) {
-            topicPartitions.addAll(consumer.partitionsFor(topic).stream()
-                    .map(item -> new TopicPartition(item.topic(), item.partition())).collect(Collectors.toList()));
-        }
-        consumer.assign(topicPartitions);
-        consumer.seekToEnd(topicPartitions);
-        consumer.commitSync();
-    }
-
-    /**
      * 在构造消费者后、设置消费者
      *
      * @param consumer
      */
     protected void afterNewConsumer(Consumer<String, byte[]> consumer) {
-        consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
+        //设置偏移量
+        if (startTimeTs > 0) {
+            //获取偏移量
+            final Map<TopicPartition, Long> map = Arrays.stream(topics)
+                    .map(consumer::partitionsFor)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toMap(e -> new TopicPartition(e.topic(), e.partition()), e -> startTimeTs));
+            final Map<TopicPartition, OffsetAndTimestamp> startOffsetMap = consumer.offsetsForTimes(map);
+            startOffsetMap.forEach((k, v) -> consumer.seek(k, v.offset()));
+        } else {
+            consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
+        }
     }
 
     /**
@@ -135,6 +190,20 @@ public abstract class AbstractConsumer {
      */
     protected void countAfterConsume(int count) {
         blockingNum.addAndGet(count);
+
+    }
+
+    private void checkSpeedAndBlock(int count) throws InterruptedException {
+        //检查速度、如果速度太快则阻塞
+        if (maxConsumeSpeed > 0) {
+            //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
+            final int curConsumeCount = consumeCount.addAndGet(count);
+            if (curConsumeCount >= maxConsumeSpeed) {
+                do {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                } while (consumeCount.get() >= maxConsumeSpeed);
+            }
+        }
     }
 
     /**
@@ -142,81 +211,77 @@ public abstract class AbstractConsumer {
      *
      * @return
      */
-    public ConsumerRecords<String, byte[]> consume() throws InterruptedException {
-        //检查阻塞
-        if (blockingNum.get() >= maxBlockingNum) {
-            TimeUnit.MILLISECONDS.sleep(500);
-            return null;
-        }
-
-        ConsumerRecords<String, byte[]> res = getConsumer().poll(Duration.ofSeconds(60));
-        final int count;
-        if (res != null && (count = res.count()) > 0) {
-            //消费成功后统计计数
-            countAfterConsume(count);
-            if (maxConsumeSpeed > 0) {
-                //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
-                final int curConsumeCount = consumeCount.addAndGet(count);
-                if (curConsumeCount < maxConsumeSpeed) {
-                    return res;
-                } else {
-                    do {
-                        TimeUnit.MILLISECONDS.sleep(50);
-                    } while (consumeCount.get() >= maxConsumeSpeed);
-                    return res;
+    public void consume() {
+        try {
+            while (true) {
+                //检查阻塞
+                if (maxBlockingNum > 0 && blockingNum.get() >= maxBlockingNum) {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                    continue;
                 }
-            } else {
-                return res;
+
+                //获取消费者
+                ConsumerRecords<String, byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(60));
+
+                if (consumerRecords == null || consumerRecords.isEmpty()) {
+                    continue;
+                }
+
+                //统计
+                final int count = consumerRecords.count();
+                countAfterConsume(count);
+
+                //检查速度、如果速度太快则阻塞
+                checkSpeedAndBlock(count);
+
+                final List<TopicPartition> removeList = new ArrayList<>();
+
+                //发布消息
+                for (ConsumerRecord<String, byte[]> consumerRecord : consumerRecords) {
+                    //检查是否超过结束时间
+                    if (endTimeTs > 0 && consumerRecord.timestamp() >= endTimeTs) {
+                        //记录需要移除的节点
+                        removeList.add(new TopicPartition(consumerRecord.topic(), consumerRecord.partition()));
+                        continue;
+                    }
+                    myDisruptor.publish(consumerRecord);
+                }
+
+                //重新设置订阅
+                if (!removeList.isEmpty()) {
+                    final String reduce = removeList.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + "," + e2).get();
+                    logger.info("consumer assignment change, remove [{}]", reduce);
+                    final Set<TopicPartition> assignment = consumer.assignment();
+                    for (TopicPartition remove : removeList) {
+                        assignment.remove(remove);
+                    }
+                    consumer.assign(assignment);
+                    if (assignment.isEmpty()) {
+                        logger.info("consumer assignment empty, exit");
+                        break;
+                    }
+                }
             }
-        } else {
-            return null;
+        } catch (Exception ex) {
+            logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error", ex);
         }
     }
 
+
     public abstract void onMessage(ConsumerRecord<String, byte[]> consumerRecord);
 
-    /**
-     * 初始化开启消费
-     */
-    public void init() {
-        for (int i = 0; i < consumerPool.getMaximumPoolSize(); i++) {
-            consumerPool.execute(() -> {
-                while (true) {
-                    try {
-                        final ConsumerRecords<String, byte[]> consumerRecords = consume();
-                        if (consumerRecords != null) {
-                            workPool.execute(() -> {
-                                try {
-                                    for (ConsumerRecord<String, byte[]> consumerRecord : consumerRecords) {
-                                        onMessage(consumerRecord);
-                                    }
-                                } catch (Exception e) {
-                                    logger.error(e.getMessage(), e);
-                                } finally {
-                                    if (autoReduceBlockingNum) {
-                                        blockingNum.addAndGet(-consumerRecords.count());
-                                    }
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error", e);
-                        return;
-                    }
-                }
-            });
+    private void onMessageInternal(ConsumerRecord<String, byte[]> consumerRecord) {
+        if (autoReleaseBlockingNum) {
+            blockingNum.decrementAndGet();
         }
-
-        if (maxConsumeSpeed > 0) {
-            resetConsumeCountPool.scheduleAtFixedRate(() -> consumeCount.set(0), 1, 1, TimeUnit.SECONDS);
-        }
+        onMessage(consumerRecord);
     }
 }
 
 class ConsumerRebalanceLogger implements ConsumerRebalanceListener {
-    static Logger logger = LoggerFactory.getLogger(ConsumerRebalanceLogger.class);
+    static final Logger logger = LoggerFactory.getLogger(ConsumerRebalanceLogger.class);
 
-    Consumer consumer;
+    final Consumer consumer;
 
     public ConsumerRebalanceLogger(Consumer consumer) {
         this.consumer = consumer;
