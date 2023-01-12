@@ -44,8 +44,8 @@ public class TaskBean extends BaseBean implements Task<Long> {
     public String message;
 
     @NotNull(message = "[任务处理进度]")
-    @Schema(description = "任务处理进度", required = true)
-    public Float percent=0F;
+    @Schema(description = "任务处理进度", requiredMode = Schema.RequiredMode.REQUIRED)
+    public float percent;
 
     @Size(max = 65535, message = "[失败堆栈信息]长度不能超过65535")
     @Schema(hidden = true, description = "失败堆栈信息(失败时后台异常堆栈信息)", maxLength = 65535)
