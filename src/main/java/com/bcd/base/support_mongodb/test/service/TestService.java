@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 import com.bcd.base.support_mongodb.test.bean.TestBean;
 
 @Service
-public class TestService extends BaseService<TestBean,String> {
+public class TestService extends BaseService<TestBean> {
 
 }

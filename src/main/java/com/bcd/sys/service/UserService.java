@@ -3,11 +3,10 @@ package com.bcd.sys.service;
 import cn.dev33.satoken.secure.SaBase64Util;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.util.RSAUtil;
-import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
@@ -25,14 +24,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<UserBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
+public class UserService extends BaseService<UserBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -42,12 +40,12 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
 
 
     public UserBean getUser(String username) {
-        return findOne(new StringCondition("username", username));
+        return get(new StringCondition("username", username));
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        UserBean userBean = findById(CommonConst.ADMIN_ID);
+        UserBean userBean = get(CommonConst.ADMIN_ID);
         if (userBean == null) {
             userBean = new UserBean();
             userBean.id = CommonConst.ADMIN_ID;
@@ -91,7 +89,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
      * @return
      */
     public UserBean login_phone(String phone, String phoneCode) {
-        final UserBean userBean = findOne(new StringCondition("phone", phone));
+        final UserBean userBean = get(new StringCondition("phone", phone));
         StpUtil.login(userBean.username, "phone");
         return userBean;
     }
@@ -167,7 +165,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
      */
     public boolean updatePassword(Long userId, String encryptOldPassword, String encryptNewPassword) {
         //1、查找当前用户
-        UserBean userBean = findById(userId);
+        UserBean userBean = get(userId);
         //2、根据是否加密处理选择不同处理方式
         if (CommonConst.IS_PASSWORD_ENCODED) {
             //2.1、获取私钥
@@ -213,7 +211,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
 
     public void resetPassword(Long userId) {
         //1、重置密码
-        UserBean userBean = findById(userId);
+        UserBean userBean = get(userId);
         //2、设置默认密码
         userBean.username = CommonConst.INITIAL_PASSWORD;
         saveUser(userBean);
@@ -233,7 +231,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
         }
 
         if (userBean == null && phone != null) {
-            userBean = findOne(new StringCondition("phone", phone));
+            userBean = get(new StringCondition("phone", phone));
         }
 
         if (userBean == null) {
@@ -249,7 +247,7 @@ public class UserService extends BaseService<UserBean, Long> implements Applicat
             user.status = 1;
             save(user);
         } else {
-            UserBean dbUser = findById(user.id);
+            UserBean dbUser = get(user.id);
             user.password = dbUser.password;
             save(user);
         }

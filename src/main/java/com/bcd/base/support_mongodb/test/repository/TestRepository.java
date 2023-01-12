@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.bcd.base.support_mongodb.test.bean.TestBean;
 
 @Repository
-public interface TestRepository extends BaseRepository<TestBean, String> {
+public interface TestRepository extends BaseRepository<TestBean> {
 
 }

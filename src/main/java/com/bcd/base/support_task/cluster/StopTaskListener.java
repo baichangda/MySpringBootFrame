@@ -29,12 +29,12 @@ public class StopTaskListener<T extends Task<K>, K extends Serializable> extends
     @Override
     public void onMessage(StopRequest stopRequest) {
         //依次停止每个任务,将结束的任务记录到结果map中
-        StopResultRequest stopResultRequest = new StopResultRequest(stopRequest.getRequestId());
-        final String[] ids = stopRequest.getIds();
+        StopResultRequest stopResultRequest = new StopResultRequest(stopRequest.requestId);
+        final String[] ids = stopRequest.ids;
         for (String id : ids) {
             TaskRunnable<T, K> runnable = taskBuilder.getTaskIdToRunnable().get(id);
             if (runnable != null) {
-                stopResultRequest.getResMap().put(id, runnable.stop().getFlag() + "");
+                stopResultRequest.resMap.put(id, runnable.stop().flag + "");
             }
         }
         stopTaskResultListener.send(stopResultRequest);

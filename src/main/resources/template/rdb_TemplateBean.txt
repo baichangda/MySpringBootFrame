@@ -1,33 +1,30 @@
 package ${packagePre}.bean;
 
-<#if superBeanType == 1>
-import com.bcd.base.support_jpa.bean.BaseBean;
-<#else>
-import com.bcd.base.support_jpa.bean.SuperBaseBean;
-</#if>
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
-import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *  ${moduleNameCN}
  */
-@Entity
-@Table(name = "${tableName}")
-public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBean<#else>SuperBaseBean</#if><${pkType}> {
+@Getter
+@Setter
+@Table("${tableName}")
+public class ${moduleName?cap_first}Bean extends BaseBean {
     //field
     <#list fieldList as field>
       <#if field.type == "String">
         <#if field.nullable>
     @Schema(description = "${field.comment}", maxLength = ${field.strLen})
         <#else>
-    @Schema(description = "${field.comment}", required = true, maxLength = ${field.strLen})
+    @Schema(description = "${field.comment}", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = ${field.strLen})
     @NotBlank(message = "[${field.commentPre}]不能为空")
         </#if>
     @Size(max = ${field.strLen}, message = "[${field.commentPre}]长度不能超过${field.strLen}")
@@ -35,7 +32,7 @@ public class ${moduleName?cap_first}Bean extends <#if superBeanType == 1>BaseBea
         <#if field.nullable>
     @Schema(description = "${field.comment}")
         <#else>
-    @Schema(description = "${field.comment}", required = true)
+    @Schema(description = "${field.comment}", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "[${field.commentPre}]不能为空")
         </#if>
       </#if>

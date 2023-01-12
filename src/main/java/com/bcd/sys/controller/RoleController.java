@@ -52,7 +52,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(roleService.findAll(condition));
+        return JsonMessage.success(roleService.list(condition));
     }
 
     /**
@@ -80,7 +80,7 @@ public class RoleController extends BaseController {
                 new StringCondition("orgCode", orgCode, StringCondition.Handler.RIGHT_LIKE),
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE)
         );
-        return JsonMessage.success(roleService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(roleService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -109,9 +109,9 @@ public class RoleController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除角色")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam Long[] ids) {
+    public JsonMessage delete(@Parameter(description = "角色id数组") @RequestParam long[] ids) {
         //验证删除权限
-        roleService.deleteAllById(ids);
+        roleService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }
 

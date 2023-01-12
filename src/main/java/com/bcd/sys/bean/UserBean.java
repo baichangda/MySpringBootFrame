@@ -1,11 +1,12 @@
 package com.bcd.sys.bean;
 
-import com.bcd.base.support_jpa.bean.BaseBean;
+import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -14,15 +15,16 @@ import java.util.Date;
 /**
  * 用户基础信息表
  */
-@Entity
-@Table(name = "t_sys_user")
-public class UserBean extends BaseBean<Long> {
+@Getter
+@Setter
+@Table("t_sys_user")
+public class UserBean extends BaseBean {
     private final static long serialVersionUID = 1L;
 
     //field
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50, message = "[用户名]长度不能超过50")
-    @Schema(description = "用户名", maxLength = 50, required = true)
+    @Schema(description = "用户名", maxLength = 50, requiredMode = Schema.RequiredMode.REQUIRED)
     public String username;
 
     @JsonIgnore
@@ -53,6 +55,6 @@ public class UserBean extends BaseBean<Long> {
     public String cardNumber;
 
     @NotNull(message = "[是否可用]不能为空")
-    @Schema(description = "是否可用(0:禁用,1:可用)", required = true)
+    @Schema(description = "是否可用(0:禁用,1:可用)",requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer status;
 }

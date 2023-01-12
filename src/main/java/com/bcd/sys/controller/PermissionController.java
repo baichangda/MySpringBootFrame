@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings(value = "unchecked")
@@ -53,7 +52,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success(permissionService.findAll(condition));
+        return JsonMessage.success(permissionService.list(condition));
     }
 
     /**
@@ -81,7 +80,7 @@ public class PermissionController extends BaseController {
                 new StringCondition("remark", remark, StringCondition.Handler.ALL_LIKE),
                 new NumberCondition("roleId", roleId, NumberCondition.Handler.EQUAL)
         );
-        return JsonMessage.success(permissionService.findAll(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return JsonMessage.success(permissionService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -110,8 +109,8 @@ public class PermissionController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(description = "删除权限")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam Long[] ids) {
-        permissionService.deleteAllById(ids);
+    public JsonMessage delete(@Parameter(description = "权限id数组") @RequestParam long[] ids) {
+        permissionService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }
 

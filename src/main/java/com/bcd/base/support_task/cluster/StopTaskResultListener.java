@@ -24,12 +24,12 @@ public class StopTaskResultListener<T extends Task<K>, K extends Serializable> e
 
     @Override
     public void onMessage(StopResultRequest stopRequest) {
-        final String requestId = stopRequest.getRequestId();
+        final String requestId = stopRequest.requestId;
         Optional.ofNullable(taskBuilder.getRequestIdToResultMap().get(requestId)).ifPresent(e -> {
-            final Map<String, String> filterMap = Maps.filterValues(stopRequest.getResMap(),
-                    v -> Integer.parseInt(v) != StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND.getFlag());
+            final Map<String, String> filterMap = Maps.filterValues(stopRequest.resMap,
+                    v -> Integer.parseInt(v) != StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND.flag);
             synchronized (e) {
-                stopRequest.getResMap().forEach((k, v) -> {
+                stopRequest.resMap.forEach((k, v) -> {
                     if (StopResult.from(Integer.parseInt(v)) != StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND) {
                         e.putAll(filterMap);
                     }

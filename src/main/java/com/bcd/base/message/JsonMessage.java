@@ -12,7 +12,6 @@ import java.util.Date;
  *
  * @param <T>
  */
-@SuppressWarnings("unchecked")
 public class JsonMessage<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -40,7 +39,7 @@ public class JsonMessage<T> implements Serializable {
         return this;
     }
 
-    public JsonMessage<T> message(int code) {
+    public JsonMessage<T> code(int code) {
         this.code = code;
         return this;
     }
@@ -69,8 +68,12 @@ public class JsonMessage<T> implements Serializable {
         return new JsonMessage<>(code, null);
     }
 
-    public static <R> JsonMessage<R> fail(int code,R data) {
+    public static <R> JsonMessage<R> fail(int code, R data) {
         return new JsonMessage<>(code, data);
+    }
+
+    public static <R> JsonMessage<R> fail(R data) {
+        return new JsonMessage<>(1, data);
     }
 
     public String toJson() {

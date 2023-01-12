@@ -56,7 +56,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition));
+        return JsonMessage.success(${moduleName?uncap_first}Service.list(condition));
     }
 
     /**
@@ -92,7 +92,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
            </#if>
         </#list>
         );
-        return JsonMessage.success(${moduleName?uncap_first}Service.findAll(condition,PageRequest.of(pageNum-1,pageSize)));
+        return JsonMessage.success(${moduleName?uncap_first}Service.page(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
@@ -117,8 +117,8 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @Operation(description = "删除${moduleNameCN}")
     @ApiResponse(responseCode = "200",description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam ${pkType}[] ids){
-        ${moduleName?uncap_first}Service.deleteById(ids);
+    public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam String[] ids){
+        ${moduleName?uncap_first}Service.delete(ids);
         return JsonMessage.success();
     }
 

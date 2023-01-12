@@ -1,6 +1,6 @@
 package com.bcd.sys.service;
 
-import com.bcd.base.support_jpa.service.BaseService;
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.sys.bean.MenuBean;
 import com.bcd.sys.define.CommonConst;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/4/11.
  */
 @Service
-public class MenuService extends BaseService<MenuBean, Long> {
+public class MenuService extends BaseService<MenuBean> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

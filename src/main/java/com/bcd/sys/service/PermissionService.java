@@ -1,12 +1,11 @@
 package com.bcd.sys.service;
 
+import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
-import com.bcd.base.support_jpa.service.BaseService;
 import com.bcd.sys.bean.PermissionBean;
 import com.bcd.sys.define.CommonConst;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
  *
  */
 @Service
-public class PermissionService extends BaseService<PermissionBean, Long> implements ApplicationListener<ContextRefreshedEvent> {
+public class PermissionService extends BaseService<PermissionBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -50,7 +49,7 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
         });
 
         //2、清空权限表
-        deleteAllInBatch();
+        delete();
 
         //3、转换成实体类并保存
         List<PermissionBean> permissionBeanList = permissionSet.stream().map(e -> {
@@ -59,12 +58,12 @@ public class PermissionService extends BaseService<PermissionBean, Long> impleme
             permissionBean.name=e.note;
             return permissionBean;
         }).collect(Collectors.toList());
-        ((PermissionService) AopContext.currentProxy()).saveAll(permissionBeanList);
+        insertBatch(permissionBeanList);
     }
 
     public List<PermissionBean> findPermissionsByUserId(Long userId) {
         if (CommonConst.ADMIN_ID == userId) {
-            return findAll();
+            return list();
         } else {
             String sql = "select d.* from t_sys_user_role a " +
                     "inner join t_sys_role_menu b on b.role_code=a.role_code " +
