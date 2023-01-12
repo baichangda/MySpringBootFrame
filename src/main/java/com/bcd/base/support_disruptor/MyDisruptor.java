@@ -53,7 +53,7 @@ public class MyDisruptor<T> {
     public static void main(String[] args) throws InterruptedException {
         MyDisruptor<UserBean> myDisruptor = new MyDisruptor<>(128, ProducerType.MULTI, new BlockingWaitStrategy());
         myDisruptor.handle(e -> {
-            JsonUtil.toJson(e);
+            System.out.println(JsonUtil.toJson(e));
         }).init();
         final UserBean userBean = new UserBean();
         userBean.realName = "test1";
