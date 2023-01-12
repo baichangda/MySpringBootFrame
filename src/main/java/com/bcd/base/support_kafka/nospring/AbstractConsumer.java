@@ -110,7 +110,7 @@ public abstract class AbstractConsumer {
         //停止消费线程
         ExecutorUtil.shutdownThenAwaitOneByOne(consumerExecutor);
 
-        if(maxConsumeSpeed > 0){
+        if (maxConsumeSpeed > 0) {
             ExecutorUtil.shutdownThenAwaitOneByOne(resetConsumeCountPool);
         }
         //disruptor
@@ -271,10 +271,14 @@ public abstract class AbstractConsumer {
     public abstract void onMessage(ConsumerRecord<String, byte[]> consumerRecord);
 
     private void onMessageInternal(ConsumerRecord<String, byte[]> consumerRecord) {
+        try {
+            onMessage(consumerRecord);
+        } catch (Exception ex) {
+            logger.error("onMessageInternal error", ex);
+        }
         if (autoReleaseBlockingNum) {
             blockingNum.decrementAndGet();
         }
-        onMessage(consumerRecord);
     }
 }
 
