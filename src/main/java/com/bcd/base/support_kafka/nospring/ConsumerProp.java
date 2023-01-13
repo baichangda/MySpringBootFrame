@@ -6,6 +6,8 @@ import java.time.Duration;
 public class ConsumerProp {
     @NotEmpty
     public String bootstrapServers;
+    @NotEmpty
+    public String groupId;
     public boolean enableAutoCommit = true;
     public Duration autoCommitInterval = Duration.ofSeconds(1);
     public String autoOffsetReset = "latest";

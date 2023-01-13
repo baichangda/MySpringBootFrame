@@ -22,7 +22,6 @@ public abstract class AbstractConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private Consumer<String, byte[]> consumer;
     private final String[] topics;
-    private final String groupId;
     private final ConsumerProp consumerProp;
     /**
      * 消费线程池、默认一个
@@ -62,18 +61,15 @@ public abstract class AbstractConsumer {
 
     /**
      * @param consumerProp   消费者属性
-     * @param groupId        消费组id
      * @param maxBlockingNum 最大阻塞数量、必需是2的倍数、如果不是向上取2的倍数
      * @param workThreadNum  工作线程个数
      * @param topics         消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
-                            String groupId,
                             int workThreadNum,
                             int maxBlockingNum,
                             String... topics) {
         this.consumerProp = consumerProp;
-        this.groupId = groupId;
         this.topics = topics;
         this.workThreadNum = workThreadNum;
         this.maxBlockingNum = maxBlockingNum;
@@ -89,7 +85,7 @@ public abstract class AbstractConsumer {
         }
 
         //初始化消费者
-        consumer = new KafkaConsumer<>(consumerProperties(consumerProp, groupId));
+        consumer = new KafkaConsumer<>(consumerProperties(consumerProp));
         afterNewConsumer(consumer);
 
         //初始化disruptor
@@ -147,9 +143,9 @@ public abstract class AbstractConsumer {
         return this;
     }
 
-    private Properties consumerProperties(ConsumerProp consumerProp, String groupId) {
+    private Properties consumerProperties(ConsumerProp consumerProp) {
         Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProp.groupId);
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, consumerProp.bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArrayDeserializer");
@@ -216,7 +212,7 @@ public abstract class AbstractConsumer {
             while (true) {
                 //检查阻塞
                 if (maxBlockingNum > 0 && blockingNum.get() >= maxBlockingNum) {
-                    TimeUnit.MILLISECONDS.sleep(100);
+                    TimeUnit.MILLISECONDS.sleep(500);
                     continue;
                 }
 
