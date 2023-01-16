@@ -214,14 +214,14 @@ public abstract class AbstractConsumerForTimeRange {
 
     }
 
-    private void checkSpeedAndBlock(int count) throws InterruptedException {
+    private void checkSpeedAndSleep(int count) throws InterruptedException {
         //检查速度、如果速度太快则阻塞
         if (maxConsumeSpeed > 0) {
             //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
             final int curConsumeCount = consumeCount.addAndGet(count);
             if (curConsumeCount >= maxConsumeSpeed) {
                 do {
-                    TimeUnit.MILLISECONDS.sleep(50);
+                    TimeUnit.MILLISECONDS.sleep(10);
                 } while (consumeCount.get() >= maxConsumeSpeed);
             }
         }
@@ -237,7 +237,7 @@ public abstract class AbstractConsumerForTimeRange {
             try {
                 //检查阻塞
                 if (blockingNum.get() >= maxBlockingNum) {
-                    TimeUnit.MILLISECONDS.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(100);
                     continue;
                 }
                 //获取消费者
@@ -254,7 +254,7 @@ public abstract class AbstractConsumerForTimeRange {
                 countAfterConsume(count);
 
                 //检查速度、如果速度太快则阻塞
-                checkSpeedAndBlock(count);
+                checkSpeedAndSleep(count);
 
                 final Set<TopicPartition> removeSet = new HashSet<>();
 
