@@ -7,6 +7,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import com.lmax.disruptor.util.DaemonThreadFactory;
 
+import java.util.Arrays;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
@@ -32,8 +33,13 @@ public class MyDisruptor<T> {
         return (-1 >>> Integer.numberOfLeadingZeros(n - 1)) + 1;
     }
 
-    public MyDisruptor<T> handle(Consumer<T> consumer) {
-        disruptor.handleEventsWith((event, sequence, endOfBatch) -> consumer.accept(event.t));
+    public MyDisruptor<T> handle(Consumer<T>... consumers) {
+        WorkHandler<Event<T>>[] workHandlers=new WorkHandler[consumers.length];
+        for (int i = 0; i < consumers.length; i++) {
+            final Consumer<T> consumer = consumers[i];
+            workHandlers[i]= event -> consumer.accept(event.t);
+        }
+        disruptor.handleEventsWithWorkerPool(workHandlers);
         return this;
     }
 
