@@ -2,6 +2,7 @@ package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.support_jdbc.bean.BaseBean;
+import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class BaseService<T extends BaseBean> {
+public class BaseService<T extends SuperBaseBean> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

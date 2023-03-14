@@ -1,18 +1,17 @@
 buildscript {
     ext {
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
-        aliyunGoogle = 'https://maven.aliyun.com/repository/google'
-        aliyunGradlePlugin = 'https://maven.aliyun.com/repository/gradle-plugin'
-        aliyunSpring = 'https://maven.aliyun.com/repository/spring'
-        aliyunSpringPlugin = 'https://maven.aliyun.com/repository/spring-plugin'
+        tencentPublic = 'http://mirrors.cloud.tencent.com/nexus/repository/maven-public/'
+        huaweiMaven = 'https://repo.huaweicloud.com/repository/maven/'
         incarMavenRepoUrl = 'https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
-        maven { url "${aliyunPublic}" }
-        maven { url "${aliyunGradlePlugin}" }
-        maven { url "${aliyunSpringPlugin}" }
+//        maven { url "${aliyunPublic}" }
+//        maven { url "${huaweiMaven}" }
+        maven {url "${tencentPublic}"
+            allowInsecureProtocol=true}
         mavenCentral()
     }
 }
@@ -24,7 +23,7 @@ plugins {
     id 'maven-publish'
     id "org.flywaydb.flyway" version "9.7.+"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
-    id 'org.springframework.boot' version "2.7.6"
+    id 'org.springframework.boot' version "2.+"
 }
 
 
@@ -39,9 +38,10 @@ targetCompatibility = 1.8
 
 repositories {
     mavenLocal()
-    maven { url "${aliyunPublic}" }
-    maven { url "${aliyunGoogle}" }
-    maven { url "${aliyunSpring}" }
+//    maven { url "${aliyunPublic}" }
+//    maven { url "${huaweiMaven}" }
+    maven {url "${tencentPublic}"
+        allowInsecureProtocol=true}
     mavenCentral()
 //    maven {
 //        url "${incarMavenRepoUrl}"
@@ -110,7 +110,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:2.9.3")
+    implementation("org.springframework.kafka:spring-kafka:2.+")
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
@@ -144,7 +144,7 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
 
     // https://mvnrepository.com/artifact/io.netty/netty-buffer
-    implementation group: 'io.netty', name: 'netty-buffer', version: "4.+"
+    implementation group: 'io.netty', name: 'netty-buffer', version: "4.1.87.Final"
 
     // define a BOM and its version
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))

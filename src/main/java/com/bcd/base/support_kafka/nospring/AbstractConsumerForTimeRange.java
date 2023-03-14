@@ -284,13 +284,13 @@ public abstract class AbstractConsumerForTimeRange {
                 if (!removeSet.isEmpty()) {
                     final String reduce = removeSet.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + "," + e2).get();
                     logger.info("consumer assignment change, remove [{}]", reduce);
-                    final Set<TopicPartition> assignment = consumer.assignment();
+                    final Set<TopicPartition> newAssignment=new HashSet<>(consumer.assignment());
                     for (TopicPartition remove : removeSet) {
-                        assignment.remove(remove);
+                        newAssignment.remove(remove);
                     }
-                    consumer.assign(assignment);
+                    consumer.assign(newAssignment);
                     //如果订阅为空、退出消费
-                    if (assignment.isEmpty()) {
+                    if (newAssignment.isEmpty()) {
                         logger.info("consumer assignment empty, exit");
                         break;
                     }

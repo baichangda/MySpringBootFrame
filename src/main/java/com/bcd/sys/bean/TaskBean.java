@@ -1,8 +1,7 @@
 package com.bcd.sys.bean;
 
 import com.bcd.base.support_jdbc.anno.Table;
-import com.bcd.base.support_jdbc.bean.BaseBean;
-import com.bcd.base.support_mongodb.bean.SuperBaseBean;
+import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.support_task.Task;
@@ -23,8 +22,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_task")
-public class TaskBean extends BaseBean implements Task<Long> {
-
+public class TaskBean extends SuperBaseBean implements Task<Long> {
 
     //field
     @NotBlank(message = "[任务名称]不能为空")
