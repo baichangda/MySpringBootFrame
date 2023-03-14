@@ -29,9 +29,14 @@ import java.util.stream.Collectors;
  * <p>
  * 只能有一个消费者、因为是手动分区{@link Consumer#assign(Collection)}不会进行负载均衡、区别于{@link Consumer#subscribe(Pattern)}是交给kafka自动分区
  * <p>
- * 要求kafka版本大于 0.10.0、因为依赖{@link Consumer#offsetsForTimes(Map)}
- * <p>
- * 会在消费完毕后自动停止销毁、即所有分区消费完毕后销毁
+ * 不同的kafka版本表现不同
+ * 1、版本>=0.10.0
+ * {@link Consumer#offsetsForTimes(Map)}、{@link ConsumerRecord#timestamp()}有效
+ * 此时会根据startTime找到offset、从此offset开始消费、直到endTime、然后自动结束、销毁资源
+ * 2、版本<0.10.0
+ * {@link Consumer#offsetsForTimes(Map)}、{@link ConsumerRecord#timestamp()}无效
+ * 此时会从头开始消费、且无法自动结束退出
+ *
  */
 public abstract class AbstractConsumerForTimeRange {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
