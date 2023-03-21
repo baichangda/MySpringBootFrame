@@ -227,8 +227,10 @@ public abstract class AbstractConsumer {
                 }
             }
         }
+        logger.info("consumer[{}] exit", this.getClass().getName());
         //退出时候销毁其他资源
         destroyByConsumerExecutor();
+        logger.info("consumer[{}] destroy", this.getClass().getName());
     }
 
 
