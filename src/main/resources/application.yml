@@ -137,3 +137,7 @@ sa-token:
   is-log: false
   # 同一账号可同时在线的最大数量
   max-login-count: -1
+  # 配置token读取的位置
+  is-read-body: false
+  is-read-header: false
+  is-read-cookie: true
