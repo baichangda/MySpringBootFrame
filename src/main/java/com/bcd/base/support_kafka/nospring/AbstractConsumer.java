@@ -122,14 +122,25 @@ public abstract class AbstractConsumer {
         //初始化消费线程、提交消费任务
         this.consumerExecutor = Executors.newSingleThreadExecutor();
         consumerExecutor.execute(this::consume);
+
+        //销毁消费者、因为消费者执行的是死循环、只有当满足条件时候才会退出
+        consumerExecutor.shutdown();
     }
 
 
+    /**
+     * 此操作仅仅是打上退出标记、不会马上结束
+     * 销毁过程如下
+     * 消费线程池任务检测到退出标记、退出循环、停止消费、然后销毁其他线程池资源{@link #destroyByConsumerExecutor()}
+     */
     public void destroy() {
         //打上退出标记
         running = false;
+    }
+
+    private void destroyByConsumerExecutor() {
         //销毁消费线程池、销毁重置计数线程池(如果存在)
-        ExecutorUtil.shutdownThenAwaitOneByOne(consumerExecutor, resetConsumeCountPool);
+        ExecutorUtil.shutdownThenAwaitOneByOne(resetConsumeCountPool);
         //等待队列中为空、然后停止工作线程池、避免出现数据丢失
         ExecutorUtil.shutdownThenAwaitOneByOneAfterQueueEmpty(queue, workPool);
     }
@@ -160,7 +171,7 @@ public abstract class AbstractConsumer {
 
     }
 
-    private void checkSpeedAndSleep(int count) throws InterruptedException {
+    private void checkConsumeSpeedAndSleep(int count) throws InterruptedException {
         //检查速度、如果速度太快则阻塞
         if (maxConsumeSpeed > 0) {
             //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
@@ -200,11 +211,11 @@ public abstract class AbstractConsumer {
                 countAfterConsume(count);
 
                 //检查速度、如果速度太快则阻塞
-                checkSpeedAndSleep(count);
+                checkConsumeSpeedAndSleep(count);
 
                 //发布消息
                 for (ConsumerRecord<String, byte[]> consumerRecord : consumerRecords) {
-                    //检查开始时间
+                    //放入队列
                     queue.put(consumerRecord);
                 }
             } catch (Exception ex) {
@@ -216,6 +227,8 @@ public abstract class AbstractConsumer {
                 }
             }
         }
+        //退出时候销毁其他资源
+        destroyByConsumerExecutor();
     }
 
 

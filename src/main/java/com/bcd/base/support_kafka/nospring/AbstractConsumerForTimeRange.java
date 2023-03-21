@@ -29,11 +29,12 @@ import java.util.stream.Collectors;
  * 此时会根据startTime找到offset、从此offset开始消费、直到endTime、然后自动结束、销毁资源
  * 2、版本<0.10.0
  * {@link Consumer#offsetsForTimes(Map)}、{@link ConsumerRecord#timestamp()}无效
- * 此时会从头开始消费、且无法自动结束退出
+ * 此时会从头开始消费、且无法自动结束退出、可以调用{@link #destroy()}触发退出
  */
 public abstract class AbstractConsumerForTimeRange {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     private final Consumer<String, byte[]> consumer;
+    private final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue;
     private final String[] topics;
     /**
      * 工作线程数量
@@ -65,8 +66,7 @@ public abstract class AbstractConsumerForTimeRange {
     private final long startTimeTs;
     private final long endTimeTs;
 
-
-    private final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue;
+    private volatile boolean running = true;
 
     /**
      * @param consumerProp        消费者属性
@@ -152,8 +152,18 @@ public abstract class AbstractConsumerForTimeRange {
         consumerExecutor.shutdown();
     }
 
+    /**
+     * 此操作仅仅是打上退出标记、不会马上结束
+     * 销毁过程如下
+     * 消费线程池任务检测到退出标记、退出循环、停止消费、然后销毁其他线程池资源{@link #destroyByConsumerExecutor()}
+     */
+    public void destroy() {
+        //打上退出标记
+        running = false;
+    }
 
-    public void destroyByConsumerExecutor() {
+
+    private void destroyByConsumerExecutor() {
         //销毁消费线程池、销毁重置计数线程池(如果存在)
         ExecutorUtil.shutdownThenAwaitOneByOne(resetConsumeCountPool);
         //等待队列中为空、然后停止工作线程池、避免出现数据丢失
@@ -219,7 +229,7 @@ public abstract class AbstractConsumerForTimeRange {
 
     }
 
-    private void checkSpeedAndSleep(int count) throws InterruptedException {
+    private void checkConsumeSpeedAndSleep(int count) throws InterruptedException {
         //检查速度、如果速度太快则阻塞
         if (maxConsumeSpeed > 0) {
             //控制每秒消费、如果消费过快、则阻塞一会、放慢速度
@@ -238,7 +248,7 @@ public abstract class AbstractConsumerForTimeRange {
      * @return
      */
     public void consume() {
-        while (true) {
+        while (running) {
             try {
                 //检查阻塞
                 if (blockingNum.get() >= maxBlockingNum) {
@@ -259,7 +269,7 @@ public abstract class AbstractConsumerForTimeRange {
                 countAfterConsume(count);
 
                 //检查速度、如果速度太快则阻塞
-                checkSpeedAndSleep(count);
+                checkConsumeSpeedAndSleep(count);
 
                 final Set<TopicPartition> removeSet = new HashSet<>();
 
