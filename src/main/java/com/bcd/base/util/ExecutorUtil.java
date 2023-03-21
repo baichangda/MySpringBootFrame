@@ -2,6 +2,7 @@ package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +15,18 @@ public class ExecutorUtil {
             throw BaseRuntimeException.getException(e);
         }
     }
+
+    public static void shutdownThenAwaitOneByOneAfterQueueEmpty(Queue queue, ExecutorService executorService){
+        while (!queue.isEmpty()) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(100L);
+            } catch (InterruptedException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        }
+        ExecutorUtil.shutdownThenAwaitOneByOne(executorService);
+    }
+
 
     /**
      * 一个一个关闭等待
