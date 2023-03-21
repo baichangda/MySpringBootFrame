@@ -219,7 +219,7 @@ public abstract class AbstractConsumer {
                     queue.put(consumerRecord);
                 }
             } catch (Exception ex) {
-                logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error", ex);
+                logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error,Try Again After 3s", ex);
                 try {
                     TimeUnit.SECONDS.sleep(3);
                 } catch (InterruptedException e) {

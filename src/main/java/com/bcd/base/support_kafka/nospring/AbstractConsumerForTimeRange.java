@@ -105,12 +105,12 @@ public abstract class AbstractConsumerForTimeRange {
     }
 
     /**
-     * @param consumerProp        消费者属性
-     * @param maxBlockingNum      最大阻塞数量
-     * @param workThreadNum       工作线程个数
-     * @param startTimeTs         获取数据开始时间戳
-     * @param endTimeTs           获取数据结束时间戳
-     * @param topics              消费的topic
+     * @param consumerProp   消费者属性
+     * @param maxBlockingNum 最大阻塞数量
+     * @param workThreadNum  工作线程个数
+     * @param startTimeTs    获取数据开始时间戳
+     * @param endTimeTs      获取数据结束时间戳
+     * @param topics         消费的topic
      */
     public AbstractConsumerForTimeRange(ConsumerProp consumerProp,
                                         int workThreadNum,
@@ -311,7 +311,7 @@ public abstract class AbstractConsumerForTimeRange {
                     }
                 }
             } catch (Exception ex) {
-                logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error", ex);
+                logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error,Try Again After 3s", ex);
                 try {
                     TimeUnit.SECONDS.sleep(3);
                 } catch (InterruptedException e) {
