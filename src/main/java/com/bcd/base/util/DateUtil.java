@@ -143,15 +143,11 @@ public class DateUtil {
             case DAYS: {
                 LocalDateTime start = ldt1.with(ChronoField.SECOND_OF_DAY, 0);
                 LocalDateTime end = start.plusDays(1);
-                while (true) {
+                do {
                     returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
-                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
-                        break;
-                    } else {
-                        start = start.plusDays(1);
-                        end = end.plusDays(1);
-                    }
-                }
+                    start = start.plusDays(1);
+                    end = end.plusDays(1);
+                } while (ldt2.isBefore(start) || ldt2.isAfter(end));
 
                 break;
             }
@@ -159,21 +155,15 @@ public class DateUtil {
                 int dayOfWeek = ldt1.get(ChronoField.DAY_OF_WEEK);
                 LocalDateTime start = ldt1.plusDays(1 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, 0);
                 LocalDateTime end = start.plusDays(7);
-                while (true) {
+                do {
                     returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
-                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
-                        break;
-                    } else {
-                        start = start.plusWeeks(1);
-                        end = end.plusWeeks(1);
-                    }
-                }
-                if (!returnList.isEmpty()) {
-                    Date[] firstEle = returnList.get(0);
-                    Date[] lastEle = returnList.get(returnList.size() - 1);
-                    firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                    lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                }
+                    start = start.plusWeeks(1);
+                    end = end.plusWeeks(1);
+                } while (ldt2.isBefore(start) || ldt2.isAfter(end));
+                Date[] firstEle = returnList.get(0);
+                Date[] lastEle = returnList.get(returnList.size() - 1);
+                firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
                 break;
             }
             case MONTHS: {
@@ -189,12 +179,10 @@ public class DateUtil {
                         temp = temp.plusMonths(1);
                     }
                 }
-                if (!returnList.isEmpty()) {
-                    Date[] firstEle = returnList.get(0);
-                    Date[] lastEle = returnList.get(returnList.size() - 1);
-                    firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                    lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                }
+                Date[] firstEle = returnList.get(0);
+                Date[] lastEle = returnList.get(returnList.size() - 1);
+                firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
                 break;
             }
             default: {
@@ -280,7 +268,7 @@ public class DateUtil {
      *
      * @param startDate  包括
      * @param endDate    不包括
-     * @param zoneOffset
+     * @param zoneOffset 时区偏移量
      */
     public static void formatDateParam(Date startDate, Date endDate, ZoneOffset zoneOffset) {
         if (startDate != null) {
@@ -306,7 +294,6 @@ public class DateUtil {
      *              {@link ChronoField#MINUTE_OF_HOUR}
      *              {@link ChronoField#SECOND_OF_MINUTE}
      *              {@link ChronoField#MILLI_OF_SECOND}
-     * @return
      */
     public static boolean isEqual(Date d1, Date d2, ChronoField field) {
         if (Arrays.stream(equal_fields).noneMatch(e -> e == field)) {
