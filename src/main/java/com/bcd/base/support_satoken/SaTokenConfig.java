@@ -15,11 +15,13 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,10 +39,9 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
          * 具体逻辑查看 {@link  SaInterceptor#preHandle(HttpServletRequest, HttpServletResponse, Object)}
          */
         registry.addInterceptor(new SaInterceptor(handler -> {
-            SaRouter.match("/**")
-                    .notMatch("/api/sys/user/login", "/api/anno")
-                    .check(r -> StpUtil.checkLogin());
-        })).addPathPatterns("/**");
+            StpUtil.checkLogin();
+        }).isAnnotation(false)).addPathPatterns("/api/**").excludePathPatterns("/api/sys/user/login", "/api/anno");
+        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/api/**");
     }
 
     /**

@@ -64,7 +64,7 @@ public class ExceptionUtil {
             return JsonMessage.fail(((BaseRuntimeException) realException).getCode())
                     .message(realException.getMessage());
         }else {
-            return JsonMessage.fail().message(realException.toString());
+            return JsonMessage.fail().message(realException.getMessage());
         }
     }
 
@@ -73,11 +73,7 @@ public class ExceptionUtil {
         if (realException == null) {
             throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
         }
-        if (realException instanceof BaseRuntimeException) {
-            return realException.getMessage();
-        } else {
-            return realException.toString();
-        }
+        return realException.getMessage();
     }
 
 

@@ -1,6 +1,6 @@
 package com.bcd.base.support_kafka.nospring;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class ProducerProp {
     @NotBlank

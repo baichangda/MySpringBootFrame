@@ -1,6 +1,6 @@
 package com.bcd.base.support_kafka.nospring;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Duration;
 
 public class ConsumerProp {

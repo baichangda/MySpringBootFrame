@@ -11,7 +11,7 @@ import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class SwaggerApiScanner {
     private static LinkedHashMap<String, ApiParamData> getApiParamsMap(Method method) {
         LinkedHashMap<String, ApiParamData> resultMap = new LinkedHashMap<>();
         //使用spring工具类获取所有参数真实名称
-        LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
+        StandardReflectionParameterNameDiscoverer discoverer=new StandardReflectionParameterNameDiscoverer();
         String[] paramNames = discoverer.getParameterNames(method);
         //获取所有swagger注解参数对应注释
         //获取所有参数

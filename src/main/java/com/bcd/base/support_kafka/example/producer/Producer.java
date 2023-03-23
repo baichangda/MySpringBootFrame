@@ -4,9 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -18,15 +15,10 @@ public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     private KafkaTemplate kafkaTemplate;
 
     public void sendMessage(byte[] key, byte[] msg) {
-        ListenableFuture<SendResult<byte[], byte[]>> listenableFuture = kafkaTemplate.send("zs-feedback", key, msg);
-        listenableFuture.addCallback(new ListenableFutureCallback<SendResult<byte[], byte[]>>() {
-            @Override
-            public void onFailure(Throwable ex) {
+        kafkaTemplate.send("zs-feedback", key, msg).whenComplete((sendResult, throwable) -> {
+            if (throwable == null) {
                 System.out.println("onFailure!");
-            }
-
-            @Override
-            public void onSuccess(SendResult<byte[], byte[]> result) {
+            } else {
                 System.out.println("onSucceed!");
             }
         });

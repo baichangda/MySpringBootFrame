@@ -8,10 +8,6 @@ server:
     session:
       timeout: 1800
 spring:
-  data:
-    redis:
-      repositories:
-        enabled: false
   # 允许循环依赖
   main:
     allow-circular-references: true
@@ -48,47 +44,46 @@ spring:
       fetch-size: -1
       max-rows: -1
       query-timeout:
+  data:
+    #mongodb配置
+    mongodb.uri: mongodb://test:test@127.0.0.1:27017/test
+    #redis配置
+    #如果都进行了配置,加载的先后顺序为:
+    #sentinel>cluster>single
+    redis:
+      repositories:
+        enabled: false
+      #公用配置
+      ssl: false
+      database: 0
+      timeout: 60000
+      password:
+      #异步lettuce连接池(默认)
+      lettuce:
+        pool:
+          maxIdle: 8
+          minIdle: 0
+          maxActive: 8
+          maxWait: -1
+        shutdown-timeout: 100ms
+      #主从配置
+      #     sentinel:
+      #       master: myMaster
+      #       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
+      #    #集群配置
+      #     cluster:
+      #       maxRedirects: 3
+      #       nodes:
+      #         - 114.116.107.184:7001
+      #         - 114.116.107.184:7002
+      #         - 114.116.107.184:7003
+      #         - 114.115.141.139:7004
+      #         - 114.115.141.139:7005
+      #         - 114.115.141.139:7006
 
-
-  #  mongodb配置
-  data.mongodb.uri: mongodb://test:test@127.0.0.1:27017/test
-
-
-  #  redis配置
-  #  如果都进行了配置,加载的先后顺序为:
-  #  sentinel>cluster>single
-  redis:
-    #公用配置
-    ssl: false
-    database: 0
-    timeout: 60000
-    password:
-    #异步lettuce连接池(默认)
-    lettuce:
-      pool:
-        maxIdle: 8
-        minIdle: 0
-        maxActive: 8
-        maxWait: -1
-      shutdown-timeout: 100ms
-    #主从配置
-    #     sentinel:
-    #       master: myMaster
-    #       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
-    #    #集群配置
-    #     cluster:
-    #       maxRedirects: 3
-    #       nodes:
-    #         - 114.116.107.184:7001
-    #         - 114.116.107.184:7002
-    #         - 114.116.107.184:7003
-    #         - 114.115.141.139:7004
-    #         - 114.115.141.139:7005
-    #         - 114.115.141.139:7006
-
-    #单机配置
-    host: 127.0.0.1
-    port: 6379
+      #单机配置
+      host: 127.0.0.1
+      port: 6379
 
   #  kafka配置
   kafka:
@@ -117,7 +112,8 @@ springdoc:
     - com.bcd
   swagger-ui:
     path: /swagger-ui.html
-
+  api-docs:
+    enabled: true
 
 # Sa-Token配置
 sa-token:

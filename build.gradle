@@ -8,10 +8,9 @@ buildscript {
 
     repositories {
         mavenLocal()
-//        maven { url "${aliyunPublic}" }
+        maven { url "${aliyunPublic}" }
 //        maven { url "${huaweiMaven}" }
-        maven {url "${tencentPublic}"
-            allowInsecureProtocol=true}
+//        maven {url "${tencentPublic}" allowInsecureProtocol=true}
         mavenCentral()
     }
 }
@@ -21,9 +20,9 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id "org.flywaydb.flyway" version "9.7.+"
-    id "io.spring.dependency-management" version "1.0.11.RELEASE"
-    id 'org.springframework.boot' version "2.+"
+    id "org.flywaydb.flyway" version "9.16.+"
+    id "io.spring.dependency-management" version "1.1.0"
+    id 'org.springframework.boot' version "3.0.4"
 }
 
 
@@ -33,8 +32,8 @@ plugins {
 group 'com.bcd'
 version '1.0'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 17
+targetCompatibility = 17
 
 repositories {
     mavenLocal()
@@ -72,7 +71,10 @@ dependencies {
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
 
     // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
-    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+//    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
+    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+//    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.3'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "+"
@@ -81,7 +83,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
     //springboot cache支持
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     //springboot aop支持
     implementation("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
@@ -100,9 +102,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
 
     //springboot redis支持
-    //lettuce异步客户端(默认使用lettuce,必须手动引用apache commons-pool2)
+    //lettuce异步客户端(默认使用lettuce)
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.apache.commons:commons-pool2:+")
     //springboot validation支持
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
@@ -110,7 +111,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     //spring kafka支持
-    implementation("org.springframework.kafka:spring-kafka:2.+")
+    implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: "3.+"
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
@@ -121,11 +122,12 @@ dependencies {
 //    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.0.3'
 
 
-    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: "+"
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: "+"
+
 
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
-    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "2.+"
+    implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "3.+"
 
     // https://mvnrepository.com/artifact/org.freemarker/freemarker
     implementation group: 'org.freemarker', name: 'freemarker', version: "+"
@@ -140,11 +142,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
-    implementation group: 'cn.dev33', name: 'sa-token-spring-boot-starter', version: "+"
+    implementation group: 'cn.dev33', name: 'sa-token-spring-boot3-starter', version: "+"
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
-
-    // https://mvnrepository.com/artifact/io.netty/netty-buffer
-    implementation group: 'io.netty', name: 'netty-buffer', version: "4.1.87.Final"
 
     // define a BOM and its version
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
