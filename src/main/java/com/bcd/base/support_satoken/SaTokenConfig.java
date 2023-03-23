@@ -3,11 +3,9 @@ package com.bcd.base.support_satoken;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.annotation.*;
 import cn.dev33.satoken.interceptor.SaInterceptor;
-import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaStrategy;
-import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckAction;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.support_satoken.anno.SaCheckRequestMappingUrl;
@@ -15,7 +13,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -40,8 +37,7 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
          */
         registry.addInterceptor(new SaInterceptor(handler -> {
             StpUtil.checkLogin();
-        }).isAnnotation(false)).addPathPatterns("/api/**").excludePathPatterns("/api/sys/user/login", "/api/anno");
-        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/api/**");
+        })).addPathPatterns("/api/**").excludePathPatterns("/api/sys/user/login", "/api/anno");
     }
 
     /**
@@ -58,7 +54,7 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
             if (saCheckAction != null) {
                 final String className = method.getDeclaringClass().getName();
                 final String methodName = method.getName();
-                SaManager.getStpLogic(saCheckAction.type()).checkPermission(className + ":" + methodName);
+                SaManager.getStpLogic(saCheckAction.type(), false).checkPermissionAnd(className + ":" + methodName);
             }
 
             // 校验 @SaCheckRequestMappingUrl 注解
@@ -78,23 +74,19 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
                     });
                 });
 
-                SaManager.getStpLogic(saCheckRequestMappingUrl.type()).checkPermissionOr(permissionSet.toArray(new String[0]));
+                SaManager.getStpLogic(saCheckRequestMappingUrl.type(), false).checkPermissionOr(permissionSet.toArray(new String[0]));
             }
 
             // 校验 @SaCheckNotePermissions 注解
             final SaCheckNotePermissions sacheckNotePermissions = method.getAnnotation(SaCheckNotePermissions.class);
             if (sacheckNotePermissions != null) {
                 String[] perms = Arrays.stream(sacheckNotePermissions.value()).map(e -> e.code).toArray(String[]::new);
-                final StpLogic stpLogic = SaManager.getStpLogic(sacheckNotePermissions.type());
-                if (perms.length == 1) {
-                    stpLogic.checkPermission(perms[0]);
+                final StpLogic stpLogic = SaManager.getStpLogic(sacheckNotePermissions.type(), false);
+                final SaMode mode = sacheckNotePermissions.mode();
+                if (mode == SaMode.AND) {
+                    stpLogic.checkPermissionAnd(perms);
                 } else {
-                    final SaMode mode = sacheckNotePermissions.mode();
-                    if (mode == SaMode.AND) {
-                        stpLogic.checkPermissionAnd(perms);
-                    } else {
-                        stpLogic.checkPermissionOr(perms);
-                    }
+                    stpLogic.checkPermissionOr(perms);
                 }
             }
         };
