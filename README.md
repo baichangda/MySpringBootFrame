@@ -1,6 +1,6 @@
 # 自定义Spring框架
 ## 框架
-- jdk17
+- jdk17(https://adoptium.net/zh-CN/temurin/releases/)
 - springBoot3+
 - gradle7.6+
 ## 第三方技术要求
