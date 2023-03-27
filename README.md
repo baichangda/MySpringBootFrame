@@ -2,7 +2,7 @@
 ## 框架
 - jdk17
 - springBoot3+
-- gradle8+
+- gradle7.6+
 ## 第三方技术要求
 ### log(log4j2)
 - 集成log4j2、排除spring默认logback依赖
