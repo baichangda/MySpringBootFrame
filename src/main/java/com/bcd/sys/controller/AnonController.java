@@ -1,4 +1,4 @@
-package com.bcd.controller;
+package com.bcd.sys.controller;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
