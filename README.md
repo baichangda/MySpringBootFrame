@@ -1,5 +1,11 @@
 # 自定义Spring框架
-## 技术要求
+## 框架
+- jdk17
+- springBoot3+
+## 第三方技术要求
+### log(log4j2)
+- 集成log4j2、排除spring默认logback依赖
+
 ### mysql/plsql(spring jdbc)
 - 可以配置Condition使用
 - 主要方法在com.bcd.base.support_jdbc.service.BaseService里面
