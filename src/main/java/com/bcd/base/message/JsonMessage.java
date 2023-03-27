@@ -4,6 +4,7 @@ package com.bcd.base.message;
 import com.bcd.base.util.JsonUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,6 +14,7 @@ import java.util.Date;
  * @param <T>
  */
 public class JsonMessage<T> implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Api调用编码(0:成功;1:通用错误;其他代表各种业务定义的错误)")
