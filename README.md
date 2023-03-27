@@ -31,8 +31,10 @@
 - 注入OkHttpClient使用、bean定义在OkHttpConfig中
 
 ### excel操作(easyExcel)
+- 网上查阅资料
 
 ### 本地缓存(caffeine)
+- 网上查阅资料
 
 ### web api文档(spring openapi)
 - spring openapi是对swagger v3封装
