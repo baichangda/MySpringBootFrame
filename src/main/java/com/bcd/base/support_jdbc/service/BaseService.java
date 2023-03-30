@@ -25,13 +25,31 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class BaseService<T extends SuperBaseBean> {
 
+    /**
+     * 注意所有的类变量必须使用get方法获取
+     * 因为类如果被aop代理了、代理对象的这些变量值都是null
+     * 而get方法会被委托给真实对象的方法
+     */
+
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     @Autowired
     TransactionTemplate transactionTemplate;
 
-    public final BeanInfo<T> beanInfo;
+    private final BeanInfo<T> beanInfo;
+
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    public TransactionTemplate getTransactionTemplate() {
+        return transactionTemplate;
+    }
+
+    public BeanInfo<T> getBeanInfo() {
+        return beanInfo;
+    }
 
     public BaseService() {
         final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -128,8 +146,8 @@ public class BaseService<T extends SuperBaseBean> {
      * @return
      */
     public final T get(long id) {
-        final String sql = "select * from " + beanInfo.tableName + " where id=?";
-        final List<T> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(beanInfo.clazz), id);
+        final String sql = "select * from " + getBeanInfo().tableName + " where id=?";
+        final List<T> list = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<>(getBeanInfo().clazz), id);
         if (list.isEmpty()) {
             return null;
         } else {
@@ -161,9 +179,9 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public final void insert(T t) {
         final KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(conn -> {
-            final PreparedStatement ps = conn.prepareStatement(beanInfo.insertSql, Statement.RETURN_GENERATED_KEYS);
-            final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(beanInfo.getValues(t).toArray());
+        getJdbcTemplate().update(conn -> {
+            final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql, Statement.RETURN_GENERATED_KEYS);
+            final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(getBeanInfo().getValues(t).toArray());
             argumentPreparedStatementSetter.setValues(ps);
             return ps;
         }, keyHolder);
@@ -176,10 +194,10 @@ public class BaseService<T extends SuperBaseBean> {
      * @param t
      */
     public final void update(T t) {
-        final String sql = beanInfo.updateSql + " where id=?";
-        final List<Object> args = beanInfo.getValues(t);
+        final String sql = getBeanInfo().updateSql + " where id=?";
+        final List<Object> args = getBeanInfo().getValues(t);
         args.add(t.id);
-        jdbcTemplate.update(sql, args.toArray());
+        getJdbcTemplate().update(sql, args.toArray());
     }
 
     /**
@@ -190,7 +208,7 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public final void update(Condition condition, Object... vals) {
         final StringBuilder sql = new StringBuilder("update ");
-        sql.append(beanInfo.tableName);
+        sql.append(getBeanInfo().tableName);
         sql.append(" set ");
         List<Object> args = new ArrayList<>();
         for (int i = 0; i < vals.length; i += 2) {
@@ -199,7 +217,7 @@ public class BaseService<T extends SuperBaseBean> {
             if (i != 0) {
                 sql.append(",");
             }
-            sql.append(beanInfo.toColumnName(name));
+            sql.append(getBeanInfo().toColumnName(name));
             sql.append("=?");
             args.add(val);
         }
@@ -209,7 +227,7 @@ public class BaseService<T extends SuperBaseBean> {
             sql.append(convertRes.sql);
             args.addAll(convertRes.paramList);
         }
-        jdbcTemplate.update(sql.toString(), args.toArray());
+        getJdbcTemplate().update(sql.toString(), args.toArray());
     }
 
     /**
@@ -219,8 +237,8 @@ public class BaseService<T extends SuperBaseBean> {
      * @param list
      */
     public final void insertBatch(List<T> list) {
-        final List<Object[]> argList = list.stream().map(e1 -> beanInfo.getValues(e1).toArray()).collect(Collectors.toList());
-        jdbcTemplate.batchUpdate(beanInfo.insertSql, argList);
+        final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
+        getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
     }
 
     /**
@@ -229,15 +247,15 @@ public class BaseService<T extends SuperBaseBean> {
      * @param list
      */
     public final void updateBatch(List<T> list) {
-        String sql = beanInfo.updateSql + " where id=?";
+        String sql = getBeanInfo().updateSql + " where id=?";
 
         final List<Object[]> argList = list.stream().map(e1 -> {
-            final List<Object> args = beanInfo.getValues(e1);
+            final List<Object> args = getBeanInfo().getValues(e1);
             args.add(e1.id);
             return args.toArray();
         }).collect(Collectors.toList());
 
-        jdbcTemplate.batchUpdate(sql, argList);
+        getJdbcTemplate().batchUpdate(sql, argList);
     }
 
     /**
@@ -247,12 +265,12 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public final void delete(long... ids) {
         if (ids.length == 1) {
-            final String sql = "delete from " + beanInfo.tableName + " where id =?";
-            jdbcTemplate.update(sql, ids[0]);
+            final String sql = "delete from " + getBeanInfo().tableName + " where id =?";
+            getJdbcTemplate().update(sql, ids[0]);
         } else if (ids.length > 1) {
             final List<Object[]> argList = Arrays.stream(ids).mapToObj(e -> new Object[]{e}).collect(Collectors.toList());
-            final String sql = "delete from " + beanInfo.tableName + " where id =?";
-            jdbcTemplate.batchUpdate(sql, argList);
+            final String sql = "delete from " + getBeanInfo().tableName + " where id =?";
+            getJdbcTemplate().batchUpdate(sql, argList);
         }
     }
 
@@ -270,7 +288,7 @@ public class BaseService<T extends SuperBaseBean> {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final StringBuilder sql = new StringBuilder();
         sql.append("delete from ");
-        sql.append(beanInfo.tableName);
+        sql.append(getBeanInfo().tableName);
         final List<Object> paramList;
         if (convertRes != null) {
             sql.append(" where ");
@@ -280,9 +298,9 @@ public class BaseService<T extends SuperBaseBean> {
             paramList = null;
         }
         if (paramList != null && !paramList.isEmpty()) {
-            jdbcTemplate.update(sql.toString(), paramList.toArray());
+            getJdbcTemplate().update(sql.toString(), paramList.toArray());
         } else {
-            jdbcTemplate.update(sql.toString());
+            getJdbcTemplate().update(sql.toString());
         }
     }
 
@@ -308,7 +326,7 @@ public class BaseService<T extends SuperBaseBean> {
     private int count(ConvertRes convertRes) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select count(*) from ");
-        sql.append(beanInfo.tableName);
+        sql.append(getBeanInfo().tableName);
         final List<Object> paramList;
         if (convertRes != null) {
             sql.append(" where ");
@@ -319,16 +337,16 @@ public class BaseService<T extends SuperBaseBean> {
         }
 
         if (paramList != null && !paramList.isEmpty()) {
-            return jdbcTemplate.queryForObject(sql.toString(), Integer.class, paramList.toArray());
+            return getJdbcTemplate().queryForObject(sql.toString(), Integer.class, paramList.toArray());
         } else {
-            return jdbcTemplate.queryForObject(sql.toString(), Integer.class);
+            return getJdbcTemplate().queryForObject(sql.toString(), Integer.class);
         }
     }
 
     private List<T> list(ConvertRes convertRes, Sort sort, int offset, int limit) {
         final StringBuilder sql = new StringBuilder();
         sql.append("select * from ");
-        sql.append(beanInfo.tableName);
+        sql.append(getBeanInfo().tableName);
         final List<Object> paramList;
         if (convertRes != null) {
             sql.append(" where ");
@@ -351,9 +369,9 @@ public class BaseService<T extends SuperBaseBean> {
         }
 
         if (!paramList.isEmpty()) {
-            return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(beanInfo.clazz), paramList.toArray());
+            return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(getBeanInfo().clazz), paramList.toArray());
         } else {
-            return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(beanInfo.clazz));
+            return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(getBeanInfo().clazz));
         }
     }
 }

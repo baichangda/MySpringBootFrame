@@ -13,7 +13,7 @@ import com.bcd.base.util.StringUtil;
  * 如果是用作第一种用途,则所有继承自Throwable的方法都是针对解析出来的真实异常,解析规则参考 {@link ExceptionUtil#parseRealException}
  */
 public class BaseRuntimeException extends RuntimeException {
-    protected int code;
+    public int code = 1;
 
     private BaseRuntimeException(String message) {
         super(message);
@@ -31,12 +31,13 @@ public class BaseRuntimeException extends RuntimeException {
      * 将异常信息转换为格式化
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
+     *
      * @param message
      * @param params
      * @return
      */
     public static BaseRuntimeException getException(String message, Object... params) {
-        return new BaseRuntimeException(StringUtil.format(message,params));
+        return new BaseRuntimeException(StringUtil.format(message, params));
     }
 
     public static BaseRuntimeException getException(Throwable e) {
@@ -49,14 +50,6 @@ public class BaseRuntimeException extends RuntimeException {
 
     public static void main(String[] args) {
         throw BaseRuntimeException.getException("[{}]-[{}]", null, 100000);
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public JsonMessage toJsonMessage() {
-        return ExceptionUtil.toJsonMessage(this);
     }
 
     public BaseRuntimeException code(int code) {

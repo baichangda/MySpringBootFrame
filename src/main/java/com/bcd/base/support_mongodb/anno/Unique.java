@@ -12,11 +12,9 @@ import java.lang.annotation.Target;
  * {@link com.bcd.base.support_mongodb.service.BaseService#save(Iterable)}
  * 时候会进行验证
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Unique {
-    String field();
-
     /**
      * 当存在重复值数据时候返回的错误信息
      * 可以使用如下变量
