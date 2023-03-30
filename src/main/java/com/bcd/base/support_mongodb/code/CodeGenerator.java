@@ -2,7 +2,6 @@ package com.bcd.base.support_mongodb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_mongodb.code.data.*;
-import com.bcd.base.support_mongodb.test.bean.TestBean;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 import java.io.File;
@@ -155,6 +155,7 @@ public class CodeGenerator {
         data.moduleName = config.moduleName;
         data.packagePre = initPackagePre(config);
         data.fieldList = initBeanField(config);
+        data.pkFieldName = data.fieldList.stream().filter(e -> e.pk).findFirst().map(e -> e.name).orElse(null);
         data.validateSaveParam = config.needValidateSaveParam;
         data.requestMappingPre = initRequestMappingPre(data.packagePre);
         return data;
@@ -175,9 +176,6 @@ public class CodeGenerator {
             if (Modifier.isStatic(e.getModifiers())) {
                 return false;
             }
-            if ("id".equals(e.getName())) {
-                return true;
-            }
             for (Class<?> aClass : CodeConst.SUPPORT_FIELD_TYPE) {
                 if (aClass.isAssignableFrom(e.getType())) {
                     return true;
@@ -196,6 +194,9 @@ public class CodeGenerator {
             Schema schema = f.getAnnotation(Schema.class);
             if (schema != null) {
                 beanField.setComment(schema.description());
+            }
+            if (f.isAnnotationPresent(Id.class)) {
+                beanField.pk = true;
             }
             return beanField;
         }).collect(Collectors.toMap(
@@ -274,13 +275,5 @@ public class CodeGenerator {
         }
     }
 
-    public static void main(String[] args) {
-        CollectionConfig config = new CollectionConfig("Test", "测试", TestBean.class);
-        config.needCreateControllerFile = true;
-        config.needCreateServiceFile = true;
-        config.needCreateRepositoryFile = true;
-        config.needValidateSaveParam = true;
-        CodeGenerator.generate(config);
-    }
 
 }

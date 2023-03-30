@@ -24,6 +24,8 @@ public class ControllerData {
      */
     public String requestMappingPre;
 
+    public String pkFieldName;
+
     /**
      * 字段集合
      */
@@ -33,5 +35,7 @@ public class ControllerData {
      * 是否需要保存方法验证
      */
     public boolean validateSaveParam = true;
+
+
 
 }

@@ -1,8 +1,9 @@
 package com.bcd.base.support_mongodb.code.data;
 
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
 
 public class BeanField {
+    public boolean pk;
     public String name;
     public String type;
     public String comment;
@@ -11,7 +12,7 @@ public class BeanField {
     public BeanField setComment(String comment) {
         this.comment = comment;
         //处理字段注释前缀
-        if (StringUtils.isNoneEmpty(comment)) {
+        if (!Strings.isNullOrEmpty(comment)) {
             if (comment.contains("(")) {
                 this.commentPre = comment.substring(0, comment.indexOf('('));
             } else {
