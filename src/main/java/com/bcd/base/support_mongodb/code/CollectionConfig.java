@@ -36,13 +36,16 @@ public class CollectionConfig {
     private void parseTargetDirPath() {
         //根据class路径找到源文件路径
         String classFilePath = clazz.getResource("").getFile();
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            classFilePath = classFilePath.substring(1);
+        }
         String beanPath;
         if (classFilePath.contains(CodeConst.CLASS_OUT_DIR_PATH)) {
             //替换out目录下
-            beanPath = clazz.getResource("").getFile().replace(CodeConst.CLASS_OUT_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
+            beanPath = classFilePath.replace(CodeConst.CLASS_OUT_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
         } else if (classFilePath.contains(CodeConst.CLASS_BUILD_DIR_PATH)) {
             //替换build目录下
-            beanPath = clazz.getResource("").getFile().replace(CodeConst.CLASS_BUILD_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
+            beanPath = classFilePath.replace(CodeConst.CLASS_BUILD_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
         } else {
             throw BaseRuntimeException.getException("parseTargetDirPath failed,class path[" + classFilePath + "] not support");
         }

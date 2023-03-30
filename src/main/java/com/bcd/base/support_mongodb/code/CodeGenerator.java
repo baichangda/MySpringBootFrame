@@ -2,6 +2,7 @@ package com.bcd.base.support_mongodb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_mongodb.code.data.*;
+import com.bcd.base.util.StringUtil;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -182,7 +184,7 @@ public class CodeGenerator {
                 }
             }
             return false;
-        }).collect(Collectors.toList());
+        }).toList();
 
 
         Map<String, BeanField> beanFieldMap = fieldList.stream().map(f -> {
@@ -203,7 +205,7 @@ public class CodeGenerator {
                 e -> e.name,
                 e -> e,
                 (e1, e2) -> e1,
-                () -> new LinkedHashMap<>()
+                LinkedHashMap::new
         ));
 
         return new ArrayList<>(beanFieldMap.values());
@@ -227,7 +229,7 @@ public class CodeGenerator {
         String springSrcPath = springSrcPathSb.toString();
         String targetDirPath = config.targetDirPath;
         if (targetDirPath.contains(springSrcPath)) {
-            return targetDirPath.split(springSrcPath)[1].replaceAll(File.separator, ".");
+            return targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
         } else {
             throw BaseRuntimeException.getException("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
         }
