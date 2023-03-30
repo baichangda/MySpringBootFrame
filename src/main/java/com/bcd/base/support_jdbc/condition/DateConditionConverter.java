@@ -59,11 +59,22 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
                 break;
             }
             case BETWEEN: {
-                paramList.addAll(List.of((Date[]) val));
-                sql.append(columnName);
-                sql.append(">=? AND ");
-                sql.append(columnName);
-                sql.append("<?");
+                final Date[] dates = (Date[]) val;
+                if (dates[0] != null && dates[1] != null) {
+                    paramList.addAll(List.of(dates));
+                    sql.append(columnName);
+                    sql.append(">=? AND ");
+                    sql.append(columnName);
+                    sql.append("<?");
+                } else if (dates[0] != null) {
+                    paramList.add(dates[0]);
+                    sql.append(columnName);
+                    sql.append(">=?");
+                } else if (dates[1] != null) {
+                    paramList.add(dates[1]);
+                    sql.append(columnName);
+                    sql.append("<?");
+                }
                 break;
             }
             default: {

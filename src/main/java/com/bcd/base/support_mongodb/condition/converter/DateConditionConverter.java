@@ -43,7 +43,12 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
                 }
                 case BETWEEN: {
                     final Date[] dates = (Date[]) val;
-                    criteria.gte(dates[0]).lt(dates[1]);
+                    if (dates[0] != null) {
+                        criteria.gte(dates[0]);
+                    }
+                    if (dates[1] != null) {
+                        criteria.lt(dates[1]);
+                    }
                     break;
                 }
                 default: {
