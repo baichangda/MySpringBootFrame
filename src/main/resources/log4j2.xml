@@ -48,7 +48,7 @@
 <!--        <Logger name="org.springframework.jdbc.core.BeanPropertyRowMapper" additivity="true" level="DEBUG"/>-->
 
         <!-- mongodb日志开启 -->
-        <!--        <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>-->
+        <logger name="org.springframework.data.mongodb.core" level="DEBUG"/>
         <!-- 日志输出级别 -->
         <Root level="INFO">
             <Appender-ref ref="Console"/>

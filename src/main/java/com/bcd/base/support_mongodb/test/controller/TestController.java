@@ -4,6 +4,7 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,8 +35,8 @@ public class TestController extends BaseController {
     @ApiResponse(responseCode = "200",description = "测试列表")
     public JsonMessage<List<TestBean>> list(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
-        @Parameter(description = "时间开始") @RequestParam(required = false) Date timeBegin,
-        @Parameter(description = "时间结束") @RequestParam(required = false) Date timeEnd
+        @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
+        @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd
     ){
         Condition condition= Condition.and(
            StringCondition.EQUAL("vin",vin),
@@ -53,8 +54,8 @@ public class TestController extends BaseController {
     @ApiResponse(responseCode = "200",description = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
-        @Parameter(description = "时间开始") @RequestParam(required = false) Date timeBegin,
-        @Parameter(description = "时间结束") @RequestParam(required = false) Date timeEnd,
+        @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
+        @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd,
         @Parameter(description = "分页参数(页数)")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
         @Parameter(description = "分页参数(页大小)") @RequestParam(required = false,defaultValue = "20") Integer pageSize
     ){

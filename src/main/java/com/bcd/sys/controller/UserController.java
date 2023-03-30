@@ -44,8 +44,8 @@ public class UserController extends BaseController {
     @Operation(description = "查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
     public JsonMessage<List<UserBean>> list(
-            @Parameter(description = "生日开始") @RequestParam(required = false) Date birthdayBegin,
-            @Parameter(description = "生日结束") @RequestParam(required = false) Date birthdayEnd,
+            @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
+            @Parameter(description = "生日结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
             @Parameter(description = "邮箱") @RequestParam(required = false) String email,
             @Parameter(description = "主键") @RequestParam(required = false) Long id,
@@ -82,7 +82,7 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
             @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
-            @Parameter(description = "生日结束") @RequestParam(required = false) Date birthdayEnd,
+            @Parameter(description = "生日结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
             @Parameter(description = "邮箱") @RequestParam(required = false) String email,
             @Parameter(description = "主键") @RequestParam(required = false) Long id,

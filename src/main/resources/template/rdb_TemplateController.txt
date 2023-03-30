@@ -4,6 +4,7 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,8 +36,8 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     public JsonMessage<List<${moduleName?cap_first}Bean>> list(
         <#list fieldList as field>
           <#if field.type == "Date">
-        @Parameter(description = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
-        @Parameter(description = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End<#if field_has_next>,</#if>
+        @Parameter(description = "${field.comment}开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date ${field.name}Begin,
+        @Parameter(description = "${field.comment}结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date ${field.name}End<#if field_has_next>,</#if>
           <#else>
         @Parameter(description = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name}<#if field_has_next>,</#if>
           </#if>
@@ -68,8 +69,8 @@ public class ${moduleName?cap_first}Controller extends BaseController {
     public JsonMessage<Page<${moduleName?cap_first}Bean>> page(
         <#list fieldList as field>
           <#if field.type == "Date">
-        @Parameter(description = "${field.comment}开始") @RequestParam(required = false) Date ${field.name}Begin,
-        @Parameter(description = "${field.comment}结束") @RequestParam(required = false) Date ${field.name}End,
+        @Parameter(description = "${field.comment}开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date ${field.name}Begin,
+        @Parameter(description = "${field.comment}结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date ${field.name}End,
           <#else>
         @Parameter(description = "${field.comment}") @RequestParam(required = false) ${field.type} ${field.name},
           </#if>
