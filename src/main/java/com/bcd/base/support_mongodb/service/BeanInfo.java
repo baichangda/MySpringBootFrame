@@ -1,5 +1,6 @@
 package com.bcd.base.support_mongodb.service;
 
+import com.bcd.base.support_mongodb.anno.Unique;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,6 +26,8 @@ public final class BeanInfo<T> {
      */
     public final String collection;
 
+    public final Field[] uniqueFields;
+
 
     public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
@@ -34,5 +37,7 @@ public final class BeanInfo<T> {
         pkFieldName = pkField.getName();
 
         collection = clazz.getAnnotation(Document.class).collection();
+
+        uniqueFields = FieldUtils.getFieldsWithAnnotation(clazz, Unique.class);
     }
 }
