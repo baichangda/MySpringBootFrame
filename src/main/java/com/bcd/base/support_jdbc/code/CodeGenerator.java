@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -65,9 +66,9 @@ public class CodeGenerator {
             throw BaseRuntimeException.getException(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Bean.java";
-        try (FileWriter out = new FileWriter(destBeanPath)) {
+        try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("rdb_TemplateBean.txt");
+            Template template = configuration.getTemplate("rdb_TemplateBean.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
@@ -93,9 +94,9 @@ public class CodeGenerator {
             throw BaseRuntimeException.getException(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
-        try (FileWriter out = new FileWriter(destBeanPath)) {
+        try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("rdb_TemplateService.txt");
+            Template template = configuration.getTemplate("rdb_TemplateService.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
@@ -121,9 +122,9 @@ public class CodeGenerator {
             throw BaseRuntimeException.getException(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
-        try (FileWriter out = new FileWriter(destBeanPath)) {
+        try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("rdb_TemplateController.txt");
+            Template template = configuration.getTemplate("rdb_TemplateController.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
