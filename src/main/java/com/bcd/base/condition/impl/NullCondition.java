@@ -10,14 +10,9 @@ public class NullCondition implements Condition {
     public final Handler handler;
     public final String fieldName;
 
-    public NullCondition(String fieldName, Handler handler) {
+    private NullCondition(String fieldName, Handler handler) {
         this.fieldName = fieldName;
         this.handler = handler;
-    }
-
-    public NullCondition(String fieldName) {
-        this(fieldName, Handler.NULL);
-
     }
 
     @Override
@@ -25,6 +20,14 @@ public class NullCondition implements Condition {
         return fieldName +
                 " " +
                 handler.toString();
+    }
+
+    public static NullCondition NULL(String fieldName) {
+        return new NullCondition(fieldName, Handler.NULL);
+    }
+
+    public static NullCondition NOT_NULL(String fieldName) {
+        return new NullCondition(fieldName, Handler.NOT_NULL);
     }
 
     public enum Handler {

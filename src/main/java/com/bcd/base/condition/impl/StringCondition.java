@@ -13,14 +13,10 @@ public class StringCondition implements Condition {
     public final String fieldName;
     public final Object val;
 
-    public StringCondition(String fieldName, Object val, Handler handler) {
+    private StringCondition(String fieldName, Object val, Handler handler) {
         this.fieldName = fieldName;
         this.val = val;
         this.handler = handler;
-    }
-
-    public StringCondition(String fieldName, Object val) {
-        this(fieldName, val, Handler.EQUAL);
     }
 
     @Override
@@ -28,6 +24,34 @@ public class StringCondition implements Condition {
         return val == null || "".equals(val) ? null : fieldName +
                 " " +
                 handler.toString();
+    }
+
+    public static StringCondition EQUAL(String fieldName, String val) {
+        return new StringCondition(fieldName, val, Handler.EQUAL);
+    }
+
+    public static StringCondition NOT_EQUAL(String fieldName, String val) {
+        return new StringCondition(fieldName, val, Handler.NOT_EQUAL);
+    }
+
+    public static StringCondition ALL_LIKE(String fieldName, String val) {
+        return new StringCondition(fieldName, val, Handler.ALL_LIKE);
+    }
+
+    public static StringCondition LEFT_LIKE(String fieldName, String val) {
+        return new StringCondition(fieldName, val, Handler.LEFT_LIKE);
+    }
+
+    public static StringCondition RIGHT_LIKE(String fieldName, String val) {
+        return new StringCondition(fieldName, val, Handler.RIGHT_LIKE);
+    }
+
+    public static StringCondition IN(String fieldName, String... val) {
+        return new StringCondition(fieldName, val, Handler.IN);
+    }
+
+    public static StringCondition NOT_IN(String fieldName, String... val) {
+        return new StringCondition(fieldName, val, Handler.NOT_IN);
     }
 
     public enum Handler {

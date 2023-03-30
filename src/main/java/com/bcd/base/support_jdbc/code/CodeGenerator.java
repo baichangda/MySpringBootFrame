@@ -41,7 +41,8 @@ public class CodeGenerator {
         helper.needValidateBeanField = true;
         helper.needValidateSaveParam = true;
         helper.needCreateInfo = true;
-        helper.addModule("User", "用户", "t_sys_user")
+        helper
+                .addModule("User", "用户", "t_sys_user")
                 .addModule("Permission", "权限", "t_sys_permission");
         Config config = Config.newConfig(path).addTableConfig(helper.toTableConfigs());
         CodeGenerator.MYSQL.generate(config);

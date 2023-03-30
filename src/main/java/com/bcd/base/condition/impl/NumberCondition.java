@@ -13,14 +13,10 @@ public class NumberCondition implements Condition {
     public final String fieldName;
     public final Object val;
 
-    public NumberCondition(String fieldName, Object val, Handler handler) {
+    private NumberCondition(String fieldName, Object val, Handler handler) {
         this.fieldName = fieldName;
         this.val = val;
         this.handler = handler;
-    }
-
-    public NumberCondition(String fieldName, Object val) {
-        this(fieldName, val, Handler.EQUAL);
     }
 
     @Override
@@ -28,6 +24,38 @@ public class NumberCondition implements Condition {
         return val == null ? null : fieldName +
                 " " +
                 handler.toString();
+    }
+
+    public static NumberCondition EQUAL(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.EQUAL);
+    }
+
+    public static NumberCondition NOT_EQUAL(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.NOT_EQUAL);
+    }
+
+    public static NumberCondition LT(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.LT);
+    }
+
+    public static NumberCondition LE(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.LE);
+    }
+
+    public static NumberCondition GT(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.GT);
+    }
+
+    public static NumberCondition GE(String fieldName, Number val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.GE);
+    }
+
+    public static NumberCondition IN(String fieldName, Number ... val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.IN);
+    }
+
+    public static NumberCondition NOT_IN(String fieldName, Number ... val) {
+        return new NumberCondition(fieldName, val, NumberCondition.Handler.NOT_IN);
     }
 
     public enum Handler {

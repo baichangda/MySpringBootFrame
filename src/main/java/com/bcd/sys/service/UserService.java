@@ -40,7 +40,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
 
 
     public UserBean getUser(String username) {
-        return get(new StringCondition("username", username));
+        return get(StringCondition.EQUAL("username", username));
     }
 
     @Override
@@ -89,7 +89,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
      * @return
      */
     public UserBean login_phone(String phone, String phoneCode) {
-        final UserBean userBean = get(new StringCondition("phone", phone));
+        final UserBean userBean = get(StringCondition.EQUAL("phone", phone));
         StpUtil.login(userBean.username, "phone");
         return userBean;
     }
@@ -231,7 +231,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         }
 
         if (userBean == null && phone != null) {
-            userBean = get(new StringCondition("phone", phone));
+            userBean = get(StringCondition.EQUAL("phone", phone));
         }
 
         if (userBean == null) {

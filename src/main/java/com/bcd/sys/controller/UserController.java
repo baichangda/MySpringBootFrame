@@ -14,6 +14,8 @@ import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,22 +54,19 @@ public class UserController extends BaseController {
             @Parameter(description = "真实姓名") @RequestParam(required = false) String realName,
             @Parameter(description = "性别") @RequestParam(required = false) String sex,
             @Parameter(description = "是否可用(0:禁用,1:可用)") @RequestParam(required = false) Integer status,
-            @Parameter(description = "类型(1:管理用户,2:企业用户)") @RequestParam(required = false) Integer type,
             @Parameter(description = "用户名") @RequestParam(required = false) String username
     ) {
         Condition condition = Condition.and(
-                new DateCondition("birthday", birthdayBegin, DateCondition.Handler.GE),
-                new DateCondition("birthday", birthdayEnd, DateCondition.Handler.LE),
-                new StringCondition("cardNumber", cardNumber, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("email", email, StringCondition.Handler.ALL_LIKE),
-                new NumberCondition("id", id, NumberCondition.Handler.EQUAL),
-                new StringCondition("password", password, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("phone", phone, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("realName", realName, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("sex", sex, StringCondition.Handler.ALL_LIKE),
-                new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
-                new NumberCondition("type", type, NumberCondition.Handler.EQUAL),
-                new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
+                DateCondition.BETWEEN("birthday", birthdayBegin, birthdayEnd),
+                StringCondition.ALL_LIKE("cardNumber", cardNumber),
+                StringCondition.ALL_LIKE("email", email),
+                NumberCondition.EQUAL("id", id),
+                StringCondition.ALL_LIKE("password", password),
+                StringCondition.ALL_LIKE("phone", phone),
+                StringCondition.ALL_LIKE("realName", realName),
+                StringCondition.ALL_LIKE("sex", sex),
+                NumberCondition.EQUAL("status", status),
+                StringCondition.ALL_LIKE("username", username)
         );
         return JsonMessage.success(userService.list(condition));
     }
@@ -82,7 +81,7 @@ public class UserController extends BaseController {
     @Operation(description = "查询用户分页")
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
-            @Parameter(description = "生日开始") @RequestParam(required = false) Date birthdayBegin,
+            @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
             @Parameter(description = "生日结束") @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
             @Parameter(description = "邮箱") @RequestParam(required = false) String email,
@@ -97,17 +96,16 @@ public class UserController extends BaseController {
             @Parameter(description = "分页参数(页大小)") @RequestParam(required = false, defaultValue = "20") Integer pageSize
     ) {
         Condition condition = Condition.and(
-                new DateCondition("birthday", birthdayBegin, DateCondition.Handler.GE),
-                new DateCondition("birthday", birthdayEnd, DateCondition.Handler.LE),
-                new StringCondition("cardNumber", cardNumber, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("email", email, StringCondition.Handler.ALL_LIKE),
-                new NumberCondition("id", id, NumberCondition.Handler.EQUAL),
-                new StringCondition("password", password, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("phone", phone, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("realName", realName, StringCondition.Handler.ALL_LIKE),
-                new StringCondition("sex", sex, StringCondition.Handler.ALL_LIKE),
-                new NumberCondition("status", status, NumberCondition.Handler.EQUAL),
-                new StringCondition("username", username, StringCondition.Handler.ALL_LIKE)
+                DateCondition.BETWEEN("birthday", birthdayBegin, birthdayEnd),
+                StringCondition.ALL_LIKE("cardNumber", cardNumber),
+                StringCondition.ALL_LIKE("email", email),
+                NumberCondition.EQUAL("id", id),
+                StringCondition.ALL_LIKE("password", password),
+                StringCondition.ALL_LIKE("phone", phone),
+                StringCondition.ALL_LIKE("realName", realName),
+                StringCondition.ALL_LIKE("sex", sex),
+                NumberCondition.EQUAL("status", status),
+                StringCondition.ALL_LIKE("username", username)
         );
         return JsonMessage.success(userService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
     }

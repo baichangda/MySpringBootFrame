@@ -6,6 +6,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,31 +27,43 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
         final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         List<Object> paramList = new ArrayList<>();
-        paramList.add(val);
         switch (handler) {
             case EQUAL: {
+                paramList.add(val);
                 sql.append(columnName);
                 sql.append("=?");
                 break;
             }
             case LE: {
+                paramList.add(val);
                 sql.append(columnName);
                 sql.append("<=?");
                 break;
             }
             case LT: {
+                paramList.add(val);
                 sql.append(columnName);
                 sql.append("<?");
                 break;
             }
             case GE: {
+                paramList.add(val);
                 sql.append(columnName);
                 sql.append(">=?");
                 break;
             }
             case GT: {
+                paramList.add(val);
                 sql.append(columnName);
                 sql.append(">?");
+                break;
+            }
+            case BETWEEN: {
+                paramList.addAll(List.of((Date[]) val));
+                sql.append(columnName);
+                sql.append(">=? AND ");
+                sql.append(columnName);
+                sql.append("<?");
                 break;
             }
             default: {

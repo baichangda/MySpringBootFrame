@@ -5,6 +5,8 @@ import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
+import java.util.Date;
+
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -37,6 +39,11 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
                 }
                 case GT: {
                     criteria.gt(val);
+                    break;
+                }
+                case BETWEEN: {
+                    final Date[] dates = (Date[]) val;
+                    criteria.gte(dates[0]).lt(dates[1]);
                     break;
                 }
                 default: {

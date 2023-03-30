@@ -45,14 +45,13 @@ public class ${moduleName?cap_first}Controller extends BaseController {
         Condition condition= Condition.and(
         <#list fieldList as field>
            <#if field.type == "Date">
-           new DateCondition("${field.name}",${field.name}Begin, DateCondition.Handler.GE),
-           new DateCondition("${field.name}",${field.name}End, DateCondition.Handler.LE)<#if field_has_next>,</#if>
+           DateCondition.BETWEEN("${field.name}",${field.name}Begin,${field.name}End)<#if field_has_next>,</#if>
            <#elseif field.type == "String">
-           new StringCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           StringCondition.EQUAL("${field.name}",${field.name})<#if field_has_next>,</#if>
            <#elseif field.type == "Long"||field.type == "Integer"||field.type == "Short"||field.type == "Byte"||field.type=="BigDecimal">
-           new NumberCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           NumberCondition.EQUAL("${field.name}",${field.name})<#if field_has_next>,</#if>
            <#elseif field.type == "Boolean">
-           new BooleanCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           BooleanCondition.NULL("${field.name}",${field.name})<#if field_has_next>,</#if>
            </#if>
         </#list>
         );
@@ -81,14 +80,13 @@ public class ${moduleName?cap_first}Controller extends BaseController {
         Condition condition= Condition.and(
         <#list fieldList as field>
            <#if field.type == "Date">
-           new DateCondition("${field.name}",${field.name}Begin, DateCondition.Handler.GE),
-           new DateCondition("${field.name}",${field.name}End, DateCondition.Handler.LE)<#if field_has_next>,</#if>
+           DateCondition.BETWEEN("${field.name}",${field.name}Begin,${field.name}End)<#if field_has_next>,</#if>
            <#elseif field.type == "String">
-           new StringCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           StringCondition.EQUAL("${field.name}",${field.name})<#if field_has_next>,</#if>
            <#elseif field.type == "Long"||field.type == "Integer"||field.type == "Short"||field.type == "Byte"||field.type=="BigDecimal">
-           new NumberCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           NumberCondition.EQUAL("${field.name}",${field.name})<#if field_has_next>,</#if>
            <#elseif field.type == "Boolean">
-           new BooleanCondition("${field.name}",${field.name})<#if field_has_next>,</#if>
+           BooleanCondition.NULL("${field.name}",${field.name})<#if field_has_next>,</#if>
            </#if>
         </#list>
         );
