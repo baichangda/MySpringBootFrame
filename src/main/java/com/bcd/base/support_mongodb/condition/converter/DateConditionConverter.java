@@ -19,30 +19,38 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
         DateCondition.Handler handler = condition.handler;
         Criteria criteria = null;
         if (val != null) {
-            criteria = Criteria.where(fieldName);
             switch (handler) {
                 case EQUAL: {
+                    criteria = Criteria.where(fieldName);
                     criteria.is(val);
                     break;
                 }
                 case LE: {
+                    criteria = Criteria.where(fieldName);
                     criteria.lte(val);
                     break;
                 }
                 case LT: {
+                    criteria = Criteria.where(fieldName);
                     criteria.lt(val);
                     break;
                 }
                 case GE: {
+                    criteria = Criteria.where(fieldName);
                     criteria.gte(val);
                     break;
                 }
                 case GT: {
+                    criteria = Criteria.where(fieldName);
                     criteria.gt(val);
                     break;
                 }
                 case BETWEEN: {
                     final Date[] dates = (Date[]) val;
+                    if (dates[0] == null && dates[1] == null) {
+                        return null;
+                    }
+                    criteria = Criteria.where(fieldName);
                     if (dates[0] != null) {
                         criteria.gte(dates[0]);
                     }

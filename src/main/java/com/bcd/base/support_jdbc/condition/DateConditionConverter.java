@@ -74,6 +74,8 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
                     paramList.add(dates[1]);
                     sql.append(columnName);
                     sql.append("<?");
+                } else {
+                    return null;
                 }
                 break;
             }
