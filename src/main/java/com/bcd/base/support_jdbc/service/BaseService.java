@@ -62,7 +62,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param condition
      * @return
      */
-    public final T get(Condition condition) {
+    public T get(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final List<T> list = list(convertRes, null, -1, -1);
         if (list.isEmpty()) {
@@ -77,7 +77,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @return
      */
-    public final List<T> list() {
+    public List<T> list() {
         return list(null, null);
     }
 
@@ -86,7 +86,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @return
      */
-    public final List<T> list(Condition condition) {
+    public List<T> list(Condition condition) {
         return list(condition, null);
     }
 
@@ -95,7 +95,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @return
      */
-    public final List<T> list(Sort sort) {
+    public List<T> list(Sort sort) {
         return list(null, sort);
     }
 
@@ -106,7 +106,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param sort      排序、可以为null
      * @return
      */
-    public final List<T> list(Condition condition, Sort sort) {
+    public List<T> list(Condition condition, Sort sort) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         return list(convertRes, sort, -1, -1);
     }
@@ -116,7 +116,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @return
      */
-    public final Page<T> page(Pageable pageable) {
+    public Page<T> page(Pageable pageable) {
         return page(null, pageable);
     }
 
@@ -127,7 +127,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param pageable
      * @return
      */
-    public final Page<T> page(Condition condition, Pageable pageable) {
+    public Page<T> page(Condition condition, Pageable pageable) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final int total = count(convertRes);
         final int offset = pageable.getPageNumber() * pageable.getPageSize();
@@ -145,7 +145,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param id
      * @return
      */
-    public final T get(long id) {
+    public T get(long id) {
         final String sql = "select * from " + getBeanInfo().tableName + " where id=?";
         final List<T> list = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<>(getBeanInfo().clazz), id);
         if (list.isEmpty()) {
@@ -162,7 +162,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param t
      */
-    public final void save(T t) {
+    public void save(T t) {
         final Long id = t.id;
         if (id == null) {
             insert(t);
@@ -177,7 +177,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param t
      */
-    public final void insert(T t) {
+    public void insert(T t) {
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         getJdbcTemplate().update(conn -> {
             final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql, Statement.RETURN_GENERATED_KEYS);
@@ -193,7 +193,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param t
      */
-    public final void update(T t) {
+    public void update(T t) {
         final String sql = getBeanInfo().updateSql + " where id=?";
         final List<Object> args = getBeanInfo().getValues(t);
         args.add(t.id);
@@ -206,7 +206,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param condition 更新条件
      * @param vals      更新的字段名称和值、奇数位置必须为字段名、偶数位置必须为值
      */
-    public final void update(Condition condition, Object... vals) {
+    public void update(Condition condition, Object... vals) {
         final StringBuilder sql = new StringBuilder("update ");
         sql.append(getBeanInfo().tableName);
         sql.append(" set ");
@@ -236,7 +236,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param list
      */
-    public final void insertBatch(List<T> list) {
+    public void insertBatch(List<T> list) {
         final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
         getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
     }
@@ -246,7 +246,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param list
      */
-    public final void updateBatch(List<T> list) {
+    public void updateBatch(List<T> list) {
         String sql = getBeanInfo().updateSql + " where id=?";
 
         final List<Object[]> argList = list.stream().map(e1 -> {
@@ -263,7 +263,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param ids
      */
-    public final void delete(long... ids) {
+    public void delete(long... ids) {
         if (ids.length == 1) {
             final String sql = "delete from " + getBeanInfo().tableName + " where id =?";
             getJdbcTemplate().update(sql, ids[0]);
@@ -277,14 +277,14 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 删除所有数据
      */
-    public final void delete() {
+    public void delete() {
         delete((Condition) null);
     }
 
     /**
      * 根据条件删除
      */
-    public final void delete(Condition condition) {
+    public void delete(Condition condition) {
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         final StringBuilder sql = new StringBuilder();
         sql.append("delete from ");
@@ -309,7 +309,7 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @return
      */
-    public final int count() {
+    public int count() {
         return count((ConvertRes) null);
     }
 
@@ -319,7 +319,7 @@ public class BaseService<T extends SuperBaseBean> {
      * @param condition
      * @return
      */
-    public final int count(Condition condition) {
+    public int count(Condition condition) {
         return count(ConditionUtil.convertCondition(condition, beanInfo));
     }
 
