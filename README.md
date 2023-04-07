@@ -36,8 +36,8 @@
 ### 本地缓存(caffeine)
 - 网上查阅资料
 
-### web api文档(spring openapi)
-- spring openapi是对swagger v3封装
+### web api文档(knife4j)
+- https://doc.xiaominfo.com/docs/quick-start
 
 ## 代码目录要求
 ### com.bcd.base
