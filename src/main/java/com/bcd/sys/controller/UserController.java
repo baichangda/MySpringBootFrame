@@ -41,7 +41,7 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(description = "查询用户列表")
+    @Operation(summary ="查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
     public JsonMessage<List<UserBean>> list(
             @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
@@ -78,7 +78,7 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @Operation(description = "查询用户分页")
+    @Operation(summary = "查询用户分页")
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
             @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
@@ -118,7 +118,7 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    @Operation(description = "保存用户")
+    @Operation(summary = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
         userService.saveUser(user);
@@ -133,7 +133,7 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Operation(description = "删除用户")
+    @Operation(summary = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
     public JsonMessage delete(@Parameter(description = "用户id数组") @RequestParam long[] ids) {
         userService.delete(ids);
@@ -148,7 +148,7 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @Operation(description = "用户登录")
+    @Operation(summary = "用户登录")
     @ApiResponse(responseCode = "200", description = "登录的用户信息")
     public JsonMessage<UserBean> login(
             @Parameter(description = "用户名")
@@ -165,7 +165,7 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    @Operation(description = "用户注销")
+    @Operation(summary = "用户注销")
     @ApiResponse(responseCode = "200", description = "注销结果")
     public JsonMessage<?> logout() {
         JsonMessage<?> jsonMessage = JsonMessage.success().message("注销成功");
@@ -182,7 +182,7 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_edit)
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    @Operation(description = "重置密码")
+    @Operation(summary = "重置密码")
     @ApiResponse(responseCode = "200", description = "重制密码结果")
     public JsonMessage<?> resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
         userService.resetPassword(userId);
@@ -198,7 +198,7 @@ public class UserController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
-    @Operation(description = "修改密码")
+    @Operation(summary = "修改密码")
     @ApiResponse(responseCode = "200", description = "修改密码结果")
     public JsonMessage updatePassword(
             @Parameter(description = "旧密码")

@@ -1,16 +1,12 @@
 buildscript {
     ext {
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
-        tencentPublic = 'http://mirrors.cloud.tencent.com/nexus/repository/maven-public/'
-        huaweiMaven = 'https://repo.huaweicloud.com/repository/maven/'
         incarMavenRepoUrl = 'https://repository.incarcloud.com/content/repositories/snapshots/'
     }
 
     repositories {
         mavenLocal()
         maven { url "${aliyunPublic}" }
-//        maven { url "${huaweiMaven}" }
-//        maven {url "${tencentPublic}" allowInsecureProtocol=true}
         mavenCentral()
     }
 }
@@ -37,10 +33,7 @@ targetCompatibility = 17
 
 repositories {
     mavenLocal()
-//    maven { url "${aliyunPublic}" }
-//    maven { url "${huaweiMaven}" }
-    maven {url "${tencentPublic}"
-        allowInsecureProtocol=true}
+    maven { url "${aliyunPublic}" }
     mavenCentral()
 //    maven {
 //        url "${incarMavenRepoUrl}"
@@ -123,7 +116,11 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: "+"
+//    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: "+"
+
+    // https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter
+    implementation group: 'com.github.xiaoymin', name: 'knife4j-openapi3-jakarta-spring-boot-starter', version: "+"
+
 
 
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine

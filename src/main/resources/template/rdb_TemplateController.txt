@@ -31,7 +31,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(description="查询${moduleNameCN}列表")
+    @Operation(summary="查询${moduleNameCN}列表")
     @ApiResponse(responseCode = "200",description = "${moduleNameCN}列表")
     public JsonMessage<List<${moduleName?cap_first}Bean>> list(
         <#list fieldList as field>
@@ -64,7 +64,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @Operation(description="查询${moduleNameCN}分页")
+    @Operation(summary="查询${moduleNameCN}分页")
     @ApiResponse(responseCode = "200",description = "${moduleNameCN}分页结果集")
     public JsonMessage<Page<${moduleName?cap_first}Bean>> page(
         <#list fieldList as field>
@@ -100,7 +100,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @Operation(description = "保存${moduleNameCN}")
+    @Operation(summary = "保存${moduleNameCN}")
     @ApiResponse(responseCode = "200",description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "${moduleNameCN}实体") <#if validateSaveParam>@Validated</#if> @RequestBody ${moduleName?cap_first}Bean ${moduleName?uncap_first}){
         ${moduleName?uncap_first}Service.save(${moduleName?uncap_first});
@@ -114,7 +114,7 @@ public class ${moduleName?cap_first}Controller extends BaseController {
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @Operation(description = "删除${moduleNameCN}")
+    @Operation(summary = "删除${moduleNameCN}")
     @ApiResponse(responseCode = "200",description = "删除结果")
     public JsonMessage delete(@Parameter(description = "${moduleNameCN}id数组") @RequestParam long[] ids){
         ${moduleName?uncap_first}Service.delete(ids);

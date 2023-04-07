@@ -25,7 +25,7 @@ public class AnonController extends BaseController {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
-    @Operation(description = "获取公钥")
+    @Operation(summary = "获取公钥")
     @ApiResponse(responseCode = "200", description = "公钥信息")
     public JsonMessage<String> getPublicKey() {
         return JsonMessage.success(KeysConst.PUBLIC_KEY_BASE64);
@@ -33,7 +33,7 @@ public class AnonController extends BaseController {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getCookie", method = RequestMethod.GET)
-    @Operation(description = "获取cookie")
+    @Operation(summary = "获取cookie")
     @ApiResponse(responseCode = "200", description = "当前浏览器的cookie")
     public JsonMessage<String> getCookie() {
         final SaSession session = StpUtil.getSession();

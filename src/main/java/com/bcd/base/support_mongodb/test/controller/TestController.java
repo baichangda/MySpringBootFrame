@@ -31,7 +31,7 @@ public class TestController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(description="查询测试列表")
+    @Operation(summary="查询测试列表")
     @ApiResponse(responseCode = "200",description = "测试列表")
     public JsonMessage<List<TestBean>> list(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
@@ -50,7 +50,7 @@ public class TestController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    @Operation(description="查询测试分页")
+    @Operation(summary="查询测试分页")
     @ApiResponse(responseCode = "200",description = "测试分页结果集")
     public JsonMessage<Page<TestBean>> page(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
@@ -72,7 +72,7 @@ public class TestController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @Operation(description = "保存测试")
+    @Operation(summary = "保存测试")
     @ApiResponse(responseCode = "200",description = "保存结果")
     public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test){
         testService.save(test);
@@ -86,7 +86,7 @@ public class TestController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
-    @Operation(description = "删除测试")
+    @Operation(summary = "删除测试")
     @ApiResponse(responseCode = "200",description = "删除结果")
     public JsonMessage delete(@Parameter(description = "测试vin数组") @RequestParam String[] vins){
         testService.delete(vins);
