@@ -6,11 +6,11 @@ import java.lang.reflect.Type;
 
 public enum ValueSerializerType {
     /**
-     * {@link RedisUtil#BYTE_ARRAY_SERIALIZER}
+     * {@link RedisUtil#SERIALIZER_VALUE_BYTEARRAY}
      */
     BYTE_ARRAY,
     /**
-     * {@link RedisUtil#STRING_SERIALIZER}
+     * {@link RedisUtil#SERIALIZER_VALUE_STRING}
      */
     STRING,
     /**
@@ -18,7 +18,7 @@ public enum ValueSerializerType {
      */
     JACKSON,
     /**
-     * {@link RedisUtil#JDK_SERIALIZATION_SERIALIZER}
+     * {@link RedisUtil#SERIALIZER_VALUE_JDK}
      */
     SERIALIZABLE
 }

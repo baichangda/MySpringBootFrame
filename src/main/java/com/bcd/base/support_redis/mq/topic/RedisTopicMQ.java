@@ -1,12 +1,12 @@
 package com.bcd.base.support_redis.mq.topic;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.JsonUtil;
-import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
@@ -22,7 +22,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -70,13 +69,13 @@ public class RedisTopicMQ<V> {
     private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
             case BYTE_ARRAY: {
-                return RedisUtil.BYTE_ARRAY_SERIALIZER;
+                return RedisUtil.SERIALIZER_VALUE_BYTEARRAY;
             }
             case STRING: {
-                return RedisUtil.STRING_SERIALIZER;
+                return RedisUtil.SERIALIZER_VALUE_STRING;
             }
             case SERIALIZABLE: {
-                return RedisUtil.JDK_SERIALIZATION_SERIALIZER;
+                return RedisUtil.SERIALIZER_VALUE_JDK;
             }
             case JACKSON: {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
