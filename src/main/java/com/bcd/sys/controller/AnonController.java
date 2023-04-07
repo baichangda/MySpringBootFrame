@@ -7,6 +7,7 @@ import com.bcd.base.message.JsonMessage;
 import com.bcd.sys.keys.KeysConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/anon")
+@Tag(name = "匿名-AnonController")
 public class AnonController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonController.class);
 

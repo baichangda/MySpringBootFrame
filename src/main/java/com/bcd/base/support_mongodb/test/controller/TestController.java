@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import com.bcd.base.support_mongodb.test.service.TestService;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/test/test")
+@Tag(name = "测试-TestController")
 public class TestController extends BaseController {
 
     @Autowired

@@ -4,6 +4,7 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +22,7 @@ import ${packagePre}.service.${moduleName?cap_first}Service;
 @SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api${requestMappingPre}/${moduleName?uncap_first}")
+@Tag(name = "${moduleNameCN}-${moduleName?cap_first}Controller")
 public class ${moduleName?cap_first}Controller extends BaseController {
 
     @Autowired
