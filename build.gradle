@@ -1,4 +1,4 @@
-import java.util.regex.Matcher
+
 
 buildscript {
     ext {
@@ -28,7 +28,7 @@ plugins {
  * ----------------------------------------------------------------------------
  */
 group 'com.bcd'
-version '1.0'
+version '1.0-SNAPSHOT'
 
 sourceCompatibility = 17
 targetCompatibility = 17
@@ -221,7 +221,8 @@ flyway {
 
 //发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
 //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
-//注意如果发布snapshots、version需要带-SNAPSHOT;releases则不用
+//注意如果发布snapshots、version需要带-SNAPSHOT、version可以重复、如果重复会append不会覆盖
+//注意如果发布releases、version不需要带后缀、version不可以重复
 publishing {
     publications {
         maven(MavenPublication) {
@@ -231,7 +232,7 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://repository.incarcloud.com/content/repositories/releases/'
+            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
             credentials {
                 username 'deployment'
                 password 'deploy123456'
@@ -240,6 +241,8 @@ publishing {
     }
 }
 
+import java.util.regex.Matcher
+//如果jar包依赖中有platform、则需要如下任务
 tasks.withType(GenerateMavenPom).all {
     doLast {
         File file = new File("$buildDir/publications/maven/pom-default.xml")
