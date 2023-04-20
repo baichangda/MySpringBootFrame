@@ -13,7 +13,7 @@ import java.util.Date;
  * 2、日期类型字符串
  * 此时日期格式有两种{@link DateUtil#DATE_FORMAT_DAY}、{@link DateUtil#DATE_FORMAT_SECOND}
  * 字符串必须以s开头
- * example: s20210126、s20210126111111
+ * example: s20210126、s20210126111111、s20210126111111111
  */
 @Component
 public class StringToDateConverter implements Converter<String, Date> {
