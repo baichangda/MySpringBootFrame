@@ -1,7 +1,5 @@
 package com.bcd.sys.service;
 
-import com.bcd.sys.bean.PermissionBean;
-import com.bcd.sys.bean.RoleBean;
 import com.bcd.sys.bean.UserBean;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
