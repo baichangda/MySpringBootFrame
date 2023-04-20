@@ -216,3 +216,23 @@ flyway {
 /**
  * ----------------------------------------------------------------------------
  */
+
+//发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
+//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact(sourceJar)
+        }
+    }
+    repositories {
+        maven {
+            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
+            credentials {
+                username 'deployment'
+                password 'deploy123456'
+            }
+        }
+    }
+}
