@@ -53,11 +53,18 @@ idea {
     }
 }
 
-//去除springboot默认的logback
+
 configurations.all {
+    //去除springboot默认的logback
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     exclude module: 'logback-classic'
     exclude module: 'logback-core'
+
+    //指定快照jar的更新策略
+    resolutionStrategy {
+        //缓存依赖时间、0代表不缓存
+        cacheChangingModulesFor 0, 'seconds'
+    }
 }
 
 dependencies {
