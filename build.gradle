@@ -1,3 +1,5 @@
+import java.util.regex.Matcher
+
 buildscript {
     ext {
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
@@ -219,6 +221,7 @@ flyway {
 
 //发布到本地MAVEN仓库使用 gradle PublishToMavenLocal
 //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
+//注意如果发布snapshots、version需要带-SNAPSHOT;releases则不用
 publishing {
     publications {
         maven(MavenPublication) {
@@ -228,11 +231,26 @@ publishing {
     }
     repositories {
         maven {
-            url 'https://repository.incarcloud.com/content/repositories/snapshots/'
+            url 'https://repository.incarcloud.com/content/repositories/releases/'
             credentials {
                 username 'deployment'
                 password 'deploy123456'
             }
         }
+    }
+}
+
+tasks.withType(GenerateMavenPom).all {
+    doLast {
+        File file = new File("$buildDir/publications/maven/pom-default.xml")
+        def text = file.text
+        def pattern = "(?s)(<dependencyManagement>.+?<dependencies>)(.+?)(</dependencies>.+?</dependencyManagement>)"
+        Matcher matcher = text =~ pattern
+        if (matcher.find()) {
+            text = text.replaceFirst(pattern, "")
+            def firstDeps = matcher.group(2)
+            text = text.replaceFirst(pattern, '$1$2' + firstDeps + '$3')
+        }
+        file.write(text)
     }
 }
