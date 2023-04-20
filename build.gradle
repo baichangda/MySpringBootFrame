@@ -142,6 +142,7 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
 
     // define a BOM and its version
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
@@ -241,8 +242,17 @@ publishing {
     }
 }
 
+
+/**
+ * 如果jar包依赖中有platform、则需要如下任务
+ * 或者使用如下方式、不需要任务
+ * dependencyManagement{
+ *      imports{
+ *          mavenBom ""
+ *      }
+ * }
+ */
 import java.util.regex.Matcher
-//如果jar包依赖中有platform、则需要如下任务
 tasks.withType(GenerateMavenPom).all {
     doLast {
         File file = new File("$buildDir/publications/maven/pom-default.xml")
