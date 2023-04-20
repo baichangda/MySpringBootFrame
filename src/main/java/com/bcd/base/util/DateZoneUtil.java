@@ -21,6 +21,7 @@ public class DateZoneUtil {
 
     public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
     public final static DateTimeFormatter DATE_TIME_FORMATTER_SECOND = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+    public final static DateTimeFormatter DATE_TIME_FORMATTER_MILLISECOND = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_MILLISECOND).withZone(ZONE_OFFSET);
 
     /**
      * 根据dateStr长度转换成不同的时间
@@ -41,6 +42,9 @@ public class DateZoneUtil {
             }
             case 14: {
                 return DateZoneUtil.stringToDate_second(dateStr);
+            }
+            case 17: {
+                return DateZoneUtil.stringToDate_millisecond(dateStr);
             }
             default: {
                 throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
@@ -71,6 +75,17 @@ public class DateZoneUtil {
     }
 
     /**
+     * @param dateStr
+     * @return
+     */
+    public static Date stringToDate_millisecond(String dateStr) {
+        if (dateStr == null) {
+            return null;
+        }
+        return Date.from(LocalDateTime.parse(dateStr,DATE_TIME_FORMATTER_MILLISECOND).toInstant(ZONE_OFFSET));
+    }
+
+    /**
      * @param date
      * @return
      */
@@ -90,6 +105,17 @@ public class DateZoneUtil {
             return null;
         }
         return DATE_TIME_FORMATTER_SECOND.format(date.toInstant());
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    public static String dateToString_millisecond(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return DATE_TIME_FORMATTER_MILLISECOND.format(date.toInstant());
     }
 
 

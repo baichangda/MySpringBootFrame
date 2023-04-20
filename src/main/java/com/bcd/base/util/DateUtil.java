@@ -25,6 +25,7 @@ public class DateUtil {
 
     public final static String DATE_FORMAT_DAY = "yyyyMMdd";
     public final static String DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
+    public final static String DATE_FORMAT_MILLISECOND = "yyyyMMddHHmmssSSS";
     private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
     private final static ChronoField[] equal_fields = new ChronoField[]{ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
 
