@@ -7,6 +7,7 @@ import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
 import com.bcd.base.util.StringUtil;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -55,6 +56,18 @@ public class BaseService<T> {
     public BaseService() {
         final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         beanInfo = new BeanInfo<>(beanClass);
+    }
+
+    /**
+     * 获取代理对象
+     * 需要如下注解开启 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
+     * 如下场景使用
+     * 同一个service中a()调用b()、其中b()符合aop切面定义、此时不会走aop逻辑、因为此时执行a()中this对象已经不是代理对象、此时需要getProxy().b()
+     * 注意:
+     * 此方法不要乱用、避免造成性能损失
+     */
+    protected BaseService<T> getProxy() {
+        return (BaseService<T>) AopContext.currentProxy();
     }
 
     public List<T> list() {
