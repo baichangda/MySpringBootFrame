@@ -82,7 +82,7 @@ public class ProviderUtil {
 
                     //从redis中加载
                     final ArrayList<String> hosts = new ArrayList<>();
-                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps("provider:" + type));
+                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(providerProp.redisKeyPre + type));
                     final Map<String, String> entries = boundHashOperations.entries();
                     if (!entries.isEmpty()) {
                         for (Map.Entry<String, String> entry : entries.entrySet()) {

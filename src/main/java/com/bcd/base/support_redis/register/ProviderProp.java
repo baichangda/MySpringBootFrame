@@ -7,6 +7,8 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "provider")
 public class ProviderProp {
 
+    public String redisKeyPre="provider:";
+
     public String host;
     /**
      * 服务类别

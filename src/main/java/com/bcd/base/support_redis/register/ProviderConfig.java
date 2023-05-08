@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
@@ -30,25 +29,26 @@ public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent
     ProviderProp providerProp;
 
     ScheduledExecutorService providerPool;
-    String []types;
-    BoundHashOperations<String, String, String> []boundHashOperations;
+    String[] types;
+    BoundHashOperations<String, String, String>[] boundHashOperations;
 
     /**
      * 开启服务自动更新到redis
+     *
      * @param providerProp
      * @param redisConnectionFactory
      */
     public void startProviderHeartbeat(ProviderProp providerProp, RedisConnectionFactory redisConnectionFactory) {
-        if(providerProp.types.contains(",")){
-            types=providerProp.types.split(",");
+        if (providerProp.types.contains(",")) {
+            types = providerProp.types.split(",");
 
-        }else{
-            types=new String[]{providerProp.types};
+        } else {
+            types = new String[]{providerProp.types};
         }
         final RedisTemplate<String, String> stringStringRedisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
-        boundHashOperations=new BoundHashOperations[types.length];
+        boundHashOperations = new BoundHashOperations[types.length];
         for (int i = 0; i < types.length; i++) {
-            boundHashOperations[i]=stringStringRedisTemplate.boundHashOps("provider:"+types[i]);
+            boundHashOperations[i] = stringStringRedisTemplate.boundHashOps(providerProp.redisKeyPre + types[i]);
         }
         providerPool = Executors.newSingleThreadScheduledExecutor();
         providerPool.scheduleAtFixedRate(() -> {
@@ -62,7 +62,7 @@ public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (!providerProp.host.isEmpty()) {
-            startProviderHeartbeat(providerProp,redisConnectionFactory);
+            startProviderHeartbeat(providerProp, redisConnectionFactory);
         }
     }
 }
