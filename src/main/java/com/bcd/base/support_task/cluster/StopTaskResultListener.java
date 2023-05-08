@@ -18,7 +18,7 @@ public class StopTaskResultListener<T extends Task<K>, K extends Serializable> e
     private final ClusterTaskBuilder<T, K> taskBuilder;
 
     public StopTaskResultListener(String name, RedisConnectionFactory connectionFactory, ClusterTaskBuilder<T, K> taskBuilder) {
-        super(connectionFactory, 1, 1, ValueSerializerType.JACKSON, RedisUtil.doWithKey("stopTaskResult:" + name));
+        super(connectionFactory, 1, 1, ValueSerializerType.JACKSON, "stopTaskResult:" + name);
         this.taskBuilder = taskBuilder;
     }
 

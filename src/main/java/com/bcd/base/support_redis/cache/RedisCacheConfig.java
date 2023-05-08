@@ -30,7 +30,6 @@ public class RedisCacheConfig {
                 RedisCacheConfiguration.defaultCacheConfig()
                         .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisUtil.SERIALIZER_KEY_STRING))
                         .entryTtl(Duration.ofSeconds(5))
-                        .prefixCacheNameWith(RedisUtil.SYSTEM_REDIS_KEY_PRE)
         );
         return redisCacheManager.getCache(CacheConst.REDIS_CACHE);
     }

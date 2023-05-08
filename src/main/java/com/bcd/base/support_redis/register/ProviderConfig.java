@@ -48,7 +48,7 @@ public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent
         final RedisTemplate<String, String> stringStringRedisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
         boundHashOperations=new BoundHashOperations[types.length];
         for (int i = 0; i < types.length; i++) {
-            boundHashOperations[i]=stringStringRedisTemplate.boundHashOps(RedisUtil.doWithKey("provider:"+types[i]));
+            boundHashOperations[i]=stringStringRedisTemplate.boundHashOps("provider:"+types[i]);
         }
         providerPool = Executors.newSingleThreadScheduledExecutor();
         providerPool.scheduleAtFixedRate(() -> {

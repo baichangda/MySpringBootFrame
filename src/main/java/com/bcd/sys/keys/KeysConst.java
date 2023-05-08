@@ -22,7 +22,7 @@ public class KeysConst {
     /**
      * redis 存储公钥私钥redis key名(仅在集群环境有效)
      */
-    public static final String REDIS_KEY_NAME = RedisUtil.doWithKey("publicPrivateKeys");
+    public static final String REDIS_KEY_NAME = "publicPrivateKeys";
     /**
      * 公钥
      */

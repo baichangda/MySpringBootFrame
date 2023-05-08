@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class ProviderUtil {
@@ -29,15 +29,15 @@ public class ProviderUtil {
      * @param no
      * @return
      */
-    public static String host(String type, int no) {
+    public static String host(String type, long no) {
         final ArrayList<String> hosts = hosts(type);
         if (hosts.isEmpty()) {
             return null;
         }
-        return hosts.get(no % hosts.size());
+        return hosts.get((int) (no % hosts.size()));
     }
 
-    private static ConcurrentHashMap<String, AtomicInteger> typeToNo = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, AtomicLong> typeToNo = new ConcurrentHashMap<>();
 
     /**
      * 使用全局静态序号完成
@@ -46,7 +46,7 @@ public class ProviderUtil {
      * @return
      */
     public static String host(String type) {
-        return host(type, typeToNo.computeIfAbsent(type, k -> new AtomicInteger()).getAndIncrement());
+        return host(type, typeToNo.computeIfAbsent(type, k -> new AtomicLong()).getAndIncrement());
     }
 
 
@@ -82,7 +82,7 @@ public class ProviderUtil {
 
                     //从redis中加载
                     final ArrayList<String> hosts = new ArrayList<>();
-                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(RedisUtil.doWithKey("provider:" + type)));
+                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps("provider:" + type));
                     final Map<String, String> entries = boundHashOperations.entries();
                     if (!entries.isEmpty()) {
                         for (Map.Entry<String, String> entry : entries.entrySet()) {
@@ -101,4 +101,11 @@ public class ProviderUtil {
         }
         return providerInfo.hosts;
     }
+
+    public static void main(String[] args) {
+        byte a=Byte.MAX_VALUE;
+        System.out.println((byte)(a+2));
+        System.out.println(-127%2);
+    }
 }
+

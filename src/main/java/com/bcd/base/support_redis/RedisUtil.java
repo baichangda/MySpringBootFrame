@@ -2,7 +2,6 @@ package com.bcd.base.support_redis;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_redis.serializer.RedisSerializer_key_string;
 import com.bcd.base.support_redis.serializer.RedisSerializer_value_integer;
 import com.bcd.base.util.JsonUtil;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -12,27 +11,15 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("unchecked")
 public class RedisUtil {
 
-    public final static RedisSerializer<String> SERIALIZER_KEY_STRING = new RedisSerializer_key_string(StandardCharsets.UTF_8, RedisUtil.SYSTEM_REDIS_KEY_PRE);
+    public final static RedisSerializer<String> SERIALIZER_KEY_STRING = RedisSerializer.string();
     public final static RedisSerializer<Object> SERIALIZER_VALUE_JDK = RedisSerializer.java();
     public final static RedisSerializer<String> SERIALIZER_VALUE_STRING = RedisSerializer.string();
     public final static RedisSerializer<Integer> SERIALIZER_VALUE_INTEGER = new RedisSerializer_value_integer();
     public final static RedisSerializer<byte[]> SERIALIZER_VALUE_BYTEARRAY = RedisSerializer.byteArray();
-    public final static String SYSTEM_REDIS_KEY_PRE = "icv:";
-
-    /**
-     * 在redis key前面加上系统标识、避免和其他服务公用redis时候因为相同的key导致异常
-     *
-     * @param key
-     * @return
-     */
-    public static String doWithKey(String key) {
-        return SYSTEM_REDIS_KEY_PRE + key;
-    }
 
     /**
      * 获取对应实体类型的String_Jackson的redisTemplate

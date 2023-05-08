@@ -47,7 +47,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
     public TaskRedisQueue(String name, RedisConnectionFactory connectionFactory, TaskBuilder<T, K> taskBuilder) {
         final RedisTemplate<String, TaskRunnable<T, K>> redisTemplate = RedisUtil.newString_SerializableRedisTemplate(connectionFactory);
         this.name = name;
-        this.queueName = RedisUtil.doWithKey("sysTask:" + name);
+        this.queueName = "sysTask:" + name;
         this.boundListOperations = redisTemplate.boundListOps(this.queueName);
         this.taskBuilder = taskBuilder;
         this.semaphore = new Semaphore(this.taskBuilder.getPoolSize());
