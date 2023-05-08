@@ -33,15 +33,15 @@ public class RedisQueueMQ<V> {
 
     private final int workThreadNum;
 
-    private RedisSerializer<V> valueSerializer;
+    private final RedisSerializer<V> valueSerializer;
 
-    private BoundListOperations<String, byte[]> boundListOperations;
+    private final BoundListOperations<String, byte[]> boundListOperations;
 
     private ThreadPoolExecutor consumeExecutor;
 
     private ThreadPoolExecutor workExecutor;
 
-    private RedisTemplate<String, byte[]> redisTemplate;
+    private final RedisTemplate<String, byte[]> redisTemplate;
 
     private boolean stop;
 

@@ -36,9 +36,9 @@ public class RedisTopicMQ<V> {
     private final int taskThreadNum;
     private final String[] names;
 
-    private RedisSerializer<V> redisSerializer;
+    private final RedisSerializer<V> redisSerializer;
 
-    private RedisTemplate<String, byte[]> redisTemplate;
+    private final RedisTemplate<String, byte[]> redisTemplate;
 
     private RedisMessageListenerContainer redisMessageListenerContainer;
 
