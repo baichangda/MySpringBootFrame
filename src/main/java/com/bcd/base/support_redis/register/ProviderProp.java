@@ -20,11 +20,11 @@ public class ProviderProp {
     /**
      * 上报周期
      */
-    public Duration reportPeriod = Duration.ofSeconds(15);
+    public Duration reportPeriod = Duration.ofSeconds(3);
     /**
      * 最大过期时间
      */
-    public Duration expired = Duration.ofSeconds(30);
+    public Duration expired = Duration.ofSeconds(5);
 
     public String getTypes() {
         return types;

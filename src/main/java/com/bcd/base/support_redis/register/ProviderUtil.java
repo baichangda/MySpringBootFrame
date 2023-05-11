@@ -22,42 +22,80 @@ public class ProviderUtil {
         ProviderUtil.redisConnectionFactory = redisConnectionFactory;
     }
 
-    /**
-     * 根据序号轮询方式获取host
-     *
-     * @param type
-     * @param no
-     * @return
-     */
-    public static String host(String type, long no) {
-        final ArrayList<String> hosts = hosts(type);
-        if (hosts.isEmpty()) {
-            return null;
+    final static ConcurrentHashMap<String, TypeInfo> typeToTypeInfo = new ConcurrentHashMap<>();
+
+    static class ProviderInfo {
+        final long lastUpdateTs;
+        final ArrayList<String> hosts;
+
+        public ProviderInfo(long lastUpdateTs, ArrayList<String> hosts) {
+            this.lastUpdateTs = lastUpdateTs;
+            this.hosts = hosts;
         }
-        return hosts.get((int) (no % hosts.size()));
     }
 
-    private static final ConcurrentHashMap<String, AtomicLong> typeToNo = new ConcurrentHashMap<>();
+    static class TypeInfo {
+        final String type;
+        final BoundHashOperations<String, String, String> boundHashOperations;
+        volatile ProviderInfo providerInfo;
+        final AtomicLong count = new AtomicLong();
+
+        public TypeInfo(String type, RedisConnectionFactory redisConnectionFactory) {
+            this.type = type;
+            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(providerProp.redisKeyPre + type);
+        }
+
+        public String host() {
+            final ArrayList<String> hosts = hosts();
+            if (hosts.isEmpty()) {
+                return null;
+            }
+            return hosts.get((int) (count.getAndIncrement() % hosts.size()));
+        }
+
+        public ArrayList<String> hosts() {
+            ProviderInfo temp = providerInfo;
+            long curTs = System.currentTimeMillis();
+            long expireTs = curTs - providerProp.expired.toMillis();
+            if (temp == null || temp.lastUpdateTs < expireTs) {
+                synchronized (this) {
+                    temp = providerInfo;
+                    curTs = System.currentTimeMillis();
+                    expireTs = curTs - providerProp.expired.toMillis();
+                    if (temp == null || temp.lastUpdateTs < expireTs) {
+                        //从redis中加载
+                        final ArrayList<String> hosts = new ArrayList<>();
+                        final Map<String, String> entries = boundHashOperations.entries();
+                        if (!entries.isEmpty()) {
+                            for (Map.Entry<String, String> entry : entries.entrySet()) {
+                                final String value = entry.getValue();
+                                if (DateZoneUtil.stringToDate_second(value).getTime() >= expireTs) {
+                                    hosts.add(entry.getKey());
+                                }
+                            }
+                            hosts.sort(String::compareTo);
+                            hosts.trimToSize();
+                            temp = new ProviderInfo(curTs, hosts);
+                        } else {
+                            temp = new ProviderInfo(curTs, new ArrayList<>());
+                        }
+                        this.providerInfo = temp;
+                    }
+                }
+            }
+            return temp.hosts;
+        }
+    }
 
     /**
-     * 使用全局静态序号完成
-     *
+     * 根据访问序号轮流使用host
      * @param type
      * @return
      */
     public static String host(String type) {
-        return host(type, typeToNo.computeIfAbsent(type, k -> new AtomicLong()).getAndIncrement());
+        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(type, k -> new TypeInfo(k, redisConnectionFactory));
+        return typeInfo.host();
     }
-
-
-    static class ProviderInfo {
-        long lastUpdateTs;
-        ArrayList<String> hosts = new ArrayList<>();
-
-    }
-
-    final static HashMap<String, ProviderInfo> typeToProvider = new HashMap<>();
-    final static HashMap<String, BoundHashOperations<String, String, String>> operationsMap = new HashMap<>();
 
     /**
      * 获取可用host
@@ -66,46 +104,14 @@ public class ProviderUtil {
      * @return
      */
     public static ArrayList<String> hosts(String type) {
-        final long curTs = System.currentTimeMillis();
-        final long checkTs = curTs - providerProp.expired.toMillis();
-        //从缓存中获取提供者信息
-        ProviderInfo providerInfo = typeToProvider.get(type);
-        //检查信息是否过期
-        if (providerInfo == null || providerInfo.lastUpdateTs < checkTs) {
-            //过期则从redis中读取
-            synchronized (type.intern()) {
-                if (providerInfo == null || providerInfo.lastUpdateTs < checkTs) {
-                    if (providerInfo == null) {
-                        providerInfo = new ProviderInfo();
-                    }
-                    providerInfo.lastUpdateTs = curTs;
-
-                    //从redis中加载
-                    final ArrayList<String> hosts = new ArrayList<>();
-                    final BoundHashOperations<String, String, String> boundHashOperations = operationsMap.computeIfAbsent(type, e -> RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(providerProp.redisKeyPre + type));
-                    final Map<String, String> entries = boundHashOperations.entries();
-                    if (!entries.isEmpty()) {
-                        for (Map.Entry<String, String> entry : entries.entrySet()) {
-                            final String value = entry.getValue();
-                            if (DateZoneUtil.stringToDate_second(value).getTime() >= checkTs) {
-                                hosts.add(entry.getKey());
-                            }
-                        }
-                        hosts.sort(String::compareTo);
-                        hosts.trimToSize();
-                        return hosts;
-                    }
-                    providerInfo.hosts = hosts;
-                }
-            }
-        }
-        return providerInfo.hosts;
+        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(type, k -> new TypeInfo(k, redisConnectionFactory));
+        return typeInfo.hosts();
     }
 
     public static void main(String[] args) {
-        byte a=Byte.MAX_VALUE;
-        System.out.println((byte)(a+2));
-        System.out.println(-127%2);
+        byte a = Byte.MAX_VALUE;
+        System.out.println((byte) (a + 2));
+        System.out.println(-127 % 2);
     }
 }
 

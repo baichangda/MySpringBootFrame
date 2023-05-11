@@ -142,3 +142,8 @@ sa-token:
   is-read-body: false
   is-read-header: false
   is-read-cookie: true
+
+provider:
+  reportPeriod: 3
+  expired: 5
+  types: test
