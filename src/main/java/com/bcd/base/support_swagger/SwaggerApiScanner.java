@@ -149,9 +149,9 @@ public class SwaggerApiScanner {
      *
      * @return
      */
-    public static void scanApiAndExport(OutputStream os, Consumer<List<List>> doBeforeWrite, int type, String... packageNames) throws IOException, ClassNotFoundException {
+    public static void scanApiAndExport(OutputStream os, Consumer<List<List<?>>> doBeforeWrite, int type, String... packageNames) throws IOException, ClassNotFoundException {
         //1、获取所有controller
-        final List<Class> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
+        final List<Class<?>> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
         //2、循环controller
         List<Map<String, Object>> dataList = new ArrayList<>();
         for (Class controllerClass : classesWithAnno) {
@@ -193,7 +193,7 @@ public class SwaggerApiScanner {
             });
         }
         //准备导入excel的数据
-        List<List> excelList = new ArrayList<>();
+        List<List<?>> excelList = new ArrayList<>();
         switch (type) {
             case 1: {
                 dataList.forEach(e -> {

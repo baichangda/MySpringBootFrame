@@ -57,7 +57,7 @@ spring:
       ssl: false
       database: 0
       timeout: 60000
-      password:
+      password: incar@2023
       #异步lettuce连接池(默认)
       lettuce:
         pool:
@@ -70,20 +70,20 @@ spring:
       #     sentinel:
       #       master: myMaster
       #       nodes: 127.0.0.1:23679,127.0.0.1:23680,127.0.0.1:23681
-      #    #集群配置
-      #     cluster:
-      #       maxRedirects: 3
-      #       nodes:
-      #         - 114.116.107.184:7001
-      #         - 114.116.107.184:7002
-      #         - 114.116.107.184:7003
-      #         - 114.115.141.139:7004
-      #         - 114.115.141.139:7005
-      #         - 114.115.141.139:7006
+      #集群配置
+      cluster:
+        maxRedirects: 3
+        nodes:
+          - 10.0.11.50:39051
+          - 10.0.11.50:39052
+          - 10.0.11.50:39053
+          - 10.0.11.50:39054
+          - 10.0.11.50:39055
+          - 10.0.11.50:39056
 
       #单机配置
-      host: 127.0.0.1
-      port: 6379
+#      host: 127.0.0.1
+#      port: 6379
 
   #  kafka配置
   kafka:
@@ -144,6 +144,5 @@ sa-token:
   is-read-cookie: true
 
 provider:
-  reportPeriod: 3
   expired: 5
   types: test

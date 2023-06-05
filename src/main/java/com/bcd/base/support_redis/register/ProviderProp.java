@@ -18,10 +18,6 @@ public class ProviderProp {
     public String types;
 
     /**
-     * 上报周期
-     */
-    public Duration reportPeriod = Duration.ofSeconds(3);
-    /**
      * 最大过期时间
      */
     public Duration expired = Duration.ofSeconds(5);
@@ -50,11 +46,4 @@ public class ProviderProp {
         this.host = host;
     }
 
-    public Duration getReportPeriod() {
-        return reportPeriod;
-    }
-
-    public void setReportPeriod(Duration reportPeriod) {
-        this.reportPeriod = reportPeriod;
-    }
 }

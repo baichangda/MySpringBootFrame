@@ -56,7 +56,7 @@ public class ProviderConfig implements ApplicationListener<ContextRefreshedEvent
             for (BoundHashOperations<String, String, String> boundHashOperation : boundHashOperations) {
                 boundHashOperation.put(providerProp.host, s);
             }
-        }, 0, providerProp.reportPeriod.toMillis(), TimeUnit.MILLISECONDS);
+        }, 0, (providerProp.expired.toSeconds() >> 1) + 1, TimeUnit.SECONDS);
     }
 
     @Override
