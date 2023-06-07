@@ -274,3 +274,17 @@ tasks.withType(GenerateMavenPom).all {
         file.write(text)
     }
 }
+
+
+/**
+ * 如果需要打jar包供其他人使用、需要排除log4j2.xml配置文件、防止冲突
+ * 如果是作为应用启动、则不需要此配置
+ */
+//sourceSets {
+//    main {
+//        resources {
+//            srcDir 'src/main/resources'
+//            exclude 'log4j2.xml'
+//        }
+//    }
+//}
