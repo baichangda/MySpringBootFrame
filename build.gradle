@@ -288,3 +288,30 @@ tasks.withType(GenerateMavenPom).all {
 //        }
 //    }
 //}
+
+
+/**
+ * gradle bootJar分离源代码和lib配置
+ */
+//// 清除现有的lib目录
+//task clearJar(type: Delete) {
+//    delete "$buildDir\\libs\\lib"
+//}
+//// 将依赖包复制到lib目录
+//task copyJar(type: Copy, dependsOn: 'clearJar') {
+//    from configurations.compileClasspath
+//    into "$buildDir\\libs\\lib"
+//}
+//bootJar {
+//    // 例外所有的jar
+//    excludes = ["*.jar"]
+//    // lib目录的清除和复制任务
+//    dependsOn clearJar
+//    dependsOn copyJar
+//
+//    // 指定依赖包的路径
+//    manifest {
+//        attributes "Manifest-Version": 1.0,
+//                'Class-Path': configurations.compileClasspath.files.collect { "lib/$it.name" }.join(' ')
+//    }
+//}
