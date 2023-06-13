@@ -208,9 +208,9 @@ bootRun {
 flyway {
     def subLocations = []
     //mysql
-    url = 'jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
+    url = 'jdbc:mysql://192.168.23.128:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
     user = 'root'
-    password = '123456'
+    password = 'bcd'
     subLocations.add('filesystem:' + project.sourceSets.main.resources.srcDirs.iterator().next().getPath() + '/db/migration/mysql')
     //pgsql
 //    url = 'jdbc:postgresql://127.0.0.1:5432/msbf'

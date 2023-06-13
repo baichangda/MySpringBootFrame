@@ -29,9 +29,9 @@ spring:
 
     #mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true&allowPublicKeyRetrieval=True
+    url: jdbc:mysql://192.168.23.128:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true&allowPublicKeyRetrieval=True
     username: root
-    password: 123456
+    password: bcd
     #pgsql
   #    driver-class-name: org.postgresql.Driver
   #    url: jdbc:postgresql://127.0.0.1:5432/msbf
@@ -74,15 +74,15 @@ spring:
       cluster:
         maxRedirects: 3
         nodes:
-          - 10.0.11.50:39051
-          - 10.0.11.50:39052
-          - 10.0.11.50:39053
-          - 10.0.11.50:39054
-          - 10.0.11.50:39055
-          - 10.0.11.50:39056
+          - 192.168.23.128:7001
+          - 192.168.23.128:7002
+          - 192.168.23.128:7003
+          - 192.168.23.128:7004
+          - 192.168.23.128:7005
+          - 192.168.23.128:7006
 
       #单机配置
-#      host: 127.0.0.1
+#      host: 192.168.23.128
 #      port: 6379
 
   #  kafka配置
