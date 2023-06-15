@@ -175,6 +175,9 @@ bootJar {
     manifest {
         attributes 'Start-Class': 'com.bcd.Application'
     }
+    //指定jar文件的名称
+    archiveBaseName='msbf'
+    version=''
 }
 
 //生成jar时打包源码
