@@ -58,7 +58,7 @@ spring:
       #公用配置
       database: 0
       timeout: 60000
-      password: incar@2023
+      password: bcd
       #异步lettuce连接池(默认)
       lettuce:
         pool:

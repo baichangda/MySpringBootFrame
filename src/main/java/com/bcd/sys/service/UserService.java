@@ -58,7 +58,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
             }
             userBean.password = password;
             userBean.status = 1;
-            save(userBean);
+            insert(userBean);
         }
     }
 
