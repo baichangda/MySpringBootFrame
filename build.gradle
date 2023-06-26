@@ -1,5 +1,3 @@
-
-
 buildscript {
     ext {
         aliyunPublic = 'https://maven.aliyun.com/repository/public/'
@@ -18,9 +16,8 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id "org.flywaydb.flyway" version "9.19.+"
     id "io.spring.dependency-management" version "1.1.0"
-    id 'org.springframework.boot' version "3.0.+"
+    id 'org.springframework.boot' version "3.+"
 }
 
 
@@ -128,7 +125,6 @@ dependencies {
     implementation group: 'com.github.xiaoymin', name: 'knife4j-openapi3-jakarta-spring-boot-starter', version: "+"
 
 
-
     // https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
     implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: "3.+"
 
@@ -146,7 +142,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/cn.dev33/sa-token-spring-boot-starter
     implementation group: 'cn.dev33', name: 'sa-token-spring-boot3-starter', version: "+"
-    implementation group: 'cn.dev33', name: 'sa-token-dao-redis-jackson', version: "+"
+    implementation group: 'cn.dev33', name: 'sa-token-redis-jackson', version: "+"
 
     // define a BOM and its version
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
@@ -176,8 +172,8 @@ bootJar {
         attributes 'Start-Class': 'com.bcd.Application'
     }
     //指定jar文件的名称
-    archiveBaseName= "${rootProject.name}"
-    version=''
+    archiveBaseName = "${rootProject.name}"
+    version = ''
 }
 
 //生成jar时打包源码
@@ -200,32 +196,11 @@ bootRun {
     //开启缓存行补齐
     jvmArgs('-XX:-RestrictContended')
     jvmArgs('-Dfile.encoding=UTF-8')
+    jvmArgs('-Dsun.jnu.encoding=UTF-8')
     jvmArgs('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
 }
 
 
-/**
- * ----------------------------------------------------------------------------
- */
-
-flyway {
-    def subLocations = []
-    //mysql
-    url = 'jdbc:mysql://192.168.23.128:3306/msbf?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC'
-    user = 'root'
-    password = 'bcd'
-    subLocations.add('filesystem:' + project.sourceSets.main.resources.srcDirs.iterator().next().getPath() + '/db/migration/mysql')
-    //pgsql
-//    url = 'jdbc:postgresql://127.0.0.1:5432/msbf'
-//    user = 'root'
-//    password = '123456'
-//    subLocations.add('filesystem:'+project.sourceSets.main.resources.srcDirs.iterator().next().getPath()+'/db/migration/pgsql')
-
-    flyway.locations = subLocations
-
-    //是否允许无序的迁移
-    outOfOrder = true
-}
 /**
  * ----------------------------------------------------------------------------
  */
@@ -263,6 +238,7 @@ publishing {
  * }
  */
 import java.util.regex.Matcher
+
 tasks.withType(GenerateMavenPom).all {
     doLast {
         File file = new File("$buildDir/publications/maven/pom-default.xml")

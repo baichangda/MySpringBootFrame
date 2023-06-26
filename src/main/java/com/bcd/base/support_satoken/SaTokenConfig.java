@@ -45,9 +45,9 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
      */
     private void rewriteCheckMethodAnnotation() {
         //重写aop注解式鉴权、实现自定义注解
-        SaStrategy.me.checkMethodAnnotation = method -> {
+        SaStrategy.instance.checkMethodAnnotation = method -> {
             // 再校验 Method 上的注解
-            SaStrategy.me.checkElementAnnotation.accept(method);
+            SaStrategy.instance.checkElementAnnotation.accept(method);
 
             // 校验 @SaCheckAction 注解
             final SaCheckAction saCheckAction = method.getAnnotation(SaCheckAction.class);
