@@ -1,4 +1,4 @@
-app=msbf
+app=bcd
 logFilePath=logs/data.log
 pid=$(ps -ef | grep $app | grep -v grep | awk '{print $2}')
 if [ $pid ]; then
