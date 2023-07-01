@@ -7,19 +7,28 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 public class ProviderUtil {
     static RedisConnectionFactory redisConnectionFactory;
-
-    static ProviderProp providerProp;
+    static long localExpired;
+    static long expired;
+    static String redisKeyPre;
 
     @Autowired
     public void setRedisConnectionFactory(RedisConnectionFactory redisConnectionFactory) {
         ProviderUtil.redisConnectionFactory = redisConnectionFactory;
+    }
+
+    @Autowired
+    public void setProviderProp(ProviderProp providerProp) {
+        localExpired = providerProp.expired.toSeconds() >> 1;
+        expired = providerProp.expired.toMillis();
+        redisKeyPre = providerProp.redisKeyPre;
     }
 
     final static ConcurrentHashMap<String, TypeInfo> typeToTypeInfo = new ConcurrentHashMap<>();
@@ -37,12 +46,12 @@ public class ProviderUtil {
     static class TypeInfo {
         final String type;
         final BoundHashOperations<String, String, String> boundHashOperations;
-        volatile ProviderInfo providerInfo;
+        ProviderInfo providerInfo;
         final AtomicLong count = new AtomicLong();
 
         public TypeInfo(String type, RedisConnectionFactory redisConnectionFactory) {
             this.type = type;
-            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(providerProp.redisKeyPre + type);
+            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(redisKeyPre + type);
         }
 
         public String host() {
@@ -53,23 +62,30 @@ public class ProviderUtil {
             return hosts.get((int) (count.getAndIncrement() % hosts.size()));
         }
 
+        /**
+         * 每次获取时候
+         * 先检查本地缓存是否过期、{@link #localExpired}
+         * 如果本地缓存过期、则从redis中获取数据、并过滤掉已经过期的节点、{@link #expired}
+         *
+         * @return
+         */
         public ArrayList<String> hosts() {
             ProviderInfo temp = providerInfo;
             long curTs = System.currentTimeMillis();
-            long expireTs = curTs - providerProp.expired.toMillis();
-            if (temp == null || temp.lastUpdateTs < expireTs) {
+            long localExpireTs = curTs - localExpired;
+            if (temp == null || temp.lastUpdateTs < localExpireTs) {
                 synchronized (this) {
                     temp = providerInfo;
                     curTs = System.currentTimeMillis();
-                    expireTs = curTs - providerProp.expired.toMillis();
-                    if (temp == null || temp.lastUpdateTs < expireTs) {
+                    localExpireTs = curTs - localExpired;
+                    if (temp == null || temp.lastUpdateTs < localExpireTs) {
                         //从redis中加载
                         final ArrayList<String> hosts = new ArrayList<>();
                         final Map<String, String> entries = boundHashOperations.entries();
                         if (!entries.isEmpty()) {
                             for (Map.Entry<String, String> entry : entries.entrySet()) {
                                 final String value = entry.getValue();
-                                if (DateZoneUtil.stringToDate_second(value).getTime() >= expireTs) {
+                                if (DateZoneUtil.stringToDate_second(value).getTime() >= expired) {
                                     hosts.add(entry.getKey());
                                 }
                             }
@@ -89,6 +105,7 @@ public class ProviderUtil {
 
     /**
      * 根据访问序号轮流使用host
+     *
      * @param type
      * @return
      */
@@ -110,8 +127,10 @@ public class ProviderUtil {
 
     public static void main(String[] args) {
         byte a = Byte.MAX_VALUE;
-        System.out.println((byte) (a + 2));
-        System.out.println(-127 % 2);
+        System.out.println((byte) a);
+        System.out.println((byte) ((a + 1) & 0x7F));
+        System.out.println((byte) ((a + 2) & 0x7F));
+        System.out.println((byte) ((a + 3) & 0x7F));
     }
 }
 
