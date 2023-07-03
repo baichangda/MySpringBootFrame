@@ -2,13 +2,12 @@ package com.bcd.base.support_redis.register;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.time.Duration;
+@ConfigurationProperties(prefix = "register")
+public class RegisterProp {
 
-@ConfigurationProperties(prefix = "provider")
-public class ProviderProp {
-
-    public String redisKeyPre="provider:";
-
+    /**
+     * ip:端口
+     */
     public String host;
     /**
      * 服务类别
@@ -17,25 +16,12 @@ public class ProviderProp {
      */
     public String types;
 
-    /**
-     * 最大过期时间
-     */
-    public Duration expired = Duration.ofSeconds(5);
-
     public String getTypes() {
         return types;
     }
 
     public void setTypes(String types) {
         this.types = types;
-    }
-
-    public Duration getExpired() {
-        return expired;
-    }
-
-    public void setExpired(Duration expired) {
-        this.expired = expired;
     }
 
     public String getHost() {

@@ -145,6 +145,6 @@ sa-token:
   is-read-cookie: true
 
 
-provider:
-  expired: 5
-  types: test
+register:
+  host: 127.0.0.1
+  types: test1,test2
