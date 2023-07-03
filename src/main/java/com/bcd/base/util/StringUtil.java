@@ -16,10 +16,10 @@ public class StringUtil {
      * a_b_c会成为aBC
      *
      * @param str
-     * @param splitStr
+     * @param splitChar
      * @return
      */
-    public static String toFirstUpperCaseWithSplit(String str, char splitStr) {
+    public static String splitCharToCamelCase(String str, char splitChar) {
         if (str == null || str.length() == 0) {
             return str;
         }
@@ -29,7 +29,7 @@ public class StringUtil {
         result.append(Character.toLowerCase(arr[0]));
         for (int i = 1; i <= arr.length - 1; i++) {
             char c = arr[i];
-            if (c == splitStr) {
+            if (c == splitChar) {
                 nextIsUpper = true;
             } else {
                 if (nextIsUpper) {
@@ -43,7 +43,7 @@ public class StringUtil {
         return result.toString();
     }
 
-    public static String toFirstSplitWithUpperCase(String str, char splitStr) {
+    public static String camelCaseToSplitChar(String str, char splitChar) {
         if (str == null || str.length() == 0) {
             return str;
         }
@@ -53,7 +53,7 @@ public class StringUtil {
         for (int i = 1; i <= arr.length - 1; i++) {
             char c = arr[i];
             if (Character.isUpperCase(c)) {
-                result.append(splitStr);
+                result.append(splitChar);
             }
             result.append(Character.toLowerCase(c));
         }

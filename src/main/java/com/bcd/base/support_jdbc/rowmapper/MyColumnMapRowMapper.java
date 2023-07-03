@@ -8,6 +8,6 @@ public class MyColumnMapRowMapper extends ColumnMapRowMapper {
 
     @Override
     protected String getColumnKey(String columnName) {
-        return StringUtil.toFirstUpperCaseWithSplit(columnName, '_');
+        return StringUtil.splitCharToCamelCase(columnName, '_');
     }
 }

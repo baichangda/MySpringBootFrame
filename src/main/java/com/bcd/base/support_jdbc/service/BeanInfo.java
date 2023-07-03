@@ -95,7 +95,7 @@ public final class BeanInfo<T> {
         public FieldInfo(Field field) {
             this.field = field;
             this.fieldName = field.getName();
-            this.columnName = StringUtil.toFirstSplitWithUpperCase(this.fieldName, '_');
+            this.columnName = StringUtil.camelCaseToSplitChar(this.fieldName, '_');
         }
     }
 
