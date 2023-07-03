@@ -198,6 +198,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
         System.out.println((byte) ((a + 1) & 0x7F));
         System.out.println((byte) ((a + 2) & 0x7F));
         System.out.println((byte) ((a + 3) & 0x7F));
+        System.out.println(RegisterServer.test1);
     }
 }
 
