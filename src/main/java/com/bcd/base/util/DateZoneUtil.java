@@ -17,6 +17,7 @@ import java.util.List;
  * 所有的操作方法都基于某个时区
  */
 public class DateZoneUtil {
+    public final static ZoneId ZONE_ID =ZoneId.of("Asia/Shanghai");
     public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
     public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);

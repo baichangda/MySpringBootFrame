@@ -101,7 +101,9 @@ spring:
       bootstrap-servers: 192.168.23.128:9092
       key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
+    listener:
+      # topic不存在时候是否正常启动
+      missing-topics-fatal: false
   mail:
     host: smtp.qq.com
     username:

@@ -19,10 +19,6 @@ public abstract class AbstractConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 消费线程池、默认一个
-     */
-    private ExecutorService consumerExecutor;
-    /**
      * 工作线程数量
      */
     private final int workThreadNum;
@@ -120,7 +116,10 @@ public abstract class AbstractConsumer {
             });
         }
         //初始化消费线程、提交消费任务
-        this.consumerExecutor = Executors.newSingleThreadExecutor();
+        /**
+         * 消费线程池、默认一个
+         */
+        final ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
         consumerExecutor.execute(this::consume);
 
         //销毁消费者、因为消费者执行的是死循环、只有当满足条件时候才会退出

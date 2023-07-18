@@ -20,7 +20,7 @@ public class Producer implements ApplicationListener<ContextRefreshedEvent> {
     static Logger logger = LoggerFactory.getLogger(Producer.class);
 
     @Autowired
-    private KafkaTemplate kafkaTemplate;
+    private KafkaTemplate<byte[],byte[]> kafkaTemplate;
 
     public void sendMessage(byte[] key, byte[] msg) {
         kafkaTemplate.send("test", key, msg).whenComplete((sendResult, throwable) -> {
