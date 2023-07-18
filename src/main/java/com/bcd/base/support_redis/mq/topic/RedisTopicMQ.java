@@ -68,19 +68,19 @@ public class RedisTopicMQ<V> {
 
     private RedisSerializer<?> getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
-            case BYTE_ARRAY: {
+            case BYTE_ARRAY -> {
                 return RedisUtil.SERIALIZER_VALUE_BYTEARRAY;
             }
-            case STRING: {
+            case STRING -> {
                 return RedisUtil.SERIALIZER_VALUE_STRING;
             }
-            case SERIALIZABLE: {
+            case SERIALIZABLE -> {
                 return RedisUtil.SERIALIZER_VALUE_JDK;
             }
-            case JACKSON: {
+            case JACKSON -> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
-            default: {
+            default -> {
                 throw BaseRuntimeException.getException("Not Support");
             }
         }
