@@ -273,7 +273,7 @@ tasks.withType(GenerateMavenPom).all {
 // * gradle bootJar分离源代码和lib配置
 // */
 //// 将依赖包复制到lib目录
-//task copyJar(type: Copy, dependsOn: 'clearJar') {
+//task copyJar(type: Copy) {
 //    delete "$buildDir\\libs\\lib"
 //    from configurations.compileClasspath,configurations.runtimeClasspath
 //    into "$buildDir\\libs\\lib"
