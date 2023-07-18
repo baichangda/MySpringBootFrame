@@ -82,13 +82,11 @@ public class RedisScheduleAopConfig {
         //拦截的方法名称
         String methodName = joinPoint.getSignature().getName();
         //拦截的放参数类型
-        Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameterTypes();
+        Class<?>[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameterTypes();
         try {
             return target.getClass().getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException ex) {
             throw BaseRuntimeException.getException(ex);
         }
     }
-
-
 }

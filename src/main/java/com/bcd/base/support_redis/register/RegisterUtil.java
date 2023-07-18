@@ -152,7 +152,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
         for (int i = 0; i < types.length; i++) {
             boundHashOperations[i] = stringStringRedisTemplate.boundHashOps(redisKeyPre + types[i]);
         }
-        ScheduledExecutorService providerPool = Executors.newSingleThreadScheduledExecutor();
+        final ScheduledExecutorService providerPool = Executors.newSingleThreadScheduledExecutor();
         providerPool.scheduleAtFixedRate(() -> {
             final String host = registerProp.host;
             final String s = DateZoneUtil.dateToString_second(new Date());
@@ -160,6 +160,8 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
                 boundHashOperation.put(host, s);
             }
         }, 1, provider_heartbeat_s, TimeUnit.SECONDS);
+        //添加关机钩子
+        Runtime.getRuntime().addShutdownHook(new Thread(providerPool::shutdown));
     }
 
     @Override

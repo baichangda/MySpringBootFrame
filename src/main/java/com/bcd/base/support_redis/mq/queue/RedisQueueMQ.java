@@ -1,12 +1,12 @@
 package com.bcd.base.support_redis.mq.queue;
 
-import com.fasterxml.jackson.databind.JavaType;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
 import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.JsonUtil;
+import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.QueryTimeoutException;
@@ -45,7 +45,7 @@ public class RedisQueueMQ<V> {
 
     private boolean stop;
 
-    private boolean consumerAvailable;
+    private volatile boolean consumerAvailable;
 
 
     public RedisQueueMQ(String name, RedisConnectionFactory connectionFactory, ValueSerializerType valueSerializerType, int consumerThreadNum, int workThreadNum) {
@@ -55,28 +55,28 @@ public class RedisQueueMQ<V> {
 
         this.redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
         this.boundListOperations = redisTemplate.boundListOps(name);
-        this.valueSerializer = getDefaultRedisSerializer(valueSerializerType);
+        this.valueSerializer = (RedisSerializer<V>) getDefaultRedisSerializer(valueSerializerType);
     }
 
     public String getName() {
         return name;
     }
 
-    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
+    private RedisSerializer<?> getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
-            case BYTE_ARRAY: {
+            case BYTE_ARRAY -> {
                 return RedisUtil.SERIALIZER_VALUE_BYTEARRAY;
             }
-            case STRING: {
+            case STRING -> {
                 return RedisUtil.SERIALIZER_VALUE_STRING;
             }
-            case SERIALIZABLE: {
+            case SERIALIZABLE -> {
                 return RedisUtil.SERIALIZER_VALUE_JDK;
             }
-            case JACKSON: {
+            case JACKSON -> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
-            default: {
+            default -> {
                 throw BaseRuntimeException.getException("valueSerializerType [{}] not support", valueSerializerType);
             }
         }

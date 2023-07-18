@@ -48,7 +48,7 @@ public class RedisTopicMQ<V> {
 
     private ThreadPoolExecutor subscriptionExecutor;
 
-    private boolean consumerAvailable;
+    private volatile boolean consumerAvailable;
 
     public RedisTopicMQ(RedisConnectionFactory connectionFactory, int subscriptionThreadNum, int taskThreadNum, ValueSerializerType valueSerializerType, String... names) {
         this.connectionFactory = connectionFactory;
@@ -57,7 +57,7 @@ public class RedisTopicMQ<V> {
         this.names = names;
 
         redisTemplate = RedisUtil.newString_BytesRedisTemplate(connectionFactory);
-        redisSerializer = getDefaultRedisSerializer(valueSerializerType);
+        redisSerializer = (RedisSerializer<V>) getDefaultRedisSerializer(valueSerializerType);
 
     }
 
@@ -66,7 +66,7 @@ public class RedisTopicMQ<V> {
     }
 
 
-    private RedisSerializer getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
+    private RedisSerializer<?> getDefaultRedisSerializer(ValueSerializerType valueSerializerType) {
         switch (valueSerializerType) {
             case BYTE_ARRAY: {
                 return RedisUtil.SERIALIZER_VALUE_BYTEARRAY;

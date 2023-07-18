@@ -16,12 +16,14 @@ public class ExecutorUtil {
         }
     }
 
-    public static void shutdownThenAwaitOneByOneAfterQueueEmpty(Queue queue, ExecutorService executorService){
-        while (!queue.isEmpty()) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(100L);
-            } catch (InterruptedException e) {
-                throw BaseRuntimeException.getException(e);
+    public static void shutdownThenAwaitOneByOneAfterQueueEmpty(Queue<?> queue, ExecutorService executorService) {
+        if (queue != null) {
+            while (!queue.isEmpty()) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100L);
+                } catch (InterruptedException e) {
+                    throw BaseRuntimeException.getException(e);
+                }
             }
         }
         ExecutorUtil.shutdownThenAwaitOneByOne(executorService);

@@ -36,6 +36,10 @@ public abstract class AbstractConsumerForTimeRange {
     private final Consumer<String, byte[]> consumer;
     private final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue;
     private final String[] topics;
+
+    private ExecutorService consumerExecutor;
+    private volatile boolean consumerAvailable;
+
     /**
      * 工作线程数量
      */
@@ -123,51 +127,57 @@ public abstract class AbstractConsumerForTimeRange {
 
 
     public void init() {
-        //订阅topic
-        initConsumer(consumer);
+        if (!consumerAvailable) {
+            synchronized (this) {
+                if (!consumerAvailable) {
+                    //订阅topic
+                    initConsumer(consumer);
+                    //初始化重置消费计数线程池、提交工作任务、每秒重置消费数量
+                    if (maxConsumeSpeed > 0) {
+                        resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
+                        resetConsumeCountPool.scheduleAtFixedRate(() -> {
+                            consumeCount.getAndSet(0);
+                        }, 1, 1, TimeUnit.SECONDS);
+                    }
+                    //初始化工作线程池、提交工作任务
+                    workPool = Executors.newFixedThreadPool(workThreadNum);
+                    for (int i = 0; i < workThreadNum; i++) {
+                        workPool.execute(() -> {
+                            try {
+                                onMessageInternal(queue.take());
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
+                    //初始化消费线程、提交消费任务
+                    consumerExecutor = Executors.newSingleThreadExecutor();
+                    consumerExecutor.execute(this::consume);
 
-        //初始化重置消费计数线程池、提交工作任务、每秒重置消费数量
-        if (maxConsumeSpeed > 0) {
-            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
-            resetConsumeCountPool.scheduleAtFixedRate(() -> {
-                consumeCount.getAndSet(0);
-            }, 1, 1, TimeUnit.SECONDS);
-        }
-        //初始化工作线程池、提交工作任务
-        workPool = Executors.newFixedThreadPool(workThreadNum);
-        for (int i = 0; i < workThreadNum; i++) {
-            workPool.execute(() -> {
-                try {
-                    onMessageInternal(queue.take());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    //增加销毁回调
+                    Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
+
+                    consumerAvailable=true;
                 }
-            });
+            }
         }
-        //初始化消费线程、提交消费任务
-        ExecutorService consumerExecutor = Executors.newSingleThreadExecutor();
-        consumerExecutor.execute(this::consume);
-
-        //销毁消费者、因为消费者执行的是死循环、只有当满足条件时候才会退出
-        consumerExecutor.shutdown();
     }
 
-    /**
-     * 此操作仅仅是打上退出标记、不会马上结束
-     * 销毁过程如下
-     * 消费线程池任务检测到退出标记、退出循环、停止消费、然后销毁其他线程池资源{@link #destroyByConsumerExecutor()}
-     */
     public void destroy() {
-        //打上退出标记
-        running = false;
-    }
+        if (!consumerAvailable) {
+            synchronized (this) {
+                if (!consumerAvailable) {
+                    //打上退出标记
+                    running = false;
+                    //销毁消费线程池、销毁重置计数线程池(如果存在)
+                    ExecutorUtil.shutdownThenAwaitOneByOne(consumerExecutor, resetConsumeCountPool);
+                    //等待队列中为空、然后停止工作线程池、避免出现数据丢失
+                    ExecutorUtil.shutdownThenAwaitOneByOneAfterQueueEmpty(queue, workPool);
 
-
-    private void destroyByConsumerExecutor() {
-        //销毁消费线程池、销毁重置计数线程池(如果存在)
-        ExecutorUtil.shutdownThenAwaitOneByOne(resetConsumeCountPool);
-        //等待队列中为空、然后停止工作线程池、避免出现数据丢失
-        ExecutorUtil.shutdownThenAwaitOneByOneAfterQueueEmpty(queue, workPool);
+                    consumerAvailable=false;
+                }
+            }
+        }
     }
 
     private Properties consumerProperties(ConsumerProp consumerProp) {
@@ -320,9 +330,6 @@ public abstract class AbstractConsumerForTimeRange {
             }
         }
         logger.info("consumer[{}] exit", this.getClass().getName());
-        //退出时候销毁其他资源
-        destroyByConsumerExecutor();
-        logger.info("consumer[{}] destroy", this.getClass().getName());
     }
 
 
