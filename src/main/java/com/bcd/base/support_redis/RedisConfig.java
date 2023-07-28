@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
 public class RedisConfig {
 
     /**
-     * key 用 {@link RedisUtil#STRING_SERIALIZER}
-     * value 用 {@link RedisUtil#JDK_SERIALIZATION_SERIALIZER}
+     * key 用 {@link RedisUtil#SERIALIZER_KEY_STRING}
+     * value 用 {@link RedisUtil#SERIALIZER_VALUE_JDK}
      * 的 RedisTemplate
      *
      * @return
@@ -27,8 +27,8 @@ public class RedisConfig {
     }
 
     /**
-     * key 用 {@link RedisUtil#STRING_SERIALIZER}
-     * value 用 {@link RedisUtil#STRING_SERIALIZER}
+     * key 用 {@link RedisUtil#SERIALIZER_KEY_STRING}
+     * value 用 {@link RedisUtil#SERIALIZER_VALUE_STRING}
      * 的 RedisTemplate
      *
      * @return

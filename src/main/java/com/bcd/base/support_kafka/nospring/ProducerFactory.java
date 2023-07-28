@@ -25,6 +25,7 @@ public class ProducerFactory {
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, producerProp.batchSize);
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, producerProp.compressionType);
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, producerProp.bufferMemory);
+        props.putAll(producerProp.properties);
         return new KafkaProducer<>(props);
     }
 

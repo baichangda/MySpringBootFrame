@@ -40,7 +40,7 @@ public abstract class AbstractConsumer {
     private final Consumer<String, byte[]> consumer;
 
     private ExecutorService consumerExecutor;
-    private boolean consumerAvailable;
+    private volatile boolean consumerAvailable;
 
     /**
      * 最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
@@ -133,6 +133,7 @@ public abstract class AbstractConsumer {
                     //增加销毁回调
                     Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
 
+
                     consumerAvailable = true;
                 }
             }
@@ -169,6 +170,7 @@ public abstract class AbstractConsumer {
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, (int) consumerProp.sessionTimeout.toMillis());
         props.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) consumerProp.requestTimeout.toMillis());
         props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, consumerProp.maxPartitionFetchBytes);
+        props.putAll(consumerProp.properties);
         return props;
     }
 
