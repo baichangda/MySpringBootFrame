@@ -150,3 +150,6 @@ sa-token:
 register:
   host: 127.0.0.1
   types: test1,test2
+
+notify:
+  id: bcd

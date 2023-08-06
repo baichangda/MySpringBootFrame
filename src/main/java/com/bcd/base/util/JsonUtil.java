@@ -2,11 +2,13 @@ package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -66,6 +68,11 @@ public class JsonUtil {
         t.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //5、设置在序列化时候遇到空属性对象时候,不抛出异常
         t.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        //6、序列化和反序列化的数据内容中添加类属性
+        //旧版本
+        //t.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        //新版本
+        //t.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         return t;
     }
 
@@ -84,7 +91,7 @@ public class JsonUtil {
     }
 
     public static void main(String[] args) throws JsonProcessingException {
-        TestBean testBean=new TestBean();
+        TestBean testBean = new TestBean();
     }
 
 }
