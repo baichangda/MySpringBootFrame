@@ -46,7 +46,7 @@ public class EntityAopConfig {
             if (param instanceof BaseBean) {
                 setValueBeforeSave((BaseBean) param, user);
             } else if (param instanceof Iterable) {
-                Iterator it = ((Iterable) param).iterator();
+                Iterator<?> it = ((Iterable) param).iterator();
                 while (it.hasNext()) {
                     Object obj = it.next();
                     if (obj instanceof BaseBean) {
