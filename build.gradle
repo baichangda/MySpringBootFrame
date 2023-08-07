@@ -146,7 +146,7 @@ dependencies {
 
     // define a BOM and its version
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
