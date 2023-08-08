@@ -291,7 +291,7 @@ public abstract class AbstractConsumer {
                         final int curConsumeCount = consumeCount.addAndGet(count);
                         if (curConsumeCount >= maxConsumeSpeed) {
                             do {
-                                TimeUnit.MILLISECONDS.sleep(10);
+                                TimeUnit.MILLISECONDS.sleep(50);
                             } while (consumeCount.get() >= maxConsumeSpeed);
                         }
                     }
