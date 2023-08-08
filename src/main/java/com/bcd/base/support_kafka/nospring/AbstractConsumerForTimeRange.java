@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
  * {@link Consumer#offsetsForTimes(Map)}、{@link ConsumerRecord#timestamp()}无效
  * 此时会从头开始消费、且无法自动结束退出、可以调用{@link #destroy()}触发退出
  */
+@SuppressWarnings("unchecked")
 public abstract class AbstractConsumerForTimeRange {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
     /**
@@ -507,6 +508,20 @@ public abstract class AbstractConsumerForTimeRange {
         } else {
             return consumerRecord.key().hashCode() % workThreadNum;
         }
+    }
+
+
+    public static void main(String[] args) {
+        double d1 = 1;
+        double d2 = 0.9;
+        double d3 = 0.1;
+        double d4 = 0.1;
+        double d5 = 0.1;
+        System.out.println((d1 - d2) == d3); //false
+        System.out.println(d4 == d5); //true
+        System.out.println(1 - 0.5);  //!=0.5
+        System.out.println(1 - 0.9); //!=0.1
+        System.out.println(0.30000000000000001 == 0.3);
     }
 }
 
