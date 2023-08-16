@@ -16,6 +16,7 @@ public class TableConfig {
     public boolean needCreateInfo = true;
     //是否创建bean文件(默认是)
     public boolean needCreateBeanFile = true;
+    //是否创建service文件(默认是)
     public boolean needCreateServiceFile = true;
     //是否创建controller文件(默认是)
     public boolean needCreateControllerFile = true;
@@ -34,8 +35,6 @@ public class TableConfig {
         public boolean needCreateInfo = true;
         //是否创建bean文件(默认是)
         public boolean needCreateBeanFile = true;
-        //是否创建repository文件(默认是)
-        public boolean needCreateRepositoryFile = true;
         //是否创建service文件(默认是)
         public boolean needCreateServiceFile = true;
         //是否创建controller文件(默认是)

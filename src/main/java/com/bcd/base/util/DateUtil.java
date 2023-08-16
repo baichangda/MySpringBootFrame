@@ -127,67 +127,101 @@ public class DateUtil {
      * 注意:
      * 返回的结果包含开头时间、不包含结尾时间
      *
-     * @param startDate
-     * @param endDate
+     * @param startDate  包含
+     * @param endDate    不包含
+     * @param amount     时间区间跨度
      * @param unit       支持
+     *                   {@link ChronoUnit#MINUTES}
+     *                   {@link ChronoUnit#HOURS}
      *                   {@link ChronoUnit#DAYS}
      *                   {@link ChronoUnit#WEEKS}
      *                   {@link ChronoUnit#MONTHS}
      * @param zoneOffset 时区
-     * @return 每一个数组第一个为开始时间, 第二个为结束时间;开始时间为当天0.0.0,结束时间为当天0.0.0
+     * @return 每一个数组第一个为开始时间, 第二个为结束时间
      */
-    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit, ZoneOffset zoneOffset) {
+    public static List<Date[]> range(Date startDate, Date endDate, int amount, ChronoUnit unit, ZoneOffset zoneOffset) {
         List<Date[]> returnList = new ArrayList<>();
         LocalDateTime ldt1 = LocalDateTime.ofInstant(startDate.toInstant(), zoneOffset);
         LocalDateTime ldt2 = LocalDateTime.ofInstant(endDate.toInstant(), zoneOffset);
         switch (unit) {
-            case DAYS: {
-                LocalDateTime start = ldt1.with(ChronoField.SECOND_OF_DAY, 0);
-                LocalDateTime end = start.plusDays(1);
-                do {
+            case MINUTES: {
+                LocalDateTime start = ldt1.withSecond(0).withNano(0);
+                LocalDateTime end;
+                while (true) {
+                    end = start.plusMinutes(amount);
                     returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
-                    start = start.plusDays(1);
-                    end = end.plusDays(1);
-                } while (ldt2.isBefore(start) || ldt2.isAfter(end));
-
+                    if (!end.isBefore(ldt2)) {
+                        break;
+                    }
+                    start = end;
+                }
+                returnList.get(0)[0] = Date.from(ldt1.toInstant(zoneOffset));
+                returnList.get(returnList.size() - 1)[1] = Date.from(ldt2.toInstant(zoneOffset));
+                break;
+            }
+            case HOURS: {
+                LocalDateTime start = ldt1.withMinute(0).withSecond(0).withNano(0);
+                LocalDateTime end;
+                while (true) {
+                    end = start.plusHours(amount);
+                    returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
+                    if (!end.isBefore(ldt2)) {
+                        break;
+                    }
+                    start = end;
+                }
+                returnList.get(0)[0] = Date.from(ldt1.toInstant(zoneOffset));
+                returnList.get(returnList.size() - 1)[1] = Date.from(ldt2.toInstant(zoneOffset));
+                break;
+            }
+            case DAYS: {
+                LocalDateTime start = ldt1.withHour(0).withMinute(0).withSecond(0).withNano(0);
+                LocalDateTime end;
+                while (true) {
+                    end = start.plusDays(amount);
+                    returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
+                    if (!end.isBefore(ldt2)) {
+                        break;
+                    }
+                    start = end;
+                }
+                returnList.get(0)[0] = Date.from(ldt1.toInstant(zoneOffset));
+                returnList.get(returnList.size() - 1)[1] = Date.from(ldt2.toInstant(zoneOffset));
                 break;
             }
             case WEEKS: {
                 int dayOfWeek = ldt1.get(ChronoField.DAY_OF_WEEK);
-                LocalDateTime start = ldt1.plusDays(1 - dayOfWeek).with(ChronoField.SECOND_OF_DAY, 0);
-                LocalDateTime end = start.plusDays(7);
-                do {
+                LocalDateTime start = ldt1.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1 - dayOfWeek);
+                LocalDateTime end;
+                while (true) {
+                    end = start.plusWeeks(amount);
                     returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
-                    start = start.plusWeeks(1);
-                    end = end.plusWeeks(1);
-                } while (ldt2.isBefore(start) || ldt2.isAfter(end));
-                Date[] firstEle = returnList.get(0);
-                Date[] lastEle = returnList.get(returnList.size() - 1);
-                firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                    if (!end.isBefore(ldt2)) {
+                        break;
+                    }
+                    start = end;
+                }
+                returnList.get(0)[0] = Date.from(ldt1.toInstant(zoneOffset));
+                returnList.get(returnList.size() - 1)[1] = Date.from(ldt2.toInstant(zoneOffset));
                 break;
             }
             case MONTHS: {
-                LocalDateTime temp = ldt1;
+                LocalDateTime start = ldt1.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+                LocalDateTime end;
                 while (true) {
-                    int dayOfMonth = temp.get(ChronoField.DAY_OF_MONTH);
-                    LocalDateTime start = temp.plusDays(1 - dayOfMonth).with(ChronoField.SECOND_OF_DAY, 0);
-                    LocalDateTime end = start.plusMonths(1);
+                    end = start.plusMonths(amount);
                     returnList.add(new Date[]{Date.from(start.toInstant(zoneOffset)), Date.from(end.toInstant(zoneOffset))});
-                    if (!ldt2.isBefore(start) && !ldt2.isAfter(end)) {
+                    if (!end.isBefore(ldt2)) {
                         break;
-                    } else {
-                        temp = temp.plusMonths(1);
                     }
+                    start = end;
                 }
-                Date[] firstEle = returnList.get(0);
-                Date[] lastEle = returnList.get(returnList.size() - 1);
-                firstEle[0] = Date.from(ldt1.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
-                lastEle[1] = Date.from(ldt2.with(ChronoField.SECOND_OF_DAY, 0).toInstant(zoneOffset));
+                returnList.get(0)[0] = Date.from(ldt1.toInstant(zoneOffset));
+                returnList.get(returnList.size() - 1)[1] = Date.from(ldt2.toInstant(zoneOffset));
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.rangeDate],unit[{}}] Not Support!", unit.toString());
+                throw BaseRuntimeException.getException("[DateUtil.range],unit[{}}] Not Support!", unit.toString());
             }
         }
         return returnList;
@@ -314,6 +348,16 @@ public class DateUtil {
             }
         }
         return true;
+    }
+
+    public static void main(String[] args) {
+        LocalDateTime ldt1 = LocalDateTime.of(2023, 8, 16, 6, 10, 10, 0);
+        LocalDateTime ldt2 = ldt1.plusDays(20);
+        ZoneOffset zoneOffset = ZoneOffset.of("+8");
+        List<Date[]> range = DateUtil.range(Date.from(ldt1.toInstant(zoneOffset)), Date.from(ldt2.toInstant(zoneOffset)), 1, ChronoUnit.MONTHS, zoneOffset);
+        for (Date[] dates : range) {
+            System.out.println(dates[0] + "," + dates[1]);
+        }
     }
 
 }

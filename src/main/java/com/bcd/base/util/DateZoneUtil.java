@@ -17,7 +17,7 @@ import java.util.List;
  * 所有的操作方法都基于某个时区
  */
 public class DateZoneUtil {
-    public final static ZoneId ZONE_ID =ZoneId.of("Asia/Shanghai");
+    public final static ZoneId ZONE_ID = ZoneId.of("Asia/Shanghai");
     public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
     public final static DateTimeFormatter DATE_TIME_FORMATTER_DAY = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
@@ -72,7 +72,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDateTime.parse(dateStr,DATE_TIME_FORMATTER_SECOND).toInstant(ZONE_OFFSET));
+        return Date.from(LocalDateTime.parse(dateStr, DATE_TIME_FORMATTER_SECOND).toInstant(ZONE_OFFSET));
     }
 
     /**
@@ -83,7 +83,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDateTime.parse(dateStr,DATE_TIME_FORMATTER_MILLISECOND).toInstant(ZONE_OFFSET));
+        return Date.from(LocalDateTime.parse(dateStr, DATE_TIME_FORMATTER_MILLISECOND).toInstant(ZONE_OFFSET));
     }
 
     /**
@@ -143,12 +143,13 @@ public class DateZoneUtil {
     /**
      * @param startDate
      * @param endDate
+     * @param skip
      * @param unit
      * @return
-     * @see DateUtil#rangeDate(Date, Date, ChronoUnit, ZoneOffset)
+     * @see DateUtil#range(Date, Date, int, ChronoUnit, ZoneOffset)
      */
-    public static List<Date[]> rangeDate(Date startDate, Date endDate, ChronoUnit unit) {
-        return DateUtil.rangeDate(startDate, endDate, unit, ZONE_OFFSET);
+    public static List<Date[]> range(Date startDate, Date endDate, int skip, ChronoUnit unit) {
+        return DateUtil.range(startDate, endDate, skip, unit, ZONE_OFFSET);
     }
 
     /**

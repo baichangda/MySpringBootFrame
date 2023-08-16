@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * 此帮助类的所有api均会读取application-*.yml的数据库配置,并将数据库切换为information_schema
  */
+@SuppressWarnings("unchecked")
 public class DBInfoUtil {
 
     private final static String DB_INFO_SCHEMA = "information_schema";
@@ -119,9 +120,18 @@ public class DBInfoUtil {
                             break;
                         }
                     }
-                    Field field = resultType.getDeclaredField(columnName.toLowerCase());
-                    field.setAccessible(true);
-                    field.set(t, val);
+                    if (val != null) {
+                        Field field = resultType.getDeclaredField(columnName.toLowerCase());
+                        field.setAccessible(true);
+                        Class<?> fieldType = field.getType();
+                        if (fieldType == Integer.class) {
+                            field.set(t, ((Number) val).intValue());
+                        } else if (fieldType == Long.class) {
+                            field.set(t, ((Number) val).longValue());
+                        } else {
+                            field.set(t, val);
+                        }
+                    }
                 }
                 res.add(t);
             }

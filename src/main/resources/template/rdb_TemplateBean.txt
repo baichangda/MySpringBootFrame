@@ -22,18 +22,18 @@ public class ${moduleName?cap_first}Bean extends BaseBean {
     <#list fieldList as field>
       <#if field.type == "String">
         <#if field.nullable>
-    @Schema(description = "${field.comment}", maxLength = ${field.strLen})
+    @Schema(description = "${field.comment}", maxLength = ${field.strLen?c})
         <#else>
-    @Schema(description = "${field.comment}", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = ${field.strLen})
-    @NotBlank(message = "[${field.commentPre}]不能为空")
+    @Schema(description = "${field.comment}", requiredMode = Schema.RequiredMode.REQUIRED, maxLength = ${field.strLen?c})
+    @NotBlank(message = "[${field.commentPre!}]不能为空")
         </#if>
-    @Size(max = ${field.strLen}, message = "[${field.commentPre}]长度不能超过${field.strLen}")
+    @Size(max = ${field.strLen?c}, message = "[${field.commentPre!}]长度不能超过${field.strLen?c}")
       <#else>
         <#if field.nullable>
     @Schema(description = "${field.comment}")
         <#else>
     @Schema(description = "${field.comment}", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "[${field.commentPre}]不能为空")
+    @NotNull(message = "[${field.commentPre!}]不能为空")
         </#if>
       </#if>
     public ${field.type} ${field.name};

@@ -95,7 +95,7 @@ dependencies {
     implementation group: 'com.lmax', name: 'disruptor', version: "3.+"
 
     //springboot jdbc支持
-    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("com.github.jsqlparser:jsqlparser:+")
     //邮件支持
     implementation("org.springframework.boot:spring-boot-starter-mail")

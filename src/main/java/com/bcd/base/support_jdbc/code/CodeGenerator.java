@@ -36,7 +36,6 @@ public class CodeGenerator {
 //        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
         final TableConfig.Helper helper = TableConfig.newHelper();
         helper.needCreateBeanFile = true;
-        helper.needCreateRepositoryFile = true;
         helper.needCreateServiceFile = true;
         helper.needCreateControllerFile = true;
         helper.needValidateBeanField = true;
@@ -97,7 +96,7 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateService.txt", StandardCharsets.UTF_8.name());
-            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {
@@ -125,7 +124,7 @@ public class CodeGenerator {
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
             Template template = configuration.getTemplate("rdb_TemplateController.txt", StandardCharsets.UTF_8.name());
-            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(com.bcd.base.support_mongodb.code.data.CodeConst.FREEMARKER_VERSION);
+            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out,objectWrapper);
         } catch (IOException | TemplateException ex) {

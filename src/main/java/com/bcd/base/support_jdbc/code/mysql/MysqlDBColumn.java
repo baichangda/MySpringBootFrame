@@ -20,6 +20,7 @@ public class MysqlDBColumn {
         DB_TYPE_TO_JAVA_TYPE.put("smallint", "Short");
         DB_TYPE_TO_JAVA_TYPE.put("bigint", "Long");
         DB_TYPE_TO_JAVA_TYPE.put("varchar", "String");
+        DB_TYPE_TO_JAVA_TYPE.put("text", "String");
         DB_TYPE_TO_JAVA_TYPE.put("int", "Integer");
         DB_TYPE_TO_JAVA_TYPE.put("float", "Float");
         DB_TYPE_TO_JAVA_TYPE.put("double", "Double");
