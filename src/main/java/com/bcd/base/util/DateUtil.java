@@ -27,7 +27,6 @@ public class DateUtil {
     public final static String DATE_FORMAT_SECOND = "yyyyMMddHHmmss";
     public final static String DATE_FORMAT_MILLISECOND = "yyyyMMddHHmmssSSS";
     private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
-    private final static ChronoField[] equal_fields = new ChronoField[]{ChronoField.YEAR, ChronoField.MONTH_OF_YEAR, ChronoField.DAY_OF_MONTH, ChronoField.HOUR_OF_DAY, ChronoField.MINUTE_OF_HOUR, ChronoField.SECOND_OF_MINUTE, ChronoField.MILLI_OF_SECOND};
 
     /**
      * 获取最近在当前日期之前的最后一个日期单位
@@ -312,42 +311,6 @@ public class DateUtil {
         if (endDate != null) {
             endDate.setTime(getCeilDate(endDate, ChronoUnit.DAYS, zoneOffset).getTime());
         }
-    }
-
-    /**
-     * 判断两个日期是否相等
-     * 对比顺序
-     * 年、月、日、时、分、秒、毫秒
-     *
-     * @param d1
-     * @param d2
-     * @param field 对比的最小日期单位、支持
-     *              {@link ChronoField#YEAR}
-     *              {@link ChronoField#MONTH_OF_YEAR}
-     *              {@link ChronoField#DAY_OF_MONTH}
-     *              {@link ChronoField#HOUR_OF_DAY}
-     *              {@link ChronoField#MINUTE_OF_HOUR}
-     *              {@link ChronoField#SECOND_OF_MINUTE}
-     *              {@link ChronoField#MILLI_OF_SECOND}
-     */
-    public static boolean isEqual(Date d1, Date d2, ChronoField field) {
-        if (Arrays.stream(equal_fields).noneMatch(e -> e == field)) {
-            throw BaseRuntimeException.getException("[DateUtil.isEqual],field[{}] Not Support!", field.toString());
-        }
-        ZoneId zoneId = ZoneId.systemDefault();
-        LocalDateTime ldt1 = LocalDateTime.ofInstant(d1.toInstant(), zoneId);
-        LocalDateTime ldt2 = LocalDateTime.ofInstant(d2.toInstant(), zoneId);
-        for (ChronoField curField : equal_fields) {
-            int curVal1 = ldt1.get(curField);
-            int curVal2 = ldt2.get(curField);
-            if (curVal1 != curVal2) {
-                return false;
-            }
-            if (curField == field) {
-                break;
-            }
-        }
-        return true;
     }
 
     public static void main(String[] args) {
