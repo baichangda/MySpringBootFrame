@@ -193,6 +193,7 @@ bootRun {
     if (project.hasProperty('jvmArgs')) {
         jvmArgs(project.jvmArgs.split("\\s+") as List)
     }
+    //这些参数在bootJar中不会生效、如果需要添加、则在java -jar后面加上、必须紧接着-jar
     //开启缓存行补齐
     jvmArgs('-XX:-RestrictContended')
     jvmArgs('-Dfile.encoding=UTF-8')

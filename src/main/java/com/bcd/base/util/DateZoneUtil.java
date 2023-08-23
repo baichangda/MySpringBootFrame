@@ -162,26 +162,34 @@ public class DateZoneUtil {
     }
 
     public static void main(String[] args) {
-        Date time = stringToDate_day("20111111");
-        System.out.println(time);
-        System.out.println(dateToString_day(time));
-        System.out.println(dateToString_second(time));
+//        Date time = stringToDate_day("20111111");
+//        System.out.println(time);
+//        System.out.println(dateToString_day(time));
+//        System.out.println(dateToString_second(time));
+//
+//
+//        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
+//        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
+//        System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli() / 1000);
+//        System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli() / 1000);
+//
+//        Date d1 = new Date();
+//        Date d2 = new Date();
+//        formatDateParam(d1, d2);
+//        System.out.println(d1);
+//        System.out.println(d2);
+//
+//        Date newD1 = getFloorDate(d1, ChronoUnit.HOURS);
+//        System.out.println(d1.getTime());
+//        System.out.println(newD1.getTime());
+//        System.out.println(DateUtil.getDiff(d1, newD1, ChronoUnit.SECONDS, true));
 
-
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_DAY).withZone(ZONE_OFFSET);
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern(DateUtil.DATE_FORMAT_SECOND).withZone(ZONE_OFFSET);
-        System.out.println(LocalDate.from(formatter1.parse("20111111")).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET).toEpochMilli() / 1000);
-        System.out.println(Instant.from(formatter2.parse("20111111000000")).toEpochMilli() / 1000);
-
-        Date d1 = new Date();
-        Date d2 = new Date();
-        formatDateParam(d1, d2);
-        System.out.println(d1);
-        System.out.println(d2);
-
-        Date newD1 = getFloorDate(d1, ChronoUnit.HOURS);
-        System.out.println(d1.getTime());
-        System.out.println(newD1.getTime());
-        System.out.println(DateUtil.getDiff(d1, newD1, ChronoUnit.SECONDS, true));
+        LocalDateTime ldt1 = LocalDateTime.of(2023, 2, 1, 1, 1, 1);
+        LocalDateTime ldt2 = LocalDateTime.of(2023, 8, 25, 1, 20, 1);
+        Duration between = Duration.between(ldt1, ldt2);
+        System.out.println(between.toDays());
+        System.out.println(between.toHours());
+        System.out.println(ChronoUnit.DAYS.between(ldt1,ldt2));
+        System.out.println(ChronoUnit.MONTHS.between(ldt1,ldt2));
     }
 }
