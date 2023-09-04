@@ -5,13 +5,13 @@ package com.bcd.base.support_ringbuffer;
  * 如果长度已满、时间最早的纪录会被移除
  * @param <T>
  */
-public class RingBuffer<T> {
+public class RingBufferArray<T> {
     private int firstIndex = -1;
     private int lastIndex = -1;
     private final int size;
     private final Object[] content;
 
-    public RingBuffer(int size) {
+    public RingBufferArray(int size) {
         this.size = size;
         this.content = new Object[size];
     }
@@ -96,7 +96,7 @@ public class RingBuffer<T> {
     }
 
     public static void main(String[] args) {
-        RingBuffer<Integer> ringBuffer = new RingBuffer<>(5);
+        RingBufferArray<Integer> ringBufferArray = new RingBufferArray<>(5);
 //        for (int i = 0; i < 10; i++) {
 //            ringBuffer.add(i);
 //            System.out.println(ringBuffer.firstIndex + " " + ringBuffer.lastIndex);
@@ -105,12 +105,12 @@ public class RingBuffer<T> {
 //        for (Object integer : list) {
 //            System.out.print(integer);
 //        }
-        ringBuffer.addAll(new Integer[]{1, 2, 3, 4});
-        ringBuffer.addAll(new Integer[]{5, 5});
-        ringBuffer.addAll(new Integer[]{6});
-        ringBuffer.addAll(new Integer[]{7, 8, 9});
-        ringBuffer.addAll(new Integer[]{10, 11});
-        Object[] list = ringBuffer.content();
+        ringBufferArray.addAll(new Integer[]{1, 2, 3, 4});
+        ringBufferArray.addAll(new Integer[]{5, 5});
+        ringBufferArray.addAll(new Integer[]{6});
+        ringBufferArray.addAll(new Integer[]{7, 8, 9});
+        ringBufferArray.addAll(new Integer[]{10, 11});
+        Object[] list = ringBufferArray.content();
         for (Object integer : list) {
             System.out.print(integer);
         }
