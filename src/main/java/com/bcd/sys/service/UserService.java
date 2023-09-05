@@ -6,13 +6,11 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BaseService;
+import com.bcd.base.support_jdbc.service.ParamPairs;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
 import com.bcd.sys.keys.KeysConst;
-
-import java.util.Base64;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
+import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -176,8 +175,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
             //2.3、将原始密码MD5加密后与数据库中进行对比
             if (userBean.password.equals(encryptPassword(userBean.username, oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名
-                userBean.password = encryptPassword(userBean.username, newPassword);
-                save(userBean);
+                update(userId, ParamPairs.create("password", encryptPassword(userBean.username, newPassword)));
                 return true;
             } else {
                 return false;
@@ -185,8 +183,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         } else {
             //3、如果不加密,则直接对比
             if (userBean.password.equals(encryptOldPassword)) {
-                userBean.password = encryptNewPassword;
-                save(userBean);
+                update(userId, ParamPairs.create("password", encryptNewPassword));
                 return true;
             } else {
                 return false;
@@ -210,11 +207,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
     }
 
     public void resetPassword(Long userId) {
-        //1、重置密码
-        UserBean userBean = get(userId);
-        //2、设置默认密码
-        userBean.username = CommonConst.INITIAL_PASSWORD;
-        saveUser(userBean);
+        update(userId, ParamPairs.create("password", CommonConst.INITIAL_PASSWORD));
     }
 
     /**
@@ -245,11 +238,11 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         if (user.id == null) {
             user.password = encryptPassword(user.username, CommonConst.INITIAL_PASSWORD);
             user.status = 1;
-            save(user);
+            insert(user);
         } else {
             UserBean dbUser = get(user.id);
             user.password = dbUser.password;
-            save(user);
+            update(user);
         }
     }
 }

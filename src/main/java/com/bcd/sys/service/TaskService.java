@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBean, Long> {
     @Override
     public TaskBean doCreate(TaskBean task) {
-        save(task);
+        insert(task);
         return task;
     }
 
@@ -23,7 +23,7 @@ public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBe
 
     @Override
     public void doUpdate(TaskBean task) {
-        save(task);
+        update(task);
     }
 
     @Override

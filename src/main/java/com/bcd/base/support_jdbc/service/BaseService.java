@@ -1,13 +1,15 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,6 +23,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -168,71 +171,112 @@ public class BaseService<T extends SuperBaseBean> {
         }
     }
 
-    /**
-     * 保存
-     * 根据id判断是否新增或者更新
-     * 如果是新增、会更新对象、设置id
-     *
-     * @param t
-     */
-    public void save(T t) {
-        final Long id = t.id;
-        if (id == null) {
-            insert(t);
-        } else {
-            update(t);
-        }
-    }
 
     /**
      * 新增
-     * 会更新对象、设置id
-     *
+     * 如果设置了id、即会按照id新增、否则自增id
+     * 所有属性都会作为参数设置、即使是null
      * @param t
      */
     public void insert(T t) {
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
-        getJdbcTemplate().update(conn -> {
-            final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql, Statement.RETURN_GENERATED_KEYS);
-            final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(getBeanInfo().getValues(t).toArray());
-            argumentPreparedStatementSetter.setValues(ps);
-            return ps;
-        }, keyHolder);
-        t.id = keyHolder.getKey().longValue();
+        if (t.id == null) {
+            final KeyHolder keyHolder = new GeneratedKeyHolder();
+            getJdbcTemplate().update(conn -> {
+                final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql_noId, Statement.RETURN_GENERATED_KEYS);
+                final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(getBeanInfo().getValues_noId(t).toArray());
+                argumentPreparedStatementSetter.setValues(ps);
+                return ps;
+            }, keyHolder);
+            t.id = keyHolder.getKey().longValue();
+        } else {
+            getJdbcTemplate().update(getBeanInfo().insertSql, getBeanInfo().getValues(t));
+        }
+
     }
 
     /**
      * 根据id更新
-     *
+     * 所有属性都会作为参数设置、即使是null
      * @param t
      */
     public void update(T t) {
-        final String sql = getBeanInfo().updateSql + " where id=?";
-        final List<Object> args = getBeanInfo().getValues(t);
+        final String sql = getBeanInfo().updateSql_noId + " where id=?";
+        final List<Object> args = getBeanInfo().getValues_noId(t);
         args.add(t.id);
         getJdbcTemplate().update(sql, args.toArray());
     }
 
     /**
-     * 通过condition更新
-     *
-     * @param condition 更新条件
-     * @param vals      更新的字段名称和值、奇数位置必须为字段名、偶数位置必须为值
+     * 根据参数对新增、只新增部分字段
+     * @param params
      */
-    public void update(Condition condition, Object... vals) {
+    public void insert(ParamPairs... params) {
+        if (params.length == 0) {
+            return;
+        }
+        StringJoiner sj1 = new StringJoiner(",");
+        StringJoiner sj2 = new StringJoiner(",");
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < params.length; i++) {
+            ParamPairs param = params[i];
+            sj1.add(getBeanInfo().toColumnName(param.field()));
+            sj2.add("?");
+            args.add(param.val());
+        }
+        String sql = "insert " + getBeanInfo().tableName + "(" + sj1 + ") values(" + sj2 + ")";
+        getJdbcTemplate().update(sql, args.toArray());
+    }
+
+    /**
+     * 根据id、参数对更新
+     * 只会更新部分字段
+     * @param id
+     * @param params
+     */
+    public void update(long id, ParamPairs... params) {
+        if (params.length == 0) {
+            return;
+        }
         final StringBuilder sql = new StringBuilder("update ");
         sql.append(getBeanInfo().tableName);
         sql.append(" set ");
         List<Object> args = new ArrayList<>();
-        for (int i = 0; i < vals.length; i += 2) {
-            final String name = (String) vals[i];
-            final Object val = vals[i + 1];
+        for (int i = 0; i < params.length; i++) {
+            ParamPairs param = params[i];
             if (i != 0) {
                 sql.append(",");
             }
-            sql.append(getBeanInfo().toColumnName(name));
+            sql.append(getBeanInfo().toColumnName(param.field()));
             sql.append("=?");
-            args.add(val);
+            args.add(param.val());
+        }
+        sql.append(" where id=?");
+        args.add(id);
+        getJdbcTemplate().update(sql.toString(), args.toArray());
+    }
+
+    /**
+     * 通过condition、参数对更新
+     * 只会更新部分字段
+     * @param condition 更新条件
+     * @param params    更新值
+     */
+    public void update(Condition condition, ParamPairs... params) {
+        if (params.length == 0) {
+            return;
+        }
+        final StringBuilder sql = new StringBuilder("update ");
+        sql.append(getBeanInfo().tableName);
+        sql.append(" set ");
+        List<Object> args = new ArrayList<>();
+        for (int i = 0; i < params.length; i++) {
+            ParamPairs param = params[i];
+            if (i != 0) {
+                sql.append(",");
+            }
+            sql.append(getBeanInfo().toColumnName(param.field()));
+            sql.append("=?");
+            args.add(param.val());
         }
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         if (convertRes != null) {
@@ -250,9 +294,19 @@ public class BaseService<T extends SuperBaseBean> {
      * @param list
      */
     public void insertBatch(List<T> list) {
-        final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
-        getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
+        if (list.isEmpty()) {
+            return;
+        }
+        T t = list.get(0);
+        if (t.id == null) {
+            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues_noId(e1).toArray()).collect(Collectors.toList());
+            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql_noId, argList);
+        } else {
+            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
+            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
+        }
     }
+
 
     /**
      * 批量更新
@@ -260,14 +314,12 @@ public class BaseService<T extends SuperBaseBean> {
      * @param list
      */
     public void updateBatch(List<T> list) {
-        String sql = getBeanInfo().updateSql + " where id=?";
-
+        String sql = getBeanInfo().updateSql_noId + " where id=?";
         final List<Object[]> argList = list.stream().map(e1 -> {
-            final List<Object> args = getBeanInfo().getValues(e1);
+            final List<Object> args = getBeanInfo().getValues_noId(e1);
             args.add(e1.id);
             return args.toArray();
         }).collect(Collectors.toList());
-
         getJdbcTemplate().batchUpdate(sql, argList);
     }
 
