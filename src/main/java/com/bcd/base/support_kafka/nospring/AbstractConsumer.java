@@ -31,7 +31,7 @@ public abstract class AbstractConsumer {
     /**
      * 最大阻塞(0代表不阻塞)
      */
-    private final int maxBlockingNum;
+    private final int workThreadQueueSize;
 
     /**
      * 当前阻塞数量
@@ -89,24 +89,28 @@ public abstract class AbstractConsumer {
 
     /**
      * @param consumerProp        消费者属性
-     * @param maxBlockingNum      最大阻塞数量
      * @param workThreadNum       工作线程个数
      * @param workThreadPerQueue  是否每一个工作线程都有一个队列
      *                            true时候、可以通过{@link #index(ConsumerRecord)}实现记录关联work线程、这在某些场景可以避免线程竞争
      *                            false时候、共享一个队列
+     * @param workThreadQueueSize 工作队列的长度
+     *                            最大实际阻塞量计算方式如下
+     *                            当{@link #workThreadPerQueue}
+     *                            为true时候、实际最大阻塞量是 {@link #workThreadQueueSize} * {@link #workThreadNum}
+     *                            为false时候、实际最大阻塞量是 {@link #workThreadQueueSize}
      * @param autoReleaseBlocking 是否自动释放阻塞、适用于工作内容为同步处理的逻辑
      * @param maxConsumeSpeed     最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
      * @param topics              消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
                             int workThreadNum,
-                            int maxBlockingNum,
                             boolean workThreadPerQueue,
+                            int workThreadQueueSize,
                             boolean autoReleaseBlocking,
                             int maxConsumeSpeed,
                             String... topics) {
         this.workThreadNum = workThreadNum;
-        this.maxBlockingNum = maxBlockingNum;
+        this.workThreadQueueSize = workThreadQueueSize;
         this.autoReleaseBlocking = autoReleaseBlocking;
         this.workThreadPerQueue = workThreadPerQueue;
         this.maxConsumeSpeed = maxConsumeSpeed;
@@ -123,7 +127,7 @@ public abstract class AbstractConsumer {
         //根据是否公用一个队列、来指定构造
         if (workThreadPerQueue) {
             this.queues = null;
-            this.queue = new ArrayBlockingQueue<>(maxBlockingNum);
+            this.queue = new ArrayBlockingQueue<>(this.workThreadQueueSize);
             for (int i = 0; i < workThreadNum; i++) {
                 workThreads[i] = new Thread(() -> work(this.queue));
             }
@@ -131,7 +135,7 @@ public abstract class AbstractConsumer {
             this.queue = null;
             this.queues = new ArrayBlockingQueue[workThreadNum];
             for (int i = 0; i < workThreadNum; i++) {
-                final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(maxBlockingNum);
+                final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(this.workThreadQueueSize);
                 this.queues[i] = queue;
                 workThreads[i] = new Thread(() -> work(queue));
             }
@@ -269,7 +273,7 @@ public abstract class AbstractConsumer {
             while (running_consume) {
                 try {
                     //检查阻塞
-                    if (blockingNum.get() >= maxBlockingNum) {
+                    if (blockingNum.get() >= workThreadQueueSize) {
                         TimeUnit.MILLISECONDS.sleep(100);
                         continue;
                     }
@@ -313,7 +317,7 @@ public abstract class AbstractConsumer {
             while (running_consume) {
                 try {
                     //检查阻塞
-                    if (blockingNum.get() >= maxBlockingNum) {
+                    if (blockingNum.get() >= workThreadQueueSize) {
                         TimeUnit.MILLISECONDS.sleep(100);
                         continue;
                     }
