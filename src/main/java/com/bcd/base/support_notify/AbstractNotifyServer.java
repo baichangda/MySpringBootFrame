@@ -34,7 +34,7 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
     private final String notifyTopic;
 
     public AbstractNotifyServer(String type, RedisConnectionFactory redisConnectionFactory, KafkaTemplate<byte[], byte[]> kafkaTemplate, NotifyProp notifyProp) {
-        super(new ConsumerProp(), 1, 1, true, true, 0, "subscribe_" + type);
+        super(new ConsumerProp(), 1, false, 100, true, 0, "subscribe_" + type);
         this.subscribeTopic = "subscribeTopic_" + type;
         this.notifyTopic = "notify_" + type;
         this.type = type;
