@@ -5,6 +5,7 @@ package com.bcd.base.support_ringbuffer;
  * 如果长度已满、时间最早的纪录会被移除
  * @param <T>
  */
+@SuppressWarnings("unchecked")
 public class RingBufferArray<T> {
     private int firstIndex = -1;
     private int lastIndex = -1;
@@ -106,7 +107,8 @@ public class RingBufferArray<T> {
 //            System.out.print(integer);
 //        }
         int i=0;
-        while (i++<100000000) {
+        long t1 = System.currentTimeMillis();
+        while (i++<10000000) {
             ringBufferArray.addAll(new Integer[]{1, 2, 3, 4});
             ringBufferArray.addAll(new Integer[]{5, 5});
             ringBufferArray.addAll(new Integer[]{6});
@@ -117,6 +119,7 @@ public class RingBufferArray<T> {
 //                System.out.print(integer);
 //            }
         }
+        System.out.println(System.currentTimeMillis()-t1);
 
     }
 }
