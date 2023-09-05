@@ -171,11 +171,32 @@ public class BaseService<T extends SuperBaseBean> {
         }
     }
 
+    /**
+     * 保存
+     * 如果id为null、则是新增、否则是更新
+     *
+     * @param t
+     */
+    public void save(T t) {
+        if (t.id == null) {
+            final KeyHolder keyHolder = new GeneratedKeyHolder();
+            getJdbcTemplate().update(conn -> {
+                final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql_noId, Statement.RETURN_GENERATED_KEYS);
+                final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(getBeanInfo().getValues_noId(t).toArray());
+                argumentPreparedStatementSetter.setValues(ps);
+                return ps;
+            }, keyHolder);
+            t.id = keyHolder.getKey().longValue();
+        } else {
+            getJdbcTemplate().update(getBeanInfo().updateSql_noId, getBeanInfo().getValues_noId(t));
+        }
+    }
 
     /**
      * 新增
      * 如果设置了id、即会按照id新增、否则自增id
      * 所有属性都会作为参数设置、即使是null
+     *
      * @param t
      */
     public void insert(T t) {
@@ -197,6 +218,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据id更新
      * 所有属性都会作为参数设置、即使是null
+     *
      * @param t
      */
     public void update(T t) {
@@ -208,6 +230,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 根据参数对新增、只新增部分字段
+     *
      * @param params
      */
     public void insert(ParamPairs... params) {
@@ -230,6 +253,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据id、参数对更新
      * 只会更新部分字段
+     *
      * @param id
      * @param params
      */
@@ -258,6 +282,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 通过condition、参数对更新
      * 只会更新部分字段
+     *
      * @param condition 更新条件
      * @param params    更新值
      */
@@ -290,6 +315,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 批量新增
      * 不会改变对象
+     * 根据第一个元素来判断新增的sql语句是否包含id字段
      *
      * @param list
      */
