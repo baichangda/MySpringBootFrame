@@ -39,11 +39,11 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
     public final Map<String, Object> newParamMap = new LinkedHashMap<>();
     private final List<Object> paramList;
     public final List<Object> newParamList = new ArrayList<>();
-    private final ItemsListVisitorAdapterForMap itemsListVisitorAdapterForMap = new ItemsListVisitorAdapterForMap();
-    private final ItemsListVisitorAdapterForList itemsListVisitorAdapterForList = new ItemsListVisitorAdapterForList();
+    private final ExpressionListVisitorAdapterForMap expressionListVisitorAdapterForMap = new ExpressionListVisitorAdapterForMap();
+    private final ExpressionListVisitorAdapterForList expressionListVisitorAdapterForList = new ExpressionListVisitorAdapterForList();
     //记录每个条件对应的合并符
     private final Map<Expression, BinaryExpression> expressionToConcat = new HashMap<>();
-    private PlainSelect selectBody;
+    private PlainSelect plainSelect;
 
     NullParamSqlReplaceVisitor(Statement statement, Map<String, Object> paramMap) {
         if (statement == null || paramMap == null) {
@@ -71,12 +71,11 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
         return new HexValue("1=0");
     }
 
-    public Statement parse() {
-        selectBody = (PlainSelect) ((Select) statement).getSelectBody();
-        if (selectBody != null) {
-            selectBody.getWhere().accept(this);
+    public void parse() {
+        plainSelect = ((Select) statement).getPlainSelect();
+        if (plainSelect != null) {
+            plainSelect.getWhere().accept(this);
         }
-        return statement;
     }
 
     @Override
@@ -133,19 +132,19 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
     public void visit(InExpression inExpression) {
         boolean needReplace = false;
         //重写 in
-        ItemsList itemsList = inExpression.getRightItemsList();
+        ExpressionList<?> expressionList = inExpression.getRightExpression(ExpressionList.class);
         if (paramList != null) {
             //JdbcParameter参数模式的逻辑
             //定义是否是JdbcParameter模式
             int size1 = newParamList.size();
-            itemsList.accept(itemsListVisitorAdapterForList);
+            expressionList.accept(expressionListVisitorAdapterForList);
             int size2 = newParamList.size();
             if (size1 == size2) {
                 needReplace = true;
             }
         } else if (paramMap != null) {
             int size1 = newParamMap.size();
-            itemsList.accept(itemsListVisitorAdapterForMap);
+            expressionList.accept(expressionListVisitorAdapterForMap);
             int size2 = newParamMap.size();
             if (size1 == size2) {
                 needReplace = true;
@@ -204,7 +203,7 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
                 BinaryExpression concat = expressionToConcat.get(binaryExpression);
                 if (concat == null) {
                     //此时说明是where后面只有一个条件、此时直接设置where为null
-                    selectBody.setWhere(null);
+                    plainSelect.setWhere(null);
                 } else {
                     if (concat instanceof AndExpression) {
                         if (concat.getRightExpression() == binaryExpression) {
@@ -240,7 +239,7 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
                 BinaryExpression concat = expressionToConcat.get(binaryExpression);
                 if (concat == null) {
                     //此时说明是where后面只有一个条件、此时直接设置where为null
-                    selectBody.setWhere(null);
+                    plainSelect.setWhere(null);
                 } else {
                     if (concat instanceof AndExpression) {
                         if (concat.getRightExpression() == binaryExpression) {
@@ -263,16 +262,15 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
         }
     }
 
-    class ItemsListVisitorAdapterForList extends ItemsListVisitorAdapter {
+    class ExpressionListVisitorAdapterForList extends ExpressionVisitorAdapter {
         @Override
-        public void visit(ExpressionList expressionList) {
-            List<Expression> list = expressionList.getExpressions();
-            for (int i = 0; i <= list.size() - 1; i++) {
-                Expression expression = list.get(i);
+        public void visit(ExpressionList<?> expressionList) {
+            for (int i = 0; i <= expressionList.size() - 1; i++) {
+                Expression expression = expressionList.get(i);
                 if (expression instanceof JdbcParameter) {
                     Object param = paramList.get(((JdbcParameter) expression).getIndex() - 1);
                     if (param == null) {
-                        list.remove(i);
+                        expressionList.remove(i);
                         i--;
                     } else {
                         newParamList.add(param);
@@ -282,10 +280,10 @@ public class NullParamSqlReplaceVisitor extends ExpressionVisitorAdapter {
         }
     }
 
-    class ItemsListVisitorAdapterForMap extends ItemsListVisitorAdapter {
+    class ExpressionListVisitorAdapterForMap extends ExpressionVisitorAdapter {
         @Override
-        public void visit(ExpressionList expressionList) {
-            expressionList.getExpressions().forEach(expression -> expression.accept(new ExpressionVisitorAdapter() {
+        public void visit(ExpressionList<?> expressionList) {
+            expressionList.forEach(expression -> expression.accept(new ExpressionVisitorAdapter() {
                 @Override
                 public void visit(JdbcNamedParameter parameter) {
                     //根据参数名称从map中取出参数,如果为null,则标记参数为空

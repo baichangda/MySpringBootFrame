@@ -2,10 +2,12 @@ package com.bcd.base.support_jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
-import com.bcd.sys.bean.UserBean;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParser;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.parser.ParseException;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.Statements;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
@@ -26,80 +29,95 @@ public class SqlUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlUtil.class);
 
+    private final static ConcurrentHashMap<String, CCJSqlParser> cache = new ConcurrentHashMap<>();
+
     public static void main(String[] args) throws JSQLParserException {
-//        String sql1 = "SELECT \n" +
-//                "    *\n" +
-//                "FROM\n" +
-//                "    t_sys_user a\n" +
-//                "        INNER JOIN\n" +
-//                "    t_sys_user_role b ON a.id = b.user_id\n" +
-//                "WHERE\n" +
-//                "    username LIKE ? AND (sex = ? OR status=?) AND type in (?,?,?) AND phone in (?,?)";
-//        List<Object> paramList1 = new ArrayList<>();
-//        //username
-//        paramList1.add("%abc%");
-//        //sex
-//        paramList1.add(1);
-//        //status
-//        paramList1.add(null);
-//        //type
-//        paramList1.add(1);
-//        paramList1.add(null);
-//        paramList1.add(3);
-//        //phone
-//        paramList1.add(null);
-//        paramList1.add(null);
-//        SqlListResult sqlListResult = replace_nullParam(sql1, paramList1.toArray());
-//        System.out.println(sqlListResult.sql);
-//        sqlListResult.paramList.forEach(e -> System.out.print(e + "    "));
-//
-//
-//        System.out.println();
-//        String sql2 = "SELECT \n" +
-//                "    *\n" +
-//                "FROM\n" +
-//                "    t_sys_user a\n" +
-//                "        INNER JOIN\n" +
-//                "    t_sys_user_role b ON a.id = b.user_id\n" +
-//                "WHERE\n" +
-//                "    username LIKE :username AND (sex = :sex or status=:status) And type in (:type) And phone in (:phone)";
-//        Map<String, Object> paramMap2 = new LinkedHashMap<>();
-//        paramMap2.put("username", "%z%");
-//        paramMap2.put("sex", 1);
-//        paramMap2.put("status", null);
-//        paramMap2.put("type", Arrays.asList(1, null, 3));
-//        paramMap2.put("phone", new Object[]{null, null});
-//        SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2, true, 1, 100);
-//        System.out.println(sqlMapResult.sql);
-//        sqlMapResult.paramMap.forEach((k, v) -> {
-//            if (v.getClass().isArray()) {
-//                Object[] arr = (Object[]) v;
-//                System.out.print(k + ":" + Arrays.asList(arr) + "    ");
-//            } else {
-//                System.out.print(k + ":" + v + "    ");
-//            }
-//        });
+        String sql1 = "SELECT \n" +
+                "    *\n" +
+                "FROM\n" +
+                "    t_sys_user a\n" +
+                "        INNER JOIN\n" +
+                "    t_sys_user_role b ON a.id = b.user_id\n" +
+                "WHERE\n" +
+                "    username LIKE ? AND (sex = ? OR status=?) AND type in (?,?,?) AND phone in (?,?)";
+        List<Object> paramList1 = new ArrayList<>();
+        //username
+        paramList1.add("%abc%");
+        //sex
+        paramList1.add(1);
+        //status
+        paramList1.add(null);
+        //type
+        paramList1.add(1);
+        paramList1.add(null);
+        paramList1.add(3);
+        //phone
+        paramList1.add(null);
+        paramList1.add(null);
+        Object[] params = paramList1.toArray();
+        SqlListResult sqlListResult = replace_nullParam(sql1, params);
+        System.out.println(sqlListResult.sql);
+        sqlListResult.paramList.forEach(e -> System.out.print(e + "    "));
 
-//        long t1=System.currentTimeMillis();
-//        for(int i=1;i<=100000;i++){
-//            replace_nullParam_count_limit(sql1,true,1,20, paramList1.toArray());
-//        }
-//        long t2=System.currentTimeMillis();
-//        for(int i=1;i<=100000;i++){
-//            replace_nullParam_count_limit(sql2,true,1,20, paramMap2);
-//        }
-//        long t3=System.currentTimeMillis();
-//        for(int i=1;i<=100000;i++){
-//            CCJSqlParserUtil.parse(sql1);
-//        }
-//        long t4=System.currentTimeMillis();
-//        System.out.printf("\n%dms,%dms,%dms",t2-t1,t3-t2,t4-t3);
 
-        InsertSqlResult<UserBean> insertSqlResult = toInsertSqlResult(UserBean.class, "t_sys_user", field -> !field.getName().equals("id"), true);
-        System.out.println(insertSqlResult.sql);
-        UpdateSqlResult<UserBean> updateSqlResult = toUpdateSqlResult(UserBean.class, "t_sys_user", field ->
-                !field.getName().equals("id"), true, "id");
-        System.out.println(updateSqlResult.sql);
+        System.out.println();
+        String sql2 = "SELECT \n" +
+                "    *\n" +
+                "FROM\n" +
+                "    t_sys_user a\n" +
+                "        INNER JOIN\n" +
+                "    t_sys_user_role b ON a.id = b.user_id\n" +
+                "WHERE\n" +
+                "    username LIKE :username AND (sex = :sex or status=:status) And type in (:type) And phone in (:phone)";
+        Map<String, Object> paramMap2 = new LinkedHashMap<>();
+        paramMap2.put("username", "%z%");
+        paramMap2.put("sex", 1);
+        paramMap2.put("status", null);
+        paramMap2.put("type", Arrays.asList(1, null, 3));
+        paramMap2.put("phone", new Object[]{null, null});
+        SqlMapResult sqlMapResult = replace_nullParam_count_limit(sql2, paramMap2, true, 1, 100);
+        System.out.println(sqlMapResult.sql);
+        sqlMapResult.paramMap.forEach((k, v) -> {
+            if (v.getClass().isArray()) {
+                Object[] arr = (Object[]) v;
+                System.out.print(k + ":" + Arrays.asList(arr) + "    ");
+            } else {
+                System.out.print(k + ":" + v + "    ");
+            }
+        });
+
+        long t1 = System.currentTimeMillis();
+        for (int i = 1; i <= 10000; i++) {
+            replace_nullParam_count_limit(sql1, true, 1, 20, params);
+        }
+        long t2 = System.currentTimeMillis();
+        for (int i = 1; i <= 10000; i++) {
+            replace_nullParam_count_limit(sql2, true, 1, 20, paramMap2);
+        }
+        long t3 = System.currentTimeMillis();
+        for (int i = 1; i <= 10000; i++) {
+            getStatement(sql1);
+        }
+        long t4 = System.currentTimeMillis();
+        System.out.printf("\n%dms,%dms,%dms", t2 - t1, t3 - t2, t4 - t3);
+
+//        InsertSqlResult<UserBean> insertSqlResult = toInsertSqlResult(UserBean.class, "t_sys_user", field -> !field.getName().equals("id"), true);
+//        System.out.println(insertSqlResult.sql);
+//        UpdateSqlResult<UserBean> updateSqlResult = toUpdateSqlResult(UserBean.class, "t_sys_user", field ->
+//                !field.getName().equals("id"), true, "id");
+//        System.out.println(updateSqlResult.sql);
+    }
+
+    private static Statement getStatement(String sql) {
+        try {
+            return CCJSqlParserUtil.parse(sql,e->{
+                e.withAllowComplexParsing(true)
+                        .withSquareBracketQuotation(false)
+                        .withBackslashEscapeCharacter(false);
+            });
+        } catch (JSQLParserException e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     /**
@@ -186,14 +204,10 @@ public class SqlUtil {
      */
     public static String replace_limit(String sql, int pageNum, int pageSize) {
         Objects.requireNonNull(sql);
-        try {
-            Statement statement = CCJSqlParserUtil.parse(sql);
-            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
-            visitor.parse();
-            return statement.toString();
-        } catch (JSQLParserException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        Statement statement = getStatement(sql);
+        LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
+        visitor.parse();
+        return statement.toString();
     }
 
     /**
@@ -204,14 +218,10 @@ public class SqlUtil {
      */
     public static String replace_count(String sql) {
         Objects.requireNonNull(sql);
-        try {
-            Statement statement = CCJSqlParserUtil.parse(sql);
-            CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
-            visitor.parse();
-            return statement.toString();
-        } catch (JSQLParserException e) {
-            throw BaseRuntimeException.getException(e);
-        }
+        Statement statement = getStatement(sql);
+        CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
+        visitor.parse();
+        return statement.toString();
     }
 
     /**
@@ -223,10 +233,8 @@ public class SqlUtil {
      * 支持的操作符有 = >  <  >=  <=  <>  like  in(:paramList)
      * <p>
      * 性能表现:
-     * 以main方法例子{@link #main(String[])}
-     * cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz
-     * 单线程、测试10w次、耗时6555ms、约每条耗时0.066ms
-     * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}、约耗时5425ms
+     * 其中主要耗时在{@link CCJSqlParserUtil#parse(String)}
+     * 所以针对解析sql做了缓存处理{@link #getStatement(String)}
      *
      * @param sql
      * @param paramMap 不会改变
@@ -238,68 +246,66 @@ public class SqlUtil {
     public static SqlMapResult replace_nullParam_count_limit(String sql, Map<String, Object> paramMap, Boolean count, Integer pageNum, Integer pageSize) {
         Objects.requireNonNull(sql);
         Objects.requireNonNull(paramMap);
-        try {
-            Statement statement = null;
-            //如果count不为null、则替换为select count(*)
-            if (count != null && count) {
-                statement = CCJSqlParserUtil.parse(sql);
-                CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
-                visitor.parse();
-            }
-            //如果pageNum不为null且pageSize不为null、则加上limit offset
-            if (pageNum != null && pageSize != null) {
-                if (statement == null) {
-                    statement = CCJSqlParserUtil.parse(sql);
-                }
-                LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
-                visitor.parse();
-            }
 
-            Map<String, Object> newParamMap = new LinkedHashMap<>();
-            if (!paramMap.isEmpty()) {
-                //循环参数map
-                //检查是否含有Null元素已经其中List、Array中是否有null
-                boolean anyNull = paramMap.values().stream().anyMatch(e -> {
-                    if (e == null) {
-                        return true;
-                    } else {
-                        if (e instanceof List) {
-                            return ((List<Object>) e).stream().anyMatch(Objects::isNull);
-                        } else if (e.getClass().isArray()) {
-                            int len = Array.getLength(e);
-                            for (int i = 0; i <= len - 1; i++) {
-                                Object val = Array.get(e, i);
-                                if (val == null) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        } else {
-                            return false;
-                        }
-                    }
-                });
-                //如果全部不为Null,直接返回
-                if (anyNull) {
-                    if (statement == null) {
-                        statement = CCJSqlParserUtil.parse(sql);
-                    }
-                    NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramMap);
-                    visitor.parse();
-                    newParamMap = visitor.newParamMap;
-                } else {
-                    newParamMap.putAll(paramMap);
-                }
-            }
-            //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
-            if (statement == null) {
-                return new SqlMapResult(sql, newParamMap);
-            } else {
-                return new SqlMapResult(statement.toString(), newParamMap);
-            }
-        } catch (JSQLParserException e) {
-            throw BaseRuntimeException.getException(e);
+        Statement statement = null;
+        //如果count不为null、则替换为select count(*)
+        if (count != null && count) {
+            statement = getStatement(sql);
+            CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
+            visitor.parse();
         }
+        //如果pageNum不为null且pageSize不为null、则加上limit offset
+        if (pageNum != null && pageSize != null) {
+            if (statement == null) {
+                statement = getStatement(sql);
+            }
+            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
+            visitor.parse();
+        }
+
+        Map<String, Object> newParamMap = new LinkedHashMap<>();
+        if (!paramMap.isEmpty()) {
+            //循环参数map
+            //检查是否含有Null元素已经其中List、Array中是否有null
+            boolean anyNull = paramMap.values().stream().anyMatch(e -> {
+                if (e == null) {
+                    return true;
+                } else {
+                    if (e instanceof List) {
+                        return ((List<Object>) e).stream().anyMatch(Objects::isNull);
+                    } else if (e.getClass().isArray()) {
+                        int len = Array.getLength(e);
+                        for (int i = 0; i <= len - 1; i++) {
+                            Object val = Array.get(e, i);
+                            if (val == null) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+            //如果全部不为Null,直接返回
+            if (anyNull) {
+                if (statement == null) {
+                    statement = getStatement(sql);
+                }
+                NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramMap);
+                visitor.parse();
+                newParamMap = visitor.newParamMap;
+            } else {
+                newParamMap.putAll(paramMap);
+            }
+        }
+        //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
+        if (statement == null) {
+            return new SqlMapResult(sql, newParamMap);
+        } else {
+            return new SqlMapResult(statement.toString(), newParamMap);
+        }
+
     }
 
     /**
@@ -328,51 +334,47 @@ public class SqlUtil {
         Objects.requireNonNull(sql);
         Objects.requireNonNull(params);
 
-        try {
-            Statement statement = null;
-            //如果count不为null、则替换为select count(*)
-            if (count) {
-                statement = CCJSqlParserUtil.parse(sql);
-                CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
-                visitor.parse();
-            }
-            //如果pageNum不为null且pageSize不为null、则加上limit offset
-            if (pageNum != null && pageSize != null) {
-                if (statement == null) {
-                    statement = CCJSqlParserUtil.parse(sql);
-                }
-                LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
-                visitor.parse();
-            }
-
-            //最后替换null条件
-            List<Object> newParamList = new ArrayList<>();
-            List<Object> paramList = new ArrayList<>(Arrays.asList(params));
-            if (!paramList.isEmpty()) {
-                //判断参数集合是否有Null元素
-                boolean anyNull = paramList.stream().anyMatch(Objects::isNull);
-                //如果有Null,则处理替换
-                if (anyNull) {
-                    if (statement == null) {
-                        statement = CCJSqlParserUtil.parse(sql);
-                    }
-                    NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramList);
-                    visitor.parse();
-                    //设置新的参数集合
-                    newParamList = visitor.newParamList;
-                } else {
-                    newParamList = new ArrayList<>(paramList);
-                }
-            }
-
-            //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
+        Statement statement = null;
+        //如果count不为null、则替换为select count(*)
+        if (count) {
+            statement = getStatement(sql);
+            CountSqlReplaceVisitor visitor = new CountSqlReplaceVisitor(statement);
+            visitor.parse();
+        }
+        //如果pageNum不为null且pageSize不为null、则加上limit offset
+        if (pageNum != null && pageSize != null) {
             if (statement == null) {
-                return new SqlListResult(sql, newParamList);
-            } else {
-                return new SqlListResult(statement.toString(), newParamList);
+                statement = getStatement(sql);
             }
-        } catch (JSQLParserException e) {
-            throw BaseRuntimeException.getException(e);
+            LimitSqlReplaceVisitor visitor = new LimitSqlReplaceVisitor(statement, pageNum, pageSize);
+            visitor.parse();
+        }
+
+        //最后替换null条件
+        List<Object> newParamList = new ArrayList<>();
+        List<Object> paramList = new ArrayList<>(Arrays.asList(params));
+        if (!paramList.isEmpty()) {
+            //判断参数集合是否有Null元素
+            boolean anyNull = paramList.stream().anyMatch(Objects::isNull);
+            //如果有Null,则处理替换
+            if (anyNull) {
+                if (statement == null) {
+                    statement = getStatement(sql);
+                }
+                NullParamSqlReplaceVisitor visitor = new NullParamSqlReplaceVisitor(statement, paramList);
+                visitor.parse();
+                //设置新的参数集合
+                newParamList = visitor.newParamList;
+            } else {
+                newParamList = new ArrayList<>(paramList);
+            }
+        }
+
+        //如果处理完了、检测是否有解析过、null则说明没有过任何解析、直接返回sql
+        if (statement == null) {
+            return new SqlListResult(sql, newParamList);
+        } else {
+            return new SqlListResult(statement.toString(), newParamList);
         }
     }
 

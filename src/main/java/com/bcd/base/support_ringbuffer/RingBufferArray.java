@@ -105,14 +105,18 @@ public class RingBufferArray<T> {
 //        for (Object integer : list) {
 //            System.out.print(integer);
 //        }
-        ringBufferArray.addAll(new Integer[]{1, 2, 3, 4});
-        ringBufferArray.addAll(new Integer[]{5, 5});
-        ringBufferArray.addAll(new Integer[]{6});
-        ringBufferArray.addAll(new Integer[]{7, 8, 9});
-        ringBufferArray.addAll(new Integer[]{10, 11});
-        Object[] list = ringBufferArray.content();
-        for (Object integer : list) {
-            System.out.print(integer);
+        int i=0;
+        while (i++<100000000) {
+            ringBufferArray.addAll(new Integer[]{1, 2, 3, 4});
+            ringBufferArray.addAll(new Integer[]{5, 5});
+            ringBufferArray.addAll(new Integer[]{6});
+            ringBufferArray.addAll(new Integer[]{7, 8, 9});
+            ringBufferArray.addAll(new Integer[]{10, 11});
+            Object[] list = ringBufferArray.content();
+//            for (Object integer : list) {
+//                System.out.print(integer);
+//            }
         }
+
     }
 }

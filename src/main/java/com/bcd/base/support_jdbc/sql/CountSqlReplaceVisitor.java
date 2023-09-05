@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class CountSqlReplaceVisitor extends SelectVisitorAdapter {
 
-    private final static List<SelectItem> countSelectItems = Collections.singletonList(getCountExpressionItem());
+    private final static List<SelectItem<?>> countSelectItems = Collections.singletonList(getCountExpressionItem());
 
     private final Statement statement;
 
@@ -28,19 +28,18 @@ public class CountSqlReplaceVisitor extends SelectVisitorAdapter {
         System.out.println(statement.toString());
     }
 
-    private static SelectExpressionItem getCountExpressionItem() {
+    private static SelectItem<Function> getCountExpressionItem() {
         Function function = new Function();
         function.setName("count");
         function.setAllColumns(true);
-        SelectExpressionItem item = new SelectExpressionItem();
+        SelectItem<Function> item = new SelectItem<>();
         item.setExpression(function);
         return item;
     }
 
-    public Statement parse() {
-        SelectBody selectBody = ((Select) statement).getSelectBody();
-        selectBody.accept(this);
-        return statement;
+    public void parse() {
+        PlainSelect plainSelect = ((Select) statement).getPlainSelect();
+        plainSelect.accept(this);
     }
 
     @Override

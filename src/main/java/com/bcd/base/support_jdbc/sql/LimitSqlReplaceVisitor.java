@@ -32,17 +32,14 @@ public class LimitSqlReplaceVisitor extends SelectVisitorAdapter {
 
     private static Limit getLimit(int pageNum, int pageSize) {
         Limit limit = new Limit();
-        limit.setOffset(new LongValue(pageNum * pageSize));
+        limit.setOffset(new LongValue((long) pageNum * pageSize));
         limit.setRowCount(new LongValue(pageSize));
-        limit.setLimitAll(false);
-        limit.setLimitNull(false);
         return limit;
     }
 
-    public Statement parse() {
-        SelectBody selectBody = ((Select) statement).getSelectBody();
-        selectBody.accept(this);
-        return statement;
+    public void parse() {
+        PlainSelect plainSelect = ((Select) statement).getPlainSelect();
+        plainSelect.accept(this);
     }
 
     @Override
