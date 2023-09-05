@@ -150,7 +150,7 @@ public class ExcelUtil {
         table.add(tr1);
         table.add(tr2);
         table.add(tr3);
-        try (final OutputStream os = Files.newOutputStream(Paths.get("/Users/baichangda/test55.xlsx"))) {
+        try (final OutputStream os = Files.newOutputStream(Paths.get("test55.xlsx"))) {
             writeExcel_xlsx(table, os);
         } catch (IOException ex) {
             throw BaseRuntimeException.getException(ex);
