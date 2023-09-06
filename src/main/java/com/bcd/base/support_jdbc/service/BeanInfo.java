@@ -45,7 +45,13 @@ public final class BeanInfo<T> {
      */
     public final String updateSql_noId;
 
+    /**
+     * 是否在新增时候自动设置创建信息
+     */
     public final boolean autoSetCreateInfoBeforeInsert;
+    /**
+     * 是否在更新时候自动设置更新信息
+     */
     public final boolean autoSetUpdateInfoBeforeUpdate;
 
     public BeanInfo(Class<T> clazz) {
