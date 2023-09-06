@@ -1,9 +1,12 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
+import com.bcd.base.support_satoken.SaTokenUtil;
+import com.bcd.sys.bean.UserBean;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,15 +23,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.lang.reflect.ParameterizedType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class BaseService<T extends SuperBaseBean> {
-
     /**
      * 注意所有的类变量必须使用get方法获取
      * 因为类如果被aop代理了、代理对象的这些变量值都是null
@@ -42,6 +41,7 @@ public class BaseService<T extends SuperBaseBean> {
     TransactionTemplate transactionTemplate;
 
     private final BeanInfo<T> beanInfo;
+
 
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
@@ -60,16 +60,24 @@ public class BaseService<T extends SuperBaseBean> {
         beanInfo = new BeanInfo<>(beanClass);
     }
 
+
     /**
-     * 获取代理对象
-     * 需要如下注解开启 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
-     * 如下场景使用
-     * 同一个service中a()调用b()、其中b()符合aop切面定义、此时不会走aop逻辑、因为此时执行a()中this对象已经不是代理对象、此时需要getProxy().b()
-     * 注意:
-     * 此方法不要乱用、避免造成性能损失
+     * 统计所有数量
+     *
+     * @return
      */
-    protected BaseService<T> getProxy() {
-        return (BaseService<T>) AopContext.currentProxy();
+    public int count() {
+        return count((ConvertRes) null);
+    }
+
+    /**
+     * 统计数量
+     *
+     * @param condition
+     * @return
+     */
+    public int count(Condition condition) {
+        return count(ConditionUtil.convertCondition(condition, beanInfo));
     }
 
     /**
@@ -179,18 +187,12 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public void save(T t) {
         if (t.id == null) {
-            final KeyHolder keyHolder = new GeneratedKeyHolder();
-            getJdbcTemplate().update(conn -> {
-                final PreparedStatement ps = conn.prepareStatement(getBeanInfo().insertSql_noId, Statement.RETURN_GENERATED_KEYS);
-                final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(getBeanInfo().getValues_noId(t).toArray());
-                argumentPreparedStatementSetter.setValues(ps);
-                return ps;
-            }, keyHolder);
-            t.id = keyHolder.getKey().longValue();
+            insert(t);
         } else {
-            getJdbcTemplate().update(getBeanInfo().updateSql_noId, getBeanInfo().getValues_noId(t));
+            update(t);
         }
     }
+
 
     /**
      * 新增
@@ -200,6 +202,9 @@ public class BaseService<T extends SuperBaseBean> {
      * @param t
      */
     public void insert(T t) {
+        if (beanInfo.autoSetCreateInfoBeforeInsert) {
+            setCreateInfo(t);
+        }
         if (t.id == null) {
             final KeyHolder keyHolder = new GeneratedKeyHolder();
             getJdbcTemplate().update(conn -> {
@@ -216,19 +221,6 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     /**
-     * 根据id更新
-     * 所有属性都会作为参数设置、即使是null
-     *
-     * @param t
-     */
-    public void update(T t) {
-        final String sql = getBeanInfo().updateSql_noId + " where id=?";
-        final List<Object> args = getBeanInfo().getValues_noId(t);
-        args.add(t.id);
-        getJdbcTemplate().update(sql, args.toArray());
-    }
-
-    /**
      * 根据参数对新增、只新增部分字段
      *
      * @param params
@@ -237,11 +229,11 @@ public class BaseService<T extends SuperBaseBean> {
         if (params.length == 0) {
             return;
         }
+        ParamPairs[] newParams = setCreateInfo(params);
         StringJoiner sj1 = new StringJoiner(",");
         StringJoiner sj2 = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (int i = 0; i < params.length; i++) {
-            ParamPairs param = params[i];
+        for (ParamPairs param : newParams) {
             sj1.add(getBeanInfo().toColumnName(param.field()));
             sj2.add("?");
             args.add(param.val());
@@ -249,6 +241,49 @@ public class BaseService<T extends SuperBaseBean> {
         String sql = "insert " + getBeanInfo().tableName + "(" + sj1 + ") values(" + sj2 + ")";
         getJdbcTemplate().update(sql, args.toArray());
     }
+
+    /**
+     * 批量新增
+     * 根据第一个元素来判断新增的sql语句是否包含id字段
+     *
+     * @param list
+     */
+    public void insertBatch(List<T> list) {
+        if (list.isEmpty()) {
+            return;
+        }
+        if (beanInfo.autoSetCreateInfoBeforeInsert) {
+            for (T t : list) {
+                setCreateInfo(t);
+            }
+        }
+        T t = list.get(0);
+        if (t.id == null) {
+            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues_noId(e1).toArray()).collect(Collectors.toList());
+            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql_noId, argList);
+        } else {
+            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
+            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
+        }
+    }
+
+    /**
+     * 根据id更新
+     * 所有属性都会作为参数设置、即使是null
+     *
+     * @param t
+     */
+    public void update(T t) {
+        if (beanInfo.autoSetUpdateInfoBeforeUpdate) {
+            setUpdateInfo(t);
+        }
+        final String sql = getBeanInfo().updateSql_noId + " where id=?";
+        final List<Object> args = getBeanInfo().getValues_noId(t);
+        args.add(t.id);
+        getJdbcTemplate().update(sql, args.toArray());
+    }
+
+
 
     /**
      * 根据id、参数对更新
@@ -261,22 +296,16 @@ public class BaseService<T extends SuperBaseBean> {
         if (params.length == 0) {
             return;
         }
-        final StringBuilder sql = new StringBuilder("update ");
-        sql.append(getBeanInfo().tableName);
-        sql.append(" set ");
+        ParamPairs[] newParams = setUpdateInfo(params);
+        StringJoiner sj = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (int i = 0; i < params.length; i++) {
-            ParamPairs param = params[i];
-            if (i != 0) {
-                sql.append(",");
-            }
-            sql.append(getBeanInfo().toColumnName(param.field()));
-            sql.append("=?");
+        for (ParamPairs param : newParams) {
+            sj.add(getBeanInfo().toColumnName(param.field()) + "=?");
             args.add(param.val());
         }
-        sql.append(" where id=?");
+        String sql = "update " + getBeanInfo().tableName + " set " + sj + " where id=?";
         args.add(id);
-        getJdbcTemplate().update(sql.toString(), args.toArray());
+        getJdbcTemplate().update(sql, args.toArray());
     }
 
     /**
@@ -290,19 +319,18 @@ public class BaseService<T extends SuperBaseBean> {
         if (params.length == 0) {
             return;
         }
+        ParamPairs[] newParams = setUpdateInfo(params);
+        StringJoiner sj = new StringJoiner(",");
+        List<Object> args = new ArrayList<>();
+        for (ParamPairs param : newParams) {
+            sj.add(getBeanInfo().toColumnName(param.field()) + "=?");
+            args.add(param.val());
+        }
+
         final StringBuilder sql = new StringBuilder("update ");
         sql.append(getBeanInfo().tableName);
         sql.append(" set ");
-        List<Object> args = new ArrayList<>();
-        for (int i = 0; i < params.length; i++) {
-            ParamPairs param = params[i];
-            if (i != 0) {
-                sql.append(",");
-            }
-            sql.append(getBeanInfo().toColumnName(param.field()));
-            sql.append("=?");
-            args.add(param.val());
-        }
+        sql.append(sj);
         final ConvertRes convertRes = ConditionUtil.convertCondition(condition, beanInfo);
         if (convertRes != null) {
             sql.append(" where ");
@@ -312,26 +340,7 @@ public class BaseService<T extends SuperBaseBean> {
         getJdbcTemplate().update(sql.toString(), args.toArray());
     }
 
-    /**
-     * 批量新增
-     * 不会改变对象
-     * 根据第一个元素来判断新增的sql语句是否包含id字段
-     *
-     * @param list
-     */
-    public void insertBatch(List<T> list) {
-        if (list.isEmpty()) {
-            return;
-        }
-        T t = list.get(0);
-        if (t.id == null) {
-            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues_noId(e1).toArray()).collect(Collectors.toList());
-            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql_noId, argList);
-        } else {
-            final List<Object[]> argList = list.stream().map(e1 -> getBeanInfo().getValues(e1).toArray()).collect(Collectors.toList());
-            getJdbcTemplate().batchUpdate(getBeanInfo().insertSql, argList);
-        }
-    }
+
 
 
     /**
@@ -340,6 +349,14 @@ public class BaseService<T extends SuperBaseBean> {
      * @param list
      */
     public void updateBatch(List<T> list) {
+        if (list.isEmpty()) {
+            return;
+        }
+        if (beanInfo.autoSetUpdateInfoBeforeUpdate) {
+            for (T t : list) {
+                setUpdateInfo(t);
+            }
+        }
         String sql = getBeanInfo().updateSql_noId + " where id=?";
         final List<Object[]> argList = list.stream().map(e1 -> {
             final List<Object> args = getBeanInfo().getValues_noId(e1);
@@ -396,22 +413,16 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     /**
-     * 统计所有数量
-     *
-     * @return
+     * 获取代理对象
+     * 需要如下注解开启 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
+     * 如下场景使用
+     * 同一个service中a()调用b()、其中b()符合aop切面定义、此时不会走aop逻辑、因为此时执行a()中this对象已经不是代理对象、此时需要getProxy().b()
+     * 注意:
+     * 此方法可能会报错、因为原本的service对象不是代理对象
+     * 此方法不要乱用、避免造成性能损失
      */
-    public int count() {
-        return count((ConvertRes) null);
-    }
-
-    /**
-     * 统计数量
-     *
-     * @param condition
-     * @return
-     */
-    public int count(Condition condition) {
-        return count(ConditionUtil.convertCondition(condition, beanInfo));
+    protected BaseService<T> getProxy() {
+        return (BaseService<T>) AopContext.currentProxy();
     }
 
     private int count(ConvertRes convertRes) {
@@ -463,6 +474,79 @@ public class BaseService<T extends SuperBaseBean> {
             return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(getBeanInfo().clazz), paramList.toArray());
         } else {
             return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(getBeanInfo().clazz));
+        }
+    }
+
+
+    private void setCreateInfo(T t) {
+        BaseBean bean = (BaseBean) t;
+        bean.createTime = new Date();
+        UserBean user = SaTokenUtil.getLoginUser_cache();
+        if (user != null) {
+            bean.createUserId = user.id;
+            bean.createUserName = user.username;
+        }
+    }
+
+    private void setUpdateInfo(T t) {
+        BaseBean bean = (BaseBean) t;
+        bean.updateTime = new Date();
+        UserBean user = SaTokenUtil.getLoginUser_cache();
+        if (user != null) {
+            bean.updateUserId = user.id;
+            bean.updateUserName = user.username;
+        }
+    }
+
+    private ParamPairs[] setCreateInfo(ParamPairs... params) {
+        if (beanInfo.autoSetCreateInfoBeforeInsert) {
+            List<ParamPairs> paramList = new ArrayList<>();
+            LinkedHashMap<String, ParamPairs> map = new LinkedHashMap<>();
+            for (ParamPairs param : params) {
+                map.put(param.field(), param);
+                paramList.add(param);
+            }
+            if (!map.containsKey("createTime")) {
+                paramList.add(new ParamPairs("createTime", new Date()));
+            }
+            UserBean user = SaTokenUtil.getLoginUser_cache();
+            if (user != null) {
+                if (!map.containsKey("createUserId")) {
+                    paramList.add(new ParamPairs("createUserId", user.id));
+                }
+                if (!map.containsKey("createUserName")) {
+                    paramList.add(new ParamPairs("createUserName", user.username));
+                }
+            }
+            return paramList.toArray(new ParamPairs[0]);
+        } else {
+            return params;
+        }
+    }
+
+    private ParamPairs[] setUpdateInfo(ParamPairs... params) {
+        if (beanInfo.autoSetUpdateInfoBeforeUpdate) {
+            List<ParamPairs> paramList = new ArrayList<>();
+            LinkedHashMap<String, ParamPairs> map = new LinkedHashMap<>();
+            for (ParamPairs param : params) {
+                map.put(param.field(), param);
+                paramList.add(param);
+            }
+            if (!map.containsKey("updateTime")) {
+                paramList.add(new ParamPairs("updateTime", new Date()));
+            }
+            UserBean user = SaTokenUtil.getLoginUser_cache();
+            if (user != null) {
+                if (!map.containsKey("updateUserId")) {
+                    paramList.add(new ParamPairs("updateUserId", user.id));
+                }
+                if (!map.containsKey("updateUserName")) {
+                    paramList.add(new ParamPairs("updateUserName", user.username));
+                }
+            }
+            return paramList.toArray(new ParamPairs[0]);
+        } else {
+            return params;
         }
     }
 }

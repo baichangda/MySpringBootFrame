@@ -3,6 +3,7 @@ package com.bcd.base.support_jdbc.service;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Transient;
+import com.bcd.base.support_jdbc.bean.BaseBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
@@ -44,11 +45,25 @@ public final class BeanInfo<T> {
      */
     public final String updateSql_noId;
 
+    public final boolean autoSetCreateInfoBeforeInsert;
+    public final boolean autoSetUpdateInfoBeforeUpdate;
+
     public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
 
         Table table = clazz.getAnnotation(Table.class);
-        tableName = table == null ? null : table.value();
+        if (table == null) {
+            throw BaseRuntimeException.getException("class[{}] must has annotation @Table", clazz.getName());
+        }
+        tableName = table.value();
+
+        if (BaseBean.class.isAssignableFrom(clazz)) {
+            autoSetCreateInfoBeforeInsert = table.autoSetCreateInfoBeforeInsert();
+            autoSetUpdateInfoBeforeUpdate = table.autoSetUpdateInfoBeforeUpdate();
+        } else {
+            autoSetCreateInfoBeforeInsert = false;
+            autoSetUpdateInfoBeforeUpdate = false;
+        }
 
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         columnFieldList_noId = new ArrayList<>();

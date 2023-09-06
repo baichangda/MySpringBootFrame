@@ -238,11 +238,10 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         if (user.id == null) {
             user.password = encryptPassword(user.username, CommonConst.INITIAL_PASSWORD);
             user.status = 1;
-            insert(user);
         } else {
             UserBean dbUser = get(user.id);
             user.password = dbUser.password;
-            update(user);
         }
+        save(user);
     }
 }
