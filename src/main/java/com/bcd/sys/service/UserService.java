@@ -175,7 +175,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
             //2.3、将原始密码MD5加密后与数据库中进行对比
             if (userBean.password.equals(encryptPassword(userBean.username, oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名
-                update(userId, ParamPairs.create("password", encryptPassword(userBean.username, newPassword)));
+                update(userId, ParamPairs.build("password", encryptPassword(userBean.username, newPassword)));
                 return true;
             } else {
                 return false;
@@ -183,7 +183,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         } else {
             //3、如果不加密,则直接对比
             if (userBean.password.equals(encryptOldPassword)) {
-                update(userId, ParamPairs.create("password", encryptNewPassword));
+                update(userId, ParamPairs.build("password", encryptNewPassword));
                 return true;
             } else {
                 return false;
@@ -207,7 +207,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
     }
 
     public void resetPassword(Long userId) {
-        update(userId, ParamPairs.create("password", CommonConst.INITIAL_PASSWORD));
+        update(userId, ParamPairs.build("password", CommonConst.INITIAL_PASSWORD));
     }
 
     /**

@@ -245,6 +245,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 批量新增
      * 根据第一个元素来判断新增的sql语句是否包含id字段
+     * 所有属性都会作为参数设置、即使是null
      *
      * @param list
      */
@@ -269,7 +270,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 根据id更新
-     * 所有属性都会作为参数设置、即使是null
+     * 更新所有字段、即使是null
      *
      * @param t
      */
@@ -345,6 +346,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 批量更新
+     * 更新所有字段、即使是null
      *
      * @param list
      */
