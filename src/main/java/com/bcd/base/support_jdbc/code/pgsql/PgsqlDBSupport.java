@@ -59,7 +59,7 @@ public class PgsqlDBSupport implements DBSupport {
                 return CodeConst.PkType.String;
             }
             default: {
-                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.table_name, pk.column_name, pk.udt_name);
+                throw BaseRuntimeException.getException("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.udt_name);
             }
         }
     }

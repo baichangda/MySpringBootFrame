@@ -3,7 +3,6 @@ package com.bcd.base.support_okhttp;
 import okhttp3.*;
 import okhttp3.internal.http.HttpHeaders;
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
