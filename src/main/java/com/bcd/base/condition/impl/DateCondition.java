@@ -72,7 +72,7 @@ public class DateCondition implements Condition {
          */
         GT,
         /**
-         * 在时间范围内
+         * 在时间范围内、前闭后开[date1,date2)
          */
         BETWEEN
     }
