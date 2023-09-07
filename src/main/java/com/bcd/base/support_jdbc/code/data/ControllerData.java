@@ -33,4 +33,9 @@ public class ControllerData {
      */
     public boolean validateSaveParam = true;
 
+    /**
+     * 主键字段
+     */
+    public BeanField pkField;
+
 }

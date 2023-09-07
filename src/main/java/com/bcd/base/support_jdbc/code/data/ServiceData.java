@@ -16,4 +16,9 @@ public class ServiceData {
      */
     public String packagePre;
 
+    /**
+     * 主键字段
+     */
+    public BeanField pkField;
+
 }

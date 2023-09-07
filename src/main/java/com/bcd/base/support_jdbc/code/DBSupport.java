@@ -21,6 +21,8 @@ public interface DBSupport {
     List<BeanField> getTableBeanFieldList(TableConfig config, Connection connection);
 
 
+    record PkInfo(String name, CodeConst.PkType pkType) {
+    }
     /**
      * 获取指定表的列名
      * <p>
@@ -31,7 +33,7 @@ public interface DBSupport {
      * @param connection
      * @return
      */
-    CodeConst.PkType getTablePkType(TableConfig config, Connection connection);
+    BeanField getTablePk(TableConfig config, Connection connection);
 
 }
 

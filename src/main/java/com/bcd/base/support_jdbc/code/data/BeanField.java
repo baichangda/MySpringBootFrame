@@ -20,6 +20,8 @@ public class BeanField {
             } else {
                 this.commentPre = comment;
             }
+        } else {
+            commentPre = "";
         }
         return this;
     }

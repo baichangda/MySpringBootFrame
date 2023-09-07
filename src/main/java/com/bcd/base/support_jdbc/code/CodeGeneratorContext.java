@@ -19,6 +19,7 @@ public class CodeGeneratorContext {
     public List<BeanField> allBeanFields;
     public List<BeanField> declaredBeanFields;
     public String packagePre;
+    public BeanField pkField;
 
 
     public CodeGeneratorContext(TableConfig tableConfig, DBSupport dbSupport, Connection connection) {
@@ -31,9 +32,10 @@ public class CodeGeneratorContext {
      * 获取实体类定义字段信息(排除公用信息 id/create/update信息)
      */
     public List<BeanField> getDeclaredBeanFields() {
+        BeanField pk = getPkField();
         if (declaredBeanFields == null) {
             declaredBeanFields = getAllBeanFields().stream().filter(e -> {
-                if ("id".equals(e.name)) {
+                if (pk.name.equals(e.name)) {
                     return false;
                 } else {
                     if (tableConfig.needCreateInfo) {
@@ -95,5 +97,17 @@ public class CodeGeneratorContext {
      */
     public String getRequestMappingPre() {
         return "/" + getPackagePre().substring(getPackagePre().lastIndexOf('.') + 1);
+    }
+
+    /**
+     * 获取所有字段信息
+     *
+     * @return
+     */
+    public BeanField getPkField() {
+        if (pkField == null) {
+            pkField = dbSupport.getTablePk(tableConfig, connection);
+        }
+        return pkField;
     }
 }

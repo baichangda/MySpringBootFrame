@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
+import java.io.Serial;
+import org.springframework.data.annotation.Id;
 
 /**
  *  ${moduleNameCN}
@@ -17,7 +19,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table("${tableName}")
-public class ${moduleName?cap_first}Bean extends BaseBean {
+public class ${moduleName?cap_first}Bean extends BaseBean<${pkField.type}> {
+    @Serial
+    private final static long serialVersionUID = 1L;
+
+    @Id
+    <#if pkField.type == "String">
+    @Schema(description = "${pkField.comment}",maxLength = ${pkField.strLen?c})
+    <#else>
+    @Schema(description = "${pkField.comment}")
+    </#if>
+    public ${pkField.type} ${pkField.name};
+
     //field
     <#list fieldList as field>
       <#if field.type == "String">
@@ -39,4 +52,16 @@ public class ${moduleName?cap_first}Bean extends BaseBean {
     public ${field.type} ${field.name};
 
     </#list>
+
+    <#if pkField.name != "id">
+    @Override
+    public ${pkField.type} getId() {
+       return ${pkField.name};
+    }
+
+    @Override
+    public void setId(${pkField.type} id) {
+        this.${pkField.name}=id;
+    }
+    </#if>
 }

@@ -1,7 +1,6 @@
 package com.bcd.base.support_jdbc.code.mysql;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_jdbc.code.CodeConst;
 import com.bcd.base.support_jdbc.code.DBSupport;
 import com.bcd.base.support_jdbc.code.TableConfig;
 import com.bcd.base.support_jdbc.code.data.BeanField;
@@ -44,22 +43,28 @@ public class MysqlDBSupport implements DBSupport {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+
     @Override
-    public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
+    public BeanField getTablePk(TableConfig config, Connection connection) {
         ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.config.dbInfo.db, config.tableName);
         switch (pk.data_type) {
-            case "int": {
-                return CodeConst.PkType.Integer;
+            case "int", "bigint", "varchar" -> {
+                MysqlDBColumn mysqlDbColumn = new MysqlDBColumn();
+                mysqlDbColumn.name = pk.column_name;
+                mysqlDbColumn.type = pk.data_type;
+                mysqlDbColumn.comment = pk.column_comment;
+                mysqlDbColumn.isNull = pk.is_nullable;
+                mysqlDbColumn.strLen = pk.character_maximum_length.intValue();
+                BeanField beanField = mysqlDbColumn.toBeanField();
+                if (beanField == null) {
+                    logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.tableName, mysqlDbColumn.name, mysqlDbColumn.type);
+                }
+                return beanField;
             }
-            case "bigint": {
-                return CodeConst.PkType.Long;
-            }
-            case "varchar": {
-                return CodeConst.PkType.String;
-            }
-            default: {
-                throw BaseRuntimeException.getException("pk[{0},{1},{2}] not support", pk.table_name, pk.column_name, pk.data_type);
+            default-> {
+                throw BaseRuntimeException.getException("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.data_type);
             }
         }
     }
+
 }

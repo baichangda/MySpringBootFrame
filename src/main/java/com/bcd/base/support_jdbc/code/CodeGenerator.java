@@ -32,8 +32,7 @@ public class CodeGenerator {
     }
 
     public static void main(String[] args) {
-        String path = "/Users/baichangda/bcd/workspace/MySpringBootFrame/src/main/java/com/bcd/base/support_jdbc/code";
-//        String path = "D:\\workspace\\MySpringBootFrame\\RDB\\src\\main\\java\\com\\bcd\\rdb\\code";
+        String path = "D:\\work\\bcd\\MySpringBootFrame\\src\\main\\java\\com\\bcd\\base\\support_jdbc\\code";
         final TableConfig.Helper helper = TableConfig.newHelper();
         helper.needCreateBeanFile = true;
         helper.needCreateServiceFile = true;
@@ -43,7 +42,8 @@ public class CodeGenerator {
         helper.needCreateInfo = true;
         helper
                 .addModule("User", "用户", "t_sys_user")
-                .addModule("Permission", "权限", "t_sys_permission");
+                .addModule("Permission", "权限", "t_sys_permission")
+                .addModule("Test", "测试", "test");
         Config config = Config.newConfig(path).addTableConfig(helper.toTableConfigs());
         CodeGenerator.MYSQL.generate(config);
 //        CodeGenerator.PGSQL.generate(config);
@@ -70,7 +70,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("rdb_TemplateBean.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -98,7 +98,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("rdb_TemplateService.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -126,7 +126,7 @@ public class CodeGenerator {
             Template template = configuration.getTemplate("rdb_TemplateController.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
-            template.process(data, out,objectWrapper);
+            template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -147,6 +147,7 @@ public class CodeGenerator {
         data.tableName = context.tableConfig.tableName;
         data.superBeanType = context.tableConfig.needCreateInfo ? 1 : 2;
         data.fieldList = context.getDeclaredBeanFields();
+        data.pkField = context.getPkField();
         return data;
     }
 
@@ -162,6 +163,7 @@ public class CodeGenerator {
         data.moduleNameCN = tableConfig.moduleNameCN;
         data.moduleName = tableConfig.moduleName;
         data.packagePre = context.getPackagePre();
+        data.pkField = context.getPkField();
         return data;
     }
 
@@ -180,6 +182,7 @@ public class CodeGenerator {
         data.fieldList = context.getAllBeanFields();
         data.validateSaveParam = tableConfig.needValidateSaveParam;
         data.requestMappingPre = context.getRequestMappingPre();
+        data.pkField = context.getPkField();
         return data;
     }
 

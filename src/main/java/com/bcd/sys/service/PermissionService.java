@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  *
  */
 @Service
-public class PermissionService extends BaseService<PermissionBean> implements ApplicationListener<ContextRefreshedEvent> {
+public class PermissionService extends BaseService<Long,PermissionBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

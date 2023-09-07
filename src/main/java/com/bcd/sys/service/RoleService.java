@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Administrator on 2017/4/11.
  */
 @Service
-public class RoleService extends BaseService<RoleBean> {
+public class RoleService extends BaseService<Long,RoleBean> {
     @Autowired
     JdbcTemplate jdbcTemplate;
 

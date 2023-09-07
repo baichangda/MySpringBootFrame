@@ -45,20 +45,23 @@ public class PgsqlDBSupport implements DBSupport {
     }
 
     @Override
-    public CodeConst.PkType getTablePkType(TableConfig config, Connection connection) {
+    public BeanField getTablePk(TableConfig config, Connection connection) {
         ColumnsBean pk = DBInfoUtil.findPKColumn(connection, config.config.dbInfo.db, config.tableName);
         switch (pk.udt_name) {
-            case "int2":
-            case "int4": {
-                return CodeConst.PkType.Integer;
+            case "int2","int4","int8","varchar"->{
+                PgsqlDBColumn pgsqlDBColumn = new PgsqlDBColumn();
+                pgsqlDBColumn.name = pk.column_name;
+                pgsqlDBColumn.type = pk.udt_name;
+                pgsqlDBColumn.comment = pk.description;
+                pgsqlDBColumn.isNull = pk.is_nullable;
+                pgsqlDBColumn.strLen = pk.character_maximum_length;
+                BeanField beanField = pgsqlDBColumn.toBeanField();
+                if (beanField == null) {
+                    logger.warn("不支持[table:{}] [name:{}] [type:{}]类型数据库字段,忽略此字段!", config.tableName, pgsqlDBColumn.name, pgsqlDBColumn.type);
+                }
+                return beanField;
             }
-            case "int8": {
-                return CodeConst.PkType.Long;
-            }
-            case "varchar": {
-                return CodeConst.PkType.String;
-            }
-            default: {
+            default-> {
                 throw BaseRuntimeException.getException("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.udt_name);
             }
         }

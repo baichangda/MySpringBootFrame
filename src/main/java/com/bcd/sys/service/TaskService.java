@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class TaskService extends BaseService<TaskBean> implements TaskDao<TaskBean, Long> {
+public class TaskService extends BaseService<Long,TaskBean> implements TaskDao<TaskBean, Long> {
     @Override
     public TaskBean doCreate(TaskBean task) {
         insert(task);

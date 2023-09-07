@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Lazy;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
+
 import java.util.Date;
 
 /**
@@ -22,7 +24,11 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_task")
-public class TaskBean extends SuperBaseBean implements Task<Long> {
+public class TaskBean implements Task<Long>,SuperBaseBean<Long> {
+    @Schema(description = "主键")
+    @Id
+    //主键
+    public Long id;
 
     //field
     @NotBlank(message = "[任务名称]不能为空")
@@ -79,12 +85,16 @@ public class TaskBean extends SuperBaseBean implements Task<Long> {
 
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public void onCreated() {
         createTime = new Date();
         UserBean userBean = SaTokenUtil.getLoginUser_cache();
         if (userBean != null) {
-            createUserId = userBean.id;
+            createUserId = userBean.getId();
             createUserName = userBean.realName;
         }
     }

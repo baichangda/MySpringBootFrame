@@ -10,6 +10,8 @@ import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,11 @@ import java.util.List;
 @Getter
 @Setter
 @Table("t_sys_menu")
-public class MenuBean extends BaseBean {
+public class MenuBean extends BaseBean<Long> {
+    @Id
+    @Schema(description = "主键")
+    //主键
+    public Long id;
     //field
     @Schema(description = "父菜单id")
     public Long parentId;

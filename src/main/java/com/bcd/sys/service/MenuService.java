@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/4/11.
  */
 @Service
-public class MenuService extends BaseService<MenuBean> {
+public class MenuService extends BaseService<Long,MenuBean> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

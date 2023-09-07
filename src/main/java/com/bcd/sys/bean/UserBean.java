@@ -9,7 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 
+import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -18,8 +20,14 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_user")
-public class UserBean extends BaseBean {
+public class UserBean extends BaseBean<Long> {
+    @Serial
     private final static long serialVersionUID = 1L;
+
+    @Id
+    @Schema(description = "主键")
+    //主键
+    public Long id;
 
     //field
     @NotBlank(message = "[用户名]不能为空")

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
 
 /**
  * 角色表
@@ -15,7 +16,13 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @Table("t_sys_role")
-public class RoleBean extends BaseBean {
+public class RoleBean extends BaseBean<Long> {
+
+    @Id
+    @Schema(description = "主键")
+    //主键
+    public Long id;
+
     //field
     @NotBlank(message = "[角色名称]不能为空")
     @Size(max = 20, message = "[角色名称]长度不能超过20")
@@ -30,6 +37,4 @@ public class RoleBean extends BaseBean {
     @Size(max = 256, message = "[备注]长度不能超过256")
     @Schema(description = "备注", maxLength = 256)
     public String remark;
-
-
 }

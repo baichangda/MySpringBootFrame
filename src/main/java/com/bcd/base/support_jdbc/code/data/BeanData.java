@@ -1,6 +1,8 @@
 package com.bcd.base.support_jdbc.code.data;
 
 
+import com.bcd.base.support_jdbc.code.CodeConst;
+
 import java.util.List;
 
 public class BeanData {
@@ -36,6 +38,11 @@ public class BeanData {
      * 字段集合
      */
     public List<BeanField> fieldList;
+
+    /**
+     * 主键字段
+     */
+    public BeanField pkField;
 
 }
 

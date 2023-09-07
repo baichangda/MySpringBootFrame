@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
 
 /**
  * 角色与权限关系表
@@ -15,7 +16,11 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @Table("t_sys_permission")
-public class PermissionBean extends BaseBean {
+public class PermissionBean extends BaseBean<Long> {
+    @Id
+    @Schema(description = "主键")
+    //主键
+    public Long id;
     //field
     @NotBlank(message = "[编码]不能为空")
     @Size(max = 50, message = "[编码]长度不能超过50")
