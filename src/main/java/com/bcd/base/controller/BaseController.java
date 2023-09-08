@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
@@ -24,9 +25,9 @@ public class BaseController {
      * @param response
      */
     protected void doBeforeResponseFile(String fileName, HttpServletResponse response) {
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        String encode = URLEncoder.encode(fileName,StandardCharsets.UTF_8);
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + encode);
     }
 
 
