@@ -1,20 +1,20 @@
 package com.bcd.sys.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.bcd.base.support_satoken.SaTokenUtil;
-import com.bcd.base.support_satoken.anno.NotePermission;
-import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.message.JsonMessage;
+import com.bcd.base.support_satoken.SaTokenUtil;
+import com.bcd.base.support_satoken.anno.NotePermission;
+import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,11 +43,11 @@ public class UserController extends BaseController {
      */
     @SaCheckNotePermissions(NotePermission.user_search)
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(summary ="查询用户列表")
+    @Operation(summary = "查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
     public JsonMessage<List<UserBean>> list(
-            @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
-            @Parameter(description = "生日结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
+            @Parameter(description = "生日开始", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
+            @Parameter(description = "生日结束", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
             @Parameter(description = "邮箱") @RequestParam(required = false) String email,
             @Parameter(description = "主键") @RequestParam(required = false) Long id,
@@ -70,6 +70,9 @@ public class UserController extends BaseController {
                 NumberCondition.EQUAL("status", status),
                 StringCondition.ALL_LIKE("username", username)
         );
+        if (1 == 1) {
+            throw BaseRuntimeException.getException("测试");
+        }
         return JsonMessage.success(userService.list(condition));
     }
 
@@ -83,8 +86,8 @@ public class UserController extends BaseController {
     @Operation(summary = "查询用户分页")
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
     public JsonMessage<Page<UserBean>> page(
-            @Parameter(description = "生日开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
-            @Parameter(description = "生日结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
+            @Parameter(description = "生日开始", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
+            @Parameter(description = "生日结束", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
             @Parameter(description = "邮箱") @RequestParam(required = false) String email,
             @Parameter(description = "主键") @RequestParam(required = false) Long id,
@@ -137,7 +140,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(summary = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "用户id数组",example = "100,101,102") @RequestParam Long[] ids) {
+    public JsonMessage delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam Long[] ids) {
         userService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }
