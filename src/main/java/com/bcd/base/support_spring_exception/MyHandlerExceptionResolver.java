@@ -21,7 +21,6 @@ import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 
@@ -76,10 +75,10 @@ import java.util.stream.Collectors;
  */
 @Component
 @SuppressWarnings("unchecked")
-public class CustomExceptionHandler extends AbstractHandlerExceptionResolver {
-    private final static Logger logger = LoggerFactory.getLogger(CustomExceptionHandler.class);
+public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
+    private final static Logger logger = LoggerFactory.getLogger(MyHandlerExceptionResolver.class);
     private final HttpMessageConverter converter;
-    public CustomExceptionHandler(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
+    public MyHandlerExceptionResolver(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         this.converter = mappingJackson2HttpMessageConverter;
     }
 
