@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * 2、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration#handlerExceptionResolver(ContentNegotiationManager)}
  * 3、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration#configureHandlerExceptionResolvers(List)}
  * 4、{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#configureHandlerExceptionResolvers(List)}
- *
+ * <p>
  * 其中依赖于变量{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#delegates}来源、逆向反推调用过程如下
  * 5、{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#addWebMvcConfigurers(List)}
  * 6、{@link org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration#setConfigurers(List)}
@@ -45,11 +45,11 @@ import java.util.stream.Collectors;
  * 发现只有如下子类加入到spring容器中
  * 7、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter#configureHandlerExceptionResolvers(List)}
  * 到此结束、其默认实现为空实现
- *
+ * <p>
  * 自定义类会在步骤6中被扫描到、并调用其中方法
- *
+ * <p>
  * ------------------------------------------------------------------------------------------------------------------------
- *
+ * <p>
  * 或者另一种方法、自定义一个类继承{@link AbstractHandlerExceptionResolver}、注册为spring bean
  * 重写{@link AbstractHandlerExceptionResolver#shouldApplyTo(HttpServletRequest, Object)}为 {return true}
  * 在http请求时候、会有如下初始化过程
@@ -59,25 +59,19 @@ import java.util.stream.Collectors;
  * 其中会扫描出所有{@link HandlerExceptionResolver}子类、并按照{@link org.springframework.core.Ordered}排序
  * 处理器顺序如下
  * {@link org.springframework.boot.web.servlet.error.DefaultErrorAttributes} 不做返回处理、只设置错误信息到attribute、优先级{@link Ordered#HIGHEST_PRECEDENCE}
- * {@link org.springframework.web.servlet.handler.HandlerExceptionResolverComposite} 包含3个子处理器、优先级{@link Ordered#LOWEST_PRECEDENCE}
+ * {@link org.springframework.web.servlet.handler.HandlerExceptionResolverComposite} 包含3个子处理器、优先级0
  *      {@link org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ExceptionHandler}
  *      {@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ResponseStatus}
  *      {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver} 处理 spring一些自定义异常
  * {@link AbstractHandlerExceptionResolver}自定义、优先级{@link Ordered#LOWEST_PRECEDENCE}
  * 所以如果需要自己处理spring自定义异常、需要重写{@link AbstractHandlerExceptionResolver#getOrder()}
- * 特别说明
- * 至于为什么会排序后、order一样的情况下、{@link AbstractHandlerExceptionResolver}自定义在最后
- * 因为原本开始的顺序是 [AbstractHandlerExceptionResolver自定义、DefaultErrorAttributes、HandlerExceptionResolverComposite]
- * 使用的是{@link java.util.TimSort}、由于其排序特性是先将连续递增、递减的分块、然后拼接
- * [DefaultErrorAttributes、HandlerExceptionResolverComposite]视为1块
- * [AbstractHandlerExceptionResolver自定义]视为1块
- * 于是后移[AbstractHandlerExceptionResolver自定义]、则放在最后
  */
 @Component
 @SuppressWarnings("unchecked")
 public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
     private final static Logger logger = LoggerFactory.getLogger(MyHandlerExceptionResolver.class);
     private final HttpMessageConverter converter;
+
     public MyHandlerExceptionResolver(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         this.converter = mappingJackson2HttpMessageConverter;
     }
@@ -85,6 +79,14 @@ public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver
     @Override
     protected boolean shouldApplyTo(HttpServletRequest request, Object handler) {
         return true;
+    }
+
+    @Override
+    public int getOrder() {
+        /**
+         * 小于0即可
+         */
+        return -1;
     }
 
     @Override

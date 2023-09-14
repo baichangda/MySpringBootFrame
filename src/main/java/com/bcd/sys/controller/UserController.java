@@ -70,9 +70,6 @@ public class UserController extends BaseController {
                 NumberCondition.EQUAL("status", status),
                 StringCondition.ALL_LIKE("username", username)
         );
-        if (1 == 1) {
-            throw BaseRuntimeException.getException("测试");
-        }
         return JsonMessage.success(userService.list(condition));
     }
 
