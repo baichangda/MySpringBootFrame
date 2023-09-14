@@ -155,7 +155,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
 
     public void destroy() {
         stop = true;
-        ExecutorUtil.shutdownAllThenAwaitAll(fetchPool, workPool);
+        ExecutorUtil.shutdownThenAwait(fetchPool, workPool);
     }
 
 

@@ -55,7 +55,7 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
         //停止消费
         super.destroy();
         //停止工作线程池
-        ExecutorUtil.shutdownAllThenAwaitAll(workPool);
+        ExecutorUtil.shutdownThenAwait(workPool);
         workPool = null;
     }
 

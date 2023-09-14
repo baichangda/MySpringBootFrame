@@ -122,7 +122,7 @@ public class RedisQueueMQ<V> {
             synchronized (this) {
                 if (consumerAvailable) {
                     this.stop = true;
-                    ExecutorUtil.shutdownThenAwaitOneByOne(consumeExecutor, workExecutor);
+                    ExecutorUtil.shutdownThenAwait(consumeExecutor, workExecutor);
                     consumerAvailable = false;
                 }
             }

@@ -194,15 +194,12 @@ public abstract class AbstractConsumer {
                         }
                         //销毁重置计数线程池(如果存在)
                         if (resetConsumeCountPool != null) {
-                            ExecutorUtil.shutdownAllThenAwaitAll(resetConsumeCountPool);
+                            ExecutorUtil.shutdownThenAwait(resetConsumeCountPool);
                         }
 
                         //等待队列中为空、然后停止工作线程池、避免出现数据丢失
-                        for (ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue : queues) {
-                            while (!queue.isEmpty()) {
-                                TimeUnit.MILLISECONDS.sleep(100L);
-                            }
-                        }
+                        ExecutorUtil.awaitQueueEmpty(queues);
+
                         //打上退出标记、等待工作线程退出
                         running_work = false;
                         for (Thread workThread : workThreads) {

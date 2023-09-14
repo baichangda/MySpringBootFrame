@@ -215,7 +215,7 @@ public abstract class AbstractConsumerForTimeRange {
                         }
                         //销毁重置计数线程池(如果存在)
                         if (resetConsumeCountPool != null) {
-                            ExecutorUtil.shutdownAllThenAwaitAll(resetConsumeCountPool);
+                            ExecutorUtil.shutdown(resetConsumeCountPool);
                         }
 
                         //等待队列中为空、然后停止工作线程池、避免出现数据丢失
