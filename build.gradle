@@ -149,6 +149,9 @@ dependencies {
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
+    // https://mvnrepository.com/artifact/com.github.oshi/oshi-core
+    implementation group: 'com.github.oshi', name: 'oshi-core', version: "+"
 }
 
 //把classpath添加到module path中、建立module-info.java后使用
