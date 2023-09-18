@@ -1,5 +1,6 @@
 package com.bcd.base.support_monitor;
 
+import com.bcd.base.util.FloatUtil;
 import com.bcd.base.util.JsonUtil;
 import oshi.SystemInfo;
 import oshi.hardware.*;
@@ -47,9 +48,9 @@ public class MonitorUtil {
         GlobalMemory memory = hal.getMemory();
         long memory_total = memory.getTotal();
         long memory_available = memory.getAvailable();
-        systemData.setMemoryMax(half_up(BigDecimal.valueOf(memory_total / GB), 2));
-        systemData.setMemoryUse(half_up(BigDecimal.valueOf((memory_total - memory_available) / GB), 2));
-        systemData.setMemoryUsePercent(half_up(BigDecimal.valueOf(100d - (memory_available * 100d / memory_total)), 2));
+        systemData.setMemoryMax(FloatUtil.format(memory_total / GB, 2));
+        systemData.setMemoryUse(FloatUtil.format((memory_total - memory_available) / GB, 2));
+        systemData.setMemoryUsePercent(FloatUtil.format(100d - (memory_available * 100d / memory_total), 2));
 
         //磁盘
         FileSystem fileSystem = os.getFileSystem();
@@ -60,9 +61,9 @@ public class MonitorUtil {
             disk_free += fs.getUsableSpace();
             disk_total += fs.getTotalSpace();
         }
-        systemData.setDiskMax(half_up(BigDecimal.valueOf(disk_total / GB), 2));
-        systemData.setDiskUse(half_up(BigDecimal.valueOf((disk_total - disk_free) / GB), 2));
-        systemData.setDiskUsePercent(half_up(BigDecimal.valueOf(100d - (disk_free * 100d / disk_total)), 2));
+        systemData.setDiskMax(FloatUtil.format(disk_total / GB, 2));
+        systemData.setDiskUse(FloatUtil.format((disk_total - disk_free) / GB, 2));
+        systemData.setDiskUsePercent(FloatUtil.format(100d - (disk_free * 100d / disk_total), 2));
 
         //磁盘io
         double prev_disk_io_read = 0d;
@@ -84,7 +85,7 @@ public class MonitorUtil {
         Util.sleep(1000);
 
         //cpu
-        systemData.setCpuUsePercent(half_up(BigDecimal.valueOf(processor.getSystemCpuLoadBetweenTicks(cpu_oldTicks) * 100), 2));
+        systemData.setCpuUsePercent(FloatUtil.format(processor.getSystemCpuLoadBetweenTicks(cpu_oldTicks) * 100, 2));
 
         //磁盘io
         double cur_disk_io_read = 0d;
@@ -93,8 +94,8 @@ public class MonitorUtil {
             cur_disk_io_read += disk.getReadBytes();
             cur_disk_io_write += disk.getWriteBytes();
         }
-        systemData.setDiskReadSpeed(half_up(BigDecimal.valueOf((cur_disk_io_read - prev_disk_io_read) / KB), 2));
-        systemData.setDiskWriteSpeed(half_up(BigDecimal.valueOf((cur_disk_io_write - prev_disk_io_write) / KB), 2));
+        systemData.setDiskReadSpeed(FloatUtil.format((cur_disk_io_read - prev_disk_io_read) / KB, 2));
+        systemData.setDiskWriteSpeed(FloatUtil.format((cur_disk_io_write - prev_disk_io_write) / KB, 2));
         //网络io
         long cur_net_recv = 0;
         long cur_net_sent = 0;
@@ -103,8 +104,8 @@ public class MonitorUtil {
             cur_net_recv += net.getBytesRecv();
             cur_net_sent += net.getBytesSent();
         }
-        systemData.setNetRecvSpeed(half_up(BigDecimal.valueOf((cur_net_recv - prev_net_recv) / KB), 2));
-        systemData.setNetSentSpeed(half_up(BigDecimal.valueOf((cur_net_sent - prev_net_sent) / KB), 2));
+        systemData.setNetRecvSpeed(FloatUtil.format((cur_net_recv - prev_net_recv) / KB, 2));
+        systemData.setNetSentSpeed(FloatUtil.format((cur_net_sent - prev_net_sent) / KB, 2));
         return systemData;
     }
 
