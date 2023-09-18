@@ -50,7 +50,7 @@ public class MonitorUtil {
         long memory_available = memory.getAvailable();
         systemData.setMemoryMax(FloatUtil.format(memory_total / GB, 2));
         systemData.setMemoryUse(FloatUtil.format((memory_total - memory_available) / GB, 2));
-        systemData.setMemoryUsePercent(FloatUtil.format(100d - (memory_available * 100d / memory_total), 2));
+        systemData.setMemoryUsePercent(FloatUtil.format((memory_total - memory_available) * 100d / memory_total, 2));
 
         //磁盘
         FileSystem fileSystem = os.getFileSystem();
@@ -63,11 +63,11 @@ public class MonitorUtil {
         }
         systemData.setDiskMax(FloatUtil.format(disk_total / GB, 2));
         systemData.setDiskUse(FloatUtil.format((disk_total - disk_free) / GB, 2));
-        systemData.setDiskUsePercent(FloatUtil.format(100d - (disk_free * 100d / disk_total), 2));
+        systemData.setDiskUsePercent(FloatUtil.format((disk_total - disk_free) * 100d / disk_total, 2));
 
         //磁盘io
-        double prev_disk_io_read = 0d;
-        double prev_disk_io_write = 0d;
+        long prev_disk_io_read = 0;
+        long prev_disk_io_write = 0;
         for (HWDiskStore disk : hal.getDiskStores()) {
             prev_disk_io_read += disk.getReadBytes();
             prev_disk_io_write += disk.getWriteBytes();
@@ -88,8 +88,8 @@ public class MonitorUtil {
         systemData.setCpuUsePercent(FloatUtil.format(processor.getSystemCpuLoadBetweenTicks(cpu_oldTicks) * 100, 2));
 
         //磁盘io
-        double cur_disk_io_read = 0d;
-        double cur_disk_io_write = 0d;
+        long cur_disk_io_read = 0;
+        long cur_disk_io_write = 0;
         for (HWDiskStore disk : hal.getDiskStores()) {
             cur_disk_io_read += disk.getReadBytes();
             cur_disk_io_write += disk.getWriteBytes();
