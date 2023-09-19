@@ -9,8 +9,6 @@ import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.Util;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -22,10 +20,6 @@ public class MonitorUtil {
     private final static double GB = 1024 * 1024 * 1024;
     private final static double MB = 1024 * 1024;
     private final static double KB = 1024;
-
-    private static BigDecimal half_up(BigDecimal data, int scale) {
-        return data.setScale(scale, RoundingMode.HALF_UP);
-    }
 
     /**
      * 此方法会阻塞1秒
