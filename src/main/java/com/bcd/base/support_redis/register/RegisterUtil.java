@@ -2,6 +2,8 @@ package com.bcd.base.support_redis.register;
 
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.DateZoneUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,45 +23,20 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * redis作为注册中心
+ * 服务提供者启动后、向redis中插入自己的服务信息、并定时刷新时间戳表示存活
+ * 消费者从redis中获取指定服务信息、然后检测其时间戳、判断是否存活、从存活的服务者轮询选取一个调用服务
+ */
 @ConditionalOnProperty(value = "register.host")
 @EnableConfigurationProperties(RegisterProp.class)
 @Component
-public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
-    final static String redisKeyPre="register:";
-    final static ConcurrentHashMap<String, TypeInfo> typeToTypeInfo = new ConcurrentHashMap<>();
-    /**
-     * 最大感知超时时间
-     * 即服务提供者、如果宕机、在此时间内会被消费者感知到
-     * <p>
-     * 此时间会产生如下两个重要时间
-     * {@link #provider_heartbeat_s} 服务提供者心跳频率
-     * {@link #consumer_localCacheExpired_ms} 消费者本地缓存过期时间
-     * {@link #consumer_providerInfoExpired_ms} 消费者从redis获取信息、检查过期时间
-     * <p>
-     * 例如
-     * maxTimeout_s=5s
-     * provider_heartbeat_s=2s
-     * consumer_localCacheExpired_ms=2000ms
-     * consumer_providerInfoExpired_ms=3000ms
-     * <p>
-     * 极端场景下(最大过期信息场景)
-     * 1、服务提供者发送完心跳立即宕机(从现在开始计算5s内消费者需要感知到)
-     * 2、接着在3s内最后一刻、消费者获取到了服务提供者的信息
-     * 逻辑分析:
-     * 此时消费者本地缓存检查此信息在3s内、合法、并在本地缓存、缓存时间为2s、则在本地缓存失效前一刻、信息达到最大过期时间即接近5s
-     * 此后本地缓存失效、再次从redis中获取并检查、剔除掉过期信息
-     */
-    final static int maxTimeout_s = 5;
-    final static int provider_heartbeat_s;
-    final static long consumer_localCacheExpired_ms;
-    final static long consumer_providerInfoExpired_ms;
+public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent> {
 
-    static {
-        int consumer_localCacheExpired = (maxTimeout_s - 1) / 2;
-        consumer_localCacheExpired_ms = consumer_localCacheExpired * 1000L;
-        provider_heartbeat_s = (maxTimeout_s - 1) - consumer_localCacheExpired;
-        consumer_providerInfoExpired_ms = (provider_heartbeat_s + 1) * 1000L;
-    }
+    static Logger logger = LoggerFactory.getLogger(RegisterUtil.class);
+
+    final static String redisKeyPre = "register:";
+    final static ConcurrentHashMap<RegisterServer, TypeInfo> typeToTypeInfo = new ConcurrentHashMap<>();
 
     static RedisConnectionFactory redisConnectionFactory;
 
@@ -69,6 +46,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
     }
 
     static RegisterProp registerProp;
+
     @Autowired
     public void setProviderProp(RegisterProp registerProp) {
         RegisterUtil.registerProp = registerProp;
@@ -79,14 +57,14 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
     }
 
     static class TypeInfo {
-        final String type;
+        final RegisterServer registerServer;
         final BoundHashOperations<String, String, String> boundHashOperations;
         ProviderInfo providerInfo;
         final AtomicLong count = new AtomicLong();
 
-        public TypeInfo(String type, RedisConnectionFactory redisConnectionFactory) {
-            this.type = type;
-            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(redisKeyPre + type);
+        public TypeInfo(RegisterServer registerServer, RedisConnectionFactory redisConnectionFactory) {
+            this.registerServer = registerServer;
+            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(redisKeyPre + registerServer.name());
         }
 
         public String host() {
@@ -100,12 +78,12 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
         public ArrayList<String> hosts() {
             ProviderInfo temp = providerInfo;
             long curTs = System.currentTimeMillis();
-            long localExpireTs = curTs - consumer_localCacheExpired_ms;
+            long localExpireTs = curTs - registerServer.consumer_localCacheExpired_ms;
             if (temp == null || temp.lastUpdateTs < localExpireTs) {
                 synchronized (this) {
                     temp = providerInfo;
                     curTs = System.currentTimeMillis();
-                    localExpireTs = curTs - consumer_localCacheExpired_ms;
+                    localExpireTs = curTs - registerServer.consumer_localCacheExpired_ms;
                     if (temp == null || temp.lastUpdateTs < localExpireTs) {
                         //从redis中加载
                         final ArrayList<String> hosts = new ArrayList<>();
@@ -113,7 +91,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
                         if (!entries.isEmpty()) {
                             for (Map.Entry<String, String> entry : entries.entrySet()) {
                                 final String value = entry.getValue();
-                                if (DateZoneUtil.stringToDate_second(value).getTime() >= consumer_providerInfoExpired_ms) {
+                                if (DateZoneUtil.stringToDate_second(value).getTime() >= registerServer.consumer_providerInfoExpired_ms) {
                                     hosts.add(entry.getKey());
                                 }
                             }
@@ -132,7 +110,6 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
     }
 
 
-
     /**
      * 开启服务自动更新到redis
      *
@@ -141,25 +118,13 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
      */
     @SuppressWarnings("unchecked")
     public void startProviderHeartbeat(RegisterProp registerProp, RedisConnectionFactory redisConnectionFactory) {
-        final String[] types;
-        if (registerProp.types.contains(",")) {
-            types = registerProp.types.split(",");
-        } else {
-            types = new String[]{registerProp.types};
-        }
         final RedisTemplate<String, String> stringStringRedisTemplate = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory);
-        final BoundHashOperations<String, String, String>[] boundHashOperations = new BoundHashOperations[types.length];
-        for (int i = 0; i < types.length; i++) {
-            boundHashOperations[i] = stringStringRedisTemplate.boundHashOps(redisKeyPre + types[i]);
-        }
         final ScheduledExecutorService providerPool = Executors.newSingleThreadScheduledExecutor();
-        providerPool.scheduleAtFixedRate(() -> {
+        for (RegisterServer registerServer : registerProp.servers) {
+            final BoundHashOperations<String, String, String> boundHashOperation = stringStringRedisTemplate.boundHashOps(redisKeyPre + registerServer.name());
             final String host = registerProp.host;
-            final String s = DateZoneUtil.dateToString_second(new Date());
-            for (BoundHashOperations<String, String, String> boundHashOperation : boundHashOperations) {
-                boundHashOperation.put(host, s);
-            }
-        }, 1, provider_heartbeat_s, TimeUnit.SECONDS);
+            providerPool.scheduleAtFixedRate(() -> boundHashOperation.put(host, DateZoneUtil.dateToString_second(new Date())), 1, registerServer.provider_heartbeat_s, TimeUnit.SECONDS);
+        }
         //添加关机钩子
         Runtime.getRuntime().addShutdownHook(new Thread(providerPool::shutdown));
     }
@@ -175,32 +140,29 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent>{
     /**
      * 根据访问序号轮流使用host
      *
-     * @param type
+     * @param registerServer
      * @return
      */
-    public static String host(String type) {
-        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(type, k -> new TypeInfo(k, redisConnectionFactory));
+    public static String host(RegisterServer registerServer) {
+        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(registerServer, k -> new TypeInfo(k, redisConnectionFactory));
         return typeInfo.host();
     }
 
     /**
      * 获取可用host
      *
-     * @param type
+     * @param registerServer
      * @return
      */
-    public static ArrayList<String> hosts(String type) {
-        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(type, k -> new TypeInfo(k, redisConnectionFactory));
+    public static ArrayList<String> hosts(RegisterServer registerServer) {
+        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(registerServer, k -> new TypeInfo(k, redisConnectionFactory));
         return typeInfo.hosts();
     }
 
     public static void main(String[] args) {
-        byte a = Byte.MAX_VALUE;
-        System.out.println((byte) a);
-        System.out.println((byte) ((a + 1) & 0x7F));
-        System.out.println((byte) ((a + 2) & 0x7F));
-        System.out.println((byte) ((a + 3) & 0x7F));
         System.out.println(RegisterServer.test1);
+        System.out.println(RegisterServer.test1.name());
+        System.out.println(RegisterServer.valueOf("test2"));
     }
 }
 

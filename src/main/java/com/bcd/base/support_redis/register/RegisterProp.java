@@ -14,14 +14,14 @@ public class RegisterProp {
      * 同一类服务提供者、应该是相同类型
      * 可以是多个,分割
      */
-    public String types;
+    public RegisterServer[] servers;
 
-    public String getTypes() {
-        return types;
+    public RegisterServer[] getServers() {
+        return servers;
     }
 
-    public void setTypes(String types) {
-        this.types = types;
+    public void setServers(RegisterServer[] servers) {
+        this.servers = servers;
     }
 
     public String getHost() {
