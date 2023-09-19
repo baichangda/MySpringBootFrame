@@ -143,17 +143,17 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-spring-boot3-starter', version: "+"
     implementation group: 'cn.dev33', name: 'sa-token-redis-jackson', version: "+"
 
-//    // define a BOM and its version
-//    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
-//    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
-//    // define any required OkHttp artifacts without version
-//    implementation("com.squareup.okhttp3:okhttp")
-//    implementation("com.squareup.okhttp3:logging-interceptor")
+    // define a BOM and its version
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
+    // define any required OkHttp artifacts without version
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
 
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.14.9'
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.9'
+//    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
+//    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.14.9'
+//    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+//    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.9'
 
 
     // https://mvnrepository.com/artifact/com.github.oshi/oshi-core
