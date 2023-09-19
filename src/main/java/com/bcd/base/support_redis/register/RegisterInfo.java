@@ -9,14 +9,13 @@ import org.springframework.data.redis.core.BoundHashOperations;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public final class RegisterInfo {
     public final RegisterServer server;
-    final ExecutorService pool = Executors.newSingleThreadExecutor();
+
+    //单线程
+    final ThreadPoolExecutor pool = new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(1000));
     final BoundHashOperations<String, String, String> boundHashOperations;
 
     ArrayList<String> hosts;
