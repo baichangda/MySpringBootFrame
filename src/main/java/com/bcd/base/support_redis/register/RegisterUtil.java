@@ -16,12 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * redis作为注册中心
@@ -35,8 +33,9 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent> 
 
     static Logger logger = LoggerFactory.getLogger(RegisterUtil.class);
 
-    final static String redisKeyPre = "register:";
-    final static ConcurrentHashMap<RegisterServer, TypeInfo> typeToTypeInfo = new ConcurrentHashMap<>();
+    public final static String redisKeyPre = "register:";
+
+    final static ConcurrentHashMap<RegisterServer, RegisterInfo> registerServer_registerInfo = new ConcurrentHashMap<>();
 
     static RedisConnectionFactory redisConnectionFactory;
 
@@ -50,65 +49,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent> 
     @Autowired
     public void setProviderProp(RegisterProp registerProp) {
         RegisterUtil.registerProp = registerProp;
-
     }
-
-    record ProviderInfo(long lastUpdateTs, ArrayList<String> hosts) {
-    }
-
-    static class TypeInfo {
-        final RegisterServer registerServer;
-        final BoundHashOperations<String, String, String> boundHashOperations;
-        ProviderInfo providerInfo;
-        final AtomicLong count = new AtomicLong();
-
-        public TypeInfo(RegisterServer registerServer, RedisConnectionFactory redisConnectionFactory) {
-            this.registerServer = registerServer;
-            this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(redisKeyPre + registerServer.name());
-        }
-
-        public String host() {
-            final ArrayList<String> hosts = hosts();
-            if (hosts.isEmpty()) {
-                return null;
-            }
-            return hosts.get((int) (count.getAndIncrement() % hosts.size()));
-        }
-
-        public ArrayList<String> hosts() {
-            ProviderInfo temp = providerInfo;
-            long curTs = System.currentTimeMillis();
-            long localExpireTs = curTs - registerServer.consumer_localCacheExpired_ms;
-            if (temp == null || temp.lastUpdateTs < localExpireTs) {
-                synchronized (this) {
-                    temp = providerInfo;
-                    curTs = System.currentTimeMillis();
-                    localExpireTs = curTs - registerServer.consumer_localCacheExpired_ms;
-                    if (temp == null || temp.lastUpdateTs < localExpireTs) {
-                        //从redis中加载
-                        final ArrayList<String> hosts = new ArrayList<>();
-                        final Map<String, String> entries = boundHashOperations.entries();
-                        if (!entries.isEmpty()) {
-                            for (Map.Entry<String, String> entry : entries.entrySet()) {
-                                final String value = entry.getValue();
-                                if (DateZoneUtil.stringToDate_second(value).getTime() >= registerServer.consumer_providerInfoExpired_ms) {
-                                    hosts.add(entry.getKey());
-                                }
-                            }
-                            hosts.sort(String::compareTo);
-                            hosts.trimToSize();
-                            temp = new ProviderInfo(curTs, hosts);
-                        } else {
-                            temp = new ProviderInfo(curTs, new ArrayList<>());
-                        }
-                        this.providerInfo = temp;
-                    }
-                }
-            }
-            return temp.hosts;
-        }
-    }
-
 
     /**
      * 开启服务自动更新到redis
@@ -136,27 +77,33 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
 
-
     /**
      * 根据访问序号轮流使用host
      *
-     * @param registerServer
+     * @param server
      * @return
      */
-    public static String host(RegisterServer registerServer) {
-        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(registerServer, k -> new TypeInfo(k, redisConnectionFactory));
-        return typeInfo.host();
+    public static String host(RegisterServer server) {
+        return registerServer_registerInfo.computeIfAbsent(server, k -> new RegisterInfo(k, redisConnectionFactory)).host();
     }
 
     /**
      * 获取可用host
      *
-     * @param registerServer
+     * @param server
      * @return
      */
-    public static ArrayList<String> hosts(RegisterServer registerServer) {
-        final TypeInfo typeInfo = typeToTypeInfo.computeIfAbsent(registerServer, k -> new TypeInfo(k, redisConnectionFactory));
-        return typeInfo.hosts();
+    public static ArrayList<String> hosts(RegisterServer server) {
+        return registerServer_registerInfo.computeIfAbsent(server, k -> new RegisterInfo(k, redisConnectionFactory)).hosts();
+    }
+
+    /**
+     * 清除本地缓存
+     * 下一次会从redis中获取最新数据
+     * @param server
+     */
+    public static void clearCache(RegisterServer server) {
+        registerServer_registerInfo.computeIfAbsent(server, k -> new RegisterInfo(k, redisConnectionFactory)).clearCache();
     }
 
     public static void main(String[] args) {

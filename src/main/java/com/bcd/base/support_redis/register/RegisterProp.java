@@ -4,7 +4,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "register")
 public class RegisterProp {
-
     /**
      * ip:端口
      */

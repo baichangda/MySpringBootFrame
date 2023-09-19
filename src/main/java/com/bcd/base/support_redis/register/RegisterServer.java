@@ -5,7 +5,6 @@ public enum RegisterServer {
     test1(5),
     test2(10);
 
-
     /**
      * 最大感知超时时间
      * 即服务提供者、如果宕机、在此时间内会被消费者感知到
