@@ -13,7 +13,10 @@ import java.util.function.Consumer;
 public class ExecutorUtil {
 
     /**
-     * 循环从队列里面拿数据、没有数据会阻塞
+     * 循环从队列里面拿数据、堆积一批到缓存中、然后触发回调
+     * 如下两种情况触发回调
+     * 1、缓存数量到达期望数量、此时数量为except
+     *  2、当队列数量为空、即将进入阻塞前一刻、此时数量<except
      *
      * @param queue    阻塞队列
      * @param except   期望数量、当到达这个数量时候会调用 consumer
@@ -24,7 +27,7 @@ public class ExecutorUtil {
      */
     public static <T> void loop(BlockingQueue<T> queue, int except, Consumer<ArrayList<T>> callback) {
         try {
-            ArrayList<T> cache = new ArrayList<>(except);
+            final ArrayList<T> cache = new ArrayList<>(except);
             while (true) {
                 T t = queue.take();
                 do {
