@@ -19,10 +19,8 @@ public class ExecutorUtil {
      *  2、当队列数量为空、即将进入阻塞前一刻、此时数量<except
      *
      * @param queue    阻塞队列
-     * @param except   期望数量、当到达这个数量时候会调用 consumer
-     * @param callback 回调方法、如下两种情况会被调用
-     *                 1、缓存数量到达期望数量、此时数量为except
-     *                 2、当队列数量为空、即将进入阻塞前一刻、此时数量<except
+     * @param except   期望数量
+     * @param callback 回调方法
      * @param <T>
      */
     public static <T> void loop(BlockingQueue<T> queue, int except, Consumer<ArrayList<T>> callback) {
