@@ -93,7 +93,7 @@ public class RegisterUtil implements ApplicationListener<ContextRefreshedEvent> 
      * @param server
      * @return
      */
-    public static ArrayList<String> hosts(RegisterServer server) {
+    public static String[] hosts(RegisterServer server) {
         return registerServer_registerInfo.computeIfAbsent(server, k -> new RegisterInfo(k, redisConnectionFactory)).hosts();
     }
 

@@ -1,91 +1,74 @@
 package com.bcd.base.support_redis.register;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.DateZoneUtil;
-import com.bcd.base.util.ExecutorUtil;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class RegisterInfo {
     public final RegisterServer server;
-
-    //单线程
-    final ThreadPoolExecutor pool = new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new ArrayBlockingQueue<>(1000));
     final BoundHashOperations<String, String, String> boundHashOperations;
+    record Info(String[] hosts, long lastUpdateTs) {
 
-    ArrayList<String> hosts;
-    long lastUpdateTs;
-    long index = 0;
+    }
+
+    volatile Info info;
+    AtomicLong index = new AtomicLong(0);
 
     public RegisterInfo(RegisterServer server, RedisConnectionFactory redisConnectionFactory) {
         this.server = server;
         this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(RegisterUtil.redisKeyPre + server.name());
     }
 
-    private ArrayList<String> hosts_unsafe() {
+    public String[] hosts() {
+        Info temp = this.info;
         long curTs = System.currentTimeMillis();
         long localExpireTs = curTs - server.consumer_localCacheExpired_ms;
-        if (lastUpdateTs < localExpireTs) {
-            //从redis中加载
-            final Map<String, String> entries = boundHashOperations.entries();
-            final ArrayList<String> temp;
-            if (entries == null || entries.isEmpty()) {
-                temp = new ArrayList<>();
-            } else {
-                temp = new ArrayList<>();
-                for (Map.Entry<String, String> entry : entries.entrySet()) {
-                    final String value = entry.getValue();
-                    if (DateZoneUtil.stringToDate_second(value).getTime() >= server.consumer_providerInfoExpired_ms) {
-                        temp.add(entry.getKey());
+        if (temp == null || temp.lastUpdateTs < localExpireTs) {
+            synchronized (this) {
+                temp = this.info;
+                curTs = System.currentTimeMillis();
+                localExpireTs = curTs - server.consumer_localCacheExpired_ms;
+                if (temp == null || temp.lastUpdateTs < localExpireTs) {
+                    //从redis中加载
+                    final Map<String, String> entries = boundHashOperations.entries();
+                    final String[] hosts;
+                    if (entries == null || entries.isEmpty()) {
+                        hosts = new String[0];
+                    } else {
+                        hosts = new String[entries.size()];
+                        int i = 0;
+                        for (Map.Entry<String, String> entry : entries.entrySet()) {
+                            final String value = entry.getValue();
+                            if (DateZoneUtil.stringToDate_second(value).getTime() >= server.consumer_providerInfoExpired_ms) {
+                                hosts[i++] = entry.getKey();
+                            }
+                        }
+                        Arrays.sort(hosts);
                     }
+                    this.info = new Info(hosts, curTs);
+                    return hosts;
+                } else {
+                    return temp.hosts;
                 }
-                temp.sort(String::compareTo);
-                temp.trimToSize();
             }
-            this.hosts = temp;
-            this.lastUpdateTs = curTs;
-            return temp;
         } else {
-            return hosts;
-        }
-    }
-
-    private String host_unsafe() {
-        ArrayList<String> list = hosts_unsafe();
-        return list.get((int) (index++ % list.size()));
-    }
-
-    public ArrayList<String> hosts() {
-        Future<ArrayList<String>> submit = pool.submit(this::hosts_unsafe);
-        try {
-            return submit.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            throw BaseRuntimeException.getException(ex);
+            return temp.hosts;
         }
     }
 
     public String host() {
-        Future<String> submit = pool.submit(this::host_unsafe);
-        try {
-            return submit.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+        String[] hosts = hosts();
+        return hosts[(int) (index.getAndIncrement() % hosts.length)];
     }
 
     public void clearCache() {
-        pool.execute(() -> {
-            lastUpdateTs = 0;
-            hosts = null;
-        });
-    }
-
-    public void destroy() {
-        ExecutorUtil.shutdownThenAwait(pool);
+        synchronized (this) {
+            info = null;
+        }
     }
 }
