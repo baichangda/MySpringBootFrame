@@ -4,9 +4,8 @@ import com.bcd.base.exception.BaseRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -314,13 +313,23 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        LocalDateTime ldt1 = LocalDateTime.of(2023, 8, 16, 6, 10, 10, 0);
-        LocalDateTime ldt2 = ldt1.plusDays(20);
-        ZoneOffset zoneOffset = ZoneOffset.of("+8");
-        List<Date[]> range = DateUtil.range(Date.from(ldt1.toInstant(zoneOffset)), Date.from(ldt2.toInstant(zoneOffset)), 1, ChronoUnit.MONTHS, zoneOffset);
-        for (Date[] dates : range) {
-            System.out.println(dates[0] + "," + dates[1]);
-        }
+//        LocalDateTime ldt1 = LocalDateTime.of(2023, 8, 16, 6, 10, 10, 0);
+//        LocalDateTime ldt2 = ldt1.plusDays(20);
+//        ZoneOffset zoneOffset = ZoneOffset.of("+8");
+//        List<Date[]> range = DateUtil.range(Date.from(ldt1.toInstant(zoneOffset)), Date.from(ldt2.toInstant(zoneOffset)), 1, ChronoUnit.MONTHS, zoneOffset);
+//        for (Date[] dates : range) {
+//            System.out.println(dates[0] + "," + dates[1]);
+//        }
+
+        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of("+0"));
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("+8"));
+        LocalDateTime ldt = LocalDateTime.now();
+        System.out.println(ldt.format(dtf));
+        System.out.println(zdt.format(dtf));
+        System.out.println(dtf.format(new Date().toInstant()));
+
+        System.out.println(Instant.from(dtf.parse("20220101010101")));
+
     }
 
 }

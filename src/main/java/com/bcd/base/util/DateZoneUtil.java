@@ -17,6 +17,12 @@ import java.util.List;
  * 所有的操作方法都基于某个时区
  */
 public class DateZoneUtil {
+
+    /**
+     * 注意
+     * {@link DateTimeFormatter#withZone(ZoneId)}如果不设置时区
+     * 则不能格式化和解析不带时区的日期类、例如{@link Instant}
+     */
     public final static ZoneId ZONE_ID = ZoneId.of("Asia/Shanghai");
     public final static ZoneOffset ZONE_OFFSET = ZoneOffset.of("+8");
 
@@ -61,7 +67,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDate.parse(dateStr, DATE_TIME_FORMATTER_DAY).atTime(LocalTime.MIN).toInstant(ZONE_OFFSET));
+        return Date.from(Instant.from(DATE_TIME_FORMATTER_DAY.parse(dateStr)));
     }
 
     /**
@@ -72,7 +78,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDateTime.parse(dateStr, DATE_TIME_FORMATTER_SECOND).toInstant(ZONE_OFFSET));
+        return Date.from(Instant.from(DATE_TIME_FORMATTER_SECOND.parse(dateStr)));
     }
 
     /**
@@ -83,7 +89,7 @@ public class DateZoneUtil {
         if (dateStr == null) {
             return null;
         }
-        return Date.from(LocalDateTime.parse(dateStr, DATE_TIME_FORMATTER_MILLISECOND).toInstant(ZONE_OFFSET));
+        return Date.from(Instant.from(DATE_TIME_FORMATTER_MILLISECOND.parse(dateStr)));
     }
 
     /**
