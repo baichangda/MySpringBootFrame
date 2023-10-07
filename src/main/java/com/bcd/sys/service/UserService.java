@@ -7,6 +7,8 @@ import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.support_jdbc.service.ParamPairs;
+import com.bcd.base.support_jdbc.service.UserInterface;
+import com.bcd.base.support_satoken.UserServiceInterface;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -21,6 +23,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<Long,UserBean> implements ApplicationListener<ContextRefreshedEvent> {
+public class UserService extends BaseService<Long, UserBean> implements ApplicationListener<ContextRefreshedEvent>, UserServiceInterface {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -37,6 +40,11 @@ public class UserService extends BaseService<Long,UserBean> implements Applicati
     @Qualifier("string_string_redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
 
+
+    @Override
+    public Object getUserByLoginId(String loginId) {
+        return getUser(loginId);
+    }
 
     public UserBean getUser(String username) {
         return get(StringCondition.EQUAL("username", username));

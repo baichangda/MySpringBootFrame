@@ -92,7 +92,7 @@ public class TaskBean implements Task<Long>,SuperBaseBean<Long> {
     @Override
     public void onCreated() {
         createTime = new Date();
-        UserBean userBean = SaTokenUtil.getLoginUser_cache();
+        UserBean userBean = (UserBean) SaTokenUtil.getLoginUser_cache();
         if (userBean != null) {
             createUserId = userBean.getId();
             createUserName = userBean.realName;

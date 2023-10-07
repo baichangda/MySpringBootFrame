@@ -7,7 +7,6 @@ import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
 import com.bcd.base.support_satoken.SaTokenUtil;
-import com.bcd.sys.bean.UserBean;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -509,20 +508,20 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
     private void setCreateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.createTime = new Date();
-        UserBean user = SaTokenUtil.getLoginUser_cache();
-        if (user != null) {
-            bean.createUserId = user.getId();
-            bean.createUserName = user.username;
+        Object user = SaTokenUtil.getLoginUser_cache();
+        if (user instanceof UserInterface<?> u) {
+            bean.createUserId = u.getId();
+            bean.createUserName = u.getUserName();
         }
     }
 
     private void setUpdateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.updateTime = new Date();
-        UserBean user = SaTokenUtil.getLoginUser_cache();
-        if (user != null) {
-            bean.updateUserId = user.getId();
-            bean.updateUserName = user.username;
+        Object user = SaTokenUtil.getLoginUser_cache();
+        if (user instanceof UserInterface<?> u) {
+            bean.updateUserId = u.getId();
+            bean.updateUserName = u.getUserName();
         }
     }
 
@@ -537,13 +536,13 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
             if (!map.containsKey("createTime")) {
                 paramList.add(new ParamPairs("createTime", new Date()));
             }
-            UserBean user = SaTokenUtil.getLoginUser_cache();
-            if (user != null) {
+            Object user = SaTokenUtil.getLoginUser_cache();
+            if (user instanceof UserInterface<?> u) {
                 if (!map.containsKey("createUserId")) {
-                    paramList.add(new ParamPairs("createUserId", user.getId()));
+                    paramList.add(new ParamPairs("createUserId", u.getId()));
                 }
                 if (!map.containsKey("createUserName")) {
-                    paramList.add(new ParamPairs("createUserName", user.username));
+                    paramList.add(new ParamPairs("createUserName", u.getUserName()));
                 }
             }
             return paramList.toArray(new ParamPairs[0]);
@@ -563,13 +562,13 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
             if (!map.containsKey("updateTime")) {
                 paramList.add(new ParamPairs("updateTime", new Date()));
             }
-            UserBean user = SaTokenUtil.getLoginUser_cache();
-            if (user != null) {
+            Object user = SaTokenUtil.getLoginUser_cache();
+            if (user instanceof UserInterface<?> u) {
                 if (!map.containsKey("updateUserId")) {
-                    paramList.add(new ParamPairs("updateUserId", user.getId()));
+                    paramList.add(new ParamPairs("updateUserId", u.getId()));
                 }
                 if (!map.containsKey("updateUserName")) {
-                    paramList.add(new ParamPairs("updateUserName", user.username));
+                    paramList.add(new ParamPairs("updateUserName", u.getUserName()));
                 }
             }
             return paramList.toArray(new ParamPairs[0]);

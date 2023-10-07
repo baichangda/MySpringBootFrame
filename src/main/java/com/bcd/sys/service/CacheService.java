@@ -22,7 +22,7 @@ public class CacheService {
     @Autowired
     PermissionService permissionService;
 
-    final Duration expire = Duration.ofSeconds(5);
+    final Duration expire = Duration.ofSeconds(3);
 
     private volatile LoadingCache<String, UserBean> username_user;
     private volatile LoadingCache<String, List<String>> username_roleList;
