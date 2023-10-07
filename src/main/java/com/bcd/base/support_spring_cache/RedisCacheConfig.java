@@ -1,6 +1,5 @@
-package com.bcd.base.support_redis.cache;
+package com.bcd.base.support_spring_cache;
 
-import com.bcd.base.support_spring_cache.CacheConst;
 import com.bcd.base.support_redis.RedisUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cache.Cache;
@@ -13,7 +12,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("unchecked")
 @Configuration

@@ -2,7 +2,6 @@ package com.bcd.base.support_jdbc.sql;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.StringUtil;
-import com.bcd.sys.bean.UserBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +16,6 @@ import java.util.function.Function;
 public class SqlUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlUtil.class);
-
-    public static void main(String[] args) {
-        InsertSqlResult<UserBean> insertSqlResult = toInsertSqlResult(UserBean.class, "t_sys_user", field -> !field.getName().equals("id"), true);
-        System.out.println(insertSqlResult.sql);
-        UpdateSqlResult<UserBean> updateSqlResult = toUpdateSqlResult(UserBean.class, "t_sys_user", field ->
-                !field.getName().equals("id"), true, "id");
-        System.out.println(updateSqlResult.sql);
-    }
 
     public record InsertSqlResult<T>(String sql, Class<T> clazz, Field[] insertFields) {
         public int[] insertBatch(final List<T> dataList, final JdbcTemplate jdbcTemplate) {
