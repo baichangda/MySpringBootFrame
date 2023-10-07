@@ -1,6 +1,7 @@
-package com.bcd.sys.service;
+package com.bcd.base.support_satoken;
 
 import cn.dev33.satoken.stp.StpInterface;
+import com.bcd.sys.service.CacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

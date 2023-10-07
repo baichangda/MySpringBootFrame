@@ -2,7 +2,6 @@ package com.bcd.sys.bean;
 
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.bean.BaseBean;
-import com.bcd.base.support_jdbc.service.UserInterface;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +20,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_user")
-public class UserBean extends BaseBean<Long> implements UserInterface<Long> {
+public class UserBean extends BaseBean<Long>{
     @Serial
     private final static long serialVersionUID = 1L;
 
@@ -67,8 +66,4 @@ public class UserBean extends BaseBean<Long> implements UserInterface<Long> {
     @Schema(description = "是否可用(0:禁用,1:可用)",requiredMode = Schema.RequiredMode.REQUIRED)
     public Integer status;
 
-    @Override
-    public String getUserName() {
-        return username;
-    }
 }

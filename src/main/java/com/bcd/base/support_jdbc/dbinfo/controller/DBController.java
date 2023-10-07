@@ -25,7 +25,7 @@ public class DBController extends BaseController {
 
     Logger logger = LoggerFactory.getLogger(DBController.class);
 
-    @Autowired
+    @Autowired(required = false)
     private DBService dbService;
 
     @SuppressWarnings("unchecked")
