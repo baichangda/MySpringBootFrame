@@ -1,13 +1,12 @@
 package com.bcd.base.support_mongodb.service;
 
 import com.bcd.base.support_mongodb.anno.Unique;
+import com.bcd.base.support_mongodb.bean.BaseBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 public final class BeanInfo<T> {
     /**
@@ -28,6 +27,11 @@ public final class BeanInfo<T> {
 
     public final Field[] uniqueFields;
 
+    /**
+     * 是否在新增时候自动设置创建信息
+     */
+    public final boolean isBaseBean;
+
 
     public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
@@ -39,5 +43,7 @@ public final class BeanInfo<T> {
         collection = clazz.getAnnotation(Document.class).collection();
 
         uniqueFields = FieldUtils.getFieldsWithAnnotation(clazz, Unique.class);
+
+        isBaseBean = BaseBean.class.isAssignableFrom(clazz);
     }
 }

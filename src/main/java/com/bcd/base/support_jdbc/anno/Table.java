@@ -26,7 +26,6 @@ public @interface Table {
      * 同时满足如下3条件才会自动设置
      * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}时候才有效
      * 2、此属性设置为true
-     * 3、{@link SaTokenUtil#getLoginUser_cache()}获取的用户对象必须是{@link com.bcd.base.support_jdbc.service.UserInterface}子类
      *
      * 影响的方法如下
      * {@link com.bcd.base.support_jdbc.service.BaseService#insert(SuperBaseBean)}
@@ -41,7 +40,6 @@ public @interface Table {
      * 同时满足如下3条件才会自动设置
      * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}时候才有效
      * 2、此属性设置为true
-     * 3、{@link SaTokenUtil#getLoginUser_cache()}获取的用户对象必须是{@link com.bcd.base.support_jdbc.service.UserInterface}子类
      *
      * 影响的方法如下
      * {@link com.bcd.base.support_jdbc.service.BaseService#update(SuperBaseBean)}

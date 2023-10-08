@@ -521,8 +521,8 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
         bean.updateTime = new Date();
         UserBean user = SaTokenUtil.getLoginUser_cache();
         if (user != null) {
-            bean.createUserId = user.getId();
-            bean.createUserName = user.getUsername();
+            bean.updateUserId = user.getId();
+            bean.updateUserName = user.getUsername();
         }
     }
 

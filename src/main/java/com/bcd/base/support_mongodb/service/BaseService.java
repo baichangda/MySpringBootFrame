@@ -1,9 +1,10 @@
 package com.bcd.base.support_mongodb.service;
 
-import com.google.common.collect.Streams;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_mongodb.anno.Unique;
+import com.bcd.base.support_mongodb.bean.BaseBean;
+import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
 import com.bcd.base.util.StringUtil;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * Created by Administrator on 2017/8/25.
  */
 @SuppressWarnings("unchecked")
-public class BaseService<T> {
+public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 注意所有的类变量必须使用get方法获取
@@ -117,17 +118,43 @@ public class BaseService<T> {
 
     public T get(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
-        return getMongoTemplate().findOne(query, (Class<T>) getBeanInfo().clazz);
+        return getMongoTemplate().findOne(query, getBeanInfo().clazz);
     }
 
     public T save(T t) {
         validateUniqueBeforeSave(Collections.singletonList(t));
+        if (getBeanInfo().isBaseBean) {
+            if (t.id == null) {
+                setCreateInfo(t);
+            } else {
+                setUpdateInfo(t);
+            }
+        }
         return getRepository().save(t);
     }
 
-    public List<T> save(Iterable<T> iterable) {
-        validateUniqueBeforeSave(Streams.stream(iterable).toList());
-        return getRepository().saveAll(iterable);
+    public List<T> save(List<T> collection) {
+        validateUniqueBeforeSave(collection);
+        if (getBeanInfo().isBaseBean) {
+            for (T t : collection) {
+                if (t.id == null) {
+                    setCreateInfo(t);
+                } else {
+                    setUpdateInfo(t);
+                }
+            }
+        }
+        return getRepository().saveAll(collection);
+    }
+
+    public List<T> insertAll(List<T> collection) {
+        validateUniqueBeforeSave(collection);
+        if (getBeanInfo().isBaseBean) {
+            for (T t : collection) {
+                setCreateInfo(t);
+            }
+        }
+        return getMongoTemplate().insertAll(collection).stream().toList();
     }
 
     /**
@@ -163,6 +190,28 @@ public class BaseService<T> {
         getMongoTemplate().remove(query, getBeanInfo().clazz);
     }
 
+
+    private void setCreateInfo(T t) {
+        BaseBean bean = (BaseBean) t;
+        bean.createTime = new Date();
+        //todo 在这里获取本地用户设置创建信息
+//        UserBean user = SaTokenUtil.getLoginUser_cache();
+//        if (user != null) {
+//            bean.createUserId = user.getId();
+//            bean.createUserName = user.getUsername();
+//        }
+    }
+
+    private void setUpdateInfo(T t) {
+        BaseBean bean = (BaseBean) t;
+        bean.createTime = new Date();
+        //todo 在这里获取本地用户设置更新信息
+//        UserBean user = SaTokenUtil.getLoginUser_cache();
+//        if (user != null) {
+//            bean.updateUserId = user.getId();
+//            bean.updateUserName = user.getUsername();
+//        }
+    }
 
     private void validateUniqueBeforeSave(List<T> list) {
         if (getBeanInfo().uniqueFields.length > 0) {
