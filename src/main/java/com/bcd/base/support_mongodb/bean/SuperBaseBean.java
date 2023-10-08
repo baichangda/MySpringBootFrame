@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import java.io.Serializable;
 
 /**
- * 不一定非要继承此类
+ * 继承此类
  * 因为如果使用业务字段作为主键、直接使用{@link Id}标注即可
  * 需要注意的是、无论主键字段名如何、数据库中的主键字段名总是 _id
  */

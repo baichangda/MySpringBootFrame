@@ -4,11 +4,11 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.message.JsonMessage;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
@@ -38,11 +38,13 @@ public class TestController extends BaseController {
     public JsonMessage<List<TestBean>> list(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
         @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
-        @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd
+        @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd,
+        @Parameter(description = "主键(唯一标识符,自动生成)") @RequestParam(required = false) String id
     ){
         Condition condition= Condition.and(
            StringCondition.EQUAL("vin",vin),
-           DateCondition.BETWEEN("time",timeBegin,timeEnd)
+           DateCondition.BETWEEN("time",timeBegin,timeEnd),
+           StringCondition.EQUAL("id",id)
         );
         return JsonMessage.success(testService.list(condition));
     }
@@ -58,12 +60,14 @@ public class TestController extends BaseController {
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
         @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
         @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd,
+        @Parameter(description = "主键(唯一标识符,自动生成)") @RequestParam(required = false) String id,
         @Parameter(description = "分页参数(页数)")  @RequestParam(required = false,defaultValue = "1")Integer pageNum,
         @Parameter(description = "分页参数(页大小)") @RequestParam(required = false,defaultValue = "20") Integer pageSize
     ){
         Condition condition= Condition.and(
            StringCondition.EQUAL("vin",vin),
-           DateCondition.BETWEEN("time",timeBegin,timeEnd)
+           DateCondition.BETWEEN("time",timeBegin,timeEnd),
+           StringCondition.EQUAL("id",id)
         );
         return JsonMessage.success(testService.page(condition,PageRequest.of(pageNum-1,pageSize)));
     }
@@ -84,14 +88,14 @@ public class TestController extends BaseController {
 
     /**
      * 删除测试
-     * @param vins
+     * @param ids
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @Operation(summary = "删除测试")
     @ApiResponse(responseCode = "200",description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "测试vin数组") @RequestParam String[] vins){
-        testService.delete(vins);
+    public JsonMessage delete(@Parameter(description = "测试ids数组",example = "100,101,102") @RequestParam String[] ids){
+        testService.delete(ids);
         return JsonMessage.success();
     }
 

@@ -1,6 +1,7 @@
 package com.bcd.base.support_mongodb.code;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.code.data.*;
 import com.bcd.base.util.StringUtil;
 import freemarker.template.Configuration;
@@ -51,7 +52,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("mongo_TemplateRepository.txt",StandardCharsets.UTF_8.name());
+            Template template = configuration.getTemplate("mongo_TemplateRepository.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
@@ -79,7 +80,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("mongo_TemplateService.txt",StandardCharsets.UTF_8.name());
+            Template template = configuration.getTemplate("mongo_TemplateService.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
@@ -107,7 +108,7 @@ public class CodeGenerator {
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
             configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("mongo_TemplateController.txt",StandardCharsets.UTF_8.name());
+            Template template = configuration.getTemplate("mongo_TemplateController.txt", StandardCharsets.UTF_8.name());
             final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
@@ -158,7 +159,6 @@ public class CodeGenerator {
         data.moduleName = config.moduleName;
         data.packagePre = initPackagePre(config);
         data.fieldList = initBeanField(config);
-        data.pkFieldName = data.fieldList.stream().filter(e -> e.pk).findFirst().map(e -> e.name).orElse(null);
         data.validateSaveParam = config.needValidateSaveParam;
         data.requestMappingPre = initRequestMappingPre(data.packagePre);
         return data;
@@ -172,6 +172,9 @@ public class CodeGenerator {
      * @param config
      */
     public static List<BeanField> initBeanField(CollectionConfig config) {
+        if (!SuperBaseBean.class.isAssignableFrom(config.clazz)) {
+            throw BaseRuntimeException.getException("bean[{}] must extends SuperBaseBean", config.clazz.getName());
+        }
         List<Field> fieldList = FieldUtils.getAllFieldsList(config.clazz).stream().filter(e -> {
             if (e.getAnnotation(Transient.class) != null) {
                 return false;
@@ -197,9 +200,6 @@ public class CodeGenerator {
             Schema schema = f.getAnnotation(Schema.class);
             if (schema != null) {
                 beanField.setComment(schema.description());
-            }
-            if (f.isAnnotationPresent(Id.class)) {
-                beanField.pk = true;
             }
             return beanField;
         }).collect(Collectors.toMap(

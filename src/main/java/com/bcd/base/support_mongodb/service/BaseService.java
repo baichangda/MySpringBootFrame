@@ -124,7 +124,7 @@ public class BaseService<T extends SuperBaseBean> {
     public T save(T t) {
         validateUniqueBeforeSave(Collections.singletonList(t));
         if (getBeanInfo().isBaseBean) {
-            if (t.id == null) {
+            if (t.getId() == null) {
                 setCreateInfo(t);
             } else {
                 setUpdateInfo(t);
@@ -137,7 +137,7 @@ public class BaseService<T extends SuperBaseBean> {
         validateUniqueBeforeSave(collection);
         if (getBeanInfo().isBaseBean) {
             for (T t : collection) {
-                if (t.id == null) {
+                if (t.getId() == null) {
                     setCreateInfo(t);
                 } else {
                     setUpdateInfo(t);
@@ -175,7 +175,7 @@ public class BaseService<T extends SuperBaseBean> {
         } else if (ids.length > 1) {
             Object[] newIds = new Object[ids.length];
             System.arraycopy(ids, 0, newIds, 0, ids.length);
-            Query query = new Query(Criteria.where(getBeanInfo().pkFieldName).in(newIds));
+            Query query = new Query(Criteria.where("id").in(newIds));
             getMongoTemplate().remove(query, getBeanInfo().clazz);
         }
     }
@@ -240,7 +240,7 @@ public class BaseService<T extends SuperBaseBean> {
                 for (T t : list) {
                     for (Field f : getBeanInfo().uniqueFields) {
                         Object val = f.get(t);
-                        if (!isUnique(f.getName(), val, (String) getBeanInfo().pkField.get(t))) {
+                        if (!isUnique(f.getName(), val, t.getId())) {
                             throw BaseRuntimeException.getException(getUniqueMessage(f));
                         }
                     }
@@ -276,13 +276,7 @@ public class BaseService<T extends SuperBaseBean> {
                 if (excludeIdSet.isEmpty()) {
                     return false;
                 } else {
-                    return resultList.stream().allMatch(e -> {
-                        try {
-                            return excludeIdSet.contains(getBeanInfo().pkField.get(e));
-                        } catch (IllegalAccessException ex) {
-                            throw BaseRuntimeException.getException(ex);
-                        }
-                    });
+                    return resultList.stream().allMatch(e -> excludeIdSet.contains(e.getId()));
                 }
             }
         }

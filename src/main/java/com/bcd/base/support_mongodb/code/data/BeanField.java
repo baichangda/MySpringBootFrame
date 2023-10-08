@@ -3,7 +3,6 @@ package com.bcd.base.support_mongodb.code.data;
 import com.google.common.base.Strings;
 
 public class BeanField {
-    public boolean pk;
     public String name;
     public String type;
     public String comment;

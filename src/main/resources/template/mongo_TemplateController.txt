@@ -112,14 +112,14 @@ public class ${moduleName?cap_first}Controller extends BaseController {
 
     /**
      * 删除${moduleNameCN}
-     * @param ${pkFieldName}s
+     * @param ids
      * @return
      */
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @Operation(summary = "删除${moduleNameCN}")
     @ApiResponse(responseCode = "200",description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "${moduleNameCN}${pkFieldName}数组",example = "100,101,102") @RequestParam String[] ${pkFieldName}s){
-        ${moduleName?uncap_first}Service.delete(${pkFieldName}s);
+    public JsonMessage delete(@Parameter(description = "${moduleNameCN}ids数组",example = "100,101,102") @RequestParam String[] ids){
+        ${moduleName?uncap_first}Service.delete(ids);
         return JsonMessage.success();
     }
 

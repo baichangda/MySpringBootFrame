@@ -15,12 +15,6 @@ public final class BeanInfo<T> {
     public final Class<T> clazz;
 
     /**
-     * 主键字段
-     */
-    public final Field pkField;
-    public final String pkFieldName;
-
-    /**
      * bean所属collection
      */
     public final String collection;
@@ -35,10 +29,6 @@ public final class BeanInfo<T> {
 
     public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
-
-        pkField = FieldUtils.getFieldsWithAnnotation(clazz, Id.class)[0];
-        pkField.setAccessible(true);
-        pkFieldName = pkField.getName();
 
         collection = clazz.getAnnotation(Document.class).collection();
 
