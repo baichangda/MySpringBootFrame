@@ -137,7 +137,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(summary = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam Long[] ids) {
+    public JsonMessage delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam long[] ids) {
         userService.delete(ids);
         return JsonMessage.success().message("删除成功");
     }

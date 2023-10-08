@@ -10,12 +10,12 @@ import java.util.Date;
 
 @Getter
 @Setter
-public abstract class BaseBean<K extends Serializable> implements SuperBaseBean<K>{
+public abstract class BaseBean extends SuperBaseBean{
     @Schema(description = "创建时间", accessMode = Schema.AccessMode.READ_ONLY)
     public Date createTime;
 
     @Schema(description = "创建人id", accessMode = Schema.AccessMode.READ_ONLY)
-    public K createUserId;
+    public Long createUserId;
 
     @Length(max = 50, message = "[创建人姓名]长度不能超过50")
     @Schema(description = "创建人姓名", maxLength = 50, accessMode = Schema.AccessMode.READ_ONLY)
@@ -25,7 +25,7 @@ public abstract class BaseBean<K extends Serializable> implements SuperBaseBean<
     public Date updateTime;
 
     @Schema(description = "更新人id", accessMode = Schema.AccessMode.READ_ONLY)
-    public K updateUserId;
+    public Long updateUserId;
 
     @Length(max = 50, message = "[更新人姓名]长度不能超过50")
     @Schema(description = "更新人姓名", maxLength = 50, accessMode = Schema.AccessMode.READ_ONLY)

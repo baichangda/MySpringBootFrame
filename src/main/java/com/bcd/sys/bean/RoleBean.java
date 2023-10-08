@@ -16,12 +16,7 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @Table("t_sys_role")
-public class RoleBean extends BaseBean<Long> {
-
-    @Id
-    @Schema(description = "主键")
-    //主键
-    public Long id;
+public class RoleBean extends BaseBean {
 
     //field
     @NotBlank(message = "[角色名称]不能为空")

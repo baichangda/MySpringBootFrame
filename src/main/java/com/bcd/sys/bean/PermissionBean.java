@@ -16,11 +16,7 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @Table("t_sys_permission")
-public class PermissionBean extends BaseBean<Long> {
-    @Id
-    @Schema(description = "主键")
-    //主键
-    public Long id;
+public class PermissionBean extends BaseBean {
     //field
     @NotBlank(message = "[编码]不能为空")
     @Size(max = 50, message = "[编码]长度不能超过50")

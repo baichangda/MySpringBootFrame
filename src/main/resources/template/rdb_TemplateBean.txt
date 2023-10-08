@@ -2,6 +2,7 @@ package ${packagePre}.bean;
 
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.bean.BaseBean;
+import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import jakarta.validation.constraints.Size;
@@ -19,17 +20,9 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 @Table("${tableName}")
-public class ${moduleName?cap_first}Bean extends BaseBean<${pkField.type}> {
+public class ${moduleName?cap_first}Bean extends <#if containCreateAndUpdateField>BaseBean<#else>SuperBaseBean</#if> {
     @Serial
     private final static long serialVersionUID = 1L;
-
-    @Id
-    <#if pkField.type == "String">
-    @Schema(description = "${pkField.comment}",maxLength = ${pkField.strLen?c})
-    <#else>
-    @Schema(description = "${pkField.comment}")
-    </#if>
-    public ${pkField.type} ${pkField.name};
 
     //field
     <#list fieldList as field>
@@ -52,16 +45,4 @@ public class ${moduleName?cap_first}Bean extends BaseBean<${pkField.type}> {
     public ${field.type} ${field.name};
 
     </#list>
-
-    <#if pkField.name != "id">
-    @Override
-    public ${pkField.type} getId() {
-       return ${pkField.name};
-    }
-
-    @Override
-    public void setId(${pkField.type} id) {
-        this.${pkField.name}=id;
-    }
-    </#if>
 }

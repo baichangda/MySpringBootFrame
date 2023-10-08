@@ -15,10 +15,4 @@ public class ServiceData {
      * 包路径
      */
     public String packagePre;
-
-    /**
-     * 主键字段
-     */
-    public BeanField pkField;
-
 }

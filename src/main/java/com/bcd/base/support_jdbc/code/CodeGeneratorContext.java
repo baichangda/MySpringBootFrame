@@ -7,6 +7,7 @@ import com.bcd.base.util.StringUtil;
 import java.io.File;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CodeGeneratorContext {
@@ -19,7 +20,7 @@ public class CodeGeneratorContext {
     public List<BeanField> allBeanFields;
     public List<BeanField> declaredBeanFields;
     public String packagePre;
-    public BeanField pkField;
+    public Boolean containCreateAndUpdateField;
 
 
     public CodeGeneratorContext(TableConfig tableConfig, DBSupport dbSupport, Connection connection) {
@@ -32,23 +33,24 @@ public class CodeGeneratorContext {
      * 获取实体类定义字段信息(排除公用信息 id/create/update信息)
      */
     public List<BeanField> getDeclaredBeanFields() {
-        BeanField pk = getPkField();
         if (declaredBeanFields == null) {
-            declaredBeanFields = getAllBeanFields().stream().filter(e -> {
-                if (pk.name.equals(e.name)) {
-                    return false;
-                } else {
-                    if (tableConfig.needCreateInfo) {
-                        if (CodeConst.CREATE_INFO_FIELD_NAME.contains(e.name)) {
-                            return false;
-                        } else {
-                            return true;
-                        }
+            if (getContainCreateAndUpdateField()) {
+                declaredBeanFields = getAllBeanFields().stream().filter(e -> {
+                    if ("id".equals(e.name)) {
+                        return false;
+                    } else {
+                        return !CodeConst.CREATE_INFO_FIELD_NAME.contains(e.name);
+                    }
+                }).collect(Collectors.toList());
+            } else {
+                declaredBeanFields = getAllBeanFields().stream().filter(e -> {
+                    if ("id".equals(e.name)) {
+                        return false;
                     } else {
                         return true;
                     }
-                }
-            }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
+            }
         }
         return declaredBeanFields;
     }
@@ -99,15 +101,18 @@ public class CodeGeneratorContext {
         return "/" + getPackagePre().substring(getPackagePre().lastIndexOf('.') + 1);
     }
 
-    /**
-     * 获取所有字段信息
-     *
-     * @return
-     */
-    public BeanField getPkField() {
-        if (pkField == null) {
-            pkField = dbSupport.getTablePk(tableConfig, connection);
+    public boolean getContainCreateAndUpdateField() {
+        if (containCreateAndUpdateField == null) {
+            containCreateAndUpdateField = true;
+            Set<String> fieldNameSet = getAllBeanFields().stream().map(e -> e.name).collect(Collectors.toSet());
+            for (String s : CodeConst.CREATE_INFO_FIELD_NAME) {
+                if (!fieldNameSet.contains(s)) {
+                    containCreateAndUpdateField = false;
+                    break;
+                }
+            }
         }
-        return pkField;
+        return containCreateAndUpdateField;
     }
+
 }

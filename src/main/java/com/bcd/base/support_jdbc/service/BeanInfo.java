@@ -5,7 +5,6 @@ import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Transient;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.springframework.data.annotation.Id;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -30,20 +29,6 @@ public final class BeanInfo<T> {
 
 
     private final Map<String, String> fieldNameOrColumnName_columnName;
-
-    /**
-     * 主键字段
-     */
-    public final FieldInfo fieldInfo_id;
-    /**
-     * 主键类型
-     * byte:1
-     * short:2
-     * int:3
-     * long:4
-     * string:5
-     */
-    public final int idType;
 
     /**
      * 新增的sql(不包含id)
@@ -94,36 +79,14 @@ public final class BeanInfo<T> {
         FieldInfo idFieldInfo = null;
         for (Field f : allFields) {
             if (f.getAnnotation(Transient.class) == null && !Modifier.isStatic(f.getModifiers())) {
-                boolean isId = f.isAnnotationPresent(Id.class);
                 final FieldInfo fieldInfo = new FieldInfo(f);
-                if (isId) {
+                if (f.getName().equals("id")) {
                     idFieldInfo = fieldInfo;
-                }else{
+                } else {
                     columnFieldList_noId.add(fieldInfo);
                 }
-                columnFieldList.add(fieldInfo);
                 fieldNameOrColumnName_columnName.put(fieldInfo.fieldName, fieldInfo.columnName);
                 fieldNameOrColumnName_columnName.put(fieldInfo.columnName, fieldInfo.columnName);
-            }
-        }
-
-        if (idFieldInfo == null) {
-            throw BaseRuntimeException.getException("class[{}] must have field with annotation @Id",clazz.getName());
-        } else {
-            fieldInfo_id = idFieldInfo;
-            Class<?> type = idFieldInfo.field.getType();
-            if (type == Byte.class) {
-                idType = 1;
-            } else if (type == Short.class) {
-                idType = 2;
-            } else if (type == Integer.class) {
-                idType = 3;
-            } else if (type == Long.class) {
-                idType = 4;
-            } else if (type == String.class) {
-                idType = 5;
-            } else {
-                throw BaseRuntimeException.getException("class[{}] idField[{}] type[{}] not support", clazz.getName(), idFieldInfo.fieldName, type.getName());
             }
         }
 
@@ -136,8 +99,10 @@ public final class BeanInfo<T> {
             sj2.add("?");
             sj3.add(columnName + "=?");
         }
+        columnFieldList.add(idFieldInfo);
+        columnFieldList.addAll(columnFieldList_noId);
         insertSql_noId = "insert into " + tableName + "(" + sj1 + ") values(" + sj2 + ")";
-        insertSql = "insert into " + tableName + "(" + fieldInfo_id.columnName + "," + sj1 + ") values(?," + sj2 + ")";
+        insertSql = "insert into " + tableName + "(id," + sj1 + ") values(?," + sj2 + ")";
         updateSql_noId = "update " + tableName + " set " + sj3;
     }
 

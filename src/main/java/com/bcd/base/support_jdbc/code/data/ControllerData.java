@@ -32,10 +32,4 @@ public class ControllerData {
      * 是否需要保存方法验证
      */
     public boolean validateSaveParam = true;
-
-    /**
-     * 主键字段
-     */
-    public BeanField pkField;
-
 }

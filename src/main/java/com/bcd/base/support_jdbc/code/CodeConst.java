@@ -23,8 +23,6 @@ public class CodeConst {
         CREATE_INFO_FIELD_NAME.add("createUserName");
         CREATE_INFO_FIELD_NAME.add("updateUserId");
         CREATE_INFO_FIELD_NAME.add("updateUserName");
-        CREATE_INFO_FIELD_NAME.add("createIp");
-        CREATE_INFO_FIELD_NAME.add("updateIp");
     }
 
     public enum PkType {

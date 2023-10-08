@@ -39,10 +39,6 @@ public class BeanData {
      */
     public List<BeanField> fieldList;
 
-    /**
-     * 主键字段
-     */
-    public BeanField pkField;
-
+    public boolean containCreateAndUpdateField;
 }
 

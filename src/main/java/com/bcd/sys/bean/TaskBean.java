@@ -24,12 +24,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_task")
-public class TaskBean implements Task<Long>,SuperBaseBean<Long> {
-    @Schema(description = "主键")
-    @Id
-    //主键
-    public Long id;
-
+public class TaskBean extends SuperBaseBean implements Task<Long> {
     //field
     @NotBlank(message = "[任务名称]不能为空")
     @Size(max = 50, message = "[任务名称]长度不能超过50")

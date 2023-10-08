@@ -1,7 +1,6 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
@@ -29,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
+public class BaseService<T extends SuperBaseBean> {
     /**
      * 注意所有的类变量必须使用get方法获取
      * 因为类如果被aop代理了、代理对象的这些变量值都是null
@@ -58,7 +57,7 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
     }
 
     public BaseService() {
-        final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         beanInfo = new BeanInfo<>(beanClass);
     }
 
@@ -171,9 +170,9 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
      * @param id
      * @return
      */
-    public T get(K id) {
+    public T get(long id) {
         BeanInfo<T> info = getBeanInfo();
-        final String sql = "select * from " + info.tableName + " where " + info.fieldInfo_id.columnName + "=?";
+        final String sql = "select * from " + info.tableName + " where id=?";
         final List<T> list = getJdbcTemplate().query(sql, new BeanPropertyRowMapper<>(info.clazz), id);
         if (list.isEmpty()) {
             return null;
@@ -209,35 +208,20 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
         if (info.autoSetCreateInfoBeforeInsert) {
             setCreateInfo(t);
         }
-        if (info.idType == 5) {
-            //字符串主键必须指定id
-            if (t.getId() == null) {
-                throw BaseRuntimeException.getException("class[{}] idField[{}] is String,id must not be null");
+        if (t.getId() == null) {
+            final KeyHolder keyHolder = new GeneratedKeyHolder();
+            getJdbcTemplate().update(conn -> {
+                final PreparedStatement ps = conn.prepareStatement(info.insertSql_noId, Statement.RETURN_GENERATED_KEYS);
+                final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(info.getValues_noId(t).toArray());
+                argumentPreparedStatementSetter.setValues(ps);
+                return ps;
+            }, keyHolder);
+            Number key = keyHolder.getKey();
+            if (key != null) {
+                t.setId(key.longValue());
             }
-            getJdbcTemplate().update(info.insertSql, info.getValues(t).toArray());
         } else {
-            if (t.getId() == null) {
-                final KeyHolder keyHolder = new GeneratedKeyHolder();
-                getJdbcTemplate().update(conn -> {
-                    final PreparedStatement ps = conn.prepareStatement(info.insertSql_noId, Statement.RETURN_GENERATED_KEYS);
-                    final ArgumentPreparedStatementSetter argumentPreparedStatementSetter = new ArgumentPreparedStatementSetter(info.getValues_noId(t).toArray());
-                    argumentPreparedStatementSetter.setValues(ps);
-                    return ps;
-                }, keyHolder);
-                Number key = keyHolder.getKey();
-                if (key != null) {
-                    Object id = null;
-                    switch (info.idType) {
-                        case 1 -> id = key.byteValue();
-                        case 2 -> id = key.shortValue();
-                        case 3 -> id = key.intValue();
-                        case 4 -> id = key.longValue();
-                    }
-                    t.setId((K) id);
-                }
-            } else {
-                getJdbcTemplate().update(info.insertSql, info.getValues(t).toArray());
-            }
+            getJdbcTemplate().update(info.insertSql, info.getValues(t).toArray());
         }
     }
 
@@ -302,7 +286,7 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
         if (info.autoSetUpdateInfoBeforeUpdate) {
             setUpdateInfo(t);
         }
-        final String sql = info.updateSql_noId + " where " + info.fieldInfo_id.columnName + "=?";
+        final String sql = info.updateSql_noId + " where id=?";
         final List<Object> args = info.getValues_noId(t);
         args.add(t.getId());
         getJdbcTemplate().update(sql, args.toArray());
@@ -316,7 +300,7 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
      * @param id
      * @param params
      */
-    public void update(K id, ParamPairs... params) {
+    public void update(long id, ParamPairs... params) {
         if (params.length == 0) {
             return;
         }
@@ -328,7 +312,7 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
             sj.add(info.toColumnName(param.field()) + "=?");
             args.add(param.val());
         }
-        String sql = "update " + info.tableName + " set " + sj + " where " + info.fieldInfo_id.columnName + "=?";
+        String sql = "update " + info.tableName + " set " + sj + " where id=?";
         args.add(id);
         getJdbcTemplate().update(sql, args.toArray());
     }
@@ -397,12 +381,12 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
      *
      * @param ids
      */
-    public void delete(K... ids) {
+    public void delete(long... ids) {
         if (ids.length == 1) {
             final String sql = "delete from " + getBeanInfo().tableName + " where id =?";
             getJdbcTemplate().update(sql, ids[0]);
         } else if (ids.length > 1) {
-            final List<Object[]> argList = Arrays.stream(ids).map(e -> new Object[]{e}).collect(Collectors.toList());
+            final List<Object[]> argList = Arrays.stream(ids).mapToObj(e -> new Object[]{e}).collect(Collectors.toList());
             final String sql = "delete from " + getBeanInfo().tableName + " where id =?";
             getJdbcTemplate().batchUpdate(sql, argList);
         }
@@ -448,8 +432,8 @@ public class BaseService<K extends Serializable, T extends SuperBaseBean<K>> {
      * 此方法可能会报错、因为原本的service对象不是代理对象
      * 此方法不要乱用、避免造成性能损失
      */
-    protected BaseService<K, T> getProxy() {
-        return (BaseService<K, T>) AopContext.currentProxy();
+    protected BaseService<T> getProxy() {
+        return (BaseService<T>) AopContext.currentProxy();
     }
 
     private int count(ConvertRes convertRes) {

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Administrator on 2017/4/18.
  */
 @Service
-public class UserService extends BaseService<Long, UserBean> implements ApplicationListener<ContextRefreshedEvent> {
+public class UserService extends BaseService<UserBean> implements ApplicationListener<ContextRefreshedEvent> {
 
     private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 

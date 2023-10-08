@@ -21,11 +21,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table("t_sys_menu")
-public class MenuBean extends BaseBean<Long> {
-    @Id
-    @Schema(description = "主键")
-    //主键
-    public Long id;
+public class MenuBean extends BaseBean {
     //field
     @Schema(description = "父菜单id")
     public Long parentId;

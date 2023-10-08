@@ -12,8 +12,6 @@ public class TableConfig {
     public String moduleNameCN;
     //表名
     public String tableName;
-    //是否需要创建信息(默认需要)
-    public boolean needCreateInfo = true;
     //是否创建bean文件(默认是)
     public boolean needCreateBeanFile = true;
     //是否创建service文件(默认是)
@@ -31,8 +29,6 @@ public class TableConfig {
 
 
     public static class Helper {
-        //是否需要创建信息(默认需要)
-        public boolean needCreateInfo = true;
         //是否创建bean文件(默认是)
         public boolean needCreateBeanFile = true;
         //是否创建service文件(默认是)
@@ -72,7 +68,6 @@ public class TableConfig {
                 tableConfig.needCreateBeanFile = this.needCreateBeanFile;
                 tableConfig.needCreateServiceFile = this.needCreateServiceFile;
                 tableConfig.needCreateControllerFile = this.needCreateControllerFile;
-                tableConfig.needCreateInfo = this.needCreateInfo;
                 tableConfig.needValidateBeanField = this.needValidateBeanField;
                 tableConfig.needValidateSaveParam = this.needValidateSaveParam;
                 res.add(tableConfig);

@@ -39,7 +39,6 @@ public class CodeGenerator {
         helper.needCreateControllerFile = true;
         helper.needValidateBeanField = true;
         helper.needValidateSaveParam = true;
-        helper.needCreateInfo = true;
         helper
                 .addModule("User", "用户", "t_sys_user")
                 .addModule("Permission", "权限", "t_sys_permission")
@@ -145,9 +144,8 @@ public class CodeGenerator {
         data.moduleName = context.tableConfig.moduleName;
         data.packagePre = context.getPackagePre();
         data.tableName = context.tableConfig.tableName;
-        data.superBeanType = context.tableConfig.needCreateInfo ? 1 : 2;
+        data.containCreateAndUpdateField = context.getContainCreateAndUpdateField();
         data.fieldList = context.getDeclaredBeanFields();
-        data.pkField = context.getPkField();
         return data;
     }
 
@@ -163,7 +161,6 @@ public class CodeGenerator {
         data.moduleNameCN = tableConfig.moduleNameCN;
         data.moduleName = tableConfig.moduleName;
         data.packagePre = context.getPackagePre();
-        data.pkField = context.getPkField();
         return data;
     }
 
@@ -182,7 +179,6 @@ public class CodeGenerator {
         data.fieldList = context.getAllBeanFields();
         data.validateSaveParam = tableConfig.needValidateSaveParam;
         data.requestMappingPre = context.getRequestMappingPre();
-        data.pkField = context.getPkField();
         return data;
     }
 
