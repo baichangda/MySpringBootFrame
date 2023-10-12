@@ -27,8 +27,8 @@ plugins {
 group 'com.bcd'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+sourceCompatibility = 21
+targetCompatibility = 21
 
 repositories {
     mavenLocal()
