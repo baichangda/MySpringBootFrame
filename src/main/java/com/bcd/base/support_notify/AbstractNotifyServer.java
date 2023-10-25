@@ -2,9 +2,13 @@ package com.bcd.base.support_notify;
 
 import com.bcd.base.support_kafka.nospring.AbstractConsumer;
 import com.bcd.base.support_kafka.nospring.ConsumerProp;
+import com.bcd.base.support_kafka.nospring.ProducerFactory;
+import com.bcd.base.support_kafka.nospring.ProducerProp;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.ExecutorUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,17 +33,17 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
     public final BoundHashOperations<String, String, String> boundHashOperations;
     public final NotifyProp notifyProp;
     public ScheduledExecutorService workPool;
-    public final KafkaTemplate<byte[], byte[]> kafkaTemplate;
+    private final Producer<String, byte[]> producer;
     private final String subscribeTopic;
     private final String notifyTopic;
 
-    public AbstractNotifyServer(String type, RedisConnectionFactory redisConnectionFactory, KafkaTemplate<byte[], byte[]> kafkaTemplate, NotifyProp notifyProp) {
+    public AbstractNotifyServer(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
         super(new ConsumerProp(), 1, false, 100, true, 0, "subscribe_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
         this.type = type;
         this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(this.notifyTopic);
-        this.kafkaTemplate = kafkaTemplate;
+        this.producer = ProducerFactory.newProducer(new ProducerProp());
         this.notifyProp = notifyProp;
     }
 
@@ -112,7 +116,7 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
     public abstract void onListenerInfoRemove(String[] id);
 
     public void sendNotify(final byte[] bytes) {
-        kafkaTemplate.send(notifyTopic, bytes);
+        producer.send(new ProducerRecord<>(notifyTopic, bytes));
     }
 
 }

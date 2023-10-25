@@ -18,4 +18,11 @@ public class ConsumerProp {
     public Duration requestTimeout = Duration.ofSeconds(30);
     public int maxPartitionFetchBytes = 3027200;
     public Map<String,String> properties=new HashMap<>();
+
+    public ConsumerProp(String bootstrapServers, String groupId) {
+        this.bootstrapServers = bootstrapServers;
+        this.groupId = groupId;
+    }
+    public ConsumerProp() {
+    }
 }

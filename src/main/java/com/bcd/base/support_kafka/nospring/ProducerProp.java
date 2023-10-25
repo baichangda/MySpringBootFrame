@@ -13,4 +13,11 @@ public class ProducerProp {
     public long bufferMemory = 33554432L;
     public String compressionType = "gzip";
     public Map<String,String> properties=new HashMap<>();
+
+    public ProducerProp(String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
+    }
+
+    public ProducerProp() {
+    }
 }
