@@ -126,18 +126,18 @@ public abstract class AbstractConsumer {
 
         //根据是否公用一个队列、来指定构造
         if (workThreadPerQueue) {
-            this.queues = null;
-            this.queue = new ArrayBlockingQueue<>(this.workThreadQueueSize);
-            for (int i = 0; i < workThreadNum; i++) {
-                workThreads[i] = new Thread(() -> work(this.queue));
-            }
-        } else {
             this.queue = null;
             this.queues = new ArrayBlockingQueue[workThreadNum];
             for (int i = 0; i < workThreadNum; i++) {
                 final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(this.workThreadQueueSize);
                 this.queues[i] = queue;
                 workThreads[i] = new Thread(() -> work(queue));
+            }
+        } else {
+            this.queues = null;
+            this.queue = new ArrayBlockingQueue<>(this.workThreadQueueSize);
+            for (int i = 0; i < workThreadNum; i++) {
+                workThreads[i] = new Thread(() -> work(this.queue));
             }
         }
 
