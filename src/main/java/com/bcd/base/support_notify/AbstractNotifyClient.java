@@ -15,7 +15,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +37,10 @@ public abstract class AbstractNotifyClient extends AbstractConsumer {
     private final String notifyTopic;
 
     public AbstractNotifyClient(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
-        super(new ConsumerProp(), 1, false, 100, true, 0, "notify_" + type);
+        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), 1, false, 100, true, 0, "notify_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
-        this.producer = ProducerFactory.newProducer(new ProducerProp());
+        this.producer = ProducerFactory.newProducer(new ProducerProp(notifyProp.bootstrapServers));
         this.notifyProp = notifyProp;
         this.boundHashOperations = RedisUtil.newString_StringRedisTemplate(redisConnectionFactory).boundHashOps(this.notifyTopic);
     }
@@ -74,10 +73,6 @@ public abstract class AbstractNotifyClient extends AbstractConsumer {
         workPool = null;
     }
 
-    public String wrapId(String id) {
-        return notifyProp.id + "," + id;
-    }
-
     /**
      * 订阅
      *
@@ -100,7 +95,7 @@ public abstract class AbstractNotifyClient extends AbstractConsumer {
      * 取消订阅
      *
      * @param type
-     * @param id   {@link #subscribe(String, String, String)}中使用的id
+     * @param id   {@link #subscribe(String, String)}返回的id
      */
     public void unSubscribe(String type, String id) {
         //删除缓存
