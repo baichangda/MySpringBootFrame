@@ -230,16 +230,17 @@ public class BaseService<T extends SuperBaseBean> {
      *
      * @param paramMap
      */
-    public void insert(Map<String,Object> paramMap) {
+    public void insert(Map<String, Object> paramMap) {
         if (paramMap.isEmpty()) {
             return;
         }
+        Map<String, Object> newParamMap = new LinkedHashMap<>(paramMap);
         BeanInfo<T> info = getBeanInfo();
-        setCreateInfo(paramMap);
+        setCreateInfo(newParamMap);
         StringJoiner sj1 = new StringJoiner(",");
         StringJoiner sj2 = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : newParamMap.entrySet()) {
             sj1.add(info.toColumnName(entry.getKey()));
             sj2.add("?");
             args.add(entry.getValue());
@@ -300,15 +301,16 @@ public class BaseService<T extends SuperBaseBean> {
      * @param id
      * @param paramMap
      */
-    public void update(long id, Map<String,Object> paramMap) {
+    public void update(long id, Map<String, Object> paramMap) {
         if (paramMap.isEmpty()) {
             return;
         }
+        Map<String, Object> newParamMap = new LinkedHashMap<>(paramMap);
         BeanInfo<T> info = getBeanInfo();
-        setUpdateInfo(paramMap);
+        setUpdateInfo(newParamMap);
         StringJoiner sj = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : newParamMap.entrySet()) {
             sj.add(info.toColumnName(entry.getKey()) + "=?");
             args.add(entry.getValue());
         }
@@ -322,17 +324,18 @@ public class BaseService<T extends SuperBaseBean> {
      * 只会更新部分字段
      *
      * @param condition 更新条件
-     * @param paramMap    更新值
+     * @param paramMap  更新值
      */
-    public void update(Condition condition, Map<String,Object> paramMap) {
+    public void update(Condition condition, Map<String, Object> paramMap) {
         if (paramMap.isEmpty()) {
             return;
         }
+        Map<String, Object> newParamMap = new LinkedHashMap<>(paramMap);
         BeanInfo<T> info = getBeanInfo();
-        setUpdateInfo(paramMap);
+        setUpdateInfo(newParamMap);
         StringJoiner sj = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : newParamMap.entrySet()) {
             sj.add(info.toColumnName(entry.getKey()) + "=?");
             args.add(entry.getValue());
         }
@@ -510,7 +513,7 @@ public class BaseService<T extends SuperBaseBean> {
         }
     }
 
-    private void setCreateInfo(Map<String,Object> paramMap) {
+    private void setCreateInfo(Map<String, Object> paramMap) {
         if (getBeanInfo().autoSetCreateInfoBeforeInsert) {
             if (!paramMap.containsKey("createTime")) {
                 paramMap.put("createTime", new Date());
@@ -527,7 +530,7 @@ public class BaseService<T extends SuperBaseBean> {
         }
     }
 
-    private void setUpdateInfo(Map<String,Object> paramMap) {
+    private void setUpdateInfo(Map<String, Object> paramMap) {
         if (getBeanInfo().autoSetUpdateInfoBeforeUpdate) {
             if (!paramMap.containsKey("updateTime")) {
                 paramMap.put("updateTime", new Date());
