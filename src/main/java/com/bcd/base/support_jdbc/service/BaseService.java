@@ -228,21 +228,21 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据参数对新增、只新增部分字段
      *
-     * @param params
+     * @param paramMap
      */
-    public void insert(ParamPairs... params) {
-        if (params.length == 0) {
+    public void insert(Map<String,Object> paramMap) {
+        if (paramMap.isEmpty()) {
             return;
         }
         BeanInfo<T> info = getBeanInfo();
-        ParamPairs[] newParams = setCreateInfo(params);
+        setCreateInfo(paramMap);
         StringJoiner sj1 = new StringJoiner(",");
         StringJoiner sj2 = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (ParamPairs param : newParams) {
-            sj1.add(info.toColumnName(param.field()));
+        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+            sj1.add(info.toColumnName(entry.getKey()));
             sj2.add("?");
-            args.add(param.val());
+            args.add(entry.getValue());
         }
         String sql = "insert " + info.tableName + "(" + sj1 + ") values(" + sj2 + ")";
         getJdbcTemplate().update(sql, args.toArray());
@@ -298,19 +298,19 @@ public class BaseService<T extends SuperBaseBean> {
      * 只会更新部分字段
      *
      * @param id
-     * @param params
+     * @param paramMap
      */
-    public void update(long id, ParamPairs... params) {
-        if (params.length == 0) {
+    public void update(long id, Map<String,Object> paramMap) {
+        if (paramMap.isEmpty()) {
             return;
         }
         BeanInfo<T> info = getBeanInfo();
-        ParamPairs[] newParams = setUpdateInfo(params);
+        setUpdateInfo(paramMap);
         StringJoiner sj = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (ParamPairs param : newParams) {
-            sj.add(info.toColumnName(param.field()) + "=?");
-            args.add(param.val());
+        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+            sj.add(info.toColumnName(entry.getKey()) + "=?");
+            args.add(entry.getValue());
         }
         String sql = "update " + info.tableName + " set " + sj + " where id=?";
         args.add(id);
@@ -322,19 +322,19 @@ public class BaseService<T extends SuperBaseBean> {
      * 只会更新部分字段
      *
      * @param condition 更新条件
-     * @param params    更新值
+     * @param paramMap    更新值
      */
-    public void update(Condition condition, ParamPairs... params) {
-        if (params.length == 0) {
+    public void update(Condition condition, Map<String,Object> paramMap) {
+        if (paramMap.isEmpty()) {
             return;
         }
         BeanInfo<T> info = getBeanInfo();
-        ParamPairs[] newParams = setUpdateInfo(params);
+        setUpdateInfo(paramMap);
         StringJoiner sj = new StringJoiner(",");
         List<Object> args = new ArrayList<>();
-        for (ParamPairs param : newParams) {
-            sj.add(info.toColumnName(param.field()) + "=?");
-            args.add(param.val());
+        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+            sj.add(info.toColumnName(entry.getKey()) + "=?");
+            args.add(entry.getValue());
         }
 
         final StringBuilder sql = new StringBuilder("update ");
@@ -510,55 +510,37 @@ public class BaseService<T extends SuperBaseBean> {
         }
     }
 
-    private ParamPairs[] setCreateInfo(ParamPairs... params) {
+    private void setCreateInfo(Map<String,Object> paramMap) {
         if (getBeanInfo().autoSetCreateInfoBeforeInsert) {
-            List<ParamPairs> paramList = new ArrayList<>();
-            LinkedHashMap<String, ParamPairs> map = new LinkedHashMap<>();
-            for (ParamPairs param : params) {
-                map.put(param.field(), param);
-                paramList.add(param);
-            }
-            if (!map.containsKey("createTime")) {
-                paramList.add(new ParamPairs("createTime", new Date()));
+            if (!paramMap.containsKey("createTime")) {
+                paramMap.put("createTime", new Date());
             }
             UserBean user = SaTokenUtil.getLoginUser_cache();
             if (user != null) {
-                if (!map.containsKey("createUserId")) {
-                    paramList.add(new ParamPairs("createUserId", user.getId()));
+                if (!paramMap.containsKey("createUserId")) {
+                    paramMap.put("createUserId", user.getId());
                 }
-                if (!map.containsKey("createUserName")) {
-                    paramList.add(new ParamPairs("createUserName", user.getUsername()));
+                if (!paramMap.containsKey("createUserName")) {
+                    paramMap.put("createUserName", user.getUsername());
                 }
             }
-            return paramList.toArray(new ParamPairs[0]);
-        } else {
-            return params;
         }
     }
 
-    private ParamPairs[] setUpdateInfo(ParamPairs... params) {
+    private void setUpdateInfo(Map<String,Object> paramMap) {
         if (getBeanInfo().autoSetUpdateInfoBeforeUpdate) {
-            List<ParamPairs> paramList = new ArrayList<>();
-            LinkedHashMap<String, ParamPairs> map = new LinkedHashMap<>();
-            for (ParamPairs param : params) {
-                map.put(param.field(), param);
-                paramList.add(param);
-            }
-            if (!map.containsKey("updateTime")) {
-                paramList.add(new ParamPairs("updateTime", new Date()));
+            if (!paramMap.containsKey("updateTime")) {
+                paramMap.put("updateTime", new Date());
             }
             UserBean user = SaTokenUtil.getLoginUser_cache();
             if (user != null) {
-                if (!map.containsKey("updateUserId")) {
-                    paramList.add(new ParamPairs("updateUserId", user.getId()));
+                if (!paramMap.containsKey("updateUserId")) {
+                    paramMap.put("updateUserId", user.getId());
                 }
-                if (!map.containsKey("updateUserName")) {
-                    paramList.add(new ParamPairs("updateUserName", user.getUsername()));
+                if (!paramMap.containsKey("updateUserName")) {
+                    paramMap.put("updateUserName", user.getUsername());
                 }
             }
-            return paramList.toArray(new ParamPairs[0]);
-        } else {
-            return params;
         }
     }
 }

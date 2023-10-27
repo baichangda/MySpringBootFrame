@@ -6,7 +6,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BaseService;
-import com.bcd.base.support_jdbc.service.ParamPairs;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.sys.bean.UserBean;
 import com.bcd.sys.define.CommonConst;
@@ -23,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -175,7 +177,9 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
             //2.3、将原始密码MD5加密后与数据库中进行对比
             if (userBean.password.equals(encryptPassword(userBean.username, oldPassword))) {
                 //2.4、使用MD5加密、盐值使用用户名
-                update(userId, ParamPairs.build("password", encryptPassword(userBean.username, newPassword)));
+                Map<String,Object> paramMap=new HashMap<>();
+                paramMap.put("password", encryptPassword(userBean.username, newPassword));
+                update(userId, paramMap);
                 return true;
             } else {
                 return false;
@@ -183,7 +187,9 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         } else {
             //3、如果不加密,则直接对比
             if (userBean.password.equals(encryptOldPassword)) {
-                update(userId, ParamPairs.build("password", encryptNewPassword));
+                Map<String,Object> paramMap=new HashMap<>();
+                paramMap.put("password", encryptNewPassword);
+                update(userId, paramMap);
                 return true;
             } else {
                 return false;
@@ -207,7 +213,9 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
     }
 
     public void resetPassword(Long userId) {
-        update(userId, ParamPairs.build("password", CommonConst.INITIAL_PASSWORD));
+        Map<String,Object> paramMap=new HashMap<>();
+        paramMap.put("password", CommonConst.INITIAL_PASSWORD);
+        update(userId, paramMap);
     }
 
     /**

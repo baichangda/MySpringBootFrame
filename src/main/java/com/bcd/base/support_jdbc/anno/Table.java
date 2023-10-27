@@ -2,8 +2,6 @@ package com.bcd.base.support_jdbc.anno;
 
 import com.bcd.base.condition.Condition;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
-import com.bcd.base.support_jdbc.service.ParamPairs;
-import com.bcd.base.support_satoken.SaTokenUtil;
 
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
@@ -11,6 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.Map;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -29,7 +28,7 @@ public @interface Table {
      *
      * 影响的方法如下
      * {@link com.bcd.base.support_jdbc.service.BaseService#insert(SuperBaseBean)}
-     * {@link com.bcd.base.support_jdbc.service.BaseService#insert(ParamPairs...)}
+     * {@link com.bcd.base.support_jdbc.service.BaseService#insert(Map)}
      * {@link com.bcd.base.support_jdbc.service.BaseService#insertBatch(List)}
      */
     boolean autoSetCreateInfoBeforeInsert() default true;
@@ -43,8 +42,8 @@ public @interface Table {
      *
      * 影响的方法如下
      * {@link com.bcd.base.support_jdbc.service.BaseService#update(SuperBaseBean)}
-     * {@link com.bcd.base.support_jdbc.service.BaseService#update(Serializable, ParamPairs...)}
-     * {@link com.bcd.base.support_jdbc.service.BaseService#update(Condition, ParamPairs...)}
+     * {@link com.bcd.base.support_jdbc.service.BaseService#update(long, Map)}
+     * {@link com.bcd.base.support_jdbc.service.BaseService#update(Condition, Map)}
      * {@link com.bcd.base.support_jdbc.service.BaseService#updateBatch(List)}
      */
     boolean autoSetUpdateInfoBeforeUpdate() default true;
