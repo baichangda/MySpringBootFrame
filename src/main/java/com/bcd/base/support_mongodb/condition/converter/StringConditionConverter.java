@@ -4,9 +4,11 @@ import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,6 +99,12 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
 
         }
         return criteria;
+    }
+
+    public static void main(String[] args) {
+        Criteria criteria = Criteria.where("id").in(Arrays.asList("1", "2"));
+        Query query = Query.query(criteria);
+        System.out.println(query);
     }
 
 }
