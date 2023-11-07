@@ -17,16 +17,7 @@ public class ProducerFactory {
     }
 
     public static Producer<String, byte[]> newProducer(ProducerProp producerProp) {
-        Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, producerProp.bootstrapServers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
-        props.put(ProducerConfig.ACKS_CONFIG, producerProp.acks);
-        props.put(ProducerConfig.BATCH_SIZE_CONFIG, producerProp.batchSize);
-        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, producerProp.compressionType);
-        props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, producerProp.bufferMemory);
-        props.putAll(producerProp.properties);
-        return new KafkaProducer<>(props);
+        return new KafkaProducer<>(producerProp.toProperties());
     }
 
     /**

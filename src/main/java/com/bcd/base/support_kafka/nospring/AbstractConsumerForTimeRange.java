@@ -138,7 +138,7 @@ public abstract class AbstractConsumerForTimeRange {
         this.endTimeTs = endTimeTs;
         this.topics = topics;
 
-        this.consumer = new KafkaConsumer<>(this.consumerProperties(consumerProp));
+        this.consumer = new KafkaConsumer<>(consumerProp.toProperties());
 
         //初始化消费线程
         this.consumeThread = new Thread(this::consume);
@@ -240,22 +240,6 @@ public abstract class AbstractConsumerForTimeRange {
                 }
             }
         }
-    }
-
-    private Properties consumerProperties(ConsumerProp consumerProp) {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, consumerProp.groupId);
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, consumerProp.bootstrapServers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArrayDeserializer");
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, consumerProp.enableAutoCommit);
-        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, (int) consumerProp.autoCommitInterval.toMillis());
-        props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, (int) consumerProp.heartbeatInterval.toMillis());
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, (int) consumerProp.sessionTimeout.toMillis());
-        props.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) consumerProp.requestTimeout.toMillis());
-        props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, consumerProp.maxPartitionFetchBytes);
-        return props;
     }
 
     /**
