@@ -7,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.Duration;
@@ -32,7 +36,10 @@ public class DynamicMongoUtil {
             .build(s -> {
                 //加载新的数据源
                 logger.info("dataSource[{}] start load", s);
-                MongoTemplate mongoTemplate=new MongoTemplate(new SimpleMongoClientDatabaseFactory(s));
+                SimpleMongoClientDatabaseFactory simpleMongoClientDatabaseFactory = new SimpleMongoClientDatabaseFactory(s);
+                MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(simpleMongoClientDatabaseFactory), new MongoMappingContext());
+                converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+                MongoTemplate mongoTemplate = new MongoTemplate(simpleMongoClientDatabaseFactory, converter);
                 logger.info("dataSource[{}] [{}] finish load", s, mongoTemplate.hashCode());
                 return mongoTemplate;
             });
