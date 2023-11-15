@@ -113,12 +113,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.alibaba/easyexcel
     implementation(group: 'com.alibaba', name: 'easyexcel', version: "+")
-//            {
-//        exclude group: 'org.apache.poi' ,module: 'poi-ooxml-schemas'
-//    }
-    // https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans
-//    implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.0.3'
-
 
     // https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-openapi3-jakarta-spring-boot-starter
     implementation group: 'com.github.xiaoymin', name: 'knife4j-openapi3-jakarta-spring-boot-starter', version: "+"
@@ -131,8 +125,8 @@ dependencies {
     implementation group: 'org.freemarker', name: 'freemarker', version: "+"
 
 
-    //mysql驱动包
-    runtimeOnly "mysql:mysql-connector-java:8.+"
+    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation group: 'com.mysql', name: 'mysql-connector-j', version: "+"
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "42.+"
 
@@ -144,8 +138,7 @@ dependencies {
     implementation group: 'cn.dev33', name: 'sa-token-redis-jackson', version: "+"
 
     // define a BOM and its version
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-bom
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.+"))
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
