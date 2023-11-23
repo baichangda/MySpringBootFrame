@@ -5,9 +5,8 @@ import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,25 +48,33 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
                     break;
                 }
                 case IN: {
-                    if (val instanceof Collection) {
-                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    if (val.getClass().isArray()) {
+                        List<Object> notEmptyList =new ArrayList<>();
+                        int length = Array.getLength(val);
+                        for (int i = 0; i < length; i++) {
+                            notEmptyList.add(Array.get(val, i));
+                        }
                         criteria.in(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
+                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
                 case NOT_IN: {
-                    if (val instanceof Collection) {
-                        List notEmptyList = (List) ((Collection) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    if (val.getClass().isArray()) {
+                        List<Object> notEmptyList =new ArrayList<>();
+                        int length = Array.getLength(val);
+                        for (int i = 0; i < length; i++) {
+                            notEmptyList.add(Array.get(val, i));
+                        }
                         criteria.nin(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
+                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support [" + handler + "]!");
+                    throw BaseRuntimeException.getException("handler[{}] not support",handler);
                 }
             }
         }

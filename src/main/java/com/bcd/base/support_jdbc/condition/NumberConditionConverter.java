@@ -5,8 +5,8 @@ import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
+import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -63,25 +63,25 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                 break;
             }
             case IN: {
-                if (val instanceof Collection) {
-                    List notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                if (val.getClass().isArray()) {
+                    int length = Array.getLength(val);
                     sql.append(columnName);
                     sql.append(" in (");
                     StringJoiner sj = new StringJoiner(",");
-                    for (int i = 0; i < notEmptyList.size(); i++) {
+                    for (int i = 0; i < length; i++) {
                         sj.add("?");
+                        paramList.add(Array.get(val, i));
                     }
                     sql.append(sj);
                     sql.append(")");
-                    paramList.addAll(notEmptyList);
                 } else {
-                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
+                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                 }
                 break;
             }
             case NOT_IN: {
                 if (val instanceof Collection) {
-                    List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).collect(Collectors.toList());
+                    List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).toList();
                     sql.append(columnName);
                     sql.append(" not in (");
                     StringJoiner sj = new StringJoiner(",");
@@ -92,12 +92,12 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                     sql.append(")");
                     paramList.addAll(notEmptyList);
                 } else {
-                    throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Value Must be Collection Instance!");
+                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                 }
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[NumberConditionConverter.convert],Do Not Support [" + handler + "]!");
+                throw BaseRuntimeException.getException("handler[{}] not support",handler);
             }
         }
         return new ConvertRes(sql.toString(), paramList);

@@ -25,78 +25,58 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
         StringCondition.Handler handler = condition.handler;
         Criteria criteria = null;
         if (val != null) {
-            if (val instanceof Collection) {
-                criteria = Criteria.where(fieldName);
-                List notEmptyList = (List) ((Collection) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
-                switch (handler) {
-                    case IN: {
+            criteria = Criteria.where(fieldName);
+            switch (handler){
+                case EQUAL: {
+                    criteria.is(val);
+                    break;
+                }
+                case NOT_EQUAL: {
+                    criteria.ne(val);
+                    break;
+                }
+                case ALL_LIKE: {
+                    criteria.regex(".*(" + val + ").*");
+                    break;
+                }
+                case LEFT_LIKE: {
+                    criteria.regex("^(" + val + ")");
+                    break;
+                }
+                case RIGHT_LIKE: {
+                    criteria.regex("(" + val + ")$");
+                    break;
+                }
+                case IN: {
+                    if (val.getClass().isArray()) {
+                        List<Object> notEmptyList =new ArrayList<>();
+                        int length = Array.getLength(val);
+                        for (int i = 0; i < length; i++) {
+                            notEmptyList.add(Array.get(val, i));
+                        }
                         criteria.in(notEmptyList);
-                        break;
+                    } else {
+                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                     }
-                    case NOT_IN: {
+                    break;
+                }
+                case NOT_IN: {
+                    if (val.getClass().isArray()) {
+                        List<Object> notEmptyList =new ArrayList<>();
+                        int length = Array.getLength(val);
+                        for (int i = 0; i < length; i++) {
+                            notEmptyList.add(Array.get(val, i));
+                        }
                         criteria.nin(notEmptyList);
-                        break;
+                    } else {
+                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                     }
-                    default: {
-                        throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Collection Instance!");
-                    }
+                    break;
                 }
-            } else if (val.getClass().isArray()) {
-                criteria = Criteria.where(fieldName);
-                List notEmptyList = new ArrayList();
-                int len = Array.getLength(val);
-                if (len != 0) {
-                    for (int i = 0; i <= len - 1; i++) {
-                        Object o = Array.get(val, i);
-                        if (o != null && !o.toString().isEmpty()) {
-                            notEmptyList.add(o);
-                        }
-                    }
-                }
-                switch (handler) {
-                    case IN: {
-                        criteria.in(notEmptyList);
-                        break;
-                    }
-                    case NOT_IN: {
-                        criteria.nin(notEmptyList);
-                        break;
-                    }
-                    default: {
-                        throw BaseRuntimeException.getException("[StringConditionConverter.convert],Value Must be Array Instance!");
-                    }
-                }
-            } else {
-                if (!val.toString().isEmpty()) {
-                    criteria = Criteria.where(fieldName);
-                    switch (handler) {
-                        case EQUAL: {
-                            criteria.is(val);
-                            break;
-                        }
-                        case NOT_EQUAL: {
-                            criteria.ne(val);
-                            break;
-                        }
-                        case ALL_LIKE: {
-                            criteria.regex(".*(" + val.toString() + ").*");
-                            break;
-                        }
-                        case LEFT_LIKE: {
-                            criteria.regex("^(" + val.toString() + ")");
-                            break;
-                        }
-                        case RIGHT_LIKE: {
-                            criteria.regex("(" + val.toString() + ")$");
-                            break;
-                        }
-                        default: {
-                            throw BaseRuntimeException.getException("[StringConditionConverter.convert],Do Not Support [" + handler + "]!");
-                        }
-                    }
+                default: {
+                    throw BaseRuntimeException.getException("handler[{}] not support",handler);
                 }
             }
-
         }
         return criteria;
     }

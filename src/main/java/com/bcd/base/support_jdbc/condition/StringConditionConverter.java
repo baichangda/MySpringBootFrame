@@ -5,6 +5,7 @@ import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,33 +61,40 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
                 break;
             }
             case IN: {
-                List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
-                sql.append(columnName);
-                sql.append(" in (");
-                StringJoiner sj = new StringJoiner(",");
-                for (int i = 0; i < notEmptyList.size(); i++) {
-                    sj.add("?");
+                if (val.getClass().isArray()) {
+                    int length = Array.getLength(val);
+                    sql.append(columnName);
+                    sql.append(" in (");
+                    StringJoiner sj = new StringJoiner(",");
+                    for (int i = 0; i < length; i++) {
+                        sj.add("?");
+                        paramList.add(Array.get(val, i));
+                    }
+                    sql.append(sj);
+                    sql.append(")");
+                } else {
+                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                 }
-                sql.append(sj);
-                sql.append(")");
-                paramList.addAll(notEmptyList);
-                break;
             }
             case NOT_IN: {
-                List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
-                sql.append(columnName);
-                sql.append(" not in (");
-                StringJoiner sj = new StringJoiner(",");
-                for (int i = 0; i < notEmptyList.size(); i++) {
-                    sj.add("?");
+                if (val.getClass().isArray()) {
+                    List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
+                    sql.append(columnName);
+                    sql.append(" not in (");
+                    StringJoiner sj = new StringJoiner(",");
+                    for (int i = 0; i < notEmptyList.size(); i++) {
+                        sj.add("?");
+                    }
+                    sql.append(sj);
+                    sql.append(")");
+                    paramList.addAll(notEmptyList);
+                } else {
+                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
                 }
-                sql.append(sj);
-                sql.append(")");
-                paramList.addAll(notEmptyList);
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[StringConditionConverter.convert],Do Not Support [" + handler + "]!");
+                throw BaseRuntimeException.getException("handler[{}] not support",handler);
             }
         }
         return new ConvertRes(sql.toString(), paramList);
