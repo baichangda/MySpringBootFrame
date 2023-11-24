@@ -12,7 +12,7 @@ import java.util.List;
 
 
 /**
- * 用于分页查询的帮助类
+ * 用于常规sql语句分页查询的帮助类
  * 可以{@link #PageQuery(String)}直接传入常规sql、会自动转换为countSql和pageSql、例如
  * select a,b,c from t_vehicle where vin =? and vehicle_type like ? order by create_time desc
  * 会生成
