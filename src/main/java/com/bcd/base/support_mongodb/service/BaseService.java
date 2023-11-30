@@ -8,15 +8,20 @@ import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
 import com.bcd.base.util.StringUtil;
+import com.mongodb.bulk.BulkWriteResult;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
+import org.springframework.data.util.Pair;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -188,6 +193,23 @@ public class BaseService<T extends SuperBaseBean> {
     public void delete(Condition condition) {
         Query query = ConditionUtil.toQuery(condition);
         getMongoTemplate().remove(query, getBeanInfo().clazz);
+    }
+
+
+    /**
+     * 批量修改、不会修改更新时间
+     * @param condition
+     * @param updates
+     * @return
+     */
+    public BulkWriteResult updateMulti(Condition condition, Update... updates) {
+        if (updates.length == 0) {
+            return null;
+        } else {
+            Query query = ConditionUtil.toQuery(condition);
+            List<Pair<Query, UpdateDefinition>> collect = Arrays.stream(updates).map(e -> Pair.of(query, (UpdateDefinition) e)).toList();
+            return getMongoTemplate().bulkOps(BulkOperations.BulkMode.UNORDERED, getBeanInfo().clazz).updateMulti(collect).execute();
+        }
     }
 
 
