@@ -17,7 +17,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id "io.spring.dependency-management" version "1.1.2"
-    id 'org.springframework.boot' version "3.+"
+    id 'org.springframework.boot' version "3.2.0"
 }
 
 
@@ -143,12 +143,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
 
-//    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-//    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.14.9'
-//    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-//    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.14.9'
-
-
     // https://mvnrepository.com/artifact/com.github.oshi/oshi-core
     implementation group: 'com.github.oshi', name: 'oshi-core-java11', version: "+"
 }
@@ -243,7 +237,7 @@ import java.util.regex.Matcher
 
 tasks.withType(GenerateMavenPom).all {
     doLast {
-        File file = new File("$buildDir/publications/maven/pom-default.xml")
+        File file = new File("${getLayout().getBuildDirectory()}/publications/maven/pom-default.xml")
         def text = file.text
         def pattern = "(?s)(<dependencyManagement>.+?<dependencies>)(.+?)(</dependencies>.+?</dependencyManagement>)"
         Matcher matcher = text =~ pattern
