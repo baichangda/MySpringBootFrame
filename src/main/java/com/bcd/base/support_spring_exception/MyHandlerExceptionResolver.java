@@ -20,6 +20,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
@@ -31,27 +32,39 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 方法1、定义一个类、继承{@link WebMvcConfigurer}、注册为spring bean
+ * 全局异常捕获流程为
+ * 1、{@link org.springframework.web.servlet.DispatcherServlet#doDispatch(HttpServletRequest, HttpServletResponse)}
+ * 2、{@link org.springframework.web.servlet.DispatcherServlet#processDispatchResult(HttpServletRequest, HttpServletResponse, HandlerExecutionChain, ModelAndView, Exception)}
+ * 3、{@link org.springframework.web.servlet.DispatcherServlet#processHandlerException(HttpServletRequest, HttpServletResponse, Object, Exception)}
+ * 其中会使用{@link org.springframework.web.servlet.DispatcherServlet#handlerExceptionResolvers}来处理异常
+ * 所以需要跟踪如何初始化这个属性
+ * 属性初始化过程如下、反推
+ * 1、{@link org.springframework.web.servlet.DispatcherServlet#initHandlerExceptionResolvers(ApplicationContext)}
+ * 2、{@link org.springframework.web.servlet.DispatcherServlet#initStrategies(ApplicationContext)}
+ * 3、{@link org.springframework.web.servlet.DispatcherServlet#refresh()}
+ * 其中步骤1中会扫描所有{@link HandlerExceptionResolver}的bean
+ *
+ *
+ * 方法1、定义一个类、继承{@link WebMvcConfigurer}、注册为spring bean、这个方法是替换掉默认的异常解析器
  * 生效过程为
  * 1、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration}生效
  * 2、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration#handlerExceptionResolver(ContentNegotiationManager)}
  * 3、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.EnableWebMvcConfiguration#configureHandlerExceptionResolvers(List)}
  * 4、{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#configureHandlerExceptionResolvers(List)}
- * <p>
  * 其中依赖于变量{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#delegates}来源、逆向反推调用过程如下
  * 5、{@link org.springframework.web.servlet.config.annotation.WebMvcConfigurerComposite#addWebMvcConfigurers(List)}
  * 6、{@link org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration#setConfigurers(List)}
- * 此时方法通过{@link org.springframework.beans.factory.annotation.Autowired}依赖注入、寻找其参数b{@link WebMvcConfigurer}bean定义
+ * 此时方法通过{@link org.springframework.beans.factory.annotation.Autowired}依赖注入、寻找其参数{@link WebMvcConfigurer}bean定义
  * 发现只有如下子类加入到spring容器中
  * 7、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter#configureHandlerExceptionResolvers(List)}
  * 到此结束、其默认实现为空实现
- * <p>
  * 自定义类会在步骤6中被扫描到、并调用其中方法
  * <p>
  * ------------------------------------------------------------------------------------------------------------------------
  * <p>
- * 或者另一种方法、自定义一个类继承{@link AbstractHandlerExceptionResolver}、注册为spring bean
+ * 或者另一种方法、自定义一个类继承{@link AbstractHandlerExceptionResolver}、注册为spring bean、这个方法是新增一个异常解析器并提升优先级
  * 重写{@link AbstractHandlerExceptionResolver#shouldApplyTo(HttpServletRequest, Object)}为 {return true}
+ * 重写{@link AbstractHandlerExceptionResolver#getOrder()} 为 {return -1}、因为默认的异常处理器是0、需要自定义的优先级高于它
  * 在http请求时候、会有如下初始化过程
  * 1、{@link org.springframework.web.servlet.DispatcherServlet#onRefresh(ApplicationContext)}
  * 2、{@link org.springframework.web.servlet.DispatcherServlet#initStrategies(ApplicationContext)}
@@ -64,7 +77,6 @@ import java.util.stream.Collectors;
  *      {@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ResponseStatus}
  *      {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver} 处理 spring一些自定义异常
  * {@link AbstractHandlerExceptionResolver}自定义、优先级{@link Ordered#LOWEST_PRECEDENCE}
- * 所以如果需要自己处理spring自定义异常、需要重写{@link AbstractHandlerExceptionResolver#getOrder()}
  */
 @Component
 @SuppressWarnings("unchecked")
