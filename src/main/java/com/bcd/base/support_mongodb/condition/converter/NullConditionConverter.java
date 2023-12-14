@@ -16,7 +16,7 @@ public class NullConditionConverter implements Converter<NullCondition, Criteria
         Criteria criteria = Criteria.where(fieldName);
         switch (handler) {
             case NULL: {
-                criteria.exists(false);
+                criteria.orOperator(criteria.exists(false), criteria.exists(true).is(null));
                 break;
             }
             case NOT_NULL: {
