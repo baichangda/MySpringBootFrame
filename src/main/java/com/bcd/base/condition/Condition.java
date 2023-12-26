@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 /**
  * Created by Administrator on 2017/4/11.
  */
-@SuppressWarnings("unchecked")
 public interface Condition extends Serializable {
     static Condition and(List<Condition> conditionList) {
         return new ConcatCondition(ConcatCondition.ConcatWay.AND, conditionList.stream().filter(Objects::nonNull).collect(Collectors.toList()));

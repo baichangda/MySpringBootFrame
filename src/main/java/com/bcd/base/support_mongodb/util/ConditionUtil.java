@@ -14,9 +14,8 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/4/11.
  */
-@SuppressWarnings("unchecked")
 public class ConditionUtil {
-    private final static Map<Class, Converter> CONDITION_CONVERTER_MAP = new HashMap<>();
+    private final static Map<Class<? extends Condition>, Converter<? extends Condition, ?>> CONDITION_CONVERTER_MAP = new HashMap<>();
 
     static {
         CONDITION_CONVERTER_MAP.put(NumberCondition.class, new NumberConditionConverter());
@@ -26,7 +25,7 @@ public class ConditionUtil {
         CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
-    public static Query toQuery(Condition condition) {
+    public static <T extends Condition> Query toQuery(T condition) {
         Criteria criteria = convertCondition(condition);
         if (criteria == null) {
             return new Query();
@@ -34,8 +33,12 @@ public class ConditionUtil {
         return new Query(criteria);
     }
 
-    public static Criteria convertCondition(Condition condition) {
-        Converter converter = CONDITION_CONVERTER_MAP.get(condition.getClass());
+    @SuppressWarnings("unchecked")
+    public static <T extends Condition> Criteria convertCondition(T condition) {
+        if (condition == null) {
+            return null;
+        }
+        Converter<T, ?> converter = (Converter<T, ?>) CONDITION_CONVERTER_MAP.get(condition.getClass());
         if (converter == null) {
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
         } else {

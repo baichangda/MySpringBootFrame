@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ConcatConditionConverter implements Converter<ConcatCondition, ConvertRes> {
     @Override
     public ConvertRes convert(ConcatCondition condition, Object... exts) {
-        final BeanInfo beanInfo = (BeanInfo) exts[0];
+        final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final boolean root = exts.length != 1;
         ConvertRes[] arr = condition.conditions.stream().map(e -> ConditionUtil.convertCondition(e, beanInfo, false)).filter(Objects::nonNull).toArray(ConvertRes[]::new);
         if (arr.length == 0) {

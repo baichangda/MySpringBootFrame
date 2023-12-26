@@ -10,28 +10,28 @@ import com.bcd.base.support_jdbc.service.BeanInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 public class ConditionUtil {
 
-    public final static Map<Class, Converter> JDBC_CONDITION_CONVERTER_MAP = new HashMap<>();
+    private final static Map<Class<? extends Condition>, Converter<? extends Condition,?>> CONDITION_CONVERTER_MAP = new HashMap<>();
 
     static {
-        JDBC_CONDITION_CONVERTER_MAP.put(NumberCondition.class, new NumberConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(StringCondition.class, new StringConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(DateCondition.class, new DateConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(NullCondition.class, new NullConditionConverter());
-        JDBC_CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
+        CONDITION_CONVERTER_MAP.put(NumberCondition.class, new NumberConditionConverter());
+        CONDITION_CONVERTER_MAP.put(StringCondition.class, new StringConditionConverter());
+        CONDITION_CONVERTER_MAP.put(DateCondition.class, new DateConditionConverter());
+        CONDITION_CONVERTER_MAP.put(NullCondition.class, new NullConditionConverter());
+        CONDITION_CONVERTER_MAP.put(ConcatCondition.class, new ConcatConditionConverter());
     }
 
-    public static ConvertRes convertCondition(Condition condition, BeanInfo beanInfo) {
+    public static  <T extends Condition>ConvertRes convertCondition(T condition, BeanInfo<?> beanInfo) {
         return convertCondition(condition, beanInfo, true);
     }
 
-    public static ConvertRes convertCondition(Condition condition, BeanInfo beanInfo, boolean root) {
+    @SuppressWarnings("unchecked")
+    public static <T extends Condition> ConvertRes convertCondition(T condition, BeanInfo<?> beanInfo, boolean root) {
         if (condition == null) {
             return null;
         }
-        Converter converter = JDBC_CONDITION_CONVERTER_MAP.get(condition.getClass());
+        Converter<T,?> converter = (Converter<T, ?>) CONDITION_CONVERTER_MAP.get(condition.getClass());
         if (converter == null) {
             throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
         } else {
