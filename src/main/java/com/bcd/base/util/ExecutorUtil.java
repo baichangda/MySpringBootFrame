@@ -55,16 +55,13 @@ public class ExecutorUtil {
         }
         for (Object arg : args) {
             if (arg != null) {
-                if (arg instanceof ExecutorService pool) {
-                    shutdownThenAwait(pool);
-                } else if (arg instanceof ExecutorService[] pools) {
-                    shutdownThenAwait(pools);
-                } else if (arg instanceof BlockingQueue<?> queue) {
-                    awaitQueueEmpty(queue);
-                } else if (arg instanceof BlockingQueue<?>[] queues) {
-                    awaitQueueEmpty(queues);
-                } else {
-                    throw BaseRuntimeException.getException("arg type[{}] not support", arg.getClass().getName());
+                switch (arg) {
+                    case ExecutorService pool -> shutdownThenAwait(pool);
+                    case ExecutorService[] pools -> shutdownThenAwait(pools);
+                    case BlockingQueue<?> queue -> awaitQueueEmpty(queue);
+                    case BlockingQueue<?>[] queues -> awaitQueueEmpty(queues);
+                    default ->
+                            throw BaseRuntimeException.getException("arg type[{}] not support", arg.getClass().getName());
                 }
             }
         }
