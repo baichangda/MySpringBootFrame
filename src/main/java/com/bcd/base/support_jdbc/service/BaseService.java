@@ -36,10 +36,10 @@ public class BaseService<T extends SuperBaseBean> {
      */
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    TransactionTemplate transactionTemplate;
+    private TransactionTemplate transactionTemplate;
 
     private final BeanInfo<T> beanInfo;
 

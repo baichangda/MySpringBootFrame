@@ -194,6 +194,7 @@ bootRun {
     jvmArgs('-Dfile.encoding=UTF-8')
     jvmArgs('-Dsun.jnu.encoding=UTF-8')
     jvmArgs('-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector')
+//    jvmArgs('--add-opens=java.base/java.nio=ALL-UNNAMED')
 }
 
 
