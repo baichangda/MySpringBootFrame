@@ -40,7 +40,7 @@ public class SwaggerApiScanner {
     private static LinkedHashMap<String, ApiParamData> getApiParamsMap(Method method) {
         LinkedHashMap<String, ApiParamData> resultMap = new LinkedHashMap<>();
         //使用spring工具类获取所有参数真实名称
-        StandardReflectionParameterNameDiscoverer discoverer=new StandardReflectionParameterNameDiscoverer();
+        StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
         String[] paramNames = discoverer.getParameterNames(method);
         //获取所有swagger注解参数对应注释
         //获取所有参数
@@ -85,13 +85,13 @@ public class SwaggerApiScanner {
      *
      * @param method
      * @return
-     * @see Operation#description()
+     * @see Operation#summary()
      */
     private static String getApiComment(Method method) {
         String comment = "";
         Operation operation = method.getAnnotation(Operation.class);
         if (operation != null) {
-            comment = operation.description();
+            comment = operation.summary();
         }
         return comment;
     }
@@ -154,9 +154,9 @@ public class SwaggerApiScanner {
         final List<Class<?>> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
         //2、循环controller
         List<Map<String, Object>> dataList = new ArrayList<>();
-        for (Class controllerClass : classesWithAnno) {
+        for (Class<?> controllerClass : classesWithAnno) {
             //获取RequestMapping注解
-            RequestMapping controllerRequestMapping = (RequestMapping) controllerClass.getAnnotation(RequestMapping.class);
+            RequestMapping controllerRequestMapping = controllerClass.getAnnotation(RequestMapping.class);
             if (controllerRequestMapping == null || controllerRequestMapping.value().length == 0) {
                 return;
             }
@@ -208,7 +208,7 @@ public class SwaggerApiScanner {
                     excelList.add(Arrays.asList("接口路径", path));
                     excelList.add(Arrays.asList("接口输入", params));
                     excelList.add(Arrays.asList("接口返回", response));
-                    excelList.add(Arrays.asList());
+                    excelList.add(List.of());
                 });
                 if (doBeforeWrite != null) {
                     doBeforeWrite.accept(excelList);
@@ -335,6 +335,8 @@ public class SwaggerApiScanner {
                 //设置内容列样式
                 if (cellStyle2 == null) {
                     cellStyle2 = cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+                    cellStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
                     cellStyle2.setBorderLeft(BorderStyle.THIN);
                     cellStyle2.setBorderBottom(BorderStyle.THIN);
                     cellStyle2.setBorderTop(BorderStyle.THIN);
@@ -374,6 +376,8 @@ public class SwaggerApiScanner {
                 //设置内容列样式
                 if (cellStyle2 == null) {
                     cellStyle2 = cell.getRow().getSheet().getWorkbook().createCellStyle();
+                    cellStyle2.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+                    cellStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
                     cellStyle2.setBorderLeft(BorderStyle.THIN);
                     cellStyle2.setBorderBottom(BorderStyle.THIN);
                     cellStyle2.setBorderTop(BorderStyle.THIN);
@@ -404,8 +408,10 @@ public class SwaggerApiScanner {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        try (final OutputStream os = Files.newOutputStream(Paths.get("/Users/baichangda/gbdatachecker.xlsx"))) {
-            scanApiAndExport(os, null, 2, "com.bcd");
+        try (final OutputStream os1 = Files.newOutputStream(Paths.get("d://msbf1.xlsx"));
+             final OutputStream os2 = Files.newOutputStream(Paths.get("d://msbf2.xlsx"))) {
+            scanApiAndExport(os1, null, 1, "com.bcd");
+            scanApiAndExport(os2, null, 2, "com.bcd");
         }
     }
 }
