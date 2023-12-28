@@ -82,7 +82,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
     private final static Logger logger = LoggerFactory.getLogger(MyHandlerExceptionResolver.class);
-    private final HttpMessageConverter converter;
+    private final HttpMessageConverter<Object> converter;
 
     public MyHandlerExceptionResolver(MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter) {
         this.converter = mappingJackson2HttpMessageConverter;
