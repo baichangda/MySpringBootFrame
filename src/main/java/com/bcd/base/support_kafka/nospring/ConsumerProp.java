@@ -16,10 +16,11 @@ public class ConsumerProp {
     public boolean enableAutoCommit = true;
     public Duration autoCommitInterval = Duration.ofSeconds(1);
     public String autoOffsetReset = "latest";
-    public Duration heartbeatInterval = Duration.ofSeconds(15);
-    public Duration sessionTimeout = Duration.ofSeconds(30);
-    public Duration requestTimeout = Duration.ofSeconds(30);
-    public int maxPartitionFetchBytes = 3027200;
+    public Duration heartbeatInterval = Duration.ofSeconds(5);
+    public Duration sessionTimeout = Duration.ofSeconds(10);
+    public Duration requestTimeout = Duration.ofSeconds(10);
+    public int maxPartitionFetchBytes = ConsumerConfig.DEFAULT_MAX_PARTITION_FETCH_BYTES;
+    public int maxPollRecords = ConsumerConfig.DEFAULT_MAX_POLL_RECORDS;
     public Map<String,String> properties=new HashMap<>();
 
     public ConsumerProp(String bootstrapServers, String groupId) {
@@ -42,6 +43,7 @@ public class ConsumerProp {
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, (int) sessionTimeout.toMillis());
         props.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) requestTimeout.toMillis());
         props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
         props.putAll(properties);
         return props;
     }
@@ -124,5 +126,13 @@ public class ConsumerProp {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public int getMaxPollRecords() {
+        return this.maxPollRecords;
+    }
+
+    public void setMaxPollRecords(int maxPollRecords) {
+        this.maxPollRecords = maxPollRecords;
     }
 }

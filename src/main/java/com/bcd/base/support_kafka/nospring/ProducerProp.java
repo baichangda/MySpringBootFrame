@@ -11,8 +11,9 @@ public class ProducerProp {
     @NotBlank
     public String bootstrapServers;
     public String acks = "0";
-    public int batchSize = 16384;
-    public long bufferMemory = 33554432L;
+    public int batchSize = 16 * 1024;
+    public long bufferMemory = 32 * 1024 * 1024L;
+    public long lingerMs = 100L;
     public String compressionType = "gzip";
     public Map<String, String> properties = new HashMap<>();
 
@@ -30,8 +31,9 @@ public class ProducerProp {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
         props.put(ProducerConfig.ACKS_CONFIG, acks);
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchSize);
-        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType);
         props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, bufferMemory);
+        props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs);
+        props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType);
         props.putAll(properties);
         return props;
     }
@@ -82,5 +84,13 @@ public class ProducerProp {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public long getLingerMs() {
+        return this.lingerMs;
+    }
+
+    public void setLingerMs(long lingerMs) {
+        this.lingerMs = lingerMs;
     }
 }
