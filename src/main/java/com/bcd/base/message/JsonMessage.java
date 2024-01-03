@@ -9,8 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by dave on 16/2/13.
- *
+ * @author bcd
  * @param <T>
  */
 public class JsonMessage<T> implements Serializable {
