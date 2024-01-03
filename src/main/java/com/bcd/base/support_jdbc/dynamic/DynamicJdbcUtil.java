@@ -1,7 +1,9 @@
 package com.bcd.base.support_jdbc.dynamic;
 
 import com.bcd.base.support_jdbc.rowmapper.MyColumnMapRowMapper;
-import com.github.benmanes.caffeine.cache.*;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +31,16 @@ public class DynamicJdbcUtil {
     static Logger logger = LoggerFactory.getLogger(DynamicJdbcUtil.class);
     private static final LoadingCache<String, DynamicJdbcData> CACHE = Caffeine.newBuilder()
             .expireAfterAccess(Duration.ofSeconds(EXPIRE_IN_SECOND))
-            .<String, DynamicJdbcData>evictionListener((k,v,c) -> {
-                //移除数据源时候关闭数据源
-                HikariDataSource dataSource = (HikariDataSource) v.jdbcTemplate.getDataSource();
-                logger.info("dataSource[{}] [{}] start remove", k, dataSource.hashCode());
-                dataSource.close();
-                logger.info("dataSource[{}] [{}] finish remove", k, dataSource.hashCode());
+            .<String, DynamicJdbcData>evictionListener((k, v, c) -> {
+                if (k != null && v != null) {
+                    //移除数据源时候关闭数据源
+                    HikariDataSource dataSource = (HikariDataSource) v.jdbcTemplate().getDataSource();
+                    if (dataSource != null) {
+                        logger.info("dataSource[{}] [{}] start remove", k, dataSource.hashCode());
+                        dataSource.close();
+                        logger.info("dataSource[{}] [{}] finish remove", k, dataSource.hashCode());
+                    }
+                }
             })
             .scheduler(Scheduler.systemScheduler())
             .build(s -> {
@@ -87,10 +93,10 @@ public class DynamicJdbcUtil {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        List<Map<String, Object>> dataList1 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
-        List<Map<String, Object>> dataList2 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList1 = getTest().jdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList2 = getTest().jdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
         TimeUnit.SECONDS.sleep(10);
-        List<Map<String, Object>> dataList3 = getTest().jdbcTemplate.query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
+        List<Map<String, Object>> dataList3 = getTest().jdbcTemplate().query("SELECT * FROM t_sys_user", MyColumnMapRowMapper.ROW_MAPPER);
 
         closeAll();
 
