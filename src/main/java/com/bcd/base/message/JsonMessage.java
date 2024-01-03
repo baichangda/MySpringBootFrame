@@ -16,9 +16,9 @@ public class JsonMessage<T> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Api调用编码(0:成功;1:通用错误;其他代表各种业务定义的错误)")
+    @Schema(description = "Api调用编码(0:成功;1:失败;其他代表各种业务定义的错误)")
     private int code;
-    @Schema(description = "Api调用失败时提示信息")
+    @Schema(description = "Api调用返回的提示信息")
     private String message;
     @Schema(description = "Api调用返回的数据")
     private T data;
