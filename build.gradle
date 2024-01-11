@@ -171,6 +171,10 @@ bootJar {
     version = ''
 }
 
+test {
+    useJUnitPlatform()
+}
+
 //生成jar时打包源码
 task sourceJar(type: Jar) {
     from sourceSets.main.java.srcDirs
