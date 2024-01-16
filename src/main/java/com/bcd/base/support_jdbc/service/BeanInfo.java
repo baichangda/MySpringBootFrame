@@ -3,6 +3,7 @@ package com.bcd.base.support_jdbc.service;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Transient;
+import com.bcd.base.support_jdbc.anno.Unique;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -53,6 +54,10 @@ public final class BeanInfo<T> {
      * 是否在更新时候自动设置更新信息
      */
     public final boolean autoSetUpdateInfoBeforeUpdate;
+    /**
+     * 唯一字段集合
+     */
+    public final List<UniqueInfo> uniqueInfoList;
 
     public BeanInfo(Class<T> clazz) {
         this.clazz = clazz;
@@ -74,6 +79,7 @@ public final class BeanInfo<T> {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         columnFieldList_noId = new ArrayList<>();
         columnFieldList = new ArrayList<>();
+        uniqueInfoList = new ArrayList<>();
         fieldNameOrColumnName_columnName = new HashMap<>();
 
         FieldInfo idFieldInfo = null;
@@ -87,6 +93,10 @@ public final class BeanInfo<T> {
                 }
                 fieldNameOrColumnName_columnName.put(fieldInfo.fieldName, fieldInfo.columnName);
                 fieldNameOrColumnName_columnName.put(fieldInfo.columnName, fieldInfo.columnName);
+                Unique unique = f.getAnnotation(Unique.class);
+                if (unique != null) {
+                    uniqueInfoList.add(new UniqueInfo(fieldInfo, unique, tableName));
+                }
             }
         }
 

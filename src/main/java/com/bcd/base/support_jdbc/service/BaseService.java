@@ -1,6 +1,7 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
@@ -20,7 +21,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -185,7 +185,10 @@ public class BaseService<T extends SuperBaseBean> {
      * 保存
      * 如果id为null、则是新增、否则是更新
      *
-     * @param t
+     * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
+     * 会设置创建信息或者更新信息
+     *
+     * @param t 如果id==null、则会设置
      */
     public void save(T t) {
         if (t.getId() == null) {
@@ -201,10 +204,16 @@ public class BaseService<T extends SuperBaseBean> {
      * 如果设置了id、即会按照id新增、否则自增id
      * 所有属性都会作为参数设置、即使是null
      *
-     * @param t
+     * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
+     * 会设置创建信息
+     *
+     * @param t 如果id==null、则会设置
      */
     public void insert(T t) {
         BeanInfo<T> info = getBeanInfo();
+        if (!info.uniqueInfoList.isEmpty()) {
+            validateUnique(Collections.singletonList(t));
+        }
         if (info.autoSetCreateInfoBeforeInsert) {
             setCreateInfo(t);
         }
@@ -227,6 +236,8 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 根据参数对新增、只新增部分字段
+     *
+     * 会设置创建信息
      *
      * @param paramMap
      */
@@ -254,13 +265,19 @@ public class BaseService<T extends SuperBaseBean> {
      * 根据第一个元素来判断新增的sql语句是否包含id字段
      * 所有属性都会作为参数设置、即使是null
      *
-     * @param list
+     * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
+     * 会设置创建信息
+     *
+     * @param list 即使其中id为null、也不会设置
      */
     public void insertBatch(List<T> list) {
         if (list.isEmpty()) {
             return;
         }
         BeanInfo<T> info = getBeanInfo();
+        if (!info.uniqueInfoList.isEmpty()) {
+            validateUnique(list);
+        }
         if (info.autoSetCreateInfoBeforeInsert) {
             for (T t : list) {
                 setCreateInfo(t);
@@ -280,10 +297,16 @@ public class BaseService<T extends SuperBaseBean> {
      * 根据id更新
      * 更新所有字段、即使是null
      *
+     * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
+     * 会设置更新信息
+     *
      * @param t
      */
     public void update(T t) {
         BeanInfo<T> info = getBeanInfo();
+        if (!info.uniqueInfoList.isEmpty()) {
+            validateUnique(Collections.singletonList(t));
+        }
         if (info.autoSetUpdateInfoBeforeUpdate) {
             setUpdateInfo(t);
         }
@@ -297,6 +320,8 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据id、参数对更新
      * 只会更新部分字段
+     *
+     * 会设置更新信息
      *
      * @param id
      * @param paramMap
@@ -322,6 +347,8 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 通过condition、参数对更新
      * 只会更新部分字段
+     *
+     * 会设置更新信息
      *
      * @param condition 更新条件
      * @param paramMap  更新值
@@ -358,6 +385,9 @@ public class BaseService<T extends SuperBaseBean> {
      * 批量更新
      * 更新所有字段、即使是null
      *
+     * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
+     * 会设置更新信息
+     *
      * @param list
      */
     public void updateBatch(List<T> list) {
@@ -365,6 +395,9 @@ public class BaseService<T extends SuperBaseBean> {
             return;
         }
         BeanInfo<T> info = getBeanInfo();
+        if (!info.uniqueInfoList.isEmpty()) {
+            validateUnique(list);
+        }
         if (info.autoSetUpdateInfoBeforeUpdate) {
             for (T t : list) {
                 setUpdateInfo(t);
@@ -423,6 +456,77 @@ public class BaseService<T extends SuperBaseBean> {
             getJdbcTemplate().update(sql.toString(), paramList.toArray());
         } else {
             getJdbcTemplate().update(sql.toString());
+        }
+    }
+
+    public void validateUnique(List<T> list) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+        try {
+            BeanInfo<T> beanInfo = getBeanInfo();
+            List<UniqueInfo> uniqueInfoList = beanInfo.uniqueInfoList;
+            if (list.size() == 1) {
+                T t = list.get(0);
+                for (UniqueInfo uniqueInfo : uniqueInfoList) {
+                    FieldInfo fieldInfo = uniqueInfo.fieldInfo;
+                    Object val = fieldInfo.field.get(t);
+                    if (val == null) {
+                        continue;
+                    }
+                    List<Long> idList = getJdbcTemplate().queryForList(uniqueInfo.eqSql, Long.class, val);
+                    int size = idList.size();
+                    switch (size) {
+                        case 0 -> {
+                        }
+                        case 1 -> {
+                            Long l = idList.get(0);
+                            Long id = t.getId();
+                            if (!l.equals(id)) {
+                                throw BaseRuntimeException.getException(uniqueInfo.msg);
+                            }
+                        }
+                        default -> throw BaseRuntimeException.getException(uniqueInfo.msg);
+                    }
+                }
+            } else {
+                for (UniqueInfo uniqueInfo : uniqueInfoList) {
+                    FieldInfo fieldInfo = uniqueInfo.fieldInfo;
+                    List<Object> valList = new ArrayList<>();
+                    for (T t : list) {
+                        Object val = fieldInfo.field.get(t);
+                        if (val != null) {
+                            if (valList.contains(val)) {
+                                throw BaseRuntimeException.getException(uniqueInfo.msg);
+                            }
+                        }
+                        valList.add(val);
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        T t = list.get(i);
+                        Object val = valList.get(i);
+                        if (val == null) {
+                            continue;
+                        }
+                        List<Long> idList = getJdbcTemplate().queryForList(uniqueInfo.eqSql, Long.class, val);
+                        int size = idList.size();
+                        switch (size) {
+                            case 0 -> {
+                            }
+                            case 1 -> {
+                                Long l = idList.get(0);
+                                Long id = t.getId();
+                                if (!l.equals(id)) {
+                                    throw BaseRuntimeException.getException(uniqueInfo.msg);
+                                }
+                            }
+                            default -> throw BaseRuntimeException.getException(uniqueInfo.msg);
+                        }
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw BaseRuntimeException.getException(e);
         }
     }
 

@@ -22,8 +22,8 @@ public @interface Table {
     /**
      * 此属性指定是否在新增时候自动设置创建信息
      * 默认开启
-     * 同时满足如下3条件才会自动设置
-     * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}时候才有效
+     * 同时满足如下条件才会自动设置
+     * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}
      * 2、此属性设置为true
      *
      * 影响的方法如下
@@ -36,8 +36,8 @@ public @interface Table {
     /**
      * 此属性指定是否在更新时候自动设置更新信息
      * 默认开启
-     * 同时满足如下3条件才会自动设置
-     * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}时候才有效
+     * 同时满足如下条件才会自动设置
+     * 1、当bean继承{@link com.bcd.base.support_jdbc.bean.BaseBean}
      * 2、此属性设置为true
      *
      * 影响的方法如下

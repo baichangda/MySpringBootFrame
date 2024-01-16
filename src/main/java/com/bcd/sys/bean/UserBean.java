@@ -1,6 +1,7 @@
 package com.bcd.sys.bean;
 
 import com.bcd.base.support_jdbc.anno.Table;
+import com.bcd.base.support_jdbc.anno.Unique;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +26,7 @@ public class UserBean extends BaseBean{
     private final static long serialVersionUID = 1L;
 
     //field
+    @Unique(msg = "用户名不能重复")
     @NotBlank(message = "[用户名]不能为空")
     @Size(max = 50, message = "[用户名]长度不能超过50")
     @Schema(description = "用户名", maxLength = 50, requiredMode = Schema.RequiredMode.REQUIRED)

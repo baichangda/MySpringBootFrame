@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public final class BeanInfo<T> {
     /**
@@ -19,7 +20,7 @@ public final class BeanInfo<T> {
      */
     public final String collection;
 
-    public final Field[] uniqueFields;
+    public final UniqueInfo[] uniqueInfos;
 
     /**
      * 是否在新增时候自动设置创建信息
@@ -32,7 +33,7 @@ public final class BeanInfo<T> {
 
         collection = clazz.getAnnotation(Document.class).collection();
 
-        uniqueFields = FieldUtils.getFieldsWithAnnotation(clazz, Unique.class);
+        uniqueInfos = Arrays.stream(FieldUtils.getFieldsWithAnnotation(clazz, Unique.class)).map(UniqueInfo::new).toArray(UniqueInfo[]::new);
 
         isBaseBean = BaseBean.class.isAssignableFrom(clazz);
     }

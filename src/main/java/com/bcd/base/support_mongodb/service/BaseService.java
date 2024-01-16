@@ -126,6 +126,12 @@ public class BaseService<T extends SuperBaseBean> {
         return getMongoTemplate().findOne(query, getBeanInfo().clazz);
     }
 
+    /**
+     * 会验证{@link Unique}
+     * 会设置创建信息或更新信息
+     * @param t
+     * @return
+     */
     public T save(T t) {
         validateUniqueBeforeSave(Collections.singletonList(t));
         if (getBeanInfo().isBaseBean) {
@@ -138,6 +144,12 @@ public class BaseService<T extends SuperBaseBean> {
         return getRepository().save(t);
     }
 
+    /**
+     * 会验证{@link Unique}
+     * 会设置创建信息或更新信息
+     * @param collection
+     * @return
+     */
     public List<T> save(List<T> collection) {
         validateUniqueBeforeSave(collection);
         if (getBeanInfo().isBaseBean) {
@@ -152,6 +164,12 @@ public class BaseService<T extends SuperBaseBean> {
         return getRepository().saveAll(collection);
     }
 
+    /**
+     * 会验证{@link Unique}
+     * 会设置创建信息
+     * @param collection
+     * @return
+     */
     public List<T> insertAll(List<T> collection) {
         validateUniqueBeforeSave(collection);
         if (getBeanInfo().isBaseBean) {
@@ -236,22 +254,23 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     private void validateUniqueBeforeSave(List<T> list) {
-        if (getBeanInfo().uniqueFields.length > 0) {
+        if (getBeanInfo().uniqueInfos.length > 0) {
             try {
                 //1、循环集合,看传入的参数集合中唯一字段是否有重复的值
                 if (list.size() > 1) {
                     Map<String, Set<Object>> fieldValueSetMap = new HashMap<>();
                     for (T t : list) {
-                        for (Field f : getBeanInfo().uniqueFields) {
-                            String fieldName = f.getName();
-                            Object val = f.get(t);
+                        for (UniqueInfo uniqueInfo : getBeanInfo().uniqueInfos) {
+                            Field field = uniqueInfo.field;
+                            String fieldName = uniqueInfo.fieldName;
+                            Object val = field.get(t);
                             Set<Object> valueSet = fieldValueSetMap.get(fieldName);
                             if (valueSet == null) {
                                 valueSet = new HashSet<>();
                                 fieldValueSetMap.put(fieldName, valueSet);
                             } else {
                                 if (valueSet.contains(val)) {
-                                    throw BaseRuntimeException.getException(getUniqueMessage(f));
+                                    throw BaseRuntimeException.getException(uniqueInfo.msg);
                                 }
                             }
                             valueSet.add(val);
@@ -260,10 +279,10 @@ public class BaseService<T extends SuperBaseBean> {
                 }
                 //2、循环集合,验证每个唯一字段是否在数据库中有重复值
                 for (T t : list) {
-                    for (Field f : getBeanInfo().uniqueFields) {
-                        Object val = f.get(t);
-                        if (!isUnique(f.getName(), val, t.getId())) {
-                            throw BaseRuntimeException.getException(getUniqueMessage(f));
+                    for (UniqueInfo uniqueInfo : getBeanInfo().uniqueInfos) {
+                        Object val = uniqueInfo.field.get(t);
+                        if (!isUnique(uniqueInfo.fieldName, val, t.getId())) {
+                            throw BaseRuntimeException.getException(uniqueInfo.msg);
                         }
                     }
                 }
@@ -271,11 +290,6 @@ public class BaseService<T extends SuperBaseBean> {
                 throw BaseRuntimeException.getException(e);
             }
         }
-    }
-
-    private String getUniqueMessage(Field field) {
-        Unique anno = field.getAnnotation(Unique.class);
-        return StringUtil.format(anno.msg(), field.getName());
     }
 
     /**

@@ -32,7 +32,7 @@ targetCompatibility = 21
 
 repositories {
     mavenLocal()
-    maven { url "${aliyunPublic}" }
+//    maven { url "${aliyunPublic}" }
     mavenCentral()
 //    maven {
 //        url "${incarMavenRepoUrl}"
