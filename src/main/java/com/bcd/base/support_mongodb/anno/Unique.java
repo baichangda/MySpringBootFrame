@@ -25,4 +25,11 @@ public @interface Unique {
      * {} 代表字段名称
      */
     String msg() default "字段[{}]值重复";
+
+    /**
+     * 错误编码
+     * 在验证失败时候设置在{@link com.bcd.base.exception.BaseRuntimeException#code}中
+     * 即{@link com.bcd.base.message.JsonMessage#code}
+     */
+    int code() default 1;
 }

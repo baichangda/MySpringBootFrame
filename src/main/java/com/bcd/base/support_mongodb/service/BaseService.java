@@ -270,7 +270,7 @@ public class BaseService<T extends SuperBaseBean> {
                                 fieldValueSetMap.put(fieldName, valueSet);
                             } else {
                                 if (valueSet.contains(val)) {
-                                    throw BaseRuntimeException.getException(uniqueInfo.msg);
+                                    throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
                                 }
                             }
                             valueSet.add(val);
@@ -282,7 +282,7 @@ public class BaseService<T extends SuperBaseBean> {
                     for (UniqueInfo uniqueInfo : getBeanInfo().uniqueInfos) {
                         Object val = uniqueInfo.field.get(t);
                         if (!isUnique(uniqueInfo.fieldName, val, t.getId())) {
-                            throw BaseRuntimeException.getException(uniqueInfo.msg);
+                            throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
                         }
                     }
                 }
