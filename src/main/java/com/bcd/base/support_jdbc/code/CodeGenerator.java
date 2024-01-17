@@ -5,6 +5,7 @@ import com.bcd.base.support_jdbc.code.data.BeanData;
 import com.bcd.base.support_jdbc.code.data.ControllerData;
 import com.bcd.base.support_jdbc.code.data.ServiceData;
 import com.bcd.base.support_jdbc.code.mysql.MysqlDBSupport;
+import com.bcd.base.support_jdbc.code.pgsql.PgsqlDBSupport;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -24,6 +25,7 @@ import java.sql.SQLException;
 public class CodeGenerator {
 
     public final static CodeGenerator MYSQL = new CodeGenerator(new MysqlDBSupport());
+    public final static CodeGenerator PGSQL = new CodeGenerator(new PgsqlDBSupport());
     static Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
     final DBSupport dbSupport;
 
@@ -41,8 +43,7 @@ public class CodeGenerator {
         helper.needValidateSaveParam = true;
         helper
                 .addModule("User", "用户", "t_sys_user")
-                .addModule("Permission", "权限", "t_sys_permission")
-                .addModule("Test", "测试", "test");
+                .addModule("Permission", "权限", "t_sys_permission");
         Config config = Config.newConfig(path).addTableConfig(helper.toTableConfigs());
         CodeGenerator.MYSQL.generate(config);
 //        CodeGenerator.PGSQL.generate(config);
