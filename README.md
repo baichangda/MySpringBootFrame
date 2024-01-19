@@ -1,8 +1,8 @@
 # 自定义Spring框架
 ## 框架
-- jdk17(https://adoptium.net/zh-CN/temurin/releases/)
+- jdk21(https://adoptium.net/zh-CN/temurin/releases/)
 - springBoot3+
-- gradle7.6+
+- gradle8+
 ## 第三方技术要求
 ### log(log4j2)
 - 集成log4j2、排除spring默认logback依赖
