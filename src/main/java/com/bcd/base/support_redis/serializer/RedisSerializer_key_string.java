@@ -8,7 +8,7 @@ public class RedisSerializer_key_string extends StringRedisSerializer {
     public final String keyPrefix;
     public final int keyPrefixLen;
 
-    public RedisSerializer_key_string(String keyPrefix,Charset charset) {
+    public RedisSerializer_key_string(String keyPrefix, Charset charset) {
         super(charset);
         this.keyPrefix = keyPrefix;
         this.keyPrefixLen = keyPrefix.length();
@@ -20,7 +20,7 @@ public class RedisSerializer_key_string extends StringRedisSerializer {
         if (deserialize == null) {
             return null;
         }
-        if (deserialize.startsWith(keyPrefix)) {
+        if (keyPrefixLen > 0) {
             return deserialize.substring(keyPrefixLen);
         } else {
             return deserialize;
@@ -29,6 +29,10 @@ public class RedisSerializer_key_string extends StringRedisSerializer {
 
     @Override
     public byte[] serialize(String str) {
-        return super.serialize(keyPrefix + str);
+        if (keyPrefixLen > 0) {
+            return super.serialize(keyPrefix + str);
+        } else {
+            return super.serialize(str);
+        }
     }
 }
