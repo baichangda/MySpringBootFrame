@@ -9,7 +9,7 @@ public class RedisSerializer_value_integer implements RedisSerializer<Integer> {
         if (i == null) {
             return null;
         } else {
-            return new byte[]{(byte) (i >> 24), (byte) (i >> 16), (byte) (i >> 8), (byte) i.intValue()};
+            return new byte[]{(byte) (i >> 24), (byte) (i >> 16), (byte) (i >> 8), i.byteValue()};
         }
     }
 
