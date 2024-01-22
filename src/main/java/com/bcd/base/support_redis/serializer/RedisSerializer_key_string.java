@@ -8,7 +8,7 @@ public class RedisSerializer_key_string extends StringRedisSerializer {
     public final String keyPrefix;
     public final int keyPrefixLen;
 
-    public RedisSerializer_key_string(Charset charset, String keyPrefix) {
+    public RedisSerializer_key_string(String keyPrefix,Charset charset) {
         super(charset);
         this.keyPrefix = keyPrefix;
         this.keyPrefixLen = keyPrefix.length();
