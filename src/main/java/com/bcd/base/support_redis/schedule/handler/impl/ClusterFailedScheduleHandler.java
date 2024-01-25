@@ -127,7 +127,6 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
                 }
             } catch (InterruptedException e) {
                 logger.error("cluster schedule interrupted", e);
-                Thread.currentThread().interrupt();
                 return false;
             }
         }
