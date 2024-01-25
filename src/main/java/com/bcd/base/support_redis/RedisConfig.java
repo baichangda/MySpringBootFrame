@@ -12,8 +12,7 @@ import java.util.concurrent.Executors;
 
 @Configuration
 @SuppressWarnings("unchecked")
-public class
- RedisConfig {
+public class RedisConfig {
 
     /**
      * key 用 {@link RedisUtil#SERIALIZER_KEY_STRING}
