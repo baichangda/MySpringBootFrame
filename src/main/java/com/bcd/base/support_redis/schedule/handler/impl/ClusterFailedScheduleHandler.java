@@ -83,7 +83,6 @@ public class ClusterFailedScheduleHandler extends RedisScheduleHandler {
             this.cycleIntervalInMillis = timeoutInMillis / 10;
         } else {
             this.cycleIntervalInMillis = anno.cycleIntervalUnit().toMillis(anno.cycleInterval());
-            ;
         }
     }
 
