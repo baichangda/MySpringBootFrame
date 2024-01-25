@@ -1,11 +1,8 @@
 package com.bcd.base.support_redis.schedule.aop;
 
-import com.bcd.base.support_redis.schedule.anno.ClusterFailedSchedule;
-import com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule;
-import com.bcd.base.support_redis.schedule.handler.RedisScheduleHandler;
-import com.bcd.base.support_redis.schedule.handler.impl.ClusterFailedScheduleHandler;
-import com.bcd.base.support_redis.schedule.handler.impl.SingleFailedScheduleHandler;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule;
+import com.bcd.base.support_redis.schedule.handler.SingleFailedScheduleHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RedisScheduleAopConfig {
 
-    private final static Map<Method, RedisScheduleHandler> METHOD_TO_HANDLER = new ConcurrentHashMap<>();
+    private final static Map<Method, SingleFailedScheduleHandler> METHOD_TO_HANDLER = new ConcurrentHashMap<>();
 
     private final static Logger logger = LoggerFactory.getLogger(RedisScheduleAopConfig.class);
 
@@ -40,8 +37,7 @@ public class RedisScheduleAopConfig {
     /**
      * 定时任务
      */
-    @Pointcut("@annotation(com.bcd.base.support_redis.schedule.anno.ClusterFailedSchedule) " +
-            "|| @annotation(com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule)")
+    @Pointcut("@annotation(com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule)")
     public void methodSchedule() {
 
     }
@@ -53,15 +49,9 @@ public class RedisScheduleAopConfig {
     public void doAroundSchedule(ProceedingJoinPoint joinPoint) {
         //1、获取aop执行的方法
         Method method = getAopMethod(joinPoint);
-        RedisScheduleHandler handler = METHOD_TO_HANDLER.computeIfAbsent(method, k -> {
-            SingleFailedSchedule anno1 = method.getAnnotation(SingleFailedSchedule.class);
-            if (anno1 == null) {
-                ClusterFailedSchedule anno2 = method.getAnnotation(ClusterFailedSchedule.class);
-                return new ClusterFailedScheduleHandler(anno2, redisConnectionFactory);
-            } else {
-                return new SingleFailedScheduleHandler(anno1, redisConnectionFactory);
-            }
-        });
+        SingleFailedScheduleHandler handler = METHOD_TO_HANDLER.computeIfAbsent(method, k ->
+             new SingleFailedScheduleHandler(method.getAnnotation(SingleFailedSchedule.class), redisConnectionFactory)
+        );
         boolean flag = handler.doBeforeStart();
         if (flag) {
             Object[] args = joinPoint.getArgs();
