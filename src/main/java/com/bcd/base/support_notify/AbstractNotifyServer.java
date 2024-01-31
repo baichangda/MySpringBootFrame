@@ -46,7 +46,7 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
     private Map<String, ListenerInfo> cache = new HashMap<>();
 
     public AbstractNotifyServer(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
-        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), 1, false, 100, true, 0, "subscribe_" + type);
+        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false, 100, 1, false, 100, true, 0, 0, "subscribe_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
         this.type = type;

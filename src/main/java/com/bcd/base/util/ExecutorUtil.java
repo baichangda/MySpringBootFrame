@@ -59,6 +59,10 @@ public class ExecutorUtil {
                     shutdownThenAwait(pool);
                 } else if (arg instanceof ExecutorService[] pools) {
                     shutdownThenAwait(pools);
+                } else if (arg instanceof Thread thread) {
+                    awaitThread(thread);
+                } else if (arg instanceof Thread[] threads) {
+                    awaitThread(threads);
                 } else if (arg instanceof BlockingQueue<?> queue) {
                     awaitQueueEmpty(queue);
                 } else if (arg instanceof BlockingQueue<?>[] queues) {
@@ -78,15 +82,17 @@ public class ExecutorUtil {
         if (pools == null) {
             return;
         }
-        for (ExecutorService pool : pools) {
-            pool.shutdown();
-            try {
-                while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+        try {
+            for (ExecutorService pool : pools) {
+                if (pool != null) {
+                    pool.shutdown();
+                    while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
 
+                    }
                 }
-            } catch (InterruptedException ex) {
-                throw BaseRuntimeException.getException(ex);
             }
+        } catch (InterruptedException ex) {
+            throw BaseRuntimeException.getException(ex);
         }
     }
 
@@ -94,14 +100,29 @@ public class ExecutorUtil {
         if (queues == null) {
             return;
         }
-        for (Queue<?> queue : queues) {
-            while (!queue.isEmpty()) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(200L);
-                } catch (InterruptedException e) {
-                    throw BaseRuntimeException.getException(e);
+        try {
+            for (Queue<?> queue : queues) {
+                while (queue != null && !queue.isEmpty()) {
+                    TimeUnit.MILLISECONDS.sleep(100L);
                 }
             }
+        } catch (InterruptedException e) {
+            throw BaseRuntimeException.getException(e);
+        }
+    }
+
+    public static void awaitThread(Thread... threads) {
+        if (threads == null) {
+            return;
+        }
+        try {
+            for (Thread thread : threads) {
+                while (thread != null && thread.isAlive()) {
+                    TimeUnit.MILLISECONDS.sleep(100L);
+                }
+            }
+        } catch (InterruptedException e) {
+            throw BaseRuntimeException.getException(e);
         }
     }
 
