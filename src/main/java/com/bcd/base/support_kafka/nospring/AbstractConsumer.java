@@ -105,6 +105,8 @@ public abstract class AbstractConsumer {
     public final LongAdder monitor_workCount;
     public ScheduledExecutorService monitor_pool;
 
+    private Thread shutdownHookThread;
+
 
     /**
      * @param consumerProp         消费者属性
@@ -246,13 +248,14 @@ public abstract class AbstractConsumer {
                             consumeThread.start();
                             logger.info("start consumer for topics[{}]", String.join(",", topics));
                         }
+                        //增加销毁回调
+                        shutdownHookThread = new Thread(this::destroy);
+                        Runtime.getRuntime().addShutdownHook(shutdownHookThread);
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源
                         destroy();
                         throw BaseRuntimeException.getException(ex);
                     }
-                    //增加销毁回调
-                    Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
                 }
             }
         }
@@ -269,8 +272,15 @@ public abstract class AbstractConsumer {
                     //打上退出标记、等待工作线程退出
                     running_work = false;
                     ExecutorUtil.shutdown(workThreads, monitor_pool);
+                    //取消shutdownHook
+                    if (shutdownHookThread != null) {
+                        try {
+                            Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
+                        }catch (IllegalStateException ignored){}
+                    }
                     //标记不可用
                     available = false;
+
                 }
             }
         }
