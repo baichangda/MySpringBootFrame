@@ -283,7 +283,7 @@ public abstract class AbstractConsumer {
     /**
      * 消费
      */
-    public void consume(KafkaConsumer<String, byte[]> consumer) {
+    private void consume(KafkaConsumer<String, byte[]> consumer) {
         try {
             if (workThreadPerQueue) {
                 while (running_consume) {
@@ -407,7 +407,7 @@ public abstract class AbstractConsumer {
     }
 
 
-    public abstract void onMessage(ConsumerRecord<String, byte[]> consumerRecord);
+    public abstract void onMessage(ConsumerRecord<String, byte[]> consumerRecord) throws Exception;
 
 
     /**
