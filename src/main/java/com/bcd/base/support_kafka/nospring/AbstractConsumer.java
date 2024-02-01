@@ -200,31 +200,44 @@ public abstract class AbstractConsumer {
                         //启动监控
                         if (monitor_period != 0) {
                             monitor_pool = Executors.newSingleThreadScheduledExecutor();
-                            monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period,monitor_period, TimeUnit.SECONDS);
+                            monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
                         }
                         //启动消费者
                         if (consumerPerPartition) {
-                            try (final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties)) {
-                                List<PartitionInfo> partitions = Arrays.stream(topics).flatMap(e -> consumer.partitionsFor(e).stream()).toList();
-                                if (!partitions.isEmpty()) {
-                                    consumeThreads = new Thread[partitions.size()];
-                                    for (int i = 0; i < partitions.size(); i++) {
+                            final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
+                            List<PartitionInfo> partitions = Arrays.stream(topics).flatMap(e -> consumer.partitionsFor(e).stream()).toList();
+                            if (partitions.isEmpty()) {
+                                consumer.close();
+                            } else {
+                                KafkaConsumer<String, byte[]>[] consumers = new KafkaConsumer[partitions.size()];
+                                try {
+                                    PartitionInfo firstPartitionInfo = partitions.get(0);
+                                    consumer.assign(Collections.singletonList(new TopicPartition(firstPartitionInfo.topic(), firstPartitionInfo.partition())));
+                                    consumers[0] = consumer;
+                                    for (int i = 1; i < partitions.size(); i++) {
                                         PartitionInfo partitionInfo = partitions.get(i);
-                                        try {
-                                            final KafkaConsumer<String, byte[]> cur = new KafkaConsumer<>(properties);
-                                            cur.assign(Collections.singletonList(new TopicPartition(partitionInfo.topic(), partitionInfo.partition())));
-                                            consumeThreads[i] = new Thread(() -> consume(cur));
-                                        } catch (Exception ex) {
-                                            consumer.close();
-                                            throw BaseRuntimeException.getException(ex);
+                                        final KafkaConsumer<String, byte[]> cur = new KafkaConsumer<>(properties);
+                                        cur.assign(Collections.singletonList(new TopicPartition(partitionInfo.topic(), partitionInfo.partition())));
+                                        consumers[i] = cur;
+                                    }
+                                } catch (Exception ex) {
+                                    //发生异常则关闭之前构造的消费者
+                                    for (KafkaConsumer<String, byte[]> cur : consumers) {
+                                        if (cur != null) {
+                                            cur.close();
                                         }
                                     }
-                                    for (Thread thread : consumeThreads) {
-                                        thread.start();
-                                    }
+                                    throw BaseRuntimeException.getException(ex);
                                 }
-                                logger.info("start consumers[{}] for partitions[{}]", partitions.size(), partitions.stream().map(e -> e.topic() + ":" + e.partition()).collect(Collectors.joining(",")));
+                                consumeThreads = new Thread[partitions.size()];
+                                for (int i = 0; i < consumers.length; i++) {
+                                    final KafkaConsumer<String, byte[]> cur = consumers[i];
+                                    Thread thread = new Thread(() -> consume(cur));
+                                    consumeThreads[i] = thread;
+                                    thread.start();
+                                }
                             }
+                            logger.info("start consumers[{}] for partitions[{}]", partitions.size(), partitions.stream().map(e -> e.topic() + ":" + e.partition()).collect(Collectors.joining(",")));
                         } else {
                             final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
                             consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
