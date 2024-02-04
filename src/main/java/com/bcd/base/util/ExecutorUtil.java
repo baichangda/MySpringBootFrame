@@ -84,7 +84,7 @@ public class ExecutorUtil {
         }
         try {
             for (ExecutorService pool : pools) {
-                if (pool != null) {
+                if (pool != null && !pool.isTerminated()) {
                     pool.shutdown();
                     while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
 
