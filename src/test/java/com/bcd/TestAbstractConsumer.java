@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest(classes = Application.class)
 public class TestAbstractConsumer extends AbstractConsumer {
     public TestAbstractConsumer() {
-        super(new ConsumerProp("192.168.23.128:9092", "test-bcd"), true, 100000, 1, true, 100000, true, 0, 1, "test");
+        super(new ConsumerProp("192.168.23.128:9092", "test-bcd"), true,true, 100000, 1, 100000, true, 0, 1, "test");
     }
 
     @Override

@@ -37,7 +37,7 @@ public abstract class AbstractNotifyClient extends AbstractConsumer {
     private final String notifyTopic;
 
     public AbstractNotifyClient(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
-        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false, 100, 1, false, 100, true, 0, 0, "notify_" + type);
+        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false, false,100, 1, 100, true, 0, 0, "notify_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
         this.producer = ProducerFactory.newProducer(new ProducerProp(notifyProp.bootstrapServers));

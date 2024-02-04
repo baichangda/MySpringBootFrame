@@ -42,7 +42,7 @@ public abstract class AbstractConsumer {
     /**
      * 工作线程任务队列长度
      */
-    public final int workThreadQueueSize;
+    public final int workQueueSize;
     /**
      * 工作线程队列
      */
@@ -57,7 +57,7 @@ public abstract class AbstractConsumer {
      */
     public final Thread[] workThreads;
 
-    public final boolean workThreadPerQueue;
+    public final boolean manyWorkQueue;
 
     /**
      * 最大阻塞(0代表不阻塞)
@@ -113,11 +113,11 @@ public abstract class AbstractConsumer {
      * @param consumerPerPartition 是否每个分区一个消费者
      *                             true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
      *                             false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
-     * @param workThreadQueueSize  工作队列的长度
-     * @param workThreadNum        工作线程个数
-     * @param workThreadPerQueue   是否每一个工作线程都有一个队列
+     * @param manyWorkQueue        是否每多个工作队列
      *                             true时候、可以通过{@link #index(ConsumerRecord)}实现记录关联work线程、这在某些场景可以避免线程竞争
      *                             false时候、共享一个队列
+     * @param workQueueSize        工作队列的长度
+     * @param workThreadNum        工作线程个数
      * @param maxBlockingNum       最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
      * @param autoReleaseBlocking  是否自动释放阻塞、适用于工作内容为同步处理的逻辑
      * @param maxConsumeSpeed      最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
@@ -126,9 +126,9 @@ public abstract class AbstractConsumer {
      */
     public AbstractConsumer(ConsumerProp consumerProp,
                             boolean consumerPerPartition,
-                            int workThreadQueueSize,
+                            boolean manyWorkQueue,
+                            int workQueueSize,
                             int workThreadNum,
-                            boolean workThreadPerQueue,
                             int maxBlockingNum,
                             boolean autoReleaseBlocking,
                             int maxConsumeSpeed,
@@ -136,9 +136,9 @@ public abstract class AbstractConsumer {
                             String... topics) {
         this.properties = consumerProp.toProperties();
         this.consumerPerPartition = consumerPerPartition;
-        this.workThreadQueueSize = workThreadQueueSize;
+        this.manyWorkQueue = manyWorkQueue;
+        this.workQueueSize = workQueueSize;
         this.workThreadNum = workThreadNum;
-        this.workThreadPerQueue = workThreadPerQueue;
         this.maxBlockingNum = maxBlockingNum;
         this.autoReleaseBlocking = autoReleaseBlocking;
         this.maxConsumeSpeed = maxConsumeSpeed;
@@ -163,17 +163,17 @@ public abstract class AbstractConsumer {
         //初始化工作线程
         this.workThreads = new Thread[workThreadNum];
         //根据是否公用一个队列、来指定构造
-        if (workThreadPerQueue) {
+        if (manyWorkQueue) {
             this.queue = null;
             this.queues = new ArrayBlockingQueue[workThreadNum];
             for (int i = 0; i < workThreadNum; i++) {
-                final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(workThreadQueueSize);
+                final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(workQueueSize);
                 this.queues[i] = queue;
                 workThreads[i] = new Thread(() -> work(queue));
             }
         } else {
             this.queues = null;
-            this.queue = new ArrayBlockingQueue<>(workThreadQueueSize);
+            this.queue = new ArrayBlockingQueue<>(workQueueSize);
             for (int i = 0; i < workThreadNum; i++) {
                 workThreads[i] = new Thread(() -> work(this.queue));
             }
@@ -276,7 +276,8 @@ public abstract class AbstractConsumer {
                     if (shutdownHookThread != null) {
                         try {
                             Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
-                        }catch (IllegalStateException ignored){}
+                        } catch (IllegalStateException ignored) {
+                        }
                     }
                     //标记不可用
                     available = false;
@@ -289,7 +290,7 @@ public abstract class AbstractConsumer {
     final AtomicLong no = new AtomicLong();
 
     /**
-     * 当{@link #workThreadPerQueue}为true时候生效
+     * 当{@link #manyWorkQueue}为true时候生效
      * 可以根据数据内容绑定到对应的工作线程上、避免线程竞争
      *
      * @param consumerRecord
@@ -308,7 +309,7 @@ public abstract class AbstractConsumer {
      */
     private void consume(KafkaConsumer<String, byte[]> consumer) {
         try {
-            if (workThreadPerQueue) {
+            if (manyWorkQueue) {
                 while (running_consume) {
                     try {
                         //检查阻塞
@@ -441,7 +442,7 @@ public abstract class AbstractConsumer {
         return StringUtil.format("blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
                 blockingNum.get(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                workThreadPerQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workThreadQueueSize).collect(Collectors.joining(",")) : queue.size(),
+                manyWorkQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workQueueSize).collect(Collectors.joining(",")) : queue.size(),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }
