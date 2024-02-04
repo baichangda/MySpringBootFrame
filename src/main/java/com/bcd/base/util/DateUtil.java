@@ -321,14 +321,15 @@ public class DateUtil {
 //            System.out.println(dates[0] + "," + dates[1]);
 //        }
 
-        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of("+0"));
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("+8"));
         LocalDateTime ldt = LocalDateTime.now();
+        OffsetDateTime odt = LocalDateTime.now().atOffset(ZoneOffset.of("+4"));
+        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of("+0"));
         System.out.println(ldt.format(dtf));
+        System.out.println(odt.format(dtf));
         System.out.println(zdt.format(dtf));
         System.out.println(dtf.format(new Date().toInstant()));
-
-        System.out.println(Instant.from(dtf.parse("20220101010101")));
+        System.out.println(Instant.from(dtf.parse("20220101010101")).atOffset(ZoneOffset.of("+8")));
 
     }
 
