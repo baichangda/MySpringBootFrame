@@ -24,7 +24,7 @@ public class SqlUtil {
                 for (T t : dataList) {
                     final Object[] param = new Object[insertFields.length];
                     for (int i = 0; i < insertFields.length; i++) {
-                        param[i] = (insertFields[i].get(t));
+                        param[i] = insertFields[i].get(t);
                     }
                     paramList.add(param);
                 }
@@ -44,10 +44,10 @@ public class SqlUtil {
                 for (T t : dataList) {
                     final Object[] param = new Object[fieldsLength + whereFieldsLength];
                     for (int i = 0; i < fieldsLength; i++) {
-                        param[i] = (updateFields[i].get(t));
+                        param[i] = updateFields[i].get(t);
                     }
                     for (int i = 0; i < whereFieldsLength; i++) {
-                        param[i + fieldsLength] = (whereFields[i].get(t));
+                        param[i + fieldsLength] = whereFields[i].get(t);
                     }
                     paramList.add(param);
                 }
