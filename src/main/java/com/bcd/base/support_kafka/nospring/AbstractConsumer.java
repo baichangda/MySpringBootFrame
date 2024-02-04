@@ -31,7 +31,7 @@ public abstract class AbstractConsumer {
     /**
      * 是否每个分区一个消费者
      */
-    public final boolean consumerPerPartition;
+    public final boolean onePartitionOneConsumer;
     /**
      * 消费线程
      */
@@ -57,7 +57,7 @@ public abstract class AbstractConsumer {
      */
     public final Thread[] workThreads;
 
-    public final boolean manyWorkQueue;
+    public final boolean oneWorkThreadOneQueue;
 
     /**
      * 最大阻塞(0代表不阻塞)
@@ -109,24 +109,24 @@ public abstract class AbstractConsumer {
 
 
     /**
-     * @param consumerProp         消费者属性
-     * @param consumerPerPartition 是否每个分区一个消费者
-     *                             true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
-     *                             false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
-     * @param manyWorkQueue        是否每多个工作队列
-     *                             true时候、可以通过{@link #index(ConsumerRecord)}实现记录关联work线程、这在某些场景可以避免线程竞争
-     *                             false时候、共享一个队列
-     * @param workQueueSize        工作队列的长度
-     * @param workThreadNum        工作线程个数
-     * @param maxBlockingNum       最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
-     * @param autoReleaseBlocking  是否自动释放阻塞、适用于工作内容为同步处理的逻辑
-     * @param maxConsumeSpeed      最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
-     * @param monitor_period       监控信息打印周期(秒)、0则代表不打印
-     * @param topics               消费的topic
+     * @param consumerProp            消费者属性
+     * @param onePartitionOneConsumer 一个分区一个消费者
+     *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
+     *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
+     * @param oneWorkThreadOneQueue   一个工作线程一个队列
+     *                                true时候、可以通过{@link #index(ConsumerRecord)}实现记录关联work线程、这在某些场景可以避免线程竞争
+     *                                false时候、共享一个队列
+     * @param workQueueSize           工作队列的长度
+     * @param workThreadNum           工作线程个数
+     * @param maxBlockingNum          最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
+     * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
+     * @param maxConsumeSpeed         最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
+     * @param monitor_period          监控信息打印周期(秒)、0则代表不打印
+     * @param topics                  消费的topic
      */
     public AbstractConsumer(ConsumerProp consumerProp,
-                            boolean consumerPerPartition,
-                            boolean manyWorkQueue,
+                            boolean onePartitionOneConsumer,
+                            boolean oneWorkThreadOneQueue,
                             int workQueueSize,
                             int workThreadNum,
                             int maxBlockingNum,
@@ -135,8 +135,8 @@ public abstract class AbstractConsumer {
                             int monitor_period,
                             String... topics) {
         this.properties = consumerProp.toProperties();
-        this.consumerPerPartition = consumerPerPartition;
-        this.manyWorkQueue = manyWorkQueue;
+        this.onePartitionOneConsumer = onePartitionOneConsumer;
+        this.oneWorkThreadOneQueue = oneWorkThreadOneQueue;
         this.workQueueSize = workQueueSize;
         this.workThreadNum = workThreadNum;
         this.maxBlockingNum = maxBlockingNum;
@@ -163,7 +163,7 @@ public abstract class AbstractConsumer {
         //初始化工作线程
         this.workThreads = new Thread[workThreadNum];
         //根据是否公用一个队列、来指定构造
-        if (manyWorkQueue) {
+        if (oneWorkThreadOneQueue) {
             this.queue = null;
             this.queues = new ArrayBlockingQueue[workThreadNum];
             for (int i = 0; i < workThreadNum; i++) {
@@ -205,7 +205,7 @@ public abstract class AbstractConsumer {
                             monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
                         }
                         //启动消费者
-                        if (consumerPerPartition) {
+                        if (onePartitionOneConsumer) {
                             final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
                             List<PartitionInfo> partitions = Arrays.stream(topics).flatMap(e -> consumer.partitionsFor(e).stream()).toList();
                             if (partitions.isEmpty()) {
@@ -290,7 +290,7 @@ public abstract class AbstractConsumer {
     final AtomicLong no = new AtomicLong();
 
     /**
-     * 当{@link #manyWorkQueue}为true时候生效
+     * 当{@link #oneWorkThreadOneQueue}为true时候生效
      * 可以根据数据内容绑定到对应的工作线程上、避免线程竞争
      *
      * @param consumerRecord
@@ -309,7 +309,7 @@ public abstract class AbstractConsumer {
      */
     private void consume(KafkaConsumer<String, byte[]> consumer) {
         try {
-            if (manyWorkQueue) {
+            if (oneWorkThreadOneQueue) {
                 while (running_consume) {
                     try {
                         //检查阻塞
@@ -442,7 +442,7 @@ public abstract class AbstractConsumer {
         return StringUtil.format("blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
                 blockingNum.get(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                manyWorkQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workQueueSize).collect(Collectors.joining(",")) : queue.size(),
+                oneWorkThreadOneQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workQueueSize).collect(Collectors.joining(",")) : queue.size(),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }
