@@ -114,8 +114,10 @@ public abstract class AbstractConsumer {
      *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
      *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
      * @param oneWorkThreadOneQueue   一个工作线程一个队列
-     *                                true时候、可以通过{@link #index(ConsumerRecord)}实现记录关联work线程、这在某些场景可以避免线程竞争
-     *                                false时候、共享一个队列
+     *                                true时候
+     *                                  消费时候会根据 {@link #index(ConsumerRecord)} 将消息定位到指定线程、然后提交到对应线程的队列中
+     *                                  实现记录关联work线程、这在某些场景可以避免线程竞争
+     *                                false时候 共享一个队列
      * @param workQueueSize           工作队列的长度
      * @param workThreadNum           工作线程个数
      * @param maxBlockingNum          最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
