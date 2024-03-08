@@ -17,7 +17,7 @@ public abstract class MyExecutorGroup<T extends MyHandler<?>> {
         this.executors = new MyExecutor[num];
         this.name = name;
         for (int i = 0; i < num; i++) {
-            this.executors[i] = new MyExecutor(perExecutorQueueSize, "MyExecutor_" + name + "_" + i);
+            this.executors[i] = new MyExecutor(perExecutorQueueSize, "MyExecutor_" + name + "(" + num + ")_" + i);
         }
     }
 
