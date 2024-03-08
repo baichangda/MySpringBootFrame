@@ -3,7 +3,7 @@ package com.bcd.base.support_notify;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ProducerFactory;
 import com.bcd.base.support_kafka.ext.ProducerProp;
-import com.bcd.base.support_kafka.ext.simple.SimpleKafkaConsumer;
+import com.bcd.base.support_kafka.ext.simple.ThreadDrivenKafkaConsumer;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.ExecutorUtil;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
-public abstract class AbstractNotifyClient extends SimpleKafkaConsumer {
+public abstract class AbstractNotifyClient extends ThreadDrivenKafkaConsumer {
     static Logger logger = LoggerFactory.getLogger(AbstractNotifyClient.class);
     public final NotifyProp notifyProp;
     private final Producer<String, byte[]> producer;

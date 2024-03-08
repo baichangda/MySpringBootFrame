@@ -1,4 +1,4 @@
-package com.bcd.base.support_kafka.ext.performance;
+package com.bcd.base.support_kafka.ext.datadriven;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 

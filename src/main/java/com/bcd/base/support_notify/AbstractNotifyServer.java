@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ProducerFactory;
 import com.bcd.base.support_kafka.ext.ProducerProp;
-import com.bcd.base.support_kafka.ext.simple.SimpleKafkaConsumer;
+import com.bcd.base.support_kafka.ext.simple.ThreadDrivenKafkaConsumer;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.ExecutorUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -33,7 +33,7 @@ import java.util.concurrent.*;
  */
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
-public abstract class AbstractNotifyServer extends SimpleKafkaConsumer {
+public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
     static Logger logger = LoggerFactory.getLogger(AbstractNotifyServer.class);
     public final String type;
     public final BoundHashOperations<String, String, String> boundHashOperations;

@@ -1,4 +1,4 @@
-package com.bcd.base.support_kafka.ext.performance;
+package com.bcd.base.support_kafka.ext.datadriven;
 
 import com.bcd.base.util.ExecutorUtil;
 import org.slf4j.Logger;
