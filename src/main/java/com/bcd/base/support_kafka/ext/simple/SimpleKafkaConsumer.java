@@ -1,9 +1,13 @@
-package com.bcd.base.support_kafka.nospring;
+package com.bcd.base.support_kafka.ext.simple;
 
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_kafka.ext.ConsumerProp;
+import com.bcd.base.support_kafka.ext.ConsumerRebalanceLogger;
 import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.StringUtil;
-import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
@@ -16,17 +20,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * 此类要求提供 kafka-client即可、不依赖spring-kafka
+ * 采用如下逻辑模型
+ * - 消费线程
+ * - 阻塞队列
+ * - 工作线程
  */
-public abstract class AbstractConsumer {
+public abstract class SimpleKafkaConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public final String name;
     public final Properties properties;
     /**
      * 是否每个分区一个消费者
@@ -104,19 +112,21 @@ public abstract class AbstractConsumer {
     public final LongAdder monitor_consumeCount;
     public final LongAdder monitor_workCount;
     public ScheduledExecutorService monitor_pool;
-
     private Thread shutdownHookThread;
 
 
     /**
+     * @param name                    当前消费者的名称(用于标定线程名称)
+     *                                消费者线程开头 {name}-consumer
+     *                                工作任务执行器线程开头 {name}-worker
      * @param consumerProp            消费者属性
      * @param onePartitionOneConsumer 一个分区一个消费者
      *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
      *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
      * @param oneWorkThreadOneQueue   一个工作线程一个队列
      *                                true时候
-     *                                  消费时候会根据 {@link #index(ConsumerRecord)} 将消息定位到指定线程、然后提交到对应线程的队列中
-     *                                  实现记录关联work线程、这在某些场景可以避免线程竞争
+     *                                消费时候会根据 {@link #index(ConsumerRecord)} 将消息定位到指定线程、然后提交到对应线程的队列中
+     *                                实现记录关联work线程、这在某些场景可以避免线程竞争
      *                                false时候 共享一个队列
      * @param workQueueSize           工作队列的长度
      * @param workThreadNum           工作线程个数
@@ -126,16 +136,18 @@ public abstract class AbstractConsumer {
      * @param monitor_period          监控信息打印周期(秒)、0则代表不打印
      * @param topics                  消费的topic
      */
-    public AbstractConsumer(ConsumerProp consumerProp,
-                            boolean onePartitionOneConsumer,
-                            boolean oneWorkThreadOneQueue,
-                            int workQueueSize,
-                            int workThreadNum,
-                            int maxBlockingNum,
-                            boolean autoReleaseBlocking,
-                            int maxConsumeSpeed,
-                            int monitor_period,
-                            String... topics) {
+    public SimpleKafkaConsumer(String name,
+                               ConsumerProp consumerProp,
+                               boolean onePartitionOneConsumer,
+                               boolean oneWorkThreadOneQueue,
+                               int workQueueSize,
+                               int workThreadNum,
+                               int maxBlockingNum,
+                               boolean autoReleaseBlocking,
+                               int maxConsumeSpeed,
+                               int monitor_period,
+                               String... topics) {
+        this.name = name;
         this.properties = consumerProp.toProperties();
         this.onePartitionOneConsumer = onePartitionOneConsumer;
         this.oneWorkThreadOneQueue = oneWorkThreadOneQueue;
@@ -171,13 +183,13 @@ public abstract class AbstractConsumer {
             for (int i = 0; i < workThreadNum; i++) {
                 final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(workQueueSize);
                 this.queues[i] = queue;
-                workThreads[i] = new Thread(() -> work(queue));
+                workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
             }
         } else {
             this.queues = null;
             this.queue = new ArrayBlockingQueue<>(workQueueSize);
             for (int i = 0; i < workThreadNum; i++) {
-                workThreads[i] = new Thread(() -> work(this.queue));
+                workThreads[i] = new Thread(() -> work(this.queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
             }
         }
 
@@ -213,12 +225,13 @@ public abstract class AbstractConsumer {
                             if (partitions.isEmpty()) {
                                 consumer.close();
                             } else {
-                                KafkaConsumer<String, byte[]>[] consumers = new KafkaConsumer[partitions.size()];
+                                int partitionSize = partitions.size();
+                                KafkaConsumer<String, byte[]>[] consumers = new KafkaConsumer[partitionSize];
                                 try {
                                     PartitionInfo firstPartitionInfo = partitions.get(0);
                                     consumer.assign(Collections.singletonList(new TopicPartition(firstPartitionInfo.topic(), firstPartitionInfo.partition())));
                                     consumers[0] = consumer;
-                                    for (int i = 1; i < partitions.size(); i++) {
+                                    for (int i = 1; i < partitionSize; i++) {
                                         PartitionInfo partitionInfo = partitions.get(i);
                                         final KafkaConsumer<String, byte[]> cur = new KafkaConsumer<>(properties);
                                         cur.assign(Collections.singletonList(new TopicPartition(partitionInfo.topic(), partitionInfo.partition())));
@@ -233,10 +246,10 @@ public abstract class AbstractConsumer {
                                     }
                                     throw BaseRuntimeException.getException(ex);
                                 }
-                                consumeThreads = new Thread[partitions.size()];
-                                for (int i = 0; i < consumers.length; i++) {
+                                consumeThreads = new Thread[partitionSize];
+                                for (int i = 0; i < partitionSize; i++) {
                                     final KafkaConsumer<String, byte[]> cur = consumers[i];
-                                    Thread thread = new Thread(() -> consume(cur));
+                                    Thread thread = new Thread(() -> consume(cur), name + "-consumer" + "(" + partitionSize + ")-" + i);
                                     consumeThreads[i] = thread;
                                     thread.start();
                                 }
@@ -246,7 +259,7 @@ public abstract class AbstractConsumer {
                             final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
                             consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
                             //初始化消费线程、提交消费任务
-                            consumeThread = new Thread(() -> consume(consumer));
+                            consumeThread = new Thread(() -> consume(consumer), name + "-consumer(1)-0");
                             consumeThread.start();
                             logger.info("start consumer for topics[{}]", String.join(",", topics));
                         }
@@ -289,8 +302,6 @@ public abstract class AbstractConsumer {
         }
     }
 
-    final AtomicLong no = new AtomicLong();
-
     /**
      * 当{@link #oneWorkThreadOneQueue}为true时候生效
      * 可以根据数据内容绑定到对应的工作线程上、避免线程竞争
@@ -299,11 +310,7 @@ public abstract class AbstractConsumer {
      * @return [0-{@link #workThreadNum})中某个值
      */
     protected int index(ConsumerRecord<String, byte[]> consumerRecord) {
-        if (consumerRecord.key() == null) {
-            return (int) ((no.getAndIncrement()) % workThreadNum);
-        } else {
-            return consumerRecord.key().hashCode() % workThreadNum;
-        }
+        return Math.floorMod(consumerRecord.key().hashCode(), workThreadNum);
     }
 
     /**
@@ -328,7 +335,9 @@ public abstract class AbstractConsumer {
                         //统计
                         final int count = consumerRecords.count();
                         blockingNum.addAndGet(count);
-                        monitor_consumeCount.add(count);
+                        if (monitor_period > 0) {
+                            monitor_consumeCount.add(count);
+                        }
 
                         //检查速度、如果速度太快则阻塞
                         if (maxConsumeSpeed > 0) {
@@ -372,6 +381,9 @@ public abstract class AbstractConsumer {
                         //统计
                         final int count = consumerRecords.count();
                         blockingNum.addAndGet(count);
+                        if (monitor_period > 0) {
+                            monitor_consumeCount.add(count);
+                        }
 
                         //检查速度、如果速度太快则阻塞
                         if (maxConsumeSpeed > 0) {
@@ -421,7 +433,9 @@ public abstract class AbstractConsumer {
                     } catch (Exception ex) {
                         logger.error("work error", ex);
                     }
-                    monitor_workCount.increment();
+                    if (monitor_period > 0) {
+                        monitor_workCount.increment();
+                    }
                     if (autoReleaseBlocking) {
                         blockingNum.decrementAndGet();
                     }
@@ -441,33 +455,12 @@ public abstract class AbstractConsumer {
      * 如果需要修改日志、可以重写此方法
      */
     public String monitor_log() {
-        return StringUtil.format("blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
+        return StringUtil.format("name[{}] blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
+                name,
                 blockingNum.get(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
                 oneWorkThreadOneQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workQueueSize).collect(Collectors.joining(",")) : queue.size(),
                 monitor_workCount.sumThenReset() / monitor_period);
-    }
-}
-
-class ConsumerRebalanceLogger implements ConsumerRebalanceListener {
-    static final Logger logger = LoggerFactory.getLogger(ConsumerRebalanceLogger.class);
-
-    final Consumer<String, byte[]> consumer;
-
-    public ConsumerRebalanceLogger(Consumer<String, byte[]> consumer) {
-        this.consumer = consumer;
-    }
-
-    @Override
-    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-        String msg = partitions.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + ";" + e2).orElse("");
-        logger.info("consumer[{}] onPartitionsRevoked [{}]", consumer.toString(), msg);
-    }
-
-    @Override
-    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-        String msg = partitions.stream().map(e -> e.topic() + ":" + e.partition()).reduce((e1, e2) -> e1 + ";" + e2).orElse("");
-        logger.info("consumer[{}] onPartitionsAssigned [{}]", consumer.toString(), msg);
     }
 }
 

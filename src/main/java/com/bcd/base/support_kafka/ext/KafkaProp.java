@@ -1,4 +1,4 @@
-package com.bcd.base.support_kafka.nospring;
+package com.bcd.base.support_kafka.ext;
 
 import org.springframework.validation.annotation.Validated;
 

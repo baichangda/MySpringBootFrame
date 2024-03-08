@@ -1,9 +1,9 @@
 package com.bcd;
 
-import com.bcd.base.support_kafka.nospring.AbstractConsumer;
-import com.bcd.base.support_kafka.nospring.ConsumerProp;
-import com.bcd.base.support_kafka.nospring.ProducerFactory;
-import com.bcd.base.support_kafka.nospring.ProducerProp;
+import com.bcd.base.support_kafka.ext.simple.SimpleKafkaConsumer;
+import com.bcd.base.support_kafka.ext.ConsumerProp;
+import com.bcd.base.support_kafka.ext.ProducerFactory;
+import com.bcd.base.support_kafka.ext.ProducerProp;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -13,9 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(classes = Application.class)
-public class TestAbstractConsumer extends AbstractConsumer {
-    public TestAbstractConsumer() {
-        super(new ConsumerProp("192.168.23.128:9092", "test-bcd"), true,true, 100000, 1, 100000, true, 0, 1, "test");
+public class TestSimpleKafkaConsumer extends SimpleKafkaConsumer {
+    public TestSimpleKafkaConsumer() {
+        super("Test",new ConsumerProp("192.168.23.128:9092", "test-bcd"), true,false, 100000, 1, 100000, true, 0, 1, "test");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class TestAbstractConsumer extends AbstractConsumer {
     }
 
     public static void main(String[] args) {
-        TestAbstractConsumer consumer = new TestAbstractConsumer();
+        TestSimpleKafkaConsumer consumer = new TestSimpleKafkaConsumer();
         consumer.init();
 
         for (int j = 0; j < 2; j++) {
@@ -37,7 +37,7 @@ public class TestAbstractConsumer extends AbstractConsumer {
                 try (Producer<String, byte[]> producer = ProducerFactory.newProducer(new ProducerProp("192.168.23.128:9092"))) {
                     while (true) {
                         for (int i = 0; i < 100000; i++) {
-                            producer.send(new ProducerRecord<>("test", (i + "").getBytes()));
+                            producer.send(new ProducerRecord<>("test",(i % 100) + "", (i + "").getBytes()));
                         }
                         TimeUnit.MILLISECONDS.sleep(5);
                     }

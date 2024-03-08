@@ -1,4 +1,4 @@
-package com.bcd.base.support_kafka.nospring;
+package com.bcd.base.support_kafka.ext;
 
 import jakarta.validation.constraints.NotBlank;
 import org.apache.kafka.clients.producer.ProducerConfig;

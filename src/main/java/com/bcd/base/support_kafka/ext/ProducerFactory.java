@@ -1,10 +1,7 @@
-package com.bcd.base.support_kafka.nospring;
+package com.bcd.base.support_kafka.ext;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
-import java.util.Properties;
 
 public class ProducerFactory {
 

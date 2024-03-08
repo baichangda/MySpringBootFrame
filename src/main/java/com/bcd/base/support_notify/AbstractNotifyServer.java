@@ -1,10 +1,10 @@
 package com.bcd.base.support_notify;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_kafka.nospring.AbstractConsumer;
-import com.bcd.base.support_kafka.nospring.ConsumerProp;
-import com.bcd.base.support_kafka.nospring.ProducerFactory;
-import com.bcd.base.support_kafka.nospring.ProducerProp;
+import com.bcd.base.support_kafka.ext.ConsumerProp;
+import com.bcd.base.support_kafka.ext.ProducerFactory;
+import com.bcd.base.support_kafka.ext.ProducerProp;
+import com.bcd.base.support_kafka.ext.simple.SimpleKafkaConsumer;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.ExecutorUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -33,7 +33,7 @@ import java.util.concurrent.*;
  */
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
-public abstract class AbstractNotifyServer extends AbstractConsumer {
+public abstract class AbstractNotifyServer extends SimpleKafkaConsumer {
     static Logger logger = LoggerFactory.getLogger(AbstractNotifyServer.class);
     public final String type;
     public final BoundHashOperations<String, String, String> boundHashOperations;
@@ -46,7 +46,7 @@ public abstract class AbstractNotifyServer extends AbstractConsumer {
     private Map<String, ListenerInfo> cache = new HashMap<>();
 
     public AbstractNotifyServer(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
-        super(new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false,false, 100, 1, 100, true, 0, 0, "subscribe_" + type);
+        super("notifyServer(" + type + ")", new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false, false, 100, 1, 100, true, 0, 0, "subscribe_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
         this.type = type;
