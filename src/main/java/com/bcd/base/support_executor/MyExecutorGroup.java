@@ -10,11 +10,14 @@ public abstract class MyExecutorGroup<T extends MyHandler<?>> {
 
     public final Map<String, MyHandler<?>> context = new ConcurrentHashMap<>();
 
-    public MyExecutorGroup(int num, int perExecutorQueueSize) {
+    public final String name;
+
+    public MyExecutorGroup(int num, int perExecutorQueueSize, String name) {
         this.num = num;
         this.executors = new MyExecutor[num];
+        this.name = name;
         for (int i = 0; i < num; i++) {
-            this.executors[i] = new MyExecutor(perExecutorQueueSize);
+            this.executors[i] = new MyExecutor(perExecutorQueueSize, "MyExecutor_" + name + "_" + i);
         }
     }
 
@@ -25,7 +28,7 @@ public abstract class MyExecutorGroup<T extends MyHandler<?>> {
         MyExecutor executor = executors[i];
         MyHandler<?> myHandler = context.computeIfAbsent(id, k -> this.newHandler(id, executor));
         myHandler.init();
-        return (T)myHandler;
+        return (T) myHandler;
     }
 
     public void destroyHandler(String id) {

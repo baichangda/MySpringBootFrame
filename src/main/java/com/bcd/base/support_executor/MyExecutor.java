@@ -1,6 +1,5 @@
 package com.bcd.base.support_executor;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.ExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,8 +12,13 @@ public class MyExecutor {
 
     public final ThreadPoolExecutor executor;
 
-    public MyExecutor(int queueSize) {
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(queueSize));
+    public MyExecutor(int queueSize, String threadName) {
+        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(queueSize), new ThreadFactory() {
+            @Override
+            public Thread newThread(@NotNull Runnable r) {
+                return new Thread(r, threadName);
+            }
+        });
     }
 
     public void execute(Runnable runnable) {

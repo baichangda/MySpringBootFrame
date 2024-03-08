@@ -15,7 +15,7 @@ public class VehicleHandler extends MyHandler<String> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        MyExecutorGroup<VehicleHandler> executorGroup = new MyExecutorGroup<>(8, 100) {
+        MyExecutorGroup<VehicleHandler> executorGroup = new MyExecutorGroup<>(8, 100,"Test") {
             @Override
             public MyHandler<?> newHandler(String id, MyExecutor executor) {
                 return new VehicleHandler(id, executor);
