@@ -4,7 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ProducerFactory;
 import com.bcd.base.support_kafka.ext.ProducerProp;
-import com.bcd.base.support_kafka.ext.simple.ThreadDrivenKafkaConsumer;
+import com.bcd.base.support_kafka.ext.threaddriven.ThreadDrivenKafkaConsumer;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.util.ExecutorUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

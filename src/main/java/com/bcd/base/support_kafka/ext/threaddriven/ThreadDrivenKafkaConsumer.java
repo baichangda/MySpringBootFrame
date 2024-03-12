@@ -1,4 +1,4 @@
-package com.bcd.base.support_kafka.ext.simple;
+package com.bcd.base.support_kafka.ext.threaddriven;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
