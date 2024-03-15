@@ -1,17 +1,40 @@
 package com.bcd.base.support_excel;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import org.apache.poi.ss.usermodel.*;
+import io.netty.buffer.ByteBufUtil;
+import org.apache.poi.poifs.filesystem.FileMagic;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExcelUtil {
+
+    public static boolean isXlsx(InputStream is) {
+        try {
+            FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
+            return fileMagic == FileMagic.OOXML;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+
+    public static boolean isXls(InputStream is) {
+        try {
+            FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
+            return fileMagic == FileMagic.OLE2;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
 
     private static int[] checkRule(List<List<Td>> table) {
         final int size = table.size();
@@ -47,6 +70,7 @@ public class ExcelUtil {
 
     /**
      * 模拟html table、tr、td形式写入成xlsx
+     *
      * @param table
      * @param os
      */
@@ -120,40 +144,41 @@ public class ExcelUtil {
     }
 
     public static void main(String[] args) {
-        List<List<Td>> table = new ArrayList<>();
-        final List<Td> tr1 = new ArrayList<>();
-        final List<Td> tr2 = new ArrayList<>();
-        final List<Td> tr3 = new ArrayList<>();
-        tr1.add(Td.newTd("1-1"));
-        tr1.add(Td.newTd("1-2",1,2));
-        tr1.add(Td.newTd("1-3"));
-
-        tr1.add(Td.newTd("1-3"));
-        tr1.add(Td.newTd("1-3",1,3));
-        tr1.add(Td.newTd("1-3"));
-
-        tr2.add(Td.newTd("2-1", 2, 2));
-        tr2.add(Td.newTd("2-2"));
-        tr2.add(Td.newTd("2-2",2,1));
-
-        tr2.add(Td.newTd("1-3"));
-        tr2.add(Td.newTd("1-3"));
-        tr2.add(Td.newTd("1-3",2,1));
-        tr2.add(Td.newTd("1-3"));
-        tr2.add(Td.newTd("1-3"));
-
-        tr3.add(Td.newTd("3-1"));
-
-        tr3.add(Td.newTd("1-3"));
-        tr3.add(Td.newTd("1-3"));
-        tr3.add(Td.newTd("1-3",1,2));
-        table.add(tr1);
-        table.add(tr2);
-        table.add(tr3);
-        try (final OutputStream os = Files.newOutputStream(Paths.get("test55.xlsx"))) {
-            writeExcel_xlsx(table, os);
-        } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
-        }
+        System.out.println(ByteBufUtil.hexDump("%PDF".getBytes(StandardCharsets.UTF_8)));
+//        List<List<Td>> table = new ArrayList<>();
+//        final List<Td> tr1 = new ArrayList<>();
+//        final List<Td> tr2 = new ArrayList<>();
+//        final List<Td> tr3 = new ArrayList<>();
+//        tr1.add(Td.newTd("1-1"));
+//        tr1.add(Td.newTd("1-2", 1, 2));
+//        tr1.add(Td.newTd("1-3"));
+//
+//        tr1.add(Td.newTd("1-3"));
+//        tr1.add(Td.newTd("1-3", 1, 3));
+//        tr1.add(Td.newTd("1-3"));
+//
+//        tr2.add(Td.newTd("2-1", 2, 2));
+//        tr2.add(Td.newTd("2-2"));
+//        tr2.add(Td.newTd("2-2", 2, 1));
+//
+//        tr2.add(Td.newTd("1-3"));
+//        tr2.add(Td.newTd("1-3"));
+//        tr2.add(Td.newTd("1-3", 2, 1));
+//        tr2.add(Td.newTd("1-3"));
+//        tr2.add(Td.newTd("1-3"));
+//
+//        tr3.add(Td.newTd("3-1"));
+//
+//        tr3.add(Td.newTd("1-3"));
+//        tr3.add(Td.newTd("1-3"));
+//        tr3.add(Td.newTd("1-3", 1, 2));
+//        table.add(tr1);
+//        table.add(tr2);
+//        table.add(tr3);
+//        try (final OutputStream os = Files.newOutputStream(Paths.get("test55.xlsx"))) {
+//            writeExcel_xlsx(table, os);
+//        } catch (IOException ex) {
+//            throw BaseRuntimeException.getException(ex);
+//        }
     }
 }
