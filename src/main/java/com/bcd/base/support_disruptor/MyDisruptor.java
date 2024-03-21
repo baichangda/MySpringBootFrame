@@ -30,7 +30,8 @@ public class MyDisruptor<T> {
         return (-1 >>> Integer.numberOfLeadingZeros(n - 1)) + 1;
     }
 
-    public MyDisruptor<T> handle(Consumer<T>... consumers) {
+    @SafeVarargs
+    public final MyDisruptor<T> handle(Consumer<T>... consumers) {
         WorkHandler<Event<T>>[] workHandlers = new WorkHandler[consumers.length];
         for (int i = 0; i < consumers.length; i++) {
             final Consumer<T> consumer = consumers[i];
