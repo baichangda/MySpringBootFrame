@@ -60,5 +60,6 @@ public class OkHttpConfig {
                 .build();
         final Call call = okHttpClient.newCall(request);
         final Response response = call.execute();
+        System.out.println(response.body().string());
     }
 }
