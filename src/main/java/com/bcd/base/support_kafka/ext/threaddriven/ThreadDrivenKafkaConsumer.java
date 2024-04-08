@@ -210,7 +210,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         if (maxConsumeSpeed > 0) {
                             resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
                             resetConsumeCountPool.scheduleAtFixedRate(() -> {
-                                consumeCount.getAndSet(0);
+                                consumeCount.set(0);
                             }, 1, 1, TimeUnit.SECONDS);
                         }
                         //初始化工作线程池、提交工作任务

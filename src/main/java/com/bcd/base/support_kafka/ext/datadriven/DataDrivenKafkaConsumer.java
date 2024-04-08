@@ -176,7 +176,7 @@ public abstract class DataDrivenKafkaConsumer {
                         if (maxConsumeSpeed > 0) {
                             resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
                             resetConsumeCountPool.scheduleAtFixedRate(() -> {
-                                consumeCount.getAndSet(0);
+                                consumeCount.set(0);
                             }, 1, 1, TimeUnit.SECONDS);
                         }
                         //启动监控
