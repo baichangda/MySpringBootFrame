@@ -5,6 +5,7 @@ import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ConsumerRebalanceLogger;
 import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.StringUtil;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -133,6 +134,9 @@ public abstract class ThreadDrivenKafkaConsumer {
      * @param maxBlockingNum          最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
      * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
      * @param maxConsumeSpeed         最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
+     *                                每消费一次的数据量大小取决于如下消费者参数
+     *                                {@link ConsumerConfig#MAX_POLL_RECORDS_CONFIG} 一次poll消费最大数据量
+     *                                {@link ConsumerConfig#MAX_PARTITION_FETCH_BYTES_CONFIG} 每个分区最大拉取字节数
      * @param monitor_period          监控信息打印周期(秒)、0则代表不打印
      * @param topics                  消费的topic
      */
