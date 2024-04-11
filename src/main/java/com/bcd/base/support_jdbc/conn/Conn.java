@@ -1,4 +1,4 @@
-package com.bcd.base.support_jdbc.sql;
+package com.bcd.base.support_jdbc.conn;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
