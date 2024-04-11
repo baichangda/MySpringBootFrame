@@ -64,18 +64,17 @@ public class SqlUtil {
      * 会获取父类的字段
      * insert字段会去除掉静态字段
      *
-     * @param clazz                实体类class
-     * @param table                表名
-     * @param fieldFilter          字段名过滤器、false则排除掉、会应用于insert字段
-     * @param camelCaseToUnderline 生成的sql中、列名是否是由 字段名驼峰格式转下划线格式而来、会应用于insert字段
+     * @param clazz       实体类class
+     * @param table       表名
+     * @param fieldFilter 字段名过滤器、false则排除掉、会应用于insert字段
      * @param <T>
      * @return
      */
-    public static <T> InsertSqlResult<T> toInsertSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter, boolean camelCaseToUnderline) {
+    public static <T> InsertSqlResult<T> toInsertSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter) {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         final List<Field> insertFieldList = new ArrayList<>();
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && fieldFilter.apply(field)) {
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && fieldFilter.apply(field)) {
                 insertFieldList.add(field);
             }
         }
@@ -83,11 +82,7 @@ public class SqlUtil {
         final StringJoiner sj2 = new StringJoiner(",");
         for (Field field : insertFieldList) {
             field.setAccessible(true);
-            if (camelCaseToUnderline) {
-                sj1.add(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
-            } else {
-                sj1.add(field.getName());
-            }
+            sj1.add(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
             sj2.add("?");
         }
         final StringBuilder sb = new StringBuilder();
@@ -106,21 +101,20 @@ public class SqlUtil {
      * 会获取父类的所有字段
      * update字段会去除掉静态字段
      *
-     * @param clazz                实体类
-     * @param table                表名
-     * @param fieldFilter          字段名过滤器、false则排除掉、会应用于update字段
-     * @param camelCaseToUnderline 生成的sql中、列名是否是由 字段名驼峰格式转下划线格式而来、会应用于update字段和where字段
-     * @param whereFieldNames      where字段名
+     * @param clazz           实体类
+     * @param table           表名
+     * @param fieldFilter     字段名过滤器、false则排除掉、会应用于update字段
+     * @param whereFieldNames where字段名
      * @param <T>
      * @return
      */
-    public static <T> UpdateSqlResult<T> toUpdateSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter, boolean camelCaseToUnderline, String... whereFieldNames) {
+    public static <T> UpdateSqlResult<T> toUpdateSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter, String... whereFieldNames) {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         final List<Field> updateFieldList = new ArrayList<>();
         final Map<String, Field> whereMap = new HashMap<>();
         final Set<String> whereColumnSet = Set.of(whereFieldNames);
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && fieldFilter.apply(field)) {
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && fieldFilter.apply(field)) {
                 updateFieldList.add(field);
             }
             if (whereColumnSet.contains(field.getName())) {
@@ -150,11 +144,7 @@ public class SqlUtil {
             if (i > 0) {
                 sb.append(",");
             }
-            if (camelCaseToUnderline) {
-                sb.append(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
-            } else {
-                sb.append(field.getName());
-            }
+            sb.append(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
             sb.append("=?");
         }
         sb.append(" where ");
@@ -164,11 +154,7 @@ public class SqlUtil {
             }
             final Field field = whereFieldList.get(i);
             field.setAccessible(true);
-            if (camelCaseToUnderline) {
-                sb.append(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
-            } else {
-                sb.append(field.getName());
-            }
+            sb.append(StringUtil.camelCaseToSplitChar(field.getName(), '_'));
             sb.append("=?");
         }
         return new UpdateSqlResult<>(sb.toString(), clazz, updateFieldList.toArray(new Field[0]), whereFieldList.toArray(new Field[0]));
