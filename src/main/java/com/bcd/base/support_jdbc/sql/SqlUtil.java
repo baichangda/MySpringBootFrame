@@ -74,7 +74,7 @@ public class SqlUtil {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         final List<Field> insertFieldList = new ArrayList<>();
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && fieldFilter.apply(field)) {
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 insertFieldList.add(field);
             }
         }
@@ -114,7 +114,7 @@ public class SqlUtil {
         final Map<String, Field> whereMap = new HashMap<>();
         final Set<String> whereColumnSet = Set.of(whereFieldNames);
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && fieldFilter.apply(field)) {
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 updateFieldList.add(field);
             }
             if (whereColumnSet.contains(field.getName())) {
