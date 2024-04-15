@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.nio.file.Files;
@@ -151,10 +152,10 @@ public class SwaggerApiScanner {
      */
     public static void scanApiAndExport(OutputStream os, Consumer<List<List<?>>> doBeforeWrite, int type, String... packageNames) throws IOException, ClassNotFoundException {
         //1、获取所有controller
-        final List<Class<?>> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
+        final List<Class<? extends Annotation>> classesWithAnno = ClassUtil.getClassesWithAnno(RestController.class, packageNames);
         //2、循环controller
         List<Map<String, Object>> dataList = new ArrayList<>();
-        for (Class<?> controllerClass : classesWithAnno) {
+        for (Class<? extends Annotation> controllerClass : classesWithAnno) {
             //获取RequestMapping注解
             RequestMapping controllerRequestMapping = controllerClass.getAnnotation(RequestMapping.class);
             if (controllerRequestMapping == null || controllerRequestMapping.value().length == 0) {
