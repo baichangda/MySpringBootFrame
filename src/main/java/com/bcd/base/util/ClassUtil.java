@@ -1,10 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
-
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -47,42 +44,6 @@ public class ClassUtil {
     }
 
     /**
-     * 递归扫描, 找出所有此注解及其标注的子注解所标注的所有类, 结果根据注解类型分类
-     *
-     * @param annoClass
-     * @param packages
-     * @return
-     */
-    public static Map<String, List<Class<?>>> findWithSub(Class<? extends Annotation> annoClass, String... packages) {
-        try {
-            Map<String, List<Class<?>>> annoNameToClassListMap = new HashMap<>();
-            //1、找出所有带注解的类
-            List<Class<?>> classList = ClassUtil.getClassesWithAnno(annoClass, packages);
-            //2、找出其中的 注解,并从集合中移除
-            List<Class> subAnnoList = new ArrayList<>();
-            for (int i = 0; i <= classList.size() - 1; i++) {
-                Class clazz = classList.get(i);
-                if (clazz.isAnnotation()) {
-                    subAnnoList.add(clazz);
-                    classList.remove(i);
-                    i--;
-                }
-            }
-            //3、找出所有子注解的类
-            for (Class subAnno : subAnnoList) {
-                //3.1、将子注解扫描出来的类添加进去
-                Map<String, List<Class<?>>> tempMap = findWithSub(subAnno, packages);
-                annoNameToClassListMap.putAll(tempMap);
-            }
-            //4、返回此注解和其子注解 标注的类
-            annoNameToClassListMap.put(annoClass.getName(), classList);
-            return annoNameToClassListMap;
-        } catch (IOException | ClassNotFoundException e) {
-            throw BaseRuntimeException.getException(e);
-        }
-    }
-
-    /**
      * 找出所有带注解的类
      *
      * @param annoClass
@@ -91,12 +52,16 @@ public class ClassUtil {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class<?>> getClassesWithAnno(Class<? extends Annotation> annoClass, String... packageNames) throws IOException, ClassNotFoundException {
-        Set<Class<?>> classSet = new HashSet<>();
+    public static List<Class<? extends Annotation>> getClassesWithAnno(Class<? extends Annotation> annoClass, String... packageNames) throws IOException, ClassNotFoundException {
+        List<Class<? extends Annotation>> list = new ArrayList<>();
         for (String packageName : packageNames) {
-            classSet.addAll(getClasses(packageName));
+            for (Class<?> clazz : getClasses(packageName)) {
+                if (clazz.isAnnotationPresent(annoClass)) {
+                    list.add((Class<? extends Annotation>) clazz);
+                }
+            }
         }
-        return classSet.stream().filter(e -> e.getAnnotation(annoClass) != null).collect(Collectors.toList());
+        return list;
     }
 
     /**
