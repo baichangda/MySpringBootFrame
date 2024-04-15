@@ -1,8 +1,12 @@
 package com.bcd.base.support_ringbuffer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * 固定长度的缓存队列
  * 如果长度已满、时间最早的纪录会被移除
+ *
  * @param <T>
  */
 @SuppressWarnings("unchecked")
@@ -78,9 +82,9 @@ public class RingBufferArray<T> {
         return lastIndex == -1 ? null : (T) content[lastIndex];
     }
 
-    public Object[] content() {
+    public ArrayList<T> content() {
         if (firstIndex == -1) {
-            return new Object[0];
+            return new ArrayList<>();
         } else {
             Object[] temp;
             if (firstIndex > lastIndex) {
@@ -92,7 +96,7 @@ public class RingBufferArray<T> {
                 temp = new Object[lastIndex - firstIndex + 1];
                 System.arraycopy(content, firstIndex, temp, 0, temp.length);
             }
-            return temp;
+            return (ArrayList<T>) new ArrayList<>(Arrays.asList(temp));
         }
     }
 
@@ -106,20 +110,20 @@ public class RingBufferArray<T> {
 //        for (Object integer : list) {
 //            System.out.print(integer);
 //        }
-        int i=0;
+        int i = 0;
         long t1 = System.currentTimeMillis();
-        while (i++<10000000) {
+        while (i++ < 10000000) {
             ringBufferArray.addAll(new Integer[]{1, 2, 3, 4});
             ringBufferArray.addAll(new Integer[]{5, 5});
             ringBufferArray.addAll(new Integer[]{6});
             ringBufferArray.addAll(new Integer[]{7, 8, 9});
             ringBufferArray.addAll(new Integer[]{10, 11});
-            Object[] list = ringBufferArray.content();
+            ArrayList<Integer> list = ringBufferArray.content();
 //            for (Object integer : list) {
 //                System.out.print(integer);
 //            }
         }
-        System.out.println(System.currentTimeMillis()-t1);
+        System.out.println(System.currentTimeMillis() - t1);
 
     }
 }
