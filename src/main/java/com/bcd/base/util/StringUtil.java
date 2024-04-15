@@ -20,7 +20,7 @@ public class StringUtil {
      * @return
      */
     public static String splitCharToCamelCase(String str, char splitChar) {
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         StringBuilder result = new StringBuilder();
@@ -67,7 +67,7 @@ public class StringUtil {
      * @return
      */
     public static String escapeExprSpecialWord(String str) {
-        if (str != null && !"".equals(str)) {
+        if (str != null && !str.isEmpty()) {
             String[] fbsArr = {"\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|"};
             for (String key : fbsArr) {
                 if (str.contains(key)) {

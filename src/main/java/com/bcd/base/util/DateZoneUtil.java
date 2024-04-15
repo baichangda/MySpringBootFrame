@@ -43,20 +43,12 @@ public class DateZoneUtil {
             return null;
         }
         int len = dateStr.length();
-        switch (len) {
-            case 8: {
-                return DateZoneUtil.stringToDate_day(dateStr);
-            }
-            case 14: {
-                return DateZoneUtil.stringToDate_second(dateStr);
-            }
-            case 17: {
-                return DateZoneUtil.stringToDate_millisecond(dateStr);
-            }
-            default: {
-                throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
-            }
-        }
+        return switch (len) {
+            case 8 -> DateZoneUtil.stringToDate_day(dateStr);
+            case 14 -> DateZoneUtil.stringToDate_second(dateStr);
+            case 17 -> DateZoneUtil.stringToDate_millisecond(dateStr);
+            default -> throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
+        };
     }
 
     /**

@@ -35,7 +35,7 @@ public class FileUtil {
             return;
         }
         try (final Stream<Path> stream = Files.list(path)) {
-            List<Path> collect = stream.collect(Collectors.toList());
+            List<Path> collect = stream.toList();
             for (Path p : collect) {
                 try {
                     if (Files.isDirectory(p)) {

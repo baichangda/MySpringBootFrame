@@ -59,9 +59,8 @@ public class RSAUtil {
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
                 keyBytes);
         try {
-            PrivateKey privateKey = Singleton.INSTANCE.keyFactory
+            return Singleton.INSTANCE.keyFactory
                     .generatePrivate(pkcs8EncodedKeySpec);
-            return privateKey;
         } catch (InvalidKeySpecException e) {
             throw BaseRuntimeException.getException(e);
         }
@@ -126,8 +125,8 @@ public class RSAUtil {
 
     enum Singleton {
         INSTANCE;
-        KeyPairGenerator keyPairGenerator;
-        KeyFactory keyFactory;
+        final KeyPairGenerator keyPairGenerator;
+        final KeyFactory keyFactory;
 
         Singleton() {
             try {
