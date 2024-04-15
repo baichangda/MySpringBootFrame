@@ -24,12 +24,4 @@ public class CORSFilter implements Filter {
         response.setCharacterEncoding("UTF-8");
         chain.doFilter(request, resp);
     }
-
-    @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
 }
