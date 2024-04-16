@@ -121,7 +121,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(summary = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public Result save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
+    public Result<?> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
         userService.saveUser(user);
         return Result.success().message("保存成功");
     }
@@ -136,7 +136,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(summary = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public Result delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam long[] ids) {
+    public Result<?> delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam long[] ids) {
         userService.delete(ids);
         return Result.success().message("删除成功");
     }
@@ -201,7 +201,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @Operation(summary = "修改密码")
     @ApiResponse(responseCode = "200", description = "修改密码结果")
-    public Result updatePassword(
+    public Result<?> updatePassword(
             @Parameter(description = "旧密码")
             @RequestParam String oldPassword,
             @Parameter(description = "新密码")
