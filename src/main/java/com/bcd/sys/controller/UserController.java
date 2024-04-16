@@ -6,8 +6,7 @@ import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
 import com.bcd.base.condition.impl.StringCondition;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.message.JsonMessage;
+import com.bcd.base.result.Result;
 import com.bcd.base.support_satoken.SaTokenUtil;
 import com.bcd.base.support_satoken.anno.NotePermission;
 import com.bcd.base.support_satoken.anno.SaCheckNotePermissions;
@@ -45,7 +44,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(summary = "查询用户列表")
     @ApiResponse(responseCode = "200", description = "用户列表")
-    public JsonMessage<List<UserBean>> list(
+    public Result<List<UserBean>> list(
             @Parameter(description = "生日开始", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
             @Parameter(description = "生日结束", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
@@ -70,7 +69,7 @@ public class UserController extends BaseController {
                 NumberCondition.EQUAL("status", status),
                 StringCondition.ALL_LIKE("username", username)
         );
-        return JsonMessage.success(userService.list(condition));
+        return Result.success(userService.list(condition));
     }
 
     /**
@@ -82,7 +81,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @Operation(summary = "查询用户分页")
     @ApiResponse(responseCode = "200", description = "用户分页结果集")
-    public JsonMessage<Page<UserBean>> page(
+    public Result<Page<UserBean>> page(
             @Parameter(description = "生日开始", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayBegin,
             @Parameter(description = "生日结束", schema = @Schema(type = "integer")) @RequestParam(required = false) Date birthdayEnd,
             @Parameter(description = "身份证号") @RequestParam(required = false) String cardNumber,
@@ -109,7 +108,7 @@ public class UserController extends BaseController {
                 NumberCondition.EQUAL("status", status),
                 StringCondition.ALL_LIKE("username", username)
         );
-        return JsonMessage.success(userService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
+        return Result.success(userService.page(condition, PageRequest.of(pageNum - 1, pageSize)));
     }
 
     /**
@@ -122,9 +121,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @Operation(summary = "保存用户")
     @ApiResponse(responseCode = "200", description = "保存结果")
-    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
+    public Result save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "用户实体") @Validated @RequestBody UserBean user) {
         userService.saveUser(user);
-        return JsonMessage.success().message("保存成功");
+        return Result.success().message("保存成功");
     }
 
     /**
@@ -137,9 +136,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Operation(summary = "删除用户")
     @ApiResponse(responseCode = "200", description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam long[] ids) {
+    public Result delete(@Parameter(description = "用户id数组", example = "100,101,102") @RequestParam long[] ids) {
         userService.delete(ids);
-        return JsonMessage.success().message("删除成功");
+        return Result.success().message("删除成功");
     }
 
     /**
@@ -152,13 +151,13 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @Operation(summary = "用户登录")
     @ApiResponse(responseCode = "200", description = "登录的用户信息")
-    public JsonMessage<UserBean> login(
+    public Result<UserBean> login(
             @Parameter(description = "用户名")
             @RequestParam String username,
             @Parameter(description = "密码")
             @RequestParam String password) {
         UserBean user = userService.login(username, password);
-        return JsonMessage.success(user);
+        return Result.success(user);
     }
 
     /**
@@ -169,11 +168,11 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     @Operation(summary = "用户注销")
     @ApiResponse(responseCode = "200", description = "注销结果")
-    public JsonMessage<?> logout() {
-        JsonMessage<?> jsonMessage = JsonMessage.success().message("注销成功");
+    public Result<?> logout() {
+        Result<?> result = Result.success().message("注销成功");
         //在logout之前必须完成所有与session相关的操作(例如从session中获取国际化的后缀)
         StpUtil.logout();
-        return jsonMessage;
+        return result;
     }
 
     /**
@@ -186,9 +185,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     @Operation(summary = "重置密码")
     @ApiResponse(responseCode = "200", description = "重制密码结果")
-    public JsonMessage<?> resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
+    public Result<?> resetPassword(@Parameter(description = "用户主键") @RequestParam Long userId) {
         userService.resetPassword(userId);
-        return JsonMessage.success().message("重置成功");
+        return Result.success().message("重置成功");
     }
 
 
@@ -202,7 +201,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
     @Operation(summary = "修改密码")
     @ApiResponse(responseCode = "200", description = "修改密码结果")
-    public JsonMessage updatePassword(
+    public Result updatePassword(
             @Parameter(description = "旧密码")
             @RequestParam String oldPassword,
             @Parameter(description = "新密码")
@@ -210,9 +209,9 @@ public class UserController extends BaseController {
         UserBean userBean = (UserBean)SaTokenUtil.getLoginUser_cache();
         boolean flag = userService.updatePassword(userBean.id, oldPassword, newPassword);
         if (flag) {
-            return JsonMessage.success().message("修改成功");
+            return Result.success().message("修改成功");
         } else {
-            return JsonMessage.fail().message("密码错误");
+            return Result.fail().message("密码错误");
         }
     }
 }

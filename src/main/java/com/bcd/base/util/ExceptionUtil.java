@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.message.JsonMessage;
+import com.bcd.base.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 /**
  * Created by Administrator on 2017/7/27.
@@ -45,33 +46,14 @@ public class ExceptionUtil {
      * @return
      */
     public static void printException(Throwable throwable) {
+        Objects.requireNonNull(throwable);
         Throwable realException = parseRealException(throwable);
         logger.error("Error", realException);
     }
 
-    /**
-     * 根据异常生成JsonMessage
-     *
-     * @param throwable
-     * @return
-     */
-    public static JsonMessage toJsonMessage(Throwable throwable) {
-        Throwable realException = parseRealException(throwable);
-        if (realException == null) {
-            throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
-        }
-        if (realException instanceof BaseRuntimeException ex) {
-            return JsonMessage.fail(ex.code).message(realException.getMessage());
-        }else {
-            return JsonMessage.fail().message(realException.getMessage());
-        }
-    }
-
     public static String getMessage(Throwable throwable) {
+        Objects.requireNonNull(throwable);
         Throwable realException = parseRealException(throwable);
-        if (realException == null) {
-            throw BaseRuntimeException.getException("ExceptionUtil.toJsonMessage Param[throwable] Can't Be Null");
-        }
         return realException.getMessage();
     }
 

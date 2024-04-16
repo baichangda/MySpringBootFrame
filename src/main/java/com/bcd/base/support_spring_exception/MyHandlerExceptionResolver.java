@@ -1,7 +1,7 @@
 package com.bcd.base.support_spring_exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import com.bcd.base.message.JsonMessage;
+import com.bcd.base.result.Result;
 import com.bcd.base.util.ExceptionUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,8 +43,8 @@ import java.util.stream.Collectors;
  * 2、{@link org.springframework.web.servlet.DispatcherServlet#initStrategies(ApplicationContext)}
  * 3、{@link org.springframework.web.servlet.DispatcherServlet#refresh()}
  * 其中步骤1中会扫描所有{@link HandlerExceptionResolver}的bean
- *
- *
+ * <p>
+ * <p>
  * 方法1、定义一个类、继承{@link WebMvcConfigurer}、注册为spring bean、这个方法是替换掉默认的异常解析器
  * 生效过程为
  * 1、{@link org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration}生效
@@ -73,9 +73,9 @@ import java.util.stream.Collectors;
  * 处理器顺序如下
  * {@link org.springframework.boot.web.servlet.error.DefaultErrorAttributes} 不做返回处理、只设置错误信息到attribute、优先级{@link Ordered#HIGHEST_PRECEDENCE}
  * {@link org.springframework.web.servlet.handler.HandlerExceptionResolverComposite} 包含3个子处理器、优先级0
- *      {@link org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ExceptionHandler}
- *      {@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ResponseStatus}
- *      {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver} 处理 spring一些自定义异常
+ * {@link org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ExceptionHandler}
+ * {@link org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver} 处理 {@link org.springframework.web.bind.annotation.ResponseStatus}
+ * {@link org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver} 处理 spring一些自定义异常
  * {@link AbstractHandlerExceptionResolver}自定义、优先级{@link Ordered#LOWEST_PRECEDENCE}
  */
 @Component
@@ -134,9 +134,9 @@ public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver
 
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
         Throwable realException = ExceptionUtil.parseRealException(throwable);
-        JsonMessage<?> result;
+        Result<?> result;
         if (realException instanceof NotLoginException) {
-            result = JsonMessage.fail(ExceptionCode.not_login.code).message(ExceptionCode.not_login.msg);
+            result = Result.fail(ExceptionCode.not_login.code).message(ExceptionCode.not_login.msg);
         } else if (realException instanceof MethodArgumentNotValidException) {
             final BindingResult bindingResult = ((MethodArgumentNotValidException) realException).getBindingResult();
             final List<ObjectError> allErrors = bindingResult.getAllErrors();
@@ -148,9 +148,9 @@ public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver
                 msgMap.put("msg", defaultMessage);
                 return msgMap;
             }).collect(Collectors.toList());
-            result = JsonMessage.fail(ExceptionCode.arg_error.code, errorList).message(ExceptionCode.arg_error.msg);
+            result = Result.fail(ExceptionCode.arg_error.code, errorList).message(ExceptionCode.arg_error.msg);
         } else {
-            result = ExceptionUtil.toJsonMessage(realException);
+            result = Result.from(realException);
         }
         ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
         converter.write(result,

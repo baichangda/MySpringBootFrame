@@ -1,6 +1,5 @@
 package com.bcd.base.exception;
 
-import com.bcd.base.message.JsonMessage;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.StringUtil;
 

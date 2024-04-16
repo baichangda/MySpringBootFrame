@@ -3,7 +3,7 @@ package com.bcd.base.support_mongodb.test.controller;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.*;
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.message.JsonMessage;
+import com.bcd.base.result.Result;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +35,7 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     @Operation(summary="查询测试列表")
     @ApiResponse(responseCode = "200",description = "测试列表")
-    public JsonMessage<List<TestBean>> list(
+    public Result<List<TestBean>> list(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
         @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
         @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd,
@@ -46,7 +46,7 @@ public class TestController extends BaseController {
            DateCondition.BETWEEN("time",timeBegin,timeEnd),
            StringCondition.EQUAL("id",id)
         );
-        return JsonMessage.success(testService.list(condition));
+        return Result.success(testService.list(condition));
     }
 
     /**
@@ -56,7 +56,7 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     @Operation(summary="查询测试分页")
     @ApiResponse(responseCode = "200",description = "测试分页结果集")
-    public JsonMessage<Page<TestBean>> page(
+    public Result<Page<TestBean>> page(
         @Parameter(description = "vin") @RequestParam(required = false) String vin,
         @Parameter(description = "时间开始",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeBegin,
         @Parameter(description = "时间结束",schema = @Schema(type = "integer")) @RequestParam(required = false) Date timeEnd,
@@ -69,7 +69,7 @@ public class TestController extends BaseController {
            DateCondition.BETWEEN("time",timeBegin,timeEnd),
            StringCondition.EQUAL("id",id)
         );
-        return JsonMessage.success(testService.page(condition,PageRequest.of(pageNum-1,pageSize)));
+        return Result.success(testService.page(condition,PageRequest.of(pageNum-1,pageSize)));
     }
 
     /**
@@ -80,9 +80,9 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @Operation(summary = "保存测试")
     @ApiResponse(responseCode = "200",description = "保存结果")
-    public JsonMessage save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test){
+    public Result save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test){
         testService.save(test);
-        return JsonMessage.success();
+        return Result.success();
     }
 
 
@@ -94,9 +94,9 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @Operation(summary = "删除测试")
     @ApiResponse(responseCode = "200",description = "删除结果")
-    public JsonMessage delete(@Parameter(description = "测试ids数组",example = "100,101,102") @RequestParam String[] ids){
+    public Result delete(@Parameter(description = "测试ids数组",example = "100,101,102") @RequestParam String[] ids){
         testService.delete(ids);
-        return JsonMessage.success();
+        return Result.success();
     }
 
 }

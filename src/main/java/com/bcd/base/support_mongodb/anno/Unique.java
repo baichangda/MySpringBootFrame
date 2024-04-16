@@ -29,7 +29,6 @@ public @interface Unique {
     /**
      * 错误编码
      * 在验证失败时候设置在{@link com.bcd.base.exception.BaseRuntimeException#code}中
-     * 即{@link com.bcd.base.message.JsonMessage#code}
      */
     int code() default 1;
 }
