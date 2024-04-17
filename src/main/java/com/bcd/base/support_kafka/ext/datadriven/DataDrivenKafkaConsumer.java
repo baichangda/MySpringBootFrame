@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +41,6 @@ public abstract class DataDrivenKafkaConsumer {
      */
     public Thread consumeThread;
     public Thread[] consumeThreads;
-
-    public ConcurrentHashMap<String, WorkHandler> workHandlerCache = new ConcurrentHashMap<>();
 
     /**
      * 工作线程数量
@@ -95,6 +92,7 @@ public abstract class DataDrivenKafkaConsumer {
      * 监控信息
      */
     public final int monitor_period;
+    public final LongAdder monitor_workHandlerCount;
     public final LongAdder monitor_consumeCount;
     public final LongAdder monitor_workCount;
     public ScheduledExecutorService monitor_pool;
@@ -143,9 +141,11 @@ public abstract class DataDrivenKafkaConsumer {
         this.topics = topics;
 
         if (monitor_period == 0) {
+            monitor_workHandlerCount = null;
             monitor_consumeCount = null;
             monitor_workCount = null;
         } else {
+            monitor_workHandlerCount = new LongAdder();
             monitor_consumeCount = new LongAdder();
             monitor_workCount = new LongAdder();
         }
@@ -163,7 +163,23 @@ public abstract class DataDrivenKafkaConsumer {
         }
     }
 
+    public WorkExecutor getWorkExecutor(String id) {
+        int index = Math.floorMod(id.hashCode(), workExecutorNum);
+        return workExecutors[index];
+    }
+
     public abstract WorkHandler newHandler(String id, WorkExecutor executor);
+
+    public void removeHandler(String id) {
+        WorkExecutor workExecutor = getWorkExecutor(id);
+        workExecutor.execute(() -> {
+            WorkHandler workHandler = workExecutor.workHandlerCache.remove(id);
+            if (workHandler != null) {
+                workExecutor.destroy();
+                monitor_workHandlerCount.decrement();
+            }
+        });
+    }
 
     public void init() {
         if (!available) {
@@ -250,12 +266,14 @@ public abstract class DataDrivenKafkaConsumer {
                     //打上退出标记、等待消费线程退出
                     running_consume = false;
                     ExecutorUtil.shutdown(consumeThread, consumeThreads, resetConsumeCountPool);
-                    //等待workHandler销毁
-                    for (WorkHandler workHandler : workHandlerCache.values()) {
-                        workHandler.executor.execute(workHandler::destroy);
-                    }
                     //等待工作执行器退出
                     for (WorkExecutor workExecutor : workExecutors) {
+                        //先销毁所有handler
+                        workExecutor.execute(() -> {
+                            for (WorkHandler workHandler : workExecutor.workHandlerCache.values()) {
+                                workHandler.destroy();
+                            }
+                        });
                         workExecutor.destroy();
                     }
                     //取消shutdownHook
@@ -314,15 +332,16 @@ public abstract class DataDrivenKafkaConsumer {
                     }
                     //发布消息
                     for (ConsumerRecord<String, byte[]> consumerRecord : consumerRecords) {
-                        String id = id(consumerRecord);
-                        int index = Math.floorMod(id.hashCode(), workExecutorNum);
-                        final WorkExecutor workExecutor = workExecutors[index];
-                        WorkHandler workHandler = workHandlerCache.computeIfAbsent(id, k -> {
-                            WorkHandler temp = newHandler(id, workExecutor);
-                            workExecutor.execute(temp::init);
-                            return temp;
-                        });
+                        final String id = id(consumerRecord);
+                        WorkExecutor workExecutor = getWorkExecutor(id);
+                        //交给执行器处理
                         workExecutor.execute(() -> {
+                            WorkHandler workHandler = workExecutor.workHandlerCache.computeIfAbsent(id, k -> {
+                                WorkHandler temp = newHandler(id, workExecutor);
+                                temp.init();
+                                monitor_workHandlerCount.increment();
+                                return temp;
+                            });
                             workHandler.onMessage(consumerRecord);
                             if (monitor_period > 0) {
                                 monitor_workCount.increment();
@@ -355,8 +374,12 @@ public abstract class DataDrivenKafkaConsumer {
      * 如果需要修改日志、可以重写此方法
      */
     public String monitor_log() {
-        return StringUtil.format("name[{}] blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
-                name,
+        return StringUtil.format("name[{}] workExecutor[{}] workHandler[{}] " +
+                        "blocking[{}/{}] " +
+                        "consume[{}/s] " +
+                        "queues[{}] " +
+                        "work[{}/s]",
+                name, workExecutors.length, monitor_workHandlerCount.sum(),
                 blockingNum.get(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
                 Arrays.stream(workExecutors).map(e -> e.executor.getActiveCount() + "/" + workExecutorQueueSize).collect(Collectors.joining(",")),

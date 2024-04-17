@@ -4,13 +4,20 @@ import com.bcd.base.util.ExecutorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class WorkExecutor {
 
-    static Logger logger= LoggerFactory.getLogger(WorkExecutor.class);
+    static Logger logger = LoggerFactory.getLogger(WorkExecutor.class);
 
     public final ThreadPoolExecutor executor;
+
+    /**
+     * 存储本执行器所有的handler
+     */
+    final Map<String, WorkHandler> workHandlerCache = new HashMap<>();
 
     public WorkExecutor(int queueSize, String threadName) {
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(queueSize)

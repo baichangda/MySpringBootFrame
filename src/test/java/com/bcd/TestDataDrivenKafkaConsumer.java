@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
     public TestDataDrivenKafkaConsumer() {
-        super("Test", new ConsumerProp("192.168.23.128:9092", "test-bcd"), true, 1, 10000, 100000, true, 0, 1, "test");
+        super("Test", new ConsumerProp("10.0.11.50:39003", "test-bcd"), false, 1, 10000, 100000, true, 0, 1, "test");
     }
 
     @Override
@@ -29,20 +29,20 @@ public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
         TestDataDrivenKafkaConsumer consumer = new TestDataDrivenKafkaConsumer();
         consumer.init();
 
-        for (int j = 0; j < 2; j++) {
-            Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
-                try (Producer<String, byte[]> producer = ProducerFactory.newProducer(new ProducerProp("192.168.23.128:9092"))) {
-                    while (true) {
-                        for (int i = 0; i < 100000; i++) {
-                            producer.send(new ProducerRecord<>("test", (i % 100) + "", (i + "").getBytes()));
-                        }
-                        TimeUnit.MILLISECONDS.sleep(5);
-                    }
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-        }
+//        for (int j = 0; j < 1; j++) {
+//            Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
+//                try (Producer<String, byte[]> producer = ProducerFactory.newProducer(new ProducerProp("10.0.11.50:39003"))) {
+//                    while (true) {
+//                        for (int i = 0; i < 100000; i++) {
+//                            producer.send(new ProducerRecord<>("test", (i % 100) + "", (i + "").getBytes()));
+//                        }
+//                        TimeUnit.MILLISECONDS.sleep(1000);
+//                    }
+//                } catch (InterruptedException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            });
+//        }
     }
 }
 
