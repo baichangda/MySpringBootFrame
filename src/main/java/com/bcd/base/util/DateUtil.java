@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -63,7 +62,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
+                    throw BaseRuntimeException.get("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -109,7 +108,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
+                    throw BaseRuntimeException.get("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -219,7 +218,7 @@ public class DateUtil {
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.range],unit[{}}] Not Support!", unit.toString());
+                throw BaseRuntimeException.get("[DateUtil.range],unit[{}}] Not Support!", unit.toString());
             }
         }
         return returnList;
@@ -264,7 +263,7 @@ public class DateUtil {
                 return d2.getTime() - d1.getTime();
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
+                throw BaseRuntimeException.get("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
             }
         }
         long begin = d1.getTime();

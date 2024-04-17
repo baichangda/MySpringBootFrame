@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
 import java.io.File;
@@ -22,7 +21,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,7 +45,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -57,7 +55,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -75,7 +73,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -85,7 +83,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -103,7 +101,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -113,7 +111,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -173,7 +171,7 @@ public class CodeGenerator {
      */
     public static List<BeanField> initBeanField(CollectionConfig config) {
         if (!SuperBaseBean.class.isAssignableFrom(config.clazz)) {
-            throw BaseRuntimeException.getException("bean[{}] must extends SuperBaseBean", config.clazz.getName());
+            throw BaseRuntimeException.get("bean[{}] must extends SuperBaseBean", config.clazz.getName());
         }
         List<Field> fieldList = FieldUtils.getAllFieldsList(config.clazz).stream().filter(e -> {
             if (e.getAnnotation(Transient.class) != null) {
@@ -232,7 +230,7 @@ public class CodeGenerator {
         if (targetDirPath.contains(springSrcPath)) {
             return targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
         } else {
-            throw BaseRuntimeException.getException("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
+            throw BaseRuntimeException.get("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
         }
     }
 

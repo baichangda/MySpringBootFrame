@@ -6,7 +6,6 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 public class AESUtil {
 
@@ -29,7 +28,7 @@ public class AESUtil {
             kg.init(size);
             return kg.generateKey();
         } catch (NoSuchAlgorithmException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -72,7 +71,7 @@ public class AESUtil {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException
                 | IllegalBlockSizeException | InvalidKeyException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -90,7 +89,7 @@ public class AESUtil {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException
                 | IllegalBlockSizeException | InvalidKeyException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

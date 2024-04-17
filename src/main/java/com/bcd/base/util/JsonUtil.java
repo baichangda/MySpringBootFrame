@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.StringJoiner;
 
 /**
  * Created by Administrator on 2017/5/12.
@@ -89,7 +88,7 @@ public class JsonUtil {
         try {
             return GLOBAL_OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

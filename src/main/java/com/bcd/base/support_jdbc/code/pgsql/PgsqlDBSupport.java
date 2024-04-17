@@ -1,7 +1,6 @@
 package com.bcd.base.support_jdbc.code.pgsql;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_jdbc.code.CodeConst;
 import com.bcd.base.support_jdbc.code.DBSupport;
 import com.bcd.base.support_jdbc.code.TableConfig;
 import com.bcd.base.support_jdbc.code.data.BeanField;
@@ -62,7 +61,7 @@ public class PgsqlDBSupport implements DBSupport {
                 return beanField;
             }
             default-> {
-                throw BaseRuntimeException.getException("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.udt_name);
+                throw BaseRuntimeException.get("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.udt_name);
             }
         }
     }

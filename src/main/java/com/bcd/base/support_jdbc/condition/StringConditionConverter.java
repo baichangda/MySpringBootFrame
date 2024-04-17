@@ -73,7 +73,7 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
                     sql.append(sj);
                     sql.append(")");
                 } else {
-                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                    throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                 }
             }
             case NOT_IN: {
@@ -89,12 +89,12 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
                     sql.append(")");
                     paramList.addAll(notEmptyList);
                 } else {
-                    throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                    throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                 }
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("handler[{}] not support",handler);
+                throw BaseRuntimeException.get("handler[{}] not support",handler);
             }
         }
         return new ConvertRes(sql.toString(), paramList);

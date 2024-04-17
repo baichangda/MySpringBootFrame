@@ -40,7 +40,7 @@ public class ConditionUtil {
         }
         Converter<T, ?> converter = (Converter<T, ?>) CONDITION_CONVERTER_MAP.get(condition.getClass());
         if (converter == null) {
-            throw BaseRuntimeException.getException("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
+            throw BaseRuntimeException.get("[ConditionUtil.convertCondition],Condition[" + condition.getClass() + "] Have Not Converter!");
         } else {
             return (Criteria) converter.convert(condition);
         }

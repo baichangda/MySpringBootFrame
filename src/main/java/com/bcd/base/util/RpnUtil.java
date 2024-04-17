@@ -323,7 +323,7 @@ public class RpnUtil {
                     default: {
                         final Double d = dataMap.get(ele.s);
                         if (d == null) {
-                            throw BaseRuntimeException.getException("var[{}] not exist", ele.s);
+                            throw BaseRuntimeException.get("var[{}] not exist", ele.s);
                         }
                         stack[++stackIndex] = d;
                     }
@@ -498,7 +498,7 @@ public class RpnUtil {
                 return 3;
             }
             default: {
-                throw BaseRuntimeException.getException("symbol[" + c + "] not support");
+                throw BaseRuntimeException.get("symbol[" + c + "] not support");
             }
         }
     }

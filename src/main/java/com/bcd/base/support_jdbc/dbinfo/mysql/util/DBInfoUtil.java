@@ -52,7 +52,7 @@ public class DBInfoUtil {
             return new DBInfo(dbInfoUrl, username, password, propDbName);
 
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
 
 
@@ -68,7 +68,7 @@ public class DBInfoUtil {
         try {
             return DriverManager.getConnection(dbInfo.url, dbInfo.username, dbInfo.password);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -85,7 +85,7 @@ public class DBInfoUtil {
         try {
             return DriverManager.getConnection("jdbc:mysql://" + url + "/" + DB_INFO_SCHEMA, username, password);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -137,7 +137,7 @@ public class DBInfoUtil {
             }
             return res;
         } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchFieldException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -157,7 +157,7 @@ public class DBInfoUtil {
                 res = parseResult(rs, TablesBean.class);
             }
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         return res;
     }
@@ -183,7 +183,7 @@ public class DBInfoUtil {
                 return res;
             }
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -204,7 +204,7 @@ public class DBInfoUtil {
                 res = parseResult(rs, ColumnsBean.class);
             }
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         return res;
     }
@@ -230,7 +230,7 @@ public class DBInfoUtil {
                 }
             }
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 }

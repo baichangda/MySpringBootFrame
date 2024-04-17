@@ -1,7 +1,6 @@
 package com.bcd.base.util;
 
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ public class ExceptionUtil {
             throwable.printStackTrace(pw);
             return sw.toString();
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

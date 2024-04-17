@@ -63,7 +63,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         //开始消费
         super.init();

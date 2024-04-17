@@ -64,7 +64,7 @@ public final class BeanInfo<T> {
 
         Table table = clazz.getAnnotation(Table.class);
         if (table == null) {
-            throw BaseRuntimeException.getException("class[{}] must has annotation @Table", clazz.getName());
+            throw BaseRuntimeException.get("class[{}] must has annotation @Table", clazz.getName());
         }
         tableName = table.value();
 
@@ -125,7 +125,7 @@ public final class BeanInfo<T> {
             }
             return args;
         } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -138,14 +138,14 @@ public final class BeanInfo<T> {
             }
             return args;
         } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
     public String toColumnName(String fieldNameOrColumnName) {
         final String columnName = fieldNameOrColumnName_columnName.get(fieldNameOrColumnName);
         if (columnName == null) {
-            throw BaseRuntimeException.getException("bean[{}] tableName[{}] toColumnName[{}] null", clazz.getName(), tableName, fieldNameOrColumnName);
+            throw BaseRuntimeException.get("bean[{}] tableName[{}] toColumnName[{}] null", clazz.getName(), tableName, fieldNameOrColumnName);
         }
         return columnName;
     }

@@ -86,7 +86,7 @@ public class CodeGeneratorContext {
             if (targetDirPath.contains(springSrcPath)) {
                 packagePre = targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
             } else {
-                throw BaseRuntimeException.getException("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
+                throw BaseRuntimeException.get("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
             }
         }
         return packagePre;

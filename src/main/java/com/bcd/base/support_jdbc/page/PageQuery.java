@@ -60,7 +60,7 @@ public final class PageQuery {
         int i1 = upperCase.indexOf("SELECT");
         int i2 = upperCase.indexOf("FROM");
         if (i1 == -1 || i2 == -1) {
-            throw BaseRuntimeException.getException("toCountSql sql[{}] not support", sql);
+            throw BaseRuntimeException.get("toCountSql sql[{}] not support", sql);
         }
         int i3 = upperCase.lastIndexOf("ORDER BY");
         return upperCase.substring(0, i1 + 6) +

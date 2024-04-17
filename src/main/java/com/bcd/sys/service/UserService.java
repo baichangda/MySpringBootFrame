@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -104,7 +102,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         String key = "phoneCode:" + phone;
         long expireTimeInSeconds = redisTemplate.getExpire(key);
         if (expireTimeInSeconds > 0) {
-            throw BaseRuntimeException.getException("等待" + expireTimeInSeconds + "秒后重试");
+            throw BaseRuntimeException.get("等待" + expireTimeInSeconds + "秒后重试");
         } else {
             if (expireTimeInSeconds == -1) {
                 //如果没有过期时间,则删除异常key
@@ -119,7 +117,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
                 } else {
                     //如果有其他服务器抢先发送了验证码,则再次获取时间
                     expireTimeInSeconds = redisTemplate.getExpire(key);
-                    throw BaseRuntimeException.getException("等待{0}秒后重试", expireTimeInSeconds);
+                    throw BaseRuntimeException.get("等待{0}秒后重试", expireTimeInSeconds);
                 }
             }
         }
@@ -135,7 +133,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
     public UserBean login(String username, String encryptPassword) {
         final UserBean userBean = getUser(username);
         if (userBean == null) {
-            throw BaseRuntimeException.getException("用户不存在");
+            throw BaseRuntimeException.get("用户不存在");
         } else {
             //根据是否加密处理选择不同处理方式
             String password;
@@ -152,7 +150,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
                 StpUtil.login(userBean.username, "web");
                 return userBean;
             } else {
-                throw BaseRuntimeException.getException("密码错误");
+                throw BaseRuntimeException.get("密码错误");
             }
         }
     }

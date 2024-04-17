@@ -116,7 +116,7 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
                     }
                 }
             } catch (InterruptedException ex) {
-                throw BaseRuntimeException.getException(ex);
+                throw BaseRuntimeException.get(ex);
             } finally {
                 requestIdToResultMap.remove(requestId);
             }

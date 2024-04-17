@@ -41,7 +41,7 @@ public class DBController extends BaseController {
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -61,7 +61,7 @@ public class DBController extends BaseController {
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 }

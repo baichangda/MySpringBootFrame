@@ -60,7 +60,7 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
+                    throw BaseRuntimeException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

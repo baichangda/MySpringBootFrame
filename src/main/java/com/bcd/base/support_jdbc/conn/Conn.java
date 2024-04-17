@@ -74,7 +74,7 @@ public class Conn {
                     return new ClassInfo<>(false, clazz.getConstructor(), map);
                 }
             } catch (NoSuchMethodException | SecurityException ex) {
-                throw BaseRuntimeException.getException(ex);
+                throw BaseRuntimeException.get(ex);
             }
         });
     }
@@ -85,7 +85,7 @@ public class Conn {
         try {
             this.connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -142,7 +142,7 @@ public class Conn {
                 return list;
             }
         } catch (Exception e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -154,7 +154,7 @@ public class Conn {
             }
             return ps.execute();
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -172,7 +172,7 @@ public class Conn {
         try {
             return insertSqlResult.insertBatch(connection, ts);
         } catch (Exception e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -190,7 +190,7 @@ public class Conn {
         try {
             return updateSqlResult.updateBatch(connection, ts);
         } catch (Exception e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -318,7 +318,7 @@ public class Conn {
             }
         }
         if (!whereNullFieldSet.isEmpty()) {
-            throw BaseRuntimeException.getException("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
+            throw BaseRuntimeException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
         }
 
         final StringBuilder sb = new StringBuilder("update ");

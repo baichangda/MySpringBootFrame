@@ -7,7 +7,6 @@ import com.bcd.base.support_mongodb.bean.BaseBean;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
-import com.bcd.base.util.StringUtil;
 import com.mongodb.bulk.BulkWriteResult;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -270,7 +269,7 @@ public class BaseService<T extends SuperBaseBean> {
                                 fieldValueSetMap.put(fieldName, valueSet);
                             } else {
                                 if (valueSet.contains(val)) {
-                                    throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                                    throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                                 }
                             }
                             valueSet.add(val);
@@ -282,12 +281,12 @@ public class BaseService<T extends SuperBaseBean> {
                     for (UniqueInfo uniqueInfo : getBeanInfo().uniqueInfos) {
                         Object val = uniqueInfo.field.get(t);
                         if (!isUnique(uniqueInfo.fieldName, val, t.getId())) {
-                            throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                            throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                         }
                     }
                 }
             } catch (IllegalAccessException e) {
-                throw BaseRuntimeException.getException(e);
+                throw BaseRuntimeException.get(e);
             }
         }
     }

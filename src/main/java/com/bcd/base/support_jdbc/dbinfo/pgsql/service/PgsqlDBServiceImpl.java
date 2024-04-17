@@ -38,7 +38,7 @@ public class PgsqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getSpringConn()) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -47,7 +47,7 @@ public class PgsqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -123,7 +123,7 @@ public class PgsqlDBServiceImpl implements DBService {
              Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
             exportDBDesignerExcel(connection, dbName, os, null);
         } catch (IOException | SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

@@ -47,7 +47,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         //检查名称
         synchronized (storage) {
             if (storage.containsKey(name)) {
-                throw BaseRuntimeException.getException("TaskBuilder[{}] [{}] exist", name, storage.get(name));
+                throw BaseRuntimeException.get("TaskBuilder[{}] [{}] exist", name, storage.get(name));
             } else {
                 storage.put(name, this);
             }
@@ -72,7 +72,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
                     while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
                     }
                 } catch (InterruptedException ex) {
-                    throw BaseRuntimeException.getException(ex);
+                    throw BaseRuntimeException.get(ex);
                 }
             }
         }

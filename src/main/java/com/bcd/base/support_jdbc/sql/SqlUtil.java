@@ -29,7 +29,7 @@ public class SqlUtil {
                     paramList.add(param);
                 }
             } catch (IllegalAccessException ex) {
-                throw BaseRuntimeException.getException(ex);
+                throw BaseRuntimeException.get(ex);
             }
             return jdbcTemplate.batchUpdate(sql, paramList);
         }
@@ -52,7 +52,7 @@ public class SqlUtil {
                     paramList.add(param);
                 }
             } catch (IllegalAccessException ex) {
-                throw BaseRuntimeException.getException(ex);
+                throw BaseRuntimeException.get(ex);
             }
             return jdbcTemplate.batchUpdate(sql, paramList);
         }
@@ -132,7 +132,7 @@ public class SqlUtil {
             }
         }
         if (!whereNullFieldSet.isEmpty()) {
-            throw BaseRuntimeException.getException("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
+            throw BaseRuntimeException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
         }
 
         final StringBuilder sb = new StringBuilder("update ");

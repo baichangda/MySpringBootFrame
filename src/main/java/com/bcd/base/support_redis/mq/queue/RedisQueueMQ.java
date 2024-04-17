@@ -77,7 +77,7 @@ public class RedisQueueMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default -> {
-                throw BaseRuntimeException.getException("valueSerializerType [{}] not support", valueSerializerType);
+                throw BaseRuntimeException.get("valueSerializerType [{}] not support", valueSerializerType);
             }
         }
     }

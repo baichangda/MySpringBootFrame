@@ -22,7 +22,7 @@ public class BaseRuntimeException extends RuntimeException {
         super(e);
     }
 
-    public static BaseRuntimeException getException(String message) {
+    public static BaseRuntimeException get(String message) {
         return new BaseRuntimeException(message);
     }
 
@@ -35,20 +35,20 @@ public class BaseRuntimeException extends RuntimeException {
      * @param params
      * @return
      */
-    public static BaseRuntimeException getException(String message, Object... params) {
+    public static BaseRuntimeException get(String message, Object... params) {
         return new BaseRuntimeException(StringUtil.format(message, params));
     }
 
-    public static BaseRuntimeException getException(Throwable e) {
+    public static BaseRuntimeException get(Throwable e) {
         return new BaseRuntimeException(e);
     }
 
-    public static BaseRuntimeException getException(Throwable e, int code) {
+    public static BaseRuntimeException get(Throwable e, int code) {
         return new BaseRuntimeException(e).code(code);
     }
 
     public static void main(String[] args) {
-        throw BaseRuntimeException.getException("[{}]-[{}]", null, 100000);
+        throw BaseRuntimeException.get("[{}]-[{}]", null, 100000);
     }
 
     public BaseRuntimeException code(int code) {

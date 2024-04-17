@@ -23,7 +23,7 @@ public class CompressUtil {
             gos.finish();
             return os.toByteArray();
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -41,7 +41,7 @@ public class CompressUtil {
             unGzip(bis, os, batchSize);
             res = os.toByteArray();
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         return res;
     }
@@ -60,7 +60,7 @@ public class CompressUtil {
                 os.write(bytes, 0, count);
             }
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 }

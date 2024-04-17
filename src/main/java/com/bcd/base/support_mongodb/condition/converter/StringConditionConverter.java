@@ -9,9 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -56,7 +54,7 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
                         }
                         criteria.in(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
@@ -69,12 +67,12 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
                         }
                         criteria.nin(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("handler[{}] not support",handler);
+                    throw BaseRuntimeException.get("handler[{}] not support",handler);
                 }
             }
         }

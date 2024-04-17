@@ -76,7 +76,7 @@ public class RedisScheduleAopConfig {
         try {
             return target.getClass().getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
     }
 }

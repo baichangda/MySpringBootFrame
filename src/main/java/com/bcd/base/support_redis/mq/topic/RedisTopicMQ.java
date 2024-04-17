@@ -81,7 +81,7 @@ public class RedisTopicMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default -> {
-                throw BaseRuntimeException.getException("Not Support");
+                throw BaseRuntimeException.get("Not Support");
             }
         }
     }
@@ -112,7 +112,7 @@ public class RedisTopicMQ<V> {
             if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], bytes);
             } else {
-                throw BaseRuntimeException.getException("Param[names] Can't Be Empty");
+                throw BaseRuntimeException.get("Param[names] Can't Be Empty");
             }
         } else {
             for (String name : names) {
@@ -156,7 +156,7 @@ public class RedisTopicMQ<V> {
                     try {
                         redisMessageListenerContainer.destroy();
                     } catch (Exception ex) {
-                        throw BaseRuntimeException.getException(ex);
+                        throw BaseRuntimeException.get(ex);
                     }
                     ExecutorUtil.shutdownThenAwait(subscriptionExecutor, taskExecutor);
                     consumerAvailable = false;

@@ -45,7 +45,7 @@ public class RSAUtil {
         try {
             return Singleton.INSTANCE.keyFactory.generatePublic(x509EncodedKeySpec);
         } catch (InvalidKeySpecException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -62,7 +62,7 @@ public class RSAUtil {
             return Singleton.INSTANCE.keyFactory
                     .generatePrivate(pkcs8EncodedKeySpec);
         } catch (InvalidKeySpecException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -81,7 +81,7 @@ public class RSAUtil {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
 
     }
@@ -101,7 +101,7 @@ public class RSAUtil {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -133,7 +133,7 @@ public class RSAUtil {
                 keyPairGenerator = KeyPairGenerator.getInstance("RSA");
                 keyFactory = KeyFactory.getInstance("RSA");
             } catch (NoSuchAlgorithmException e) {
-                throw BaseRuntimeException.getException(e);
+                throw BaseRuntimeException.get(e);
             }
         }
     }

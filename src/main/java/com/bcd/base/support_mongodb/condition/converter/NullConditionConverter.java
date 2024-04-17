@@ -24,7 +24,7 @@ public class NullConditionConverter implements Converter<NullCondition, Criteria
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[NullConditionConverter.convert],Do Not Support [" + handler + "]!");
+                throw BaseRuntimeException.get("[NullConditionConverter.convert],Do Not Support [" + handler + "]!");
             }
         }
         return criteria;

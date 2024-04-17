@@ -62,7 +62,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Bean.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -72,7 +72,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -90,7 +90,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -100,7 +100,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -118,7 +118,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -128,7 +128,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -222,7 +222,7 @@ public class CodeGenerator {
                 }
             }
         } catch (SQLException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
     }
 
@@ -230,7 +230,7 @@ public class CodeGenerator {
         try {
             return DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

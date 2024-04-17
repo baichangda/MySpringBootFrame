@@ -43,7 +43,7 @@ public class MailUtil {
             consumer.accept(mimeMessageHelper);
             MailUtil.mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

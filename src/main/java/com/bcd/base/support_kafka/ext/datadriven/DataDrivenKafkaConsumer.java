@@ -210,7 +210,7 @@ public abstract class DataDrivenKafkaConsumer {
                                             cur.close();
                                         }
                                     }
-                                    throw BaseRuntimeException.getException(ex);
+                                    throw BaseRuntimeException.get(ex);
                                 }
                                 consumeThreads = new Thread[partitionSize];
                                 for (int i = 0; i < partitionSize; i++) {
@@ -235,7 +235,7 @@ public abstract class DataDrivenKafkaConsumer {
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源
                         destroy();
-                        throw BaseRuntimeException.getException(ex);
+                        throw BaseRuntimeException.get(ex);
                     }
                 }
             }
@@ -337,7 +337,7 @@ public abstract class DataDrivenKafkaConsumer {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException e) {
-                        throw BaseRuntimeException.getException(e);
+                        throw BaseRuntimeException.get(e);
                     }
                 }
             }

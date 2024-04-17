@@ -72,7 +72,7 @@ public class DataBaseBackupSchedule {
             }
 
             if (Files.size(temp) == 0) {
-                throw BaseRuntimeException.getException("backup failed,can't find temp backup file");
+                throw BaseRuntimeException.get("backup failed,can't find temp backup file");
             } else {
                 try (InputStream is = Files.newInputStream(temp)) {
                     //上传文件
@@ -87,7 +87,7 @@ public class DataBaseBackupSchedule {
                 }
             }
         } catch (IOException | InterruptedException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         } finally {
             try {
                 Files.deleteIfExists(temp);

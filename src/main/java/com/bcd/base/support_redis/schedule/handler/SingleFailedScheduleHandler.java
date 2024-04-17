@@ -57,7 +57,7 @@ public class SingleFailedScheduleHandler {
         //1、获取锁
         Boolean res = valueOperations.setIfAbsent(lockId, "0", aliveTime);
         if (res == null) {
-            throw BaseRuntimeException.getException("doBeforeStart lockId[{}] res null", lockId);
+            throw BaseRuntimeException.get("doBeforeStart lockId[{}] res null", lockId);
         }
         return res;
     }

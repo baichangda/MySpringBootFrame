@@ -250,7 +250,7 @@ public class SwaggerApiScanner {
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("type[{}] not support", type);
+                throw BaseRuntimeException.get("type[{}] not support", type);
             }
         }
 

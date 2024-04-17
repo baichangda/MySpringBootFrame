@@ -39,7 +39,7 @@ public class MysqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getSpringConn()) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -48,7 +48,7 @@ public class MysqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getConn(url, username, password)) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -120,7 +120,7 @@ public class MysqlDBServiceImpl implements DBService {
              Connection connection = DBInfoUtil.getConn(url, username, password)) {
             exportDBDesignerExcel(connection, dbName, os, null);
         } catch (IOException | SQLException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 }

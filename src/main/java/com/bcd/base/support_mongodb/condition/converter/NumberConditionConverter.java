@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -56,7 +55,7 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
                         }
                         criteria.in(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
@@ -69,12 +68,12 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
                         }
                         criteria.nin(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.getException("type[{}] not support",val.getClass().getName());
+                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("handler[{}] not support",handler);
+                    throw BaseRuntimeException.get("handler[{}] not support",handler);
                 }
             }
         }

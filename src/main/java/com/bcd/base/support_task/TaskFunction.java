@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,7 @@ public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
         this.name = name;
         synchronized (storage) {
             if (storage.containsKey(name)) {
-                throw BaseRuntimeException.getException("TaskFunction[{}] [{}] exist", name, storage.get(name));
+                throw BaseRuntimeException.get("TaskFunction[{}] [{}] exist", name, storage.get(name));
             } else {
                 storage.put(name, this);
             }

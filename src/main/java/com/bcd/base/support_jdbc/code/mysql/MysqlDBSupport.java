@@ -62,7 +62,7 @@ public class MysqlDBSupport implements DBSupport {
                 return beanField;
             }
             default-> {
-                throw BaseRuntimeException.getException("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.data_type);
+                throw BaseRuntimeException.get("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.data_type);
             }
         }
     }

@@ -483,10 +483,10 @@ public class BaseService<T extends SuperBaseBean> {
                             Long l = idList.get(0);
                             Long id = t.getId();
                             if (!l.equals(id)) {
-                                throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                                throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                             }
                         }
-                        default -> throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                        default -> throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                     }
                 }
             } else {
@@ -497,7 +497,7 @@ public class BaseService<T extends SuperBaseBean> {
                         Object val = fieldInfo.field.get(t);
                         if (val != null) {
                             if (valList.contains(val)) {
-                                throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                                throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                             }
                         }
                         valList.add(val);
@@ -517,16 +517,16 @@ public class BaseService<T extends SuperBaseBean> {
                                 Long l = idList.get(0);
                                 Long id = t.getId();
                                 if (!l.equals(id)) {
-                                    throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                                    throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                                 }
                             }
-                            default -> throw BaseRuntimeException.getException(uniqueInfo.msg).code(uniqueInfo.code);
+                            default -> throw BaseRuntimeException.get(uniqueInfo.msg).code(uniqueInfo.code);
                         }
                     }
                 }
             }
         } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

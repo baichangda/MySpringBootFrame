@@ -49,7 +49,7 @@ public class ExcelUtil {
             }
         }
         if (colNum * size != all) {
-            throw BaseRuntimeException.getException("data error");
+            throw BaseRuntimeException.get("data error");
         }
         return new int[]{size, colNum};
     }
@@ -110,7 +110,7 @@ public class ExcelUtil {
             }
             workbook.write(os);
         } catch (IOException ex) {
-            throw BaseRuntimeException.getException(ex);
+            throw BaseRuntimeException.get(ex);
         }
     }
 
@@ -178,7 +178,7 @@ public class ExcelUtil {
 //        try (final OutputStream os = Files.newOutputStream(Paths.get("test55.xlsx"))) {
 //            writeExcel_xlsx(table, os);
 //        } catch (IOException ex) {
-//            throw BaseRuntimeException.getException(ex);
+//            throw BaseRuntimeException.get(ex);
 //        }
     }
 }
