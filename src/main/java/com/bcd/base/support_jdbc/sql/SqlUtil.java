@@ -74,7 +74,7 @@ public class SqlUtil {
         final Field[] allFields = FieldUtils.getAllFields(clazz);
         final List<Field> insertFieldList = new ArrayList<>();
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
+            if (!Modifier.isStatic(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 insertFieldList.add(field);
             }
         }
@@ -114,7 +114,7 @@ public class SqlUtil {
         final Map<String, Field> whereMap = new HashMap<>();
         final Set<String> whereColumnSet = Set.of(whereFieldNames);
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
+            if (!Modifier.isStatic(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 updateFieldList.add(field);
             }
             if (whereColumnSet.contains(field.getName())) {
@@ -124,11 +124,11 @@ public class SqlUtil {
 
         final List<Field> whereFieldList = new ArrayList<>();
         final Set<String> whereNullFieldSet = new HashSet<>();
-        for (String whereColumn : whereFieldNames) {
-            if (whereMap.containsKey(whereColumn)) {
-                whereFieldList.add(whereMap.get(whereColumn));
+        for (String whereFieldName : whereFieldNames) {
+            if (whereMap.containsKey(whereFieldName)) {
+                whereFieldList.add(whereMap.get(whereFieldName));
             } else {
-                whereNullFieldSet.add(whereColumn);
+                whereNullFieldSet.add(whereFieldName);
             }
         }
         if (!whereNullFieldSet.isEmpty()) {
@@ -158,6 +158,16 @@ public class SqlUtil {
             sb.append("=?");
         }
         return new UpdateSqlResult<>(sb.toString(), clazz, updateFieldList.toArray(new Field[0]), whereFieldList.toArray(new Field[0]));
+    }
+
+    record Test(long id, String userName, Date createTime) {
+    }
+
+    public static void main(String[] args) {
+        InsertSqlResult<Test> insertSqlResult = toInsertSqlResult(Test.class, "t_test", field -> !field.getName().equals("id"));
+        UpdateSqlResult<Test> updateSqlResult = toUpdateSqlResult(Test.class, "t_test", field -> !field.getName().equals("id"),"id");
+        System.out.println(insertSqlResult.sql);
+        System.out.println(updateSqlResult.sql);
     }
 
 }

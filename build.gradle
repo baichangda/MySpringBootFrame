@@ -145,6 +145,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.oshi/oshi-core
     implementation group: 'com.github.oshi', name: 'oshi-core-java11', version: "+"
+
+    // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.45.2.0'
 }
 
 //把classpath添加到module path中、建立module-info.java后使用
