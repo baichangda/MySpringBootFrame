@@ -22,6 +22,10 @@ public class BaseRuntimeException extends RuntimeException {
         super(e);
     }
 
+    public static BaseRuntimeException get(String message) {
+        return new BaseRuntimeException(message);
+    }
+
     /**
      * 将异常信息转换为格式化
      * 使用方式和sl4j log一样、例如
@@ -32,11 +36,7 @@ public class BaseRuntimeException extends RuntimeException {
      * @return
      */
     public static BaseRuntimeException get(String message, Object... params) {
-        if (params.length == 0) {
-            return new BaseRuntimeException(message);
-        } else {
-            return new BaseRuntimeException(StringUtil.format(message, params));
-        }
+        return new BaseRuntimeException(StringUtil.format(message, params));
     }
 
     public static BaseRuntimeException get(Throwable e) {
