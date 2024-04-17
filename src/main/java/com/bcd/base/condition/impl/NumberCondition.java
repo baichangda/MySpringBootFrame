@@ -7,7 +7,6 @@ import com.bcd.base.condition.Condition;
  * 日期类型条件
  * 当val==null时候忽略此条件
  */
-@SuppressWarnings("unchecked")
 public class NumberCondition implements Condition {
     public final Handler handler;
     public final String fieldName;
