@@ -50,7 +50,7 @@ public class ExecutorUtil {
     }
 
     public static void shutdown(Object... args) {
-        if (args == null) {
+        if (args == null || args.length == 0) {
             return;
         }
         for (Object arg : args) {
@@ -79,7 +79,7 @@ public class ExecutorUtil {
      * @param pools
      */
     public static void shutdownThenAwait(ExecutorService... pools) {
-        if (pools == null) {
+        if (pools == null || pools.length == 0) {
             return;
         }
         try {
@@ -97,7 +97,7 @@ public class ExecutorUtil {
     }
 
     public static void awaitQueueEmpty(Queue<?>... queues) {
-        if (queues == null) {
+        if (queues == null || queues.length == 0) {
             return;
         }
         try {
@@ -112,13 +112,13 @@ public class ExecutorUtil {
     }
 
     public static void awaitThread(Thread... threads) {
-        if (threads == null) {
+        if (threads == null || threads.length == 0) {
             return;
         }
         try {
             for (Thread thread : threads) {
-                while (thread != null && thread.isAlive()) {
-                    TimeUnit.MILLISECONDS.sleep(100L);
+                if (thread != null) {
+                    thread.join();
                 }
             }
         } catch (InterruptedException e) {
