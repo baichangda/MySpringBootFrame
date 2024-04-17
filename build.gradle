@@ -51,7 +51,7 @@ idea {
 }
 
 
-configurations.all {
+configurations.configureEach {
     //去除springboot默认的logback
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     exclude module: 'logback-classic'
@@ -179,7 +179,7 @@ test {
 }
 
 //生成jar时打包源码
-task sourceJar(type: Jar) {
+tasks.register('sourceJar', Jar) {
     from sourceSets.main.java.srcDirs
     archiveClassifier.set("sources")
 }
@@ -243,7 +243,7 @@ publishing {
  */
 import java.util.regex.Matcher
 
-tasks.withType(GenerateMavenPom).all {
+tasks.withType(GenerateMavenPom).configureEach {
     doLast {
         File file = new File("${getLayout().getBuildDirectory()}/publications/maven/pom-default.xml")
         def text = file.text
