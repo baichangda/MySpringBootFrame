@@ -6,7 +6,6 @@ import com.bcd.base.util.StringUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.sql.*;
 import java.util.*;
@@ -358,11 +357,12 @@ public class Conn {
             this.userName = userName;
             this.remark = remark;
         }
+
         public Test() {
         }
     }
 
-    public static void main(String[] args) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) {
         Conn conn = new Conn("jdbc:sqlite::memory:");
 //        Conn conn = new Conn("jdbc:sqlite:test.db");
         InsertSqlResult<Test> insertSqlResult = Conn.toInsertSqlResult(Test.class, "t_test", f -> !f.getName().equals("id"));
