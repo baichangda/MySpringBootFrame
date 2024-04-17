@@ -175,7 +175,7 @@ public abstract class DataDrivenKafkaConsumer {
         workExecutor.execute(() -> {
             WorkHandler workHandler = workExecutor.workHandlerCache.remove(id);
             if (workHandler != null) {
-                workExecutor.destroy();
+                workHandler.destroy();
                 monitor_workHandlerCount.decrement();
             }
         });
