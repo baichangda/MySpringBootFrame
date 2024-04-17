@@ -4,6 +4,7 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.util.StringUtil;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -11,28 +12,63 @@ import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * 标准jdbc语法封装
+ * 主键默认为id
+ */
+@SuppressWarnings("unchecked")
 public class Conn {
-    private final static HashMap<Class<?>, Map<String, Field>> class_fields = new HashMap<>();
+    private record ClassInfo<T>(boolean isRecord, Constructor<T> constructor, LinkedHashMap<String, FieldInfo> fieldMap) {
 
-    private static Map<String, Field> getFieldMap(Class<?> clazz) {
-        if (clazz.isRecord()) {
-            throw BaseRuntimeException.getException("Record[{}] not support", clazz.getName());
-        }
-        return class_fields.computeIfAbsent(clazz, c -> {
-            Map<String, Field> map = new HashMap<>();
-            do {
-                Field[] fields = c.getDeclaredFields();
-                for (Field field : fields) {
-                    int modifiers = field.getModifiers();
-                    if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) {
-                        continue;
-                    }
-                    field.setAccessible(true);
-                    map.put(field.getName(), field);
+    }
+
+    private record FieldInfo(Field field, int index) {
+
+    }
+
+    private final static HashMap<Class<?>, ClassInfo<?>> class_info = new HashMap<>();
+
+    private static <T> ClassInfo<T> getClassInfo(Class<T> clazz) {
+        return (ClassInfo<T>) class_info.computeIfAbsent(clazz, c -> {
+            try {
+                if (clazz.isRecord()) {
+                    List<Class<?>> fieldTypeList = new ArrayList<>();
+                    LinkedHashMap<String, FieldInfo> map = new LinkedHashMap<>();
+                    do {
+                        Field[] fields = c.getDeclaredFields();
+                        int index = 0;
+                        for (Field field : fields) {
+                            int modifiers = field.getModifiers();
+                            if (Modifier.isStatic(modifiers)) {
+                                continue;
+                            }
+                            field.setAccessible(true);
+                            map.put(field.getName(), new FieldInfo(field, index++));
+                            fieldTypeList.add(field.getType());
+                        }
+                        c = c.getSuperclass();
+                    } while (c != null);
+                    return new ClassInfo<>(true, clazz.getConstructor(fieldTypeList.toArray(new Class[0])), map);
+                } else {
+                    LinkedHashMap<String, FieldInfo> map = new LinkedHashMap<>();
+                    do {
+                        Field[] fields = c.getDeclaredFields();
+                        int index = 0;
+                        for (Field field : fields) {
+                            int modifiers = field.getModifiers();
+                            if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)) {
+                                continue;
+                            }
+                            field.setAccessible(true);
+                            map.put(field.getName(), new FieldInfo(field, index++));
+                        }
+                        c = c.getSuperclass();
+                    } while (c != null);
+                    return new ClassInfo<>(false, clazz.getConstructor(), map);
                 }
-                c = c.getSuperclass();
-            } while (c != null);
-            return map;
+            } catch (NoSuchMethodException | SecurityException ex) {
+                throw BaseRuntimeException.getException(ex);
+            }
         });
     }
 
@@ -46,49 +82,73 @@ public class Conn {
         }
     }
 
-    public synchronized <T> List<T> list(String sql, Class<T> clazz, Object... args) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        PreparedStatement ps = connection.prepareStatement(sql);
-        for (int i = 0; i < args.length; i++) {
-            ps.setObject(i + 1, args[i]);
-        }
-        ResultSet rs = ps.executeQuery();
-        ResultSetMetaData metaData = rs.getMetaData();
 
-        if (clazz == Map.class) {
-            List<Map<String, Object>> list = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> map = new LinkedHashMap<>();
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    String columnName = metaData.getColumnName(i);
-                    map.put(columnName, rs.getObject(i));
-                }
-                list.add(map);
+    public synchronized <T> List<T> list(String sql, Class<T> clazz, Object... args) {
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            for (int i = 0; i < args.length; i++) {
+                ps.setObject(i + 1, args[i]);
             }
-            return (List<T>) list;
-        } else {
-            Map<String, Field> fieldMap = getFieldMap(clazz);
-            List<T> list = new ArrayList<>();
-            while (rs.next()) {
-                T t = clazz.getConstructor().newInstance();
-                for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                    String columnName = metaData.getColumnName(i);
-                    Field field = fieldMap.get(columnName);
-                    if (field != null) {
-                        field.set(t, rs.getObject(i));
+            ResultSet rs = ps.executeQuery();
+            ResultSetMetaData metaData = rs.getMetaData();
+            if (clazz == Map.class) {
+                List<Map<String, Object>> list = new ArrayList<>();
+                while (rs.next()) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                        String columnName = metaData.getColumnName(i);
+                        map.put(columnName, rs.getObject(i));
+                    }
+                    list.add(map);
+                }
+                return (List<T>) list;
+            } else {
+                List<T> list = new ArrayList<>();
+                ClassInfo<T> classInfo = getClassInfo(clazz);
+                LinkedHashMap<String, FieldInfo> fieldMap = classInfo.fieldMap;
+                if (classInfo.isRecord) {
+                    while (rs.next()) {
+                        Object[] arr = new Object[fieldMap.size()];
+                        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                            String columnName = metaData.getColumnName(i);
+                            FieldInfo fieldInfo = fieldMap.get(columnName);
+                            if (fieldInfo != null) {
+                                arr[fieldInfo.index] = rs.getObject(i);
+                            }
+                        }
+                        T t = classInfo.constructor.newInstance(arr);
+                        list.add(t);
+                    }
+                } else {
+                    while (rs.next()) {
+                        T t = classInfo.constructor.newInstance();
+                        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                            String columnName = metaData.getColumnName(i);
+                            FieldInfo fieldInfo = fieldMap.get(columnName);
+                            if (fieldInfo != null) {
+                                fieldInfo.field.set(t, rs.getObject(i));
+                            }
+                        }
+                        list.add(t);
                     }
                 }
-                list.add(t);
+                return list;
             }
-            return list;
+        } catch (Exception e) {
+            throw BaseRuntimeException.getException(e);
         }
     }
 
-    public synchronized boolean execute(String sql, Object... args) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(sql);
-        for (int i = 0; i < args.length; i++) {
-            ps.setObject(i + 1, args[i]);
+    public synchronized boolean execute(String sql, Object... args) {
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            for (int i = 0; i < args.length; i++) {
+                ps.setObject(i + 1, args[i]);
+            }
+            return ps.execute();
+        } catch (SQLException e) {
+            throw BaseRuntimeException.getException(e);
         }
-        return ps.execute();
     }
 
     /**
@@ -101,8 +161,12 @@ public class Conn {
      * @throws SQLException
      * @throws IllegalAccessException
      */
-    public synchronized <T> int insert(InsertSqlResult<T> insertSqlResult, T... ts) throws SQLException, IllegalAccessException {
-        return insertSqlResult.insertBatch(connection, ts);
+    public synchronized <T> int insert(InsertSqlResult<T> insertSqlResult, T... ts) {
+        try {
+            return insertSqlResult.insertBatch(connection, ts);
+        } catch (Exception e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     /**
@@ -115,8 +179,12 @@ public class Conn {
      * @throws SQLException
      * @throws IllegalAccessException
      */
-    public synchronized <T> int update(UpdateSqlResult<T> updateSqlResult, T... ts) throws SQLException, IllegalAccessException {
-        return updateSqlResult.updateBatch(connection, ts);
+    public synchronized <T> int update(UpdateSqlResult<T> updateSqlResult, T... ts) {
+        try {
+            return updateSqlResult.updateBatch(connection, ts);
+        } catch (Exception e) {
+            throw BaseRuntimeException.getException(e);
+        }
     }
 
     public record InsertSqlResult<T>(Class<T> clazz, String sqlPrefix, String sqlSuffix, Field[] insertFields) {
@@ -156,10 +224,10 @@ public class Conn {
      * @return
      */
     public static <T> InsertSqlResult<T> toInsertSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter) {
-        final Collection<Field> allFields = getFieldMap(clazz).values();
+        final List<Field> allFields = getClassInfo(clazz).fieldMap.values().stream().map(e -> e.field).toList();
         final List<Field> insertFieldList = new ArrayList<>();
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
+            if (!Modifier.isStatic(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 insertFieldList.add(field);
             }
         }
@@ -221,12 +289,12 @@ public class Conn {
      * @return
      */
     public static <T> UpdateSqlResult<T> toUpdateSqlResult(Class<T> clazz, String table, Function<Field, Boolean> fieldFilter, String... whereFieldNames) {
-        final Collection<Field> allFields = getFieldMap(clazz).values();
+        final List<Field> allFields = getClassInfo(clazz).fieldMap.values().stream().map(e -> e.field).toList();
         final List<Field> updateFieldList = new ArrayList<>();
         final Map<String, Field> whereMap = new HashMap<>();
         final Set<String> whereColumnSet = Set.of(whereFieldNames);
         for (Field field : allFields) {
-            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
+            if (!Modifier.isStatic(field.getModifiers()) && (fieldFilter == null || fieldFilter.apply(field))) {
                 updateFieldList.add(field);
             }
             if (whereColumnSet.contains(field.getName())) {
@@ -272,20 +340,23 @@ public class Conn {
         return new UpdateSqlResult<>(sb.toString(), updateFieldList.toArray(new Field[0]), whereFieldList.toArray(new Field[0]));
     }
 
-    public static class Test {
-        public long id;
-        public String name;
-        public String remark;
+    public record Test(long id, String name, String remark) {
 
-        public Test() {
-        }
-
-        public Test(long id, String name, String remark) {
-            this.id = id;
-            this.name = name;
-            this.remark = remark;
-        }
     }
+
+//    public static class Test {
+//        public long id;
+//        public String name;
+//        public String remark;
+//
+//        public Test(long id, String name, String remark) {
+//            this.id = id;
+//            this.name = name;
+//            this.remark = remark;
+//        }
+//        public Test() {
+//        }
+//    }
 
     public static void main(String[] args) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Conn conn = new Conn("jdbc:sqlite::memory:");
