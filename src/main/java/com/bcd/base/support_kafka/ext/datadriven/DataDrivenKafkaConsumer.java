@@ -272,6 +272,7 @@ public abstract class DataDrivenKafkaConsumer {
                         workExecutor.execute(() -> {
                             for (WorkHandler workHandler : workExecutor.workHandlerCache.values()) {
                                 workHandler.destroy();
+                                monitor_workHandlerCount.decrement();
                             }
                         });
                         workExecutor.destroy();
@@ -339,7 +340,9 @@ public abstract class DataDrivenKafkaConsumer {
                             WorkHandler workHandler = workExecutor.workHandlerCache.computeIfAbsent(id, k -> {
                                 WorkHandler temp = newHandler(id, workExecutor);
                                 temp.init();
-                                monitor_workHandlerCount.increment();
+                                if (monitor_period > 0) {
+                                    monitor_workHandlerCount.increment();
+                                }
                                 return temp;
                             });
                             workHandler.onMessage(consumerRecord);
