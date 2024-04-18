@@ -206,7 +206,7 @@ public class UserController extends BaseController {
             @RequestParam String oldPassword,
             @Parameter(description = "新密码")
             @RequestParam String newPassword) {
-        UserBean userBean = (UserBean)SaTokenUtil.getLoginUser_cache();
+        UserBean userBean = SaTokenUtil.getLoginUser_cache();
         boolean flag = userService.updatePassword(userBean.id, oldPassword, newPassword);
         if (flag) {
             return Result.success().message("修改成功");
