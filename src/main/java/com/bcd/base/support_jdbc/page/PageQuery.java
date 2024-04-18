@@ -46,7 +46,7 @@ public final class PageQuery {
      * @return
      */
     public static String toPageSql(String sql) {
-        return sql.toUpperCase().trim() + " LIMIT ?,?";
+        return sql.toLowerCase().trim() + " limit ?,?";
     }
 
     /**
@@ -56,15 +56,15 @@ public final class PageQuery {
      * @return
      */
     public static String toCountSql(String sql) {
-        String upperCase = sql.toUpperCase().trim();
-        int i1 = upperCase.indexOf("SELECT");
-        int i2 = upperCase.indexOf("FROM");
+        String upperCase = sql.toLowerCase().trim();
+        int i1 = upperCase.indexOf("select");
+        int i2 = upperCase.indexOf("from");
         if (i1 == -1 || i2 == -1) {
             throw MyException.get("toCountSql sql[{}] not support", sql);
         }
-        int i3 = upperCase.lastIndexOf("ORDER BY");
+        int i3 = upperCase.lastIndexOf("order by");
         return upperCase.substring(0, i1 + 6) +
-                " COUNT(*) " +
+                " count(*) " +
                 (i3 == -1 ? upperCase.substring(i2) : upperCase.substring(i2, i3));
     }
 
