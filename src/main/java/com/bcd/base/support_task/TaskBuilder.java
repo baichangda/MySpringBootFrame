@@ -65,7 +65,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
 
 
     public void destroy() {
-        if (pools.length > 0) {
+        if (pools != null) {
             for (ThreadPoolExecutor pool : pools) {
                 pool.shutdown();
                 try {
@@ -97,7 +97,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
                 if (runnable == null) {
                     //此时找不到任务
                     stopResults[i] = StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND;
-                }else{
+                } else {
                     logger.info("stop{},{}", ids[i], runnable.getExecutor());
                     stopResults[i] = runnable.stop();
                 }
