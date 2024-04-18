@@ -1,6 +1,6 @@
 package com.bcd.sys.util;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class MailUtil {
             consumer.accept(mimeMessageHelper);
             MailUtil.mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 

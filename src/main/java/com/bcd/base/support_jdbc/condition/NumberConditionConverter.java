@@ -2,7 +2,7 @@ package com.bcd.base.support_jdbc.condition;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NumberCondition;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.lang.reflect.Array;
@@ -75,7 +75,7 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                     sql.append(sj);
                     sql.append(")");
                 } else {
-                    throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
+                    throw MyException.get("type[{}] not support",val.getClass().getName());
                 }
                 break;
             }
@@ -92,12 +92,12 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                     sql.append(")");
                     paramList.addAll(notEmptyList);
                 } else {
-                    throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
+                    throw MyException.get("type[{}] not support",val.getClass().getName());
                 }
                 break;
             }
             default: {
-                throw BaseRuntimeException.get("handler[{}] not support",handler);
+                throw MyException.get("handler[{}] not support",handler);
             }
         }
         return new ConvertRes(sql.toString(), paramList);

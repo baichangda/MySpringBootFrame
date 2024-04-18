@@ -1,6 +1,6 @@
 package com.bcd.base.support_redis.mq.queue;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
@@ -77,7 +77,7 @@ public class RedisQueueMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default -> {
-                throw BaseRuntimeException.get("valueSerializerType [{}] not support", valueSerializerType);
+                throw MyException.get("valueSerializerType [{}] not support", valueSerializerType);
             }
         }
     }

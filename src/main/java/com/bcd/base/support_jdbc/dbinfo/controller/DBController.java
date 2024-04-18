@@ -1,7 +1,7 @@
 package com.bcd.base.support_jdbc.dbinfo.controller;
 
 import com.bcd.base.controller.BaseController;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.dbinfo.service.DBService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,7 +41,7 @@ public class DBController extends BaseController {
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 
@@ -61,7 +61,7 @@ public class DBController extends BaseController {
                 doBeforeResponseFile(fileName, response);
             });
         } catch (IOException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 }

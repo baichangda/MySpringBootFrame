@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +47,7 @@ public class DateZoneUtil {
             case 8 -> DateZoneUtil.stringToDate_day(dateStr);
             case 14 -> DateZoneUtil.stringToDate_second(dateStr);
             case 17 -> DateZoneUtil.stringToDate_millisecond(dateStr);
-            default -> throw BaseRuntimeException.get("dateStr[{}] not support", dateStr);
+            default -> throw MyException.get("dateStr[{}] not support", dateStr);
         };
     }
 

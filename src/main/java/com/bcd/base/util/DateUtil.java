@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.get("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
+                    throw MyException.get("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -108,7 +108,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.get("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
+                    throw MyException.get("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -218,7 +218,7 @@ public class DateUtil {
                 break;
             }
             default: {
-                throw BaseRuntimeException.get("[DateUtil.range],unit[{}}] Not Support!", unit.toString());
+                throw MyException.get("[DateUtil.range],unit[{}}] Not Support!", unit.toString());
             }
         }
         return returnList;
@@ -263,7 +263,7 @@ public class DateUtil {
                 return d2.getTime() - d1.getTime();
             }
             default: {
-                throw BaseRuntimeException.get("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
+                throw MyException.get("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
             }
         }
         long begin = d1.getTime();

@@ -2,7 +2,7 @@ package com.bcd.base.support_jdbc.condition;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.DateCondition;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
                 break;
             }
             default: {
-                throw BaseRuntimeException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
+                throw MyException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
             }
         }
         return new ConvertRes(sql.toString(), paramList);

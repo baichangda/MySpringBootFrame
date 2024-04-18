@@ -1,6 +1,6 @@
 package com.bcd.base.support_kafka.ext.threaddriven;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ConsumerRebalanceLogger;
 import com.bcd.base.util.ExecutorUtil;
@@ -248,7 +248,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                                             cur.close();
                                         }
                                     }
-                                    throw BaseRuntimeException.get(ex);
+                                    throw MyException.get(ex);
                                 }
                                 consumeThreads = new Thread[partitionSize];
                                 for (int i = 0; i < partitionSize; i++) {
@@ -273,7 +273,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源
                         destroy();
-                        throw BaseRuntimeException.get(ex);
+                        throw MyException.get(ex);
                     }
                 }
             }
@@ -363,7 +363,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         try {
                             TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e) {
-                            throw BaseRuntimeException.get(e);
+                            throw MyException.get(e);
                         }
                     }
                 }
@@ -409,7 +409,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         try {
                             TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e) {
-                            throw BaseRuntimeException.get(e);
+                            throw MyException.get(e);
                         }
                     }
                 }
@@ -446,7 +446,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                 }
             }
         } catch (InterruptedException ex) {
-            throw BaseRuntimeException.get(ex);
+            throw MyException.get(ex);
         }
     }
 

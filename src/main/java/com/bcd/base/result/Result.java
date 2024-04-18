@@ -1,7 +1,7 @@
 package com.bcd.base.result;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.JsonUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -86,7 +86,7 @@ public class Result<T> implements Serializable {
     public static Result<?> from(Throwable throwable) {
         Objects.requireNonNull(throwable);
         Throwable realException = ExceptionUtil.parseRealException(throwable);
-        if (realException instanceof BaseRuntimeException ex) {
+        if (realException instanceof MyException ex) {
             return Result.fail(ex.code).message(realException.getMessage());
         } else {
             return Result.fail().message(realException.getMessage());

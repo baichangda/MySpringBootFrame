@@ -2,7 +2,7 @@ package com.bcd.base.support_mongodb.condition.converter;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NumberCondition;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.lang.reflect.Array;
@@ -55,7 +55,7 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
                         }
                         criteria.in(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
@@ -68,12 +68,12 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
                         }
                         criteria.nin(notEmptyList);
                     } else {
-                        throw BaseRuntimeException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support",val.getClass().getName());
                     }
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.get("handler[{}] not support",handler);
+                    throw MyException.get("handler[{}] not support",handler);
                 }
             }
         }

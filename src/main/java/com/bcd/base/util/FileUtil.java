@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +25,7 @@ public class FileUtil {
         try {
             Files.deleteIfExists(path);
         } catch (IOException ex) {
-            throw BaseRuntimeException.get(ex);
+            throw MyException.get(ex);
         }
     }
 
@@ -42,11 +42,11 @@ public class FileUtil {
                     }
                     Files.delete(p);
                 } catch (IOException ex) {
-                    throw BaseRuntimeException.get(ex);
+                    throw MyException.get(ex);
                 }
             }
         } catch (IOException ex) {
-            throw BaseRuntimeException.get(ex);
+            throw MyException.get(ex);
         }
     }
 

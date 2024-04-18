@@ -11,19 +11,19 @@ import com.bcd.base.util.StringUtil;
  * 注意:
  * 如果是用作第一种用途,则所有继承自Throwable的方法都是针对解析出来的真实异常,解析规则参考 {@link ExceptionUtil#parseRealException}
  */
-public class BaseRuntimeException extends RuntimeException {
+public class MyException extends RuntimeException {
     public int code = 1;
 
-    private BaseRuntimeException(String message) {
+    private MyException(String message) {
         super(message);
     }
 
-    private BaseRuntimeException(Throwable e) {
+    private MyException(Throwable e) {
         super(e);
     }
 
-    public static BaseRuntimeException get(String message) {
-        return new BaseRuntimeException(message);
+    public static MyException get(String message) {
+        return new MyException(message);
     }
 
     /**
@@ -35,19 +35,19 @@ public class BaseRuntimeException extends RuntimeException {
      * @param params
      * @return
      */
-    public static BaseRuntimeException get(String message, Object... params) {
-        return new BaseRuntimeException(StringUtil.format(message, params));
+    public static MyException get(String message, Object... params) {
+        return new MyException(StringUtil.format(message, params));
     }
 
-    public static BaseRuntimeException get(Throwable e) {
-        return new BaseRuntimeException(e);
+    public static MyException get(Throwable e) {
+        return new MyException(e);
     }
 
     public static void main(String[] args) {
-        throw BaseRuntimeException.get("[{}]-[{}]", null, 100000);
+        throw MyException.get("[{}]-[{}]", null, 100000);
     }
 
-    public BaseRuntimeException code(int code) {
+    public MyException code(int code) {
         this.code = code;
         return this;
     }

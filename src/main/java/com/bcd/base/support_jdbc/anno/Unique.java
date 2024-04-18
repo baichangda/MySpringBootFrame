@@ -1,5 +1,7 @@
 package com.bcd.base.support_jdbc.anno;
 
+import com.bcd.base.exception.MyException;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,7 +30,7 @@ public @interface Unique {
 
     /**
      * 错误编码
-     * 在验证失败时候设置在{@link com.bcd.base.exception.BaseRuntimeException#code}中
+     * 在验证失败时候设置在{@link MyException#code}中
      */
     int code() default 1;
 }

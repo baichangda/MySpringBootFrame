@@ -1,7 +1,7 @@
 package com.bcd.base.support_redis.mq.topic;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.mq.ValueSerializerType;
 import com.bcd.base.util.ClassUtil;
@@ -81,7 +81,7 @@ public class RedisTopicMQ<V> {
                 return RedisUtil.newJackson2JsonRedisSerializer(parseValueJavaType());
             }
             default -> {
-                throw BaseRuntimeException.get("Not Support");
+                throw MyException.get("Not Support");
             }
         }
     }
@@ -112,7 +112,7 @@ public class RedisTopicMQ<V> {
             if (this.names.length == 1) {
                 redisTemplate.convertAndSend(this.names[0], bytes);
             } else {
-                throw BaseRuntimeException.get("Param[names] Can't Be Empty");
+                throw MyException.get("Param[names] Can't Be Empty");
             }
         } else {
             for (String name : names) {
@@ -156,7 +156,7 @@ public class RedisTopicMQ<V> {
                     try {
                         redisMessageListenerContainer.destroy();
                     } catch (Exception ex) {
-                        throw BaseRuntimeException.get(ex);
+                        throw MyException.get(ex);
                     }
                     ExecutorUtil.shutdownThenAwait(subscriptionExecutor, taskExecutor);
                     consumerAvailable = false;

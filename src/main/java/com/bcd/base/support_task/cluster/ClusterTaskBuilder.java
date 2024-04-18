@@ -1,6 +1,6 @@
 package com.bcd.base.support_task.cluster;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_task.*;
 import com.bcd.base.support_task.TaskBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -116,7 +116,7 @@ public class ClusterTaskBuilder<T extends Task<K>, K extends Serializable> exten
                     }
                 }
             } catch (InterruptedException ex) {
-                throw BaseRuntimeException.get(ex);
+                throw MyException.get(ex);
             } finally {
                 requestIdToResultMap.remove(requestId);
             }

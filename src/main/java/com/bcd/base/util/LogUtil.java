@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class LogUtil {
                             no++;
                         }
                     } catch (IOException ex) {
-                        throw BaseRuntimeException.get(ex);
+                        throw MyException.get(ex);
                     }
                 }
                 return resMap;

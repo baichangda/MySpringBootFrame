@@ -1,6 +1,6 @@
 package com.bcd.base.support_kafka.ext.datadriven;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ConsumerRebalanceLogger;
 import com.bcd.base.util.ExecutorUtil;
@@ -192,7 +192,7 @@ public abstract class DataDrivenKafkaConsumer {
         try {
             return workExecutor.submit(() -> workExecutor.workHandlerCache.get(id)).get();
         } catch (InterruptedException | ExecutionException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 
@@ -241,7 +241,7 @@ public abstract class DataDrivenKafkaConsumer {
                                             cur.close();
                                         }
                                     }
-                                    throw BaseRuntimeException.get(ex);
+                                    throw MyException.get(ex);
                                 }
                                 consumeThreads = new Thread[partitionSize];
                                 for (int i = 0; i < partitionSize; i++) {
@@ -266,7 +266,7 @@ public abstract class DataDrivenKafkaConsumer {
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源
                         destroy();
-                        throw BaseRuntimeException.get(ex);
+                        throw MyException.get(ex);
                     }
                 }
             }
@@ -374,7 +374,7 @@ public abstract class DataDrivenKafkaConsumer {
                     try {
                         TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException e) {
-                        throw BaseRuntimeException.get(e);
+                        throw MyException.get(e);
                     }
                 }
             }

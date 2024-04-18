@@ -1,7 +1,7 @@
 package com.bcd.base.support_task;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public abstract class TaskFunction<T extends Task<K>, K extends Serializable> {
         this.name = name;
         synchronized (storage) {
             if (storage.containsKey(name)) {
-                throw BaseRuntimeException.get("TaskFunction[{}] [{}] exist", name, storage.get(name));
+                throw MyException.get("TaskFunction[{}] [{}] exist", name, storage.get(name));
             } else {
                 storage.put(name, this);
             }

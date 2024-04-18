@@ -2,7 +2,7 @@ package com.bcd.base.support_mongodb.condition.converter;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NullCondition;
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 /**
@@ -24,7 +24,7 @@ public class NullConditionConverter implements Converter<NullCondition, Criteria
                 break;
             }
             default: {
-                throw BaseRuntimeException.get("[NullConditionConverter.convert],Do Not Support [" + handler + "]!");
+                throw MyException.get("[NullConditionConverter.convert],Do Not Support [" + handler + "]!");
             }
         }
         return criteria;

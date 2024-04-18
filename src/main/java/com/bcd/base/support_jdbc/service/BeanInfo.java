@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.service;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Transient;
 import com.bcd.base.support_jdbc.anno.Unique;
@@ -64,7 +64,7 @@ public final class BeanInfo<T> {
 
         Table table = clazz.getAnnotation(Table.class);
         if (table == null) {
-            throw BaseRuntimeException.get("class[{}] must has annotation @Table", clazz.getName());
+            throw MyException.get("class[{}] must has annotation @Table", clazz.getName());
         }
         tableName = table.value();
 
@@ -125,7 +125,7 @@ public final class BeanInfo<T> {
             }
             return args;
         } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 
@@ -138,14 +138,14 @@ public final class BeanInfo<T> {
             }
             return args;
         } catch (IllegalAccessException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 
     public String toColumnName(String fieldNameOrColumnName) {
         final String columnName = fieldNameOrColumnName_columnName.get(fieldNameOrColumnName);
         if (columnName == null) {
-            throw BaseRuntimeException.get("bean[{}] tableName[{}] toColumnName[{}] null", clazz.getName(), tableName, fieldNameOrColumnName);
+            throw MyException.get("bean[{}] tableName[{}] toColumnName[{}] null", clazz.getName(), tableName, fieldNameOrColumnName);
         }
         return columnName;
     }

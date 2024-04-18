@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.sql;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.util.StringUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class SqlUtil {
                     paramList.add(param);
                 }
             } catch (IllegalAccessException ex) {
-                throw BaseRuntimeException.get(ex);
+                throw MyException.get(ex);
             }
             return jdbcTemplate.batchUpdate(sql, paramList);
         }
@@ -52,7 +52,7 @@ public class SqlUtil {
                     paramList.add(param);
                 }
             } catch (IllegalAccessException ex) {
-                throw BaseRuntimeException.get(ex);
+                throw MyException.get(ex);
             }
             return jdbcTemplate.batchUpdate(sql, paramList);
         }
@@ -132,7 +132,7 @@ public class SqlUtil {
             }
         }
         if (!whereNullFieldSet.isEmpty()) {
-            throw BaseRuntimeException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
+            throw MyException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
         }
 
         final StringBuilder sb = new StringBuilder("update ");

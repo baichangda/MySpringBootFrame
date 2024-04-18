@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.code.mysql;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.code.DBSupport;
 import com.bcd.base.support_jdbc.code.TableConfig;
 import com.bcd.base.support_jdbc.code.data.BeanField;
@@ -62,7 +62,7 @@ public class MysqlDBSupport implements DBSupport {
                 return beanField;
             }
             default-> {
-                throw BaseRuntimeException.get("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.data_type);
+                throw MyException.get("pk[{},{},{}] not support", pk.table_name, pk.column_name, pk.data_type);
             }
         }
     }

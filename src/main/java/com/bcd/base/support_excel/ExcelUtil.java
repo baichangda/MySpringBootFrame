@@ -1,7 +1,6 @@
 package com.bcd.base.support_excel;
 
-import com.bcd.base.exception.BaseRuntimeException;
-import io.netty.buffer.ByteBufUtil;
+import com.bcd.base.exception.MyException;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -11,7 +10,6 @@ import org.apache.poi.xssf.usermodel.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -79,7 +77,7 @@ public class ExcelUtil {
             }
         }
         if (colNum * size != all) {
-            throw BaseRuntimeException.get("data error");
+            throw MyException.get("data error");
         }
         return new int[]{size, colNum};
     }
@@ -140,7 +138,7 @@ public class ExcelUtil {
             }
             workbook.write(os);
         } catch (IOException ex) {
-            throw BaseRuntimeException.get(ex);
+            throw MyException.get(ex);
         }
     }
 
