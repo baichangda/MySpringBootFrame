@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unchecked")
 public class SwaggerApiScanner {
 
 
@@ -233,7 +232,7 @@ public class SwaggerApiScanner {
                     String response = e.get("response").toString();
 
                     excelList.add(Arrays.asList(comment, method, path, params, response));
-                    excelList.add(Arrays.asList());
+                    excelList.add(List.of());
                 });
 
                 if (doBeforeWrite != null) {
@@ -261,16 +260,6 @@ public class SwaggerApiScanner {
         final static MyWorkbookWriteHandler1 instance = new MyWorkbookWriteHandler1();
 
         @Override
-        public void beforeWorkbookCreate() {
-
-        }
-
-        @Override
-        public void afterWorkbookCreate(WriteWorkbookHolder writeWorkbookHolder) {
-
-        }
-
-        @Override
         public void afterWorkbookDispose(WriteWorkbookHolder writeWorkbookHolder) {
             int sheetNum = writeWorkbookHolder.getCachedWorkbook().getNumberOfSheets();
             for (int i = 0; i < sheetNum; i++) {
@@ -283,16 +272,6 @@ public class SwaggerApiScanner {
 
     static class MyWorkbookWriteHandler2 implements WorkbookWriteHandler {
         final static MyWorkbookWriteHandler2 instance = new MyWorkbookWriteHandler2();
-
-        @Override
-        public void beforeWorkbookCreate() {
-
-        }
-
-        @Override
-        public void afterWorkbookCreate(WriteWorkbookHolder writeWorkbookHolder) {
-
-        }
 
         @Override
         public void afterWorkbookDispose(WriteWorkbookHolder writeWorkbookHolder) {
