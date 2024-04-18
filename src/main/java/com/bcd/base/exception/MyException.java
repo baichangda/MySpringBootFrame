@@ -9,8 +9,7 @@ import com.bcd.base.util.StringUtil;
  * 2、在业务需要出异常的时候,定义异常并且抛出
  * <p>
  * 注意:
- * 如果是用作第一种用途,则所有继承自Throwable的方法都是针对解析出来的真实异常,解析规则参考 {@link ExceptionUtil#parseR
- * ealException}
+ * 如果是用作第一种用途,则所有继承自Throwable的方法都是针对解析出来的真实异常,解析规则参考 {@link ExceptionUtil#parseRealException}
  */
 public class MyException extends RuntimeException {
     public int code = 1;
