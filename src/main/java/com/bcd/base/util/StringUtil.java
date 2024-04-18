@@ -44,7 +44,7 @@ public class StringUtil {
     }
 
     public static String camelCaseToSplitChar(String str, char splitChar) {
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         StringBuilder result = new StringBuilder();
