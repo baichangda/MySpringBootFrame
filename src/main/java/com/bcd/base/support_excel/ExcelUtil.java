@@ -12,12 +12,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ExcelUtil {
 
+    /**
+     * 判断是否是excel文件
+     * 注意xlsx是zip格式、所以zip文件也被认定为xlsx格式
+     * @param is
+     * @return
+     */
     public static boolean isExcel(InputStream is) {
         try {
             FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
@@ -34,6 +42,12 @@ public class ExcelUtil {
         }
     }
 
+    /**
+     * 判断是否是xlsx文件
+     * 注意xlsx是zip格式、所以zip文件也被认定为xlsx格式
+     * @param is
+     * @return
+     */
     public static boolean isXlsx(InputStream is) {
         try {
             FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
@@ -159,8 +173,7 @@ public class ExcelUtil {
         cell.setCellStyle(cellStyle);
     }
 
-    public static void main(String[] args) {
-        System.out.println(ByteBufUtil.hexDump("%PDF".getBytes(StandardCharsets.UTF_8)));
+    public static void main(String[] args) throws IOException {
 //        List<List<Td>> table = new ArrayList<>();
 //        final List<Td> tr1 = new ArrayList<>();
 //        final List<Td> tr2 = new ArrayList<>();
@@ -196,5 +209,9 @@ public class ExcelUtil {
 //        } catch (IOException ex) {
 //            throw BaseRuntimeException.get(ex);
 //        }
+        try(InputStream is = Files.newInputStream(Paths.get("D:\\download\\nginx-1.24.0.zip"))){
+            boolean excel = isExcel(is);
+            System.out.println(excel);
+        }
     }
 }
