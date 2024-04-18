@@ -18,6 +18,22 @@ import java.util.Map;
 
 public class ExcelUtil {
 
+    public static boolean isExcel(InputStream is) {
+        try {
+            FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
+            switch (fileMagic) {
+                case OOXML, OLE2 -> {
+                    return true;
+                }
+                default -> {
+                    return false;
+                }
+            }
+        } catch (IOException ex) {
+            return false;
+        }
+    }
+
     public static boolean isXlsx(InputStream is) {
         try {
             FileMagic fileMagic = FileMagic.valueOf(FileMagic.prepareToCheckMagic(is));
