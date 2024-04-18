@@ -170,7 +170,7 @@ public class Conn {
     public synchronized <T> int insert(InsertSqlResult<T> insertSqlResult, T... ts) {
         try {
             return insertSqlResult.insertBatch(connection, ts);
-        } catch (Exception e) {
+        } catch (SQLException | IllegalAccessException e) {
             throw MyException.get(e);
         }
     }
@@ -188,7 +188,7 @@ public class Conn {
     public synchronized <T> int update(UpdateSqlResult<T> updateSqlResult, T... ts) {
         try {
             return updateSqlResult.updateBatch(connection, ts);
-        } catch (Exception e) {
+        } catch (SQLException | IllegalAccessException e) {
             throw MyException.get(e);
         }
     }
