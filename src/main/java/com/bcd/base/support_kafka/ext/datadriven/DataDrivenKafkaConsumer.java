@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -186,6 +187,15 @@ public abstract class DataDrivenKafkaConsumer {
         });
     }
 
+    public WorkHandler getHandler(String id) {
+        WorkExecutor workExecutor = getWorkExecutor(id);
+        try {
+            return workExecutor.submit(() -> workExecutor.workHandlerCache.get(id)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw BaseRuntimeException.get(e);
+        }
+    }
+
     public void init() {
         if (!available) {
             synchronized (this) {
@@ -275,9 +285,9 @@ public abstract class DataDrivenKafkaConsumer {
                     for (WorkExecutor workExecutor : workExecutors) {
                         //先销毁所有handler
                         workExecutor.execute(() -> {
-                            for (WorkHandler workHandler : workExecutor.workHandlerCache.values()) {
-                                workHandler.destroy();
-                                monitor_workHandlerCount.decrement();
+                            Set<String> keySet = workExecutor.workHandlerCache.keySet();
+                            for (String key : keySet) {
+                                removeHandler(key);
                             }
                         });
                         workExecutor.destroy();
