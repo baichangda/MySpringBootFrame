@@ -26,6 +26,11 @@ import java.util.stream.Collectors;
 
 /**
  * 此类要求提供 kafka-client即可、不依赖spring-kafka
+ * 数据驱动模型
+ * 即消费到数据后、每一个数据将会根据{@link #id(ConsumerRecord)}、{@link #getWorkExecutor(String)}分配到固定的{@link WorkExecutor}
+ * 同时会通过{@link #newHandler(String, WorkExecutor)}构造数据对象
+ * 后续{@link WorkHandler}中所有的操作都会由分配的{@link WorkExecutor}来执行
+ * 这样做的好处是能保证{@link WorkHandler}所有方法都是线程安全的
  */
 public abstract class DataDrivenKafkaConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
