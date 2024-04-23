@@ -133,7 +133,7 @@ public class MyHandlerExceptionResolver extends AbstractHandlerExceptionResolver
     }
 
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
-        Throwable realException = ExceptionUtil.parseRealException(throwable);
+        Throwable realException = ExceptionUtil.parseException(throwable);
         Result<?> result;
         if (realException instanceof NotLoginException) {
             result = Result.fail(ExceptionCode.not_login.code).message(ExceptionCode.not_login.msg);

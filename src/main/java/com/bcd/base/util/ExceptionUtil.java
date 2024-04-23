@@ -45,7 +45,7 @@ public class ExceptionUtil {
      */
     public static void printException(Throwable throwable) {
         Objects.requireNonNull(throwable);
-        Throwable realException = parseRealException(throwable);
+        Throwable realException = parseException(throwable);
         logger.error("Error", realException);
     }
 
@@ -56,7 +56,7 @@ public class ExceptionUtil {
      */
     public static String getMessage(Throwable throwable) {
         Objects.requireNonNull(throwable);
-        Throwable realException = parseRealException(throwable);
+        Throwable realException = parseException(throwable);
         return realException.getMessage();
     }
 
@@ -69,7 +69,7 @@ public class ExceptionUtil {
      * @param throwable
      * @return
      */
-    public static Throwable parseRealException(Throwable throwable) {
+    public static Throwable parseException(Throwable throwable) {
         //1、如果异常为空,返回null
         if (throwable == null) {
             return null;
@@ -80,14 +80,14 @@ public class ExceptionUtil {
         if (realException == null) {
             //4、如果真实异常为InvocationTargetException,则获取其目标异常
             if (throwable instanceof InvocationTargetException) {
-                return parseRealException(((InvocationTargetException) throwable).getTargetException());
+                return parseException(((InvocationTargetException) throwable).getTargetException());
             } else {
                 //5、否则直接返回
                 return throwable;
             }
         } else {
             //6、如果真实异常不为当前异常,则继续解析其真实异常
-            return parseRealException(realException);
+            return parseException(realException);
         }
     }
 }

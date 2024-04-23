@@ -85,7 +85,7 @@ public class Result<T> implements Serializable {
 
     public static Result<?> from(Throwable throwable) {
         Objects.requireNonNull(throwable);
-        Throwable realException = ExceptionUtil.parseRealException(throwable);
+        Throwable realException = ExceptionUtil.parseException(throwable);
         if (realException instanceof MyException ex) {
             return Result.fail(ex.code).message(realException.getMessage());
         } else {

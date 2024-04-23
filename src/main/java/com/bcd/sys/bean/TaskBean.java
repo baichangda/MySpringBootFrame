@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Lazy;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
@@ -108,7 +107,7 @@ public class TaskBean extends SuperBaseBean implements Task<Long> {
     @Override
     public void onFailed(Exception ex) {
         finishTime = new Date();
-        Throwable realException = ExceptionUtil.parseRealException(ex);
+        Throwable realException = ExceptionUtil.parseException(ex);
         message = ExceptionUtil.getMessage(realException);
         stackMessage = ExceptionUtil.getStackTraceMessage(realException);
     }
