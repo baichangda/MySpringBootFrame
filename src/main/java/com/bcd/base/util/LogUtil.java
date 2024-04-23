@@ -18,6 +18,13 @@ import java.util.stream.Collectors;
 public class LogUtil {
     public final static ConcurrentHashMap<Class<?>, HashMap<String, Integer>> class_fieldName_lineNo = new ConcurrentHashMap<>();
 
+    /**
+     * 获取指定类指定字段的行号
+     *
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
     public static String getFieldStackTrace(Class<?> clazz, String fieldName) {
         final Class<?>[] nestMembers = clazz.getNestMembers();
         final Class<?> topClass = nestMembers[0];

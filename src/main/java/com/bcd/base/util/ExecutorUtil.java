@@ -49,6 +49,13 @@ public class ExecutorUtil {
         }
     }
 
+    /**
+     * 关闭资源、包括如下情况
+     * 1、关闭线程池、等待线程执行完毕
+     * 2、关闭队列、等待队列为空
+     * 3、关闭线程、等待线程执行完毕
+     * @param args
+     */
     public static void shutdown(Object... args) {
         if (args == null || args.length == 0) {
             return;
@@ -76,6 +83,7 @@ public class ExecutorUtil {
 
 
     /**
+     * 关闭线程池并等待线程执行完毕
      * @param pools
      */
     public static void shutdownThenAwait(ExecutorService... pools) {
@@ -96,6 +104,10 @@ public class ExecutorUtil {
         }
     }
 
+    /**
+     * 等待队列为空
+     * @param queues
+     */
     public static void awaitQueueEmpty(Queue<?>... queues) {
         if (queues == null || queues.length == 0) {
             return;
@@ -111,6 +123,10 @@ public class ExecutorUtil {
         }
     }
 
+    /**
+     * 等待线程执行完毕
+     * @param threads
+     */
     public static void awaitThread(Thread... threads) {
         if (threads == null || threads.length == 0) {
             return;

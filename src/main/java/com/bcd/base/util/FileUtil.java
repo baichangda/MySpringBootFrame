@@ -29,6 +29,11 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 递归删除文件夹
+     *
+     * @param path
+     */
     public static void clearDirRecursion(Path path) {
         if (Files.notExists(path) || !Files.isDirectory(path)) {
             return;

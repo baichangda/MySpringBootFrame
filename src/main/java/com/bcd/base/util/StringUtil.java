@@ -43,6 +43,12 @@ public class StringUtil {
         return result.toString();
     }
 
+    /**
+     * 将驼峰格式字符串转换为分隔符格式
+     * @param str
+     * @param splitChar
+     * @return
+     */
     public static String camelCaseToSplitChar(String str, char splitChar) {
         if (str == null || str.isEmpty()) {
             return str;

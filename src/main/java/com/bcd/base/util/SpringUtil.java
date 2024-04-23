@@ -25,6 +25,12 @@ public class SpringUtil implements ApplicationListener<ContextRefreshedEvent> {
         applicationContext = event.getApplicationContext();
     }
 
+    /**
+     * 获取spring.yml中指定key的节点
+     * @param keys
+     * @return
+     * @throws IOException
+     */
     public static JsonNode[] getSpringPropsInYml(String... keys) throws IOException {
         YAMLMapper yamlMapper = YAMLMapper.builder().build();
         final JsonNode base = yamlMapper.readTree(new File(SPRING_PROPERTIES_PATH));

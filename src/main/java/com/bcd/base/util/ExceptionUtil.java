@@ -49,6 +49,11 @@ public class ExceptionUtil {
         logger.error("Error", realException);
     }
 
+    /**
+     * 获取异常的信息
+     * @param throwable
+     * @return
+     */
     public static String getMessage(Throwable throwable) {
         Objects.requireNonNull(throwable);
         Throwable realException = parseRealException(throwable);
