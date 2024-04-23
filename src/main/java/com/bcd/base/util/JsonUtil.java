@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Administrator on 2017/5/12.
  */
 public class JsonUtil {
-    public final static ObjectMapper INSTANCE = withConfig(new ObjectMapper());
+    public final static ObjectMapper OBJECT_MAPPER = withConfig(new ObjectMapper());
 
 
     public static JavaType getJavaType(Type type) {
@@ -84,7 +84,7 @@ public class JsonUtil {
      */
     public static String toJson(Object object) {
         try {
-            return INSTANCE.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw MyException.get(e);
         }
@@ -94,7 +94,7 @@ public class JsonUtil {
         byte[] bytes = new byte[]{1, -1, 3};
         String json = JsonUtil.toJson(bytes);
         System.out.println(json);
-        byte[] bytes1 = JsonUtil.INSTANCE.readValue(json, byte[].class);
+        byte[] bytes1 = JsonUtil.OBJECT_MAPPER.readValue(json, byte[].class);
     }
 
 }

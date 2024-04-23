@@ -23,6 +23,6 @@ public class ListenerInfo {
     }
 
     public static ListenerInfo fromString(String str) throws IOException {
-        return JsonUtil.INSTANCE.readValue(str, ListenerInfo.class);
+        return JsonUtil.OBJECT_MAPPER.readValue(str, ListenerInfo.class);
     }
 }
