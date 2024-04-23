@@ -206,6 +206,11 @@ public class RpnUtil {
         return sb.toString();
     }
 
+    /**
+     * 转换为算数表达式
+     * @param eles
+     * @return
+     */
     public static String toExpr(Ele[] eles) {
         if (eles == null || eles.length==0) {
             throw new IllegalArgumentException("param[eles] must not be null or empty");
