@@ -25,7 +25,6 @@ import java.util.Optional;
 public class AnonController extends BaseController {
     Logger logger = LoggerFactory.getLogger(AnonController.class);
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
     @Operation(summary = "获取公钥")
     @ApiResponse(responseCode = "200", description = "公钥信息")
@@ -33,7 +32,6 @@ public class AnonController extends BaseController {
         return Result.success(KeysConst.PUBLIC_KEY_BASE64);
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/getCookie", method = RequestMethod.GET)
     @Operation(summary = "获取cookie")
     @ApiResponse(responseCode = "200", description = "当前浏览器的cookie")

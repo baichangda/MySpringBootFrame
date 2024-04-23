@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 import java.util.List;
 
-@SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/sys/user")
 @Tag(name = "用户-UserController")
