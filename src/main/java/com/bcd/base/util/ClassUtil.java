@@ -19,6 +19,12 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class ClassUtil {
+    /**
+     * 从指定类开始向上找，直到指定类结束
+     * @param startClass
+     * @param endClasses
+     * @return
+     */
     public static Type getParentUntil(Class<?> startClass, Class<?>... endClasses) {
         Type parentType = startClass.getGenericSuperclass();
         while (true) {
@@ -186,6 +192,11 @@ public class ClassUtil {
         }
     }
 
+    /**
+     * 判断类型是否是基本类型或基本类型的包装类型
+     * @param clazz
+     * @return
+     */
     public static boolean isPrimitiveWrapper(Class<?> clazz) {
         try {
             final Field field = clazz.getField("TYPE");
@@ -221,5 +232,10 @@ public class ClassUtil {
         } else {
             return true;
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(isPrimitiveWrapper(Integer.class));
+        System.out.println(isPrimitiveWrapper(int.class));
     }
 }
