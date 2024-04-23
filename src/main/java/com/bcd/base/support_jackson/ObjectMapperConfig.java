@@ -10,7 +10,7 @@ public class ObjectMapperConfig {
 
     @Bean
     public ObjectMapper objectMapper(){
-        return JsonUtil.GLOBAL_OBJECT_MAPPER;
+        return JsonUtil.INSTANCE;
     }
 
 }

@@ -17,10 +17,8 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/5/12.
  */
-@SuppressWarnings("unchecked")
 public class JsonUtil {
-    //此空过滤器必须定义在全局 GLOBAL_OBJECT_MAPPER 之前
-    public final static ObjectMapper GLOBAL_OBJECT_MAPPER = withConfig(new ObjectMapper());
+    public final static ObjectMapper INSTANCE = withConfig(new ObjectMapper());
 
 
     public static JavaType getJavaType(Type type) {
@@ -86,7 +84,7 @@ public class JsonUtil {
      */
     public static String toJson(Object object) {
         try {
-            return GLOBAL_OBJECT_MAPPER.writeValueAsString(object);
+            return INSTANCE.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw MyException.get(e);
         }
@@ -96,7 +94,7 @@ public class JsonUtil {
         byte[] bytes = new byte[]{1, -1, 3};
         String json = JsonUtil.toJson(bytes);
         System.out.println(json);
-        byte[] bytes1 = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(json, byte[].class);
+        byte[] bytes1 = JsonUtil.INSTANCE.readValue(json, byte[].class);
     }
 
 }

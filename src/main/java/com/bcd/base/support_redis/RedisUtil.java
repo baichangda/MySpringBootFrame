@@ -70,9 +70,9 @@ public class RedisUtil {
     public static <V> Jackson2JsonRedisSerializer<V> newJackson2JsonRedisSerializer(Type type) {
         Jackson2JsonRedisSerializer<V> redisSerializer;
         if (type instanceof Class) {
-            redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.GLOBAL_OBJECT_MAPPER, (Class<V>) type);
+            redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.INSTANCE, (Class<V>) type);
         } else if (type instanceof JavaType) {
-            redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.GLOBAL_OBJECT_MAPPER, (JavaType) type);
+            redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.INSTANCE, (JavaType) type);
         } else {
             throw MyException.get("Param Type[{0}] Not Support", type.getTypeName());
         }
