@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import ${packagePre}.bean.${moduleName?cap_first}Bean;
 import ${packagePre}.service.${moduleName?cap_first}Service;
 
-@SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api${requestMappingPre}/${moduleName?uncap_first}")
 @Tag(name = "${moduleNameCN}-${moduleName?cap_first}Controller")
