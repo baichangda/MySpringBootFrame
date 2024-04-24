@@ -30,17 +30,16 @@ spring:
     hikari:
       minimum-idle: 5
       maximum-pool-size: 15
-
     #mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.23.128:3306/bcd?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true&allowPublicKeyRetrieval=True
+    url: jdbc:mysql://192.168.23.129:3306/bcd?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=GMT%2B8&generateSimpleParameterMetadata=true&allowPublicKeyRetrieval=True
     username: root
     password: bcd
-    #pgsql
-  #    driver-class-name: org.postgresql.Driver
-  #    url: jdbc:postgresql://127.0.0.1:5432/msbf
-  #    username: root
-  #    password: 123456
+    #pgsql:
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://127.0.0.1:5432/msbf
+#    username: root
+#    password: 123456
 
   #  jdbcTemplate配置
   jdbc:
@@ -50,7 +49,7 @@ spring:
       query-timeout:
   data:
     #mongodb配置
-    mongodb.uri: mongodb://bcd:bcd@192.168.23.128:27017/bcd
+    mongodb.uri: mongodb://bcd:bcd@192.168.23.129:27017/bcd
     #redis配置
     #如果都进行了配置,加载的先后顺序为:
     #sentinel>cluster>single
@@ -79,15 +78,15 @@ spring:
       cluster:
         maxRedirects: 3
         nodes:
-          - 192.168.23.128:7001
-          - 192.168.23.128:7002
-          - 192.168.23.128:7003
-          - 192.168.23.128:7004
-          - 192.168.23.128:7005
-          - 192.168.23.128:7006
+          - 192.168.23.129:7001
+          - 192.168.23.129:7002
+          - 192.168.23.129:7003
+          - 192.168.23.129:7004
+          - 192.168.23.129:7005
+          - 192.168.23.129:7006
 
       #单机配置
-#      host: 192.168.23.128
+#      host: 192.168.23.129
 #      port: 6379
 
   #  kafka配置
