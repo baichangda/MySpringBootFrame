@@ -18,7 +18,7 @@
 - 可以使用代码生成器com.bcd.base.support_mongodb.service.CodeGenerator
 
 ### json(jackson)
-- ObjectMapper使用全局静态变量JsonUtil.GLOBAL_OBJECT_MAPPER
+- ObjectMapper使用全局静态变量JsonUtil.OBJECT_MAPPER
 
 ### redis(spring redis)
 - 内部使用lettuce异步客户端
