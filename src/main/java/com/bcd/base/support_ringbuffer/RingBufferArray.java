@@ -1,5 +1,6 @@
 package com.bcd.base.support_ringbuffer;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -119,9 +120,7 @@ public class RingBufferArray<T> {
             ringBufferArray.addAll(new Integer[]{7, 8, 9});
             ringBufferArray.addAll(new Integer[]{10, 11});
             ArrayList<Integer> list = ringBufferArray.content();
-//            for (Object integer : list) {
-//                System.out.print(integer);
-//            }
+//            System.out.println(Arrays.toString(arr));
         }
         System.out.println(System.currentTimeMillis() - t1);
 
