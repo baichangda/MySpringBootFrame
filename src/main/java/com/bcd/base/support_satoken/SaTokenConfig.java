@@ -60,19 +60,15 @@ public class SaTokenConfig implements WebMvcConfigurer, ApplicationListener<Cont
             // 校验 @SaCheckRequestMappingUrl 注解
             final SaCheckRequestMappingUrl saCheckRequestMappingUrl = method.getAnnotation(SaCheckRequestMappingUrl.class);
             if (saCheckRequestMappingUrl != null) {
-                Class clazz = method.getDeclaringClass();
-                RequestMapping classRequestMapping = (RequestMapping) clazz.getAnnotation(RequestMapping.class);
+                Class<?> clazz = method.getDeclaringClass();
+                RequestMapping classRequestMapping = clazz.getAnnotation(RequestMapping.class);
                 RequestMapping methodRequestMapping = method.getAnnotation(RequestMapping.class);
 
                 String[] classUrls = classRequestMapping.value();
                 String[] methodUrls = methodRequestMapping.value();
 
                 Set<String> permissionSet = new HashSet<>();
-                Arrays.stream(classUrls).forEach(e1 -> {
-                    Arrays.stream(methodUrls).forEach(e2 -> {
-                        permissionSet.add(e1 + e2);
-                    });
-                });
+                Arrays.stream(classUrls).forEach(e1 -> Arrays.stream(methodUrls).forEach(e2 -> permissionSet.add(e1 + e2)));
 
                 SaManager.getStpLogic(saCheckRequestMappingUrl.type(), false).checkPermissionOr(permissionSet.toArray(new String[0]));
             }
