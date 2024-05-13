@@ -126,7 +126,7 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
-    implementation group: 'com.mysql', name: 'mysql-connector-j', version: "+"
+    runtimeOnly group: 'com.mysql', name: 'mysql-connector-j', version: "+"
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
     runtimeOnly group: 'org.postgresql', name: 'postgresql', version: "42.+"
 
