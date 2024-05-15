@@ -191,7 +191,7 @@ public class CodeGenerator {
 
         Map<String, BeanField> beanFieldMap = fieldList.stream().map(f -> {
             String fieldName = f.getName();
-            Class fieldType = f.getType();
+            Class<?> fieldType = f.getType();
             BeanField beanField = new BeanField();
             beanField.name = fieldName;
             beanField.type = fieldType.getSimpleName();

@@ -16,7 +16,7 @@ public class CollectionConfig {
     //模块名(中文)
     public String moduleNameCN;
     //类名
-    public Class clazz;
+    public Class<?> clazz;
     //是否创建repository文件(默认是)
     public boolean needCreateRepositoryFile = true;
     //是否创建service文件(默认是)
@@ -26,7 +26,7 @@ public class CollectionConfig {
     //是否需要加上controller save方法的验证注解
     public boolean needValidateSaveParam = false;
 
-    public CollectionConfig(String moduleName, String moduleNameCN, Class clazz) {
+    public CollectionConfig(String moduleName, String moduleNameCN, Class<?> clazz) {
         this.moduleName = moduleName;
         this.moduleNameCN = moduleNameCN;
         this.clazz = clazz;
@@ -52,7 +52,7 @@ public class CollectionConfig {
         targetDirPath = Paths.get(beanPath).getParent().toString();
     }
 
-    public CollectionConfig setClazz(Class clazz) {
+    public CollectionConfig setClazz(Class<?> clazz) {
         this.clazz = clazz;
         parseTargetDirPath();
         return this;
