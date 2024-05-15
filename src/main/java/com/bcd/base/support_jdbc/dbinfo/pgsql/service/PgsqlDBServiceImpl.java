@@ -2,6 +2,7 @@ package com.bcd.base.support_jdbc.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.handler.AbstractSheetWriteHandler;
+import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.base.exception.MyException;
@@ -52,8 +53,8 @@ public class PgsqlDBServiceImpl implements DBService {
     }
 
     public void exportDBDesignerExcel(Connection connection, String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
-        List<List> dataList = new ArrayList<>();
-        List emptyList = new ArrayList();
+        List<List<Object>> dataList = new ArrayList<>();
+        List<Object> emptyList = new ArrayList<>();
         for (int i = 0; i <= headArr.length - 1; i++) {
             emptyList.add("");
         }
@@ -65,13 +66,12 @@ public class PgsqlDBServiceImpl implements DBService {
                 continue;
             }
             String tableComment = table.table_comment;
-            List define = new ArrayList();
-            List head = new ArrayList();
+            List<Object> define = new ArrayList<>();
             define.add(tableName + "(" + tableComment + ")");
             for (int i = 1; i <= headArr.length - define.size(); i++) {
                 define.add("");
             }
-            head.addAll(Arrays.asList(headArr));
+            List<Object> head = new ArrayList<>(Arrays.asList(headArr));
 
             List<ColumnsBean> columnsList = DBInfoUtil.findColumns(
                     connection, dbName, tableName
@@ -80,7 +80,7 @@ public class PgsqlDBServiceImpl implements DBService {
             dataList.add(define);
             dataList.add(head);
             columnsList.forEach(column -> {
-                List data = new ArrayList();
+                List<Object> data = new ArrayList<>();
                 data.add(column.column_name);
                 if (column.udt_name.equals("varchar")) {
                     data.add(column.udt_name + "(" + column.character_maximum_length + ")");
@@ -99,10 +99,9 @@ public class PgsqlDBServiceImpl implements DBService {
             doBeforeWrite.run();
         }
 
-        EasyExcel.write(os).sheet(0).registerWriteHandler(new AbstractSheetWriteHandler(){
+        EasyExcel.write(os).sheet(0).registerWriteHandler(new SheetWriteHandler(){
             @Override
             public void afterSheetCreate(WriteWorkbookHolder writeWorkbookHolder, WriteSheetHolder writeSheetHolder) {
-                super.afterSheetCreate(writeWorkbookHolder, writeSheetHolder);
                 applyStyleToSheet(writeSheetHolder.getCachedSheet());
             }
         }).doWrite(dataList);
