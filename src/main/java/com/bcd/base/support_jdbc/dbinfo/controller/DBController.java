@@ -28,7 +28,6 @@ public class DBController extends BaseController {
     @Autowired(required = false)
     private DBService dbService;
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/exportSpringDBDesignerExcel", method = RequestMethod.GET)
     @Operation(summary = "导出spring数据库设计")
     @ApiResponse(responseCode = "200", description = "导出结果")
@@ -45,7 +44,6 @@ public class DBController extends BaseController {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @RequestMapping(value = "/exportDBDesignerExcel", method = RequestMethod.GET)
     @Operation(summary = "导出数据库设计")
     @ApiResponse(responseCode = "200", description = "导出结果")
