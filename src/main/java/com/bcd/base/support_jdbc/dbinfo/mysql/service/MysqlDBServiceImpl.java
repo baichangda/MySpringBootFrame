@@ -1,18 +1,14 @@
 package com.bcd.base.support_jdbc.dbinfo.mysql.service;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.metadata.Head;
-import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
-import com.alibaba.excel.write.metadata.holder.WriteTableHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
 import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_jdbc.dbinfo.mysql.bean.TablesBean;
 import com.bcd.base.support_jdbc.dbinfo.mysql.util.DBInfoUtil;
 import com.bcd.base.support_jdbc.dbinfo.service.DBService;
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "com.mysql.cj.jdbc.Driver")
 @Service
 public class MysqlDBServiceImpl implements DBService {

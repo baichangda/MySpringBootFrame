@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 @ConditionalOnProperty(value = "spring.datasource.driver-class-name", havingValue = "org.postgresql.Driver")
 @Service
 public class PgsqlDBServiceImpl implements DBService {
