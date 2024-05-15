@@ -10,13 +10,12 @@ import java.util.Collections;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class NullConditionConverter implements Converter<NullCondition, ConvertRes> {
     @Override
     public ConvertRes convert(NullCondition condition, Object... exts) {
         final String fieldName = condition.fieldName;
         final NullCondition.Handler handler = condition.handler;
-        final BeanInfo beanInfo = (BeanInfo)exts[0];
+        final BeanInfo<?> beanInfo = (BeanInfo<?>)exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         switch (handler) {

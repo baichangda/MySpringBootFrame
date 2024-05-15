@@ -11,7 +11,6 @@ import java.util.*;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class NumberConditionConverter implements Converter<NumberCondition, ConvertRes> {
     @Override
     public ConvertRes convert(NumberCondition condition, Object... exts) {
@@ -21,7 +20,7 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
         }
         final String fieldName = condition.fieldName;
         final NumberCondition.Handler handler = condition.handler;
-        final BeanInfo beanInfo = (BeanInfo) exts[0];
+        final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         List<Object> paramList = new ArrayList<>();
@@ -80,17 +79,17 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                 break;
             }
             case NOT_IN: {
-                if (val instanceof Collection) {
-                    List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(Objects::nonNull).toList();
+                if (val.getClass().isArray()) {
+                    int length = Array.getLength(val);
                     sql.append(columnName);
                     sql.append(" not in (");
                     StringJoiner sj = new StringJoiner(",");
-                    for (int i = 0; i < notEmptyList.size(); i++) {
+                    for (int i = 0; i < length; i++) {
                         sj.add("?");
+                        paramList.add(Array.get(val, i));
                     }
                     sql.append(sj);
                     sql.append(")");
-                    paramList.addAll(notEmptyList);
                 } else {
                     throw MyException.get("type[{}] not support",val.getClass().getName());
                 }

@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class DateConditionConverter implements Converter<DateCondition, ConvertRes> {
     @Override
     public ConvertRes convert(DateCondition condition, Object... exts) {
@@ -22,7 +21,7 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
         }
         final String fieldName = condition.fieldName;
         final DateCondition.Handler handler = condition.handler;
-        final BeanInfo beanInfo = (BeanInfo) exts[0];
+        final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         List<Object> paramList = new ArrayList<>();

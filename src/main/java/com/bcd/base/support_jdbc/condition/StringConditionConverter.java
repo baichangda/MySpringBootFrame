@@ -25,7 +25,7 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
         }
         final String fieldName = condition.fieldName;
         final StringCondition.Handler handler = condition.handler;
-        final BeanInfo beanInfo = (BeanInfo) exts[0];
+        final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
         StringBuilder sql = new StringBuilder();
         List<Object> paramList = new ArrayList<>();
@@ -78,16 +78,16 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
             }
             case NOT_IN: {
                 if (val.getClass().isArray()) {
-                    List<Object> notEmptyList = ((Collection<Object>) val).stream().filter(e -> e != null && !e.toString().isEmpty()).collect(Collectors.toList());
+                    int length = Array.getLength(val);
                     sql.append(columnName);
                     sql.append(" not in (");
                     StringJoiner sj = new StringJoiner(",");
-                    for (int i = 0; i < notEmptyList.size(); i++) {
+                    for (int i = 0; i < length; i++) {
                         sj.add("?");
+                        paramList.add(Array.get(val, i));
                     }
                     sql.append(sj);
                     sql.append(")");
-                    paramList.addAll(notEmptyList);
                 } else {
                     throw MyException.get("type[{}] not support",val.getClass().getName());
                 }
