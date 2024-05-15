@@ -589,10 +589,10 @@ public class BaseService<T extends SuperBaseBean> {
             paramList.add(limit);
         }
 
-        if (!paramList.isEmpty()) {
-            return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(info.clazz), paramList.toArray());
-        } else {
+        if (paramList.isEmpty()) {
             return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(info.clazz));
+        } else {
+            return getJdbcTemplate().query(sql.toString(), new BeanPropertyRowMapper<>(info.clazz), paramList.toArray());
         }
     }
 

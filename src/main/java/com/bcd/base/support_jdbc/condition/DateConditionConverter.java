@@ -23,64 +23,54 @@ public class DateConditionConverter implements Converter<DateCondition, ConvertR
         final DateCondition.Handler handler = condition.handler;
         final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
-        StringBuilder sql = new StringBuilder();
-        List<Object> paramList = new ArrayList<>();
         switch (handler) {
             case EQUAL: {
-                paramList.add(val);
-                sql.append(columnName);
-                sql.append("=?");
-                break;
+                return new ConvertRes(columnName + "=?", new ArrayList<>(List.of(val)));
             }
             case LE: {
-                paramList.add(val);
-                sql.append(columnName);
-                sql.append("<=?");
-                break;
+                return new ConvertRes(columnName + "<=?", new ArrayList<>(List.of(val)));
             }
             case LT: {
-                paramList.add(val);
-                sql.append(columnName);
-                sql.append("<?");
-                break;
+                return new ConvertRes(columnName + "<?", new ArrayList<>(List.of(val)));
             }
             case GE: {
-                paramList.add(val);
-                sql.append(columnName);
-                sql.append(">=?");
-                break;
+                return new ConvertRes(columnName + ">=?", new ArrayList<>(List.of(val)));
             }
             case GT: {
-                paramList.add(val);
-                sql.append(columnName);
-                sql.append(">?");
-                break;
+                return new ConvertRes(columnName + ">?", new ArrayList<>(List.of(val)));
             }
             case BETWEEN: {
                 final Date[] dates = (Date[]) val;
                 if (dates[0] != null && dates[1] != null) {
-                    paramList.addAll(List.of(dates));
+                    StringBuilder sql = new StringBuilder();
+                    List<Object> paramList = new ArrayList<>(List.of(dates));
                     sql.append(columnName);
                     sql.append(">=? AND ");
                     sql.append(columnName);
                     sql.append("<?");
+                    return new ConvertRes(sql.toString(), paramList);
                 } else if (dates[0] != null) {
+                    StringBuilder sql = new StringBuilder();
+                    List<Object> paramList = new ArrayList<>();
                     paramList.add(dates[0]);
                     sql.append(columnName);
                     sql.append(">=?");
+                    return new ConvertRes(sql.toString(), paramList);
                 } else if (dates[1] != null) {
+                    StringBuilder sql = new StringBuilder();
+                    List<Object> paramList = new ArrayList<>();
                     paramList.add(dates[1]);
                     sql.append(columnName);
                     sql.append("<?");
+                    return new ConvertRes(sql.toString(), paramList);
                 } else {
                     return null;
                 }
-                break;
             }
             default: {
                 throw MyException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
             }
         }
-        return new ConvertRes(sql.toString(), paramList);
+
     }
 }

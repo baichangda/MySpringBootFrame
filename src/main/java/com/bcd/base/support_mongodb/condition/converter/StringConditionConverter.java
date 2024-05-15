@@ -21,62 +21,68 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
         String fieldName = condition.fieldName;
         Object val = condition.val;
         StringCondition.Handler handler = condition.handler;
-        Criteria criteria = null;
-        if (val != null) {
-            criteria = Criteria.where(fieldName);
-            switch (handler){
+        if (val == null) {
+            return null;
+        } else {
+            switch (handler) {
                 case EQUAL: {
-                    criteria.is(val);
-                    break;
+                    return Criteria.where(fieldName).is(val);
                 }
                 case NOT_EQUAL: {
-                    criteria.ne(val);
-                    break;
+                    return Criteria.where(fieldName).ne(val);
                 }
                 case ALL_LIKE: {
-                    criteria.regex(".*(" + val + ").*");
-                    break;
+                    return Criteria.where(fieldName).regex(".*(" + val + ").*");
                 }
                 case LEFT_LIKE: {
-                    criteria.regex("^(" + val + ")");
-                    break;
+                    return Criteria.where(fieldName).regex("^(" + val + ")");
                 }
                 case RIGHT_LIKE: {
-                    criteria.regex("(" + val + ")$");
-                    break;
+                    return Criteria.where(fieldName).regex("(" + val + ")$");
                 }
                 case IN: {
                     if (val.getClass().isArray()) {
-                        List<Object> notEmptyList =new ArrayList<>();
+                        List<Object> list = new ArrayList<>();
                         int length = Array.getLength(val);
                         for (int i = 0; i < length; i++) {
-                            notEmptyList.add(Array.get(val, i));
+                            Object o = Array.get(val, i);
+                            if (o != null) {
+                                list.add(o);
+                            }
                         }
-                        criteria.in(notEmptyList);
+                        if (list.isEmpty()) {
+                            return null;
+                        } else {
+                            return Criteria.where(fieldName).in(list);
+                        }
                     } else {
-                        throw MyException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support", val.getClass().getName());
                     }
-                    break;
                 }
                 case NOT_IN: {
                     if (val.getClass().isArray()) {
-                        List<Object> notEmptyList =new ArrayList<>();
+                        List<Object> list = new ArrayList<>();
                         int length = Array.getLength(val);
                         for (int i = 0; i < length; i++) {
-                            notEmptyList.add(Array.get(val, i));
+                            Object o = Array.get(val, i);
+                            if (o != null) {
+                                list.add(o);
+                            }
                         }
-                        criteria.nin(notEmptyList);
+                        if (list.isEmpty()) {
+                            return null;
+                        } else {
+                            return Criteria.where(fieldName).nin(list);
+                        }
                     } else {
-                        throw MyException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support", val.getClass().getName());
                     }
-                    break;
                 }
                 default: {
-                    throw MyException.get("handler[{}] not support",handler);
+                    throw MyException.get("handler[{}] not support", handler);
                 }
             }
         }
-        return criteria;
     }
 
     public static void main(String[] args) {

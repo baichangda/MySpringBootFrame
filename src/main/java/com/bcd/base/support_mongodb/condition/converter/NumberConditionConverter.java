@@ -6,7 +6,8 @@ import com.bcd.base.exception.MyException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -18,65 +19,70 @@ public class NumberConditionConverter implements Converter<NumberCondition, Crit
         String fieldName = condition.fieldName;
         Object val = condition.val;
         NumberCondition.Handler handler = condition.handler;
-        Criteria criteria = null;
-        if (val != null) {
-            criteria = Criteria.where(fieldName);
+        if (val == null) {
+            return null;
+        } else {
             switch (handler) {
                 case EQUAL: {
-                    criteria.is(val);
-                    break;
+                    return Criteria.where(fieldName).is(val);
                 }
                 case LT: {
-                    criteria.lt(val);
-                    break;
+                    return Criteria.where(fieldName).lt(val);
                 }
                 case LE: {
-                    criteria.lte(val);
-                    break;
+                    return Criteria.where(fieldName).lte(val);
                 }
                 case GT: {
-                    criteria.gt(val);
-                    break;
+                    return Criteria.where(fieldName).gt(val);
                 }
                 case GE: {
-                    criteria.gte(val);
-                    break;
+                    return Criteria.where(fieldName).gte(val);
                 }
                 case NOT_EQUAL: {
-                    criteria.ne(val);
-                    break;
+                    return Criteria.where(fieldName).ne(val);
                 }
                 case IN: {
                     if (val.getClass().isArray()) {
-                        List<Object> notEmptyList =new ArrayList<>();
+                        List<Object> list = new ArrayList<>();
                         int length = Array.getLength(val);
                         for (int i = 0; i < length; i++) {
-                            notEmptyList.add(Array.get(val, i));
+                            Object o = Array.get(val, i);
+                            if (o != null) {
+                                list.add(o);
+                            }
                         }
-                        criteria.in(notEmptyList);
+                        if (list.isEmpty()) {
+                            return null;
+                        } else {
+                            return Criteria.where(fieldName).in(list);
+                        }
                     } else {
-                        throw MyException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support", val.getClass().getName());
                     }
-                    break;
                 }
                 case NOT_IN: {
                     if (val.getClass().isArray()) {
-                        List<Object> notEmptyList =new ArrayList<>();
+                        List<Object> list = new ArrayList<>();
                         int length = Array.getLength(val);
                         for (int i = 0; i < length; i++) {
-                            notEmptyList.add(Array.get(val, i));
+                            Object o = Array.get(val, i);
+                            if (o != null) {
+                                list.add(o);
+                            }
                         }
-                        criteria.nin(notEmptyList);
+                        if (list.isEmpty()) {
+                            return null;
+                        } else {
+                            return Criteria.where(fieldName).nin(list);
+                        }
                     } else {
-                        throw MyException.get("type[{}] not support",val.getClass().getName());
+                        throw MyException.get("type[{}] not support", val.getClass().getName());
                     }
-                    break;
                 }
                 default: {
-                    throw MyException.get("handler[{}] not support",handler);
+                    throw MyException.get("handler[{}] not support", handler);
                 }
             }
         }
-        return criteria;
     }
 }

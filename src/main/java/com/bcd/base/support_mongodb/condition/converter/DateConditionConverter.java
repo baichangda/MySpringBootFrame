@@ -17,53 +17,43 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
         String fieldName = condition.fieldName;
         Object val = condition.val;
         DateCondition.Handler handler = condition.handler;
-        Criteria criteria = null;
-        if (val != null) {
+        if (val == null) {
+            return null;
+        } else {
             switch (handler) {
                 case EQUAL: {
-                    criteria = Criteria.where(fieldName);
-                    criteria.is(val);
-                    break;
+                    return Criteria.where(fieldName).is(val);
                 }
                 case LE: {
-                    criteria = Criteria.where(fieldName);
-                    criteria.lte(val);
-                    break;
+                    return Criteria.where(fieldName).lte(val);
                 }
                 case LT: {
-                    criteria = Criteria.where(fieldName);
-                    criteria.lt(val);
-                    break;
+                    return Criteria.where(fieldName).lt(val);
                 }
                 case GE: {
-                    criteria = Criteria.where(fieldName);
-                    criteria.gte(val);
-                    break;
+                    return Criteria.where(fieldName).gte(val);
                 }
                 case GT: {
-                    criteria = Criteria.where(fieldName);
-                    criteria.gt(val);
-                    break;
+                    return Criteria.where(fieldName).gt(val);
                 }
                 case BETWEEN: {
                     final Date[] dates = (Date[]) val;
                     if (dates[0] == null && dates[1] == null) {
                         return null;
                     }
-                    criteria = Criteria.where(fieldName);
+                    Criteria criteria = Criteria.where(fieldName);
                     if (dates[0] != null) {
                         criteria.gte(dates[0]);
                     }
                     if (dates[1] != null) {
                         criteria.lt(dates[1]);
                     }
-                    break;
+                    return criteria;
                 }
                 default: {
                     throw MyException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }
-        return criteria;
     }
 }

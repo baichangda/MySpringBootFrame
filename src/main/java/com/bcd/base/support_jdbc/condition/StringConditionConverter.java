@@ -7,10 +7,8 @@ import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2017/9/15.
@@ -27,77 +25,78 @@ public class StringConditionConverter implements Converter<StringCondition, Conv
         final StringCondition.Handler handler = condition.handler;
         final BeanInfo<?> beanInfo = (BeanInfo<?>) exts[0];
         final String columnName = beanInfo.toColumnName(fieldName);
-        StringBuilder sql = new StringBuilder();
-        List<Object> paramList = new ArrayList<>();
         switch (handler) {
             case EQUAL: {
-                sql.append(columnName);
-                sql.append("=?");
-                paramList.add(val);
-                break;
+                return new ConvertRes(columnName + "=?", new ArrayList<>(List.of(val)));
             }
             case NOT_EQUAL: {
-                sql.append(columnName);
-                sql.append("<>?");
-                paramList.add(val);
-                break;
+                return new ConvertRes(columnName + "<>?", new ArrayList<>(List.of(val)));
             }
             case ALL_LIKE: {
-                sql.append(columnName);
-                sql.append(" like ?");
-                paramList.add("%" + val + "%");
-                break;
+                return new ConvertRes(columnName + " like ?", new ArrayList<>(List.of("%" + val + "%")));
             }
             case LEFT_LIKE: {
-                sql.append(columnName);
-                sql.append(" like ?");
-                paramList.add("%" + val);
-                break;
+                return new ConvertRes(columnName + " like ?", new ArrayList<>(List.of("%" + val)));
             }
             case RIGHT_LIKE: {
-                sql.append(columnName);
-                sql.append(" like ?");
-                paramList.add(val + "%");
-                break;
+                return new ConvertRes(columnName + " like ?", new ArrayList<>(List.of(val+ "%")));
             }
             case IN: {
                 if (val.getClass().isArray()) {
+                    StringBuilder sql = new StringBuilder();
+                    List<Object> paramList = new ArrayList<>();
                     int length = Array.getLength(val);
                     sql.append(columnName);
                     sql.append(" in (");
                     StringJoiner sj = new StringJoiner(",");
                     for (int i = 0; i < length; i++) {
-                        sj.add("?");
-                        paramList.add(Array.get(val, i));
+                        Object o = Array.get(val, i);
+                        if (o != null) {
+                            sj.add("?");
+                            paramList.add(o);
+                        }
                     }
                     sql.append(sj);
                     sql.append(")");
+                    if (paramList.isEmpty()) {
+                        return null;
+                    }else{
+                        return new ConvertRes(sql.toString(), paramList);
+                    }
                 } else {
-                    throw MyException.get("type[{}] not support",val.getClass().getName());
+                    throw MyException.get("type[{}] not support", val.getClass().getName());
                 }
             }
             case NOT_IN: {
                 if (val.getClass().isArray()) {
+                    StringBuilder sql = new StringBuilder();
+                    List<Object> paramList = new ArrayList<>();
                     int length = Array.getLength(val);
                     sql.append(columnName);
                     sql.append(" not in (");
                     StringJoiner sj = new StringJoiner(",");
                     for (int i = 0; i < length; i++) {
-                        sj.add("?");
-                        paramList.add(Array.get(val, i));
+                        Object o = Array.get(val, i);
+                        if (o != null) {
+                            sj.add("?");
+                            paramList.add(o);
+                        }
                     }
                     sql.append(sj);
                     sql.append(")");
+                    if (paramList.isEmpty()) {
+                        return null;
+                    }else{
+                        return new ConvertRes(sql.toString(), paramList);
+                    }
                 } else {
-                    throw MyException.get("type[{}] not support",val.getClass().getName());
+                    throw MyException.get("type[{}] not support", val.getClass().getName());
                 }
-                break;
             }
             default: {
-                throw MyException.get("handler[{}] not support",handler);
+                throw MyException.get("handler[{}] not support", handler);
             }
         }
-        return new ConvertRes(sql.toString(), paramList);
     }
 
 }
