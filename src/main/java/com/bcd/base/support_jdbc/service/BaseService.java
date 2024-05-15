@@ -93,7 +93,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (list.isEmpty()) {
             return null;
         } else {
-            return list.get(0);
+            return list.getFirst();
         }
     }
 
@@ -177,7 +177,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (list.isEmpty()) {
             return null;
         } else {
-            return list.get(0);
+            return list.getFirst();
         }
     }
 
@@ -283,7 +283,7 @@ public class BaseService<T extends SuperBaseBean> {
                 setCreateInfo(t);
             }
         }
-        T t = list.get(0);
+        T t = list.getFirst();
         if (t.getId() == null) {
             final List<Object[]> argList = list.stream().map(e1 -> info.getValues_noId(e1).toArray()).collect(Collectors.toList());
             getJdbcTemplate().batchUpdate(info.insertSql_noId, argList);
@@ -467,7 +467,7 @@ public class BaseService<T extends SuperBaseBean> {
             BeanInfo<T> beanInfo = getBeanInfo();
             List<UniqueInfo> uniqueInfoList = beanInfo.uniqueInfoList;
             if (list.size() == 1) {
-                T t = list.get(0);
+                T t = list.getFirst();
                 for (UniqueInfo uniqueInfo : uniqueInfoList) {
                     FieldInfo fieldInfo = uniqueInfo.fieldInfo;
                     Object val = fieldInfo.field.get(t);
@@ -480,7 +480,7 @@ public class BaseService<T extends SuperBaseBean> {
                         case 0 -> {
                         }
                         case 1 -> {
-                            Long l = idList.get(0);
+                            Long l = idList.getFirst();
                             Long id = t.getId();
                             if (!l.equals(id)) {
                                 throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
@@ -514,7 +514,7 @@ public class BaseService<T extends SuperBaseBean> {
                             case 0 -> {
                             }
                             case 1 -> {
-                                Long l = idList.get(0);
+                                Long l = idList.getFirst();
                                 Long id = t.getId();
                                 if (!l.equals(id)) {
                                     throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
