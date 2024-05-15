@@ -13,7 +13,6 @@ import java.util.StringJoiner;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class StringConditionConverter implements Converter<StringCondition, ConvertRes> {
     @Override
     public ConvertRes convert(StringCondition condition, Object... exts) {

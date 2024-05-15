@@ -12,7 +12,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class NumberConditionConverter implements Converter<NumberCondition, Criteria> {
     @Override
     public Criteria convert(NumberCondition condition, Object... exts) {

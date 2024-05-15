@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/9/15.
  */
-@SuppressWarnings("unchecked")
 public class StringConditionConverter implements Converter<StringCondition, Criteria> {
     @Override
     public Criteria convert(StringCondition condition, Object... exts) {
