@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 public class WorkExecutor {
 
@@ -37,8 +38,16 @@ public class WorkExecutor {
         executor.execute(runnable);
     }
 
+    public CompletableFuture<Void> execute_cf(Runnable runnable) {
+        return CompletableFuture.runAsync(runnable, executor);
+    }
+
     public <T> Future<T> submit(Callable<T> callable) {
         return executor.submit(callable);
+    }
+
+    public <T> CompletableFuture<T> submit_cf(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, executor);
     }
 
     public void destroy() {
