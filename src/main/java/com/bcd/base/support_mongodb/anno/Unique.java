@@ -13,7 +13,6 @@ import java.util.List;
  * 唯一值验证注解
  * 在调用
  * {@link com.bcd.base.support_mongodb.service.BaseService#save(SuperBaseBean)}
- * {@link com.bcd.base.support_mongodb.service.BaseService#save(List)}
  * {@link com.bcd.base.support_mongodb.service.BaseService#insertAll(List)}
  * 时候会进行验证
  */

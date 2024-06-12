@@ -5,7 +5,6 @@ import com.bcd.base.exception.MyException;
 import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.BaseBean;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
-import com.bcd.base.support_mongodb.repository.BaseRepository;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
 import com.mongodb.bulk.BulkWriteResult;
 import org.springframework.aop.framework.AopContext;
@@ -39,16 +38,11 @@ public class BaseService<T extends SuperBaseBean> {
      * 而get方法会被委托给真实对象的方法
      */
 
-    @Autowired(required = false)
-    public BaseRepository<T> repository;
-    @Autowired
+
     public MongoTemplate mongoTemplate;
+
     private final BeanInfo<T> beanInfo;
 
-
-    public BaseRepository<T> getRepository() {
-        return repository;
-    }
 
     public BeanInfo<T> getBeanInfo() {
         return beanInfo;
@@ -56,6 +50,11 @@ public class BaseService<T extends SuperBaseBean> {
 
     public MongoTemplate getMongoTemplate() {
         return mongoTemplate;
+    }
+
+    @Autowired
+    public void init(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     public BaseService() {
@@ -76,26 +75,27 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     public List<T> list() {
-        return getRepository().findAll();
+        return list(null, null);
     }
 
     public List<T> list(Condition condition) {
-        Query query = ConditionUtil.toQuery(condition);
-        return getMongoTemplate().find(query, getBeanInfo().clazz);
+        return list(condition, null);
     }
 
     public List<T> list(Sort sort) {
-        return getRepository().findAll(sort);
+        return list(null, sort);
     }
 
     public List<T> list(Condition condition, Sort sort) {
         Query query = ConditionUtil.toQuery(condition);
-        query.with(sort);
+        if (sort != null) {
+            query.with(sort);
+        }
         return getMongoTemplate().find(query, getBeanInfo().clazz);
     }
 
     public Page<T> page(Pageable pageable) {
-        return getRepository().findAll(pageable);
+        return page(null, pageable);
     }
 
     public Page<T> page(Condition condition, Pageable pageable) {
@@ -107,7 +107,7 @@ public class BaseService<T extends SuperBaseBean> {
             List<T> list = getMongoTemplate().find(query, getBeanInfo().clazz);
             return new PageImpl<>(list, pageable, total);
         } else {
-            return new PageImpl<>(new ArrayList<>(), pageable, total);
+            return new PageImpl<>(Collections.emptyList(), pageable, total);
         }
     }
 
@@ -117,7 +117,7 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     public T get(String id) {
-        return getRepository().findById(id).orElse(null);
+        return getMongoTemplate().findById(id, getBeanInfo().clazz);
     }
 
     public T get(Condition condition) {
@@ -128,6 +128,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 会验证{@link Unique}
      * 会设置创建信息或更新信息
+     *
      * @param t
      * @return
      */
@@ -140,32 +141,13 @@ public class BaseService<T extends SuperBaseBean> {
                 setUpdateInfo(t);
             }
         }
-        return getRepository().save(t);
-    }
-
-    /**
-     * 会验证{@link Unique}
-     * 会设置创建信息或更新信息
-     * @param collection
-     * @return
-     */
-    public List<T> save(List<T> collection) {
-        validateUniqueBeforeSave(collection);
-        if (getBeanInfo().isBaseBean) {
-            for (T t : collection) {
-                if (t.getId() == null) {
-                    setCreateInfo(t);
-                } else {
-                    setUpdateInfo(t);
-                }
-            }
-        }
-        return getRepository().saveAll(collection);
+        return getMongoTemplate().save(t);
     }
 
     /**
      * 会验证{@link Unique}
      * 会设置创建信息
+     *
      * @param collection
      * @return
      */
@@ -183,7 +165,7 @@ public class BaseService<T extends SuperBaseBean> {
      * 删除所有数据
      */
     public void delete() {
-        getRepository().deleteAll();
+        getMongoTemplate().remove(getBeanInfo().clazz);
     }
 
     /**
@@ -193,7 +175,7 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public void delete(String... ids) {
         if (ids.length == 1) {
-            getRepository().deleteById(ids[0]);
+            getMongoTemplate().remove(new Query(Criteria.where("id").is(ids[0])));
         } else if (ids.length > 1) {
             Object[] newIds = new Object[ids.length];
             System.arraycopy(ids, 0, newIds, 0, ids.length);
@@ -215,6 +197,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 批量修改、不会修改更新时间
+     *
      * @param condition
      * @param updates
      * @return

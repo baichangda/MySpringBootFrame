@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import com.bcd.base.support_mongodb.test.bean.TestBean;
 import com.bcd.base.support_mongodb.test.service.TestService;
 
-@SuppressWarnings(value = "unchecked")
 @RestController
 @RequestMapping("/api/test/test")
 @Tag(name = "测试-TestController")
@@ -80,7 +79,7 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @Operation(summary = "保存测试")
     @ApiResponse(responseCode = "200",description = "保存结果")
-    public Result save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test){
+    public Result<?> save(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "测试实体") @Validated @RequestBody TestBean test){
         testService.save(test);
         return Result.success();
     }
@@ -94,7 +93,7 @@ public class TestController extends BaseController {
     @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
     @Operation(summary = "删除测试")
     @ApiResponse(responseCode = "200",description = "删除结果")
-    public Result delete(@Parameter(description = "测试ids数组",example = "100,101,102") @RequestParam String[] ids){
+    public Result<?> delete(@Parameter(description = "id数组",example = "100,101,102") @RequestParam String[] ids){
         testService.delete(ids);
         return Result.success();
     }

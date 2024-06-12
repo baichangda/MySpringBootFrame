@@ -17,8 +17,6 @@ public class CollectionConfig {
     public String moduleNameCN;
     //类名
     public Class<?> clazz;
-    //是否创建repository文件(默认是)
-    public boolean needCreateRepositoryFile = true;
     //是否创建service文件(默认是)
     public boolean needCreateServiceFile = true;
     //是否创建controller文件(默认是)

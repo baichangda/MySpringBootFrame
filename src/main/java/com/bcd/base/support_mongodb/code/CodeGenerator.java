@@ -33,34 +33,6 @@ public class CodeGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
 
     /**
-     * 生成repository文件
-     *
-     * @param data
-     * @param templateDir
-     * @param destDir
-     */
-    public static void generateRepository(RepositoryData data, String templateDir, String destDir) {
-        Configuration configuration = new Configuration(CodeConst.FREEMARKER_VERSION);
-        String fileDir = destDir + "/repository";
-        try {
-            Files.createDirectories(Paths.get(fileDir));
-        } catch (IOException e) {
-            throw MyException.get(e);
-        }
-        String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Repository.java";
-        try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
-            configuration.setDirectoryForTemplateLoading(Paths.get(templateDir).toFile());
-            Template template = configuration.getTemplate("mongo_TemplateRepository.txt", StandardCharsets.UTF_8.name());
-            final DefaultObjectWrapper objectWrapper = new DefaultObjectWrapper(CodeConst.FREEMARKER_VERSION);
-            objectWrapper.setExposeFields(true);
-            template.process(data, out, objectWrapper);
-        } catch (IOException | TemplateException ex) {
-            throw MyException.get(ex);
-        }
-        logger.info("{} generate succeed", destBeanPath);
-    }
-
-    /**
      * 生成service文件
      *
      * @param data
@@ -116,20 +88,6 @@ public class CodeGenerator {
         logger.info("{} generate succeed", destBeanPath);
     }
 
-
-    /**
-     * 根据配置初始化repository数据
-     *
-     * @param config
-     * @return
-     */
-    public static RepositoryData initRepositoryData(CollectionConfig config) {
-        RepositoryData data = new RepositoryData();
-        data.moduleNameCN = config.moduleNameCN;
-        data.moduleName = config.moduleName;
-        data.packagePre = initPackagePre(config);
-        return data;
-    }
 
     /**
      * 根据配置初始化service数据
@@ -262,10 +220,6 @@ public class CodeGenerator {
      */
     public static void generate(CollectionConfig config) {
         initConfig(config);
-        if (config.needCreateRepositoryFile) {
-            RepositoryData repositoryData = initRepositoryData(config);
-            generateRepository(repositoryData, config.templateDirPath, config.targetDirPath);
-        }
         if (config.needCreateServiceFile) {
             ServiceData serviceData = initServiceData(config);
             generateService(serviceData, config.templateDirPath, config.targetDirPath);
