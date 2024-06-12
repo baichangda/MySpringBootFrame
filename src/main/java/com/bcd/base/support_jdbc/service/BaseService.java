@@ -35,10 +35,8 @@ public class BaseService<T extends SuperBaseBean> {
      * 而get方法会被委托给真实对象的方法
      */
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     private TransactionTemplate transactionTemplate;
 
     private final BeanInfo<T> beanInfo;
@@ -56,11 +54,16 @@ public class BaseService<T extends SuperBaseBean> {
         return beanInfo;
     }
 
+    @Autowired
+    public void init(JdbcTemplate jdbcTemplate, TransactionTemplate transactionTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.transactionTemplate = transactionTemplate;
+    }
+
     public BaseService() {
         final Class<T> beanClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         beanInfo = new BeanInfo<>(beanClass);
     }
-
 
     /**
      * 统计所有数量
@@ -184,7 +187,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 保存
      * 如果id为null、则是新增、否则是更新
-     *
+     * <p>
      * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
      * 会设置创建信息或者更新信息
      *
@@ -203,7 +206,7 @@ public class BaseService<T extends SuperBaseBean> {
      * 新增
      * 如果设置了id、即会按照id新增、否则自增id
      * 所有属性都会作为参数设置、即使是null
-     *
+     * <p>
      * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
      * 会设置创建信息
      *
@@ -236,7 +239,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     /**
      * 根据参数对新增、只新增部分字段
-     *
+     * <p>
      * 会设置创建信息
      *
      * @param paramMap
@@ -264,7 +267,7 @@ public class BaseService<T extends SuperBaseBean> {
      * 批量新增
      * 根据第一个元素来判断新增的sql语句是否包含id字段
      * 所有属性都会作为参数设置、即使是null
-     *
+     * <p>
      * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
      * 会设置创建信息
      *
@@ -296,7 +299,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据id更新
      * 更新所有字段、即使是null
-     *
+     * <p>
      * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
      * 会设置更新信息
      *
@@ -320,7 +323,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 根据id、参数对更新
      * 只会更新部分字段
-     *
+     * <p>
      * 会设置更新信息
      *
      * @param id
@@ -347,7 +350,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 通过condition、参数对更新
      * 只会更新部分字段
-     *
+     * <p>
      * 会设置更新信息
      *
      * @param condition 更新条件
@@ -384,7 +387,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 批量更新
      * 更新所有字段、即使是null
-     *
+     * <p>
      * 会验证{@link com.bcd.base.support_jdbc.anno.Unique}
      * 会设置更新信息
      *
