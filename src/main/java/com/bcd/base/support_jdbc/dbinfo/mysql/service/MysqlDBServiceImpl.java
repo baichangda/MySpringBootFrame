@@ -4,7 +4,7 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.dbinfo.mysql.bean.ColumnsBean;
 import com.bcd.base.support_jdbc.dbinfo.mysql.bean.TablesBean;
 import com.bcd.base.support_jdbc.dbinfo.mysql.util.DBInfoUtil;
@@ -38,7 +38,7 @@ public class MysqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getSpringConn()) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -47,7 +47,7 @@ public class MysqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getConn(url, username, password)) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -117,7 +117,7 @@ public class MysqlDBServiceImpl implements DBService {
              Connection connection = DBInfoUtil.getConn(url, username, password)) {
             exportDBDesignerExcel(connection, dbName, os, null);
         } catch (IOException | SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 }

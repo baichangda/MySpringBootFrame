@@ -1,7 +1,7 @@
 package com.bcd.base.support_mongodb.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.BaseBean;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
@@ -252,7 +252,7 @@ public class BaseService<T extends SuperBaseBean> {
                                 fieldValueSetMap.put(fieldName, valueSet);
                             } else {
                                 if (valueSet.contains(val)) {
-                                    throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                                    throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                                 }
                             }
                             valueSet.add(val);
@@ -264,12 +264,12 @@ public class BaseService<T extends SuperBaseBean> {
                     for (UniqueInfo uniqueInfo : getBeanInfo().uniqueInfos) {
                         Object val = uniqueInfo.field.get(t);
                         if (!isUnique(uniqueInfo.fieldName, val, t.getId())) {
-                            throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                            throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                         }
                     }
                 }
             } catch (IllegalAccessException e) {
-                throw MyException.get(e);
+                throw BaseException.get(e);
             }
         }
     }

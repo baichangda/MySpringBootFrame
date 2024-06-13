@@ -2,7 +2,6 @@ package com.bcd.base.support_jdbc.condition;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NullCondition;
-import com.bcd.base.exception.MyException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.util.Collections;

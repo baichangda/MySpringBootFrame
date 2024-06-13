@@ -1,7 +1,7 @@
 package com.bcd.base.support_jdbc.service;
 
 import com.bcd.base.condition.Condition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
@@ -486,10 +486,10 @@ public class BaseService<T extends SuperBaseBean> {
                             Long l = idList.getFirst();
                             Long id = t.getId();
                             if (!l.equals(id)) {
-                                throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                                throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                             }
                         }
-                        default -> throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                        default -> throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                     }
                 }
             } else {
@@ -500,7 +500,7 @@ public class BaseService<T extends SuperBaseBean> {
                         Object val = fieldInfo.field.get(t);
                         if (val != null) {
                             if (valList.contains(val)) {
-                                throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                                throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                             }
                         }
                         valList.add(val);
@@ -520,16 +520,16 @@ public class BaseService<T extends SuperBaseBean> {
                                 Long l = idList.getFirst();
                                 Long id = t.getId();
                                 if (!l.equals(id)) {
-                                    throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                                    throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                                 }
                             }
-                            default -> throw MyException.get(uniqueInfo.msg).code(uniqueInfo.code);
+                            default -> throw BaseException.get(uniqueInfo.msg).code(uniqueInfo.code);
                         }
                     }
                 }
             }
         } catch (IllegalAccessException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

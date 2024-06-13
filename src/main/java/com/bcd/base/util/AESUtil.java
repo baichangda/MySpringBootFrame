@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,7 +28,7 @@ public class AESUtil {
             kg.init(size);
             return kg.generateKey();
         } catch (NoSuchAlgorithmException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -71,7 +71,7 @@ public class AESUtil {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException
                 | IllegalBlockSizeException | InvalidKeyException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -89,7 +89,7 @@ public class AESUtil {
             return cipher.doFinal(data);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException
                 | IllegalBlockSizeException | InvalidKeyException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

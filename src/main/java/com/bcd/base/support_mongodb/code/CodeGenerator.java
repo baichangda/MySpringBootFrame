@@ -1,6 +1,6 @@
 package com.bcd.base.support_mongodb.code;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 import com.bcd.base.support_mongodb.code.data.*;
 import com.bcd.base.util.StringUtil;
@@ -45,7 +45,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Service.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -55,7 +55,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -73,7 +73,7 @@ public class CodeGenerator {
         try {
             Files.createDirectories(Paths.get(fileDir));
         } catch (IOException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
         String destBeanPath = fileDir + "/" + data.moduleName.substring(0, 1).toUpperCase() + data.moduleName.substring(1) + "Controller.java";
         try (FileWriter out = new FileWriter(destBeanPath, StandardCharsets.UTF_8)) {
@@ -83,7 +83,7 @@ public class CodeGenerator {
             objectWrapper.setExposeFields(true);
             template.process(data, out, objectWrapper);
         } catch (IOException | TemplateException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
         logger.info("{} generate succeed", destBeanPath);
     }
@@ -129,7 +129,7 @@ public class CodeGenerator {
      */
     public static List<BeanField> initBeanField(CollectionConfig config) {
         if (!SuperBaseBean.class.isAssignableFrom(config.clazz)) {
-            throw MyException.get("bean[{}] must extends SuperBaseBean", config.clazz.getName());
+            throw BaseException.get("bean[{}] must extends SuperBaseBean", config.clazz.getName());
         }
         List<Field> fieldList = FieldUtils.getAllFieldsList(config.clazz).stream().filter(e -> {
             if (e.getAnnotation(Transient.class) != null) {
@@ -188,7 +188,7 @@ public class CodeGenerator {
         if (targetDirPath.contains(springSrcPath)) {
             return targetDirPath.split(StringUtil.escapeExprSpecialWord(springSrcPath))[1].replaceAll(StringUtil.escapeExprSpecialWord(File.separator), ".");
         } else {
-            throw MyException.get("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
+            throw BaseException.get("targetDirPath[" + targetDirPath + "] must contains [" + springSrcPath + "]");
         }
     }
 

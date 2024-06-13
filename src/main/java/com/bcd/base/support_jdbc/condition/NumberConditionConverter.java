@@ -2,7 +2,7 @@ package com.bcd.base.support_jdbc.condition;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.NumberCondition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.service.BeanInfo;
 
 import java.lang.reflect.Array;
@@ -66,7 +66,7 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                         return new ConvertRes(sql.toString(), paramList);
                     }
                 } else {
-                    throw MyException.get("type[{}] not support", val.getClass().getName());
+                    throw BaseException.get("type[{}] not support", val.getClass().getName());
                 }
             }
             case NOT_IN: {
@@ -92,11 +92,11 @@ public class NumberConditionConverter implements Converter<NumberCondition, Conv
                         return new ConvertRes(sql.toString(), paramList);
                     }
                 } else {
-                    throw MyException.get("type[{}] not support", val.getClass().getName());
+                    throw BaseException.get("type[{}] not support", val.getClass().getName());
                 }
             }
             default: {
-                throw MyException.get("handler[{}] not support", handler);
+                throw BaseException.get("handler[{}] not support", handler);
             }
         }
 

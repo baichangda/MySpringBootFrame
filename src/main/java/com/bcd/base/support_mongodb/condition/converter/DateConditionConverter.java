@@ -2,7 +2,7 @@ package com.bcd.base.support_mongodb.condition.converter;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.DateCondition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import java.util.Date;
@@ -51,7 +51,7 @@ public class DateConditionConverter implements Converter<DateCondition, Criteria
                     return criteria;
                 }
                 default: {
-                    throw MyException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
+                    throw BaseException.get("[DateConditionConverter.convert],Do Not Support [" + handler + "]!");
                 }
             }
         }

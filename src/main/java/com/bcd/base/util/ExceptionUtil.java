@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class ExceptionUtil {
             throwable.printStackTrace(pw);
             return sw.toString();
         } catch (IOException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

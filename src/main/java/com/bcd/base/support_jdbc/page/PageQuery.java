@@ -1,7 +1,7 @@
 package com.bcd.base.support_jdbc.page;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -60,7 +60,7 @@ public final class PageQuery {
         int i1 = upperCase.indexOf("select");
         int i2 = upperCase.indexOf("from");
         if (i1 == -1 || i2 == -1) {
-            throw MyException.get("toCountSql sql[{}] not support", sql);
+            throw BaseException.get("toCountSql sql[{}] not support", sql);
         }
         int i3 = upperCase.lastIndexOf("order by");
         return upperCase.substring(0, i1 + 6) +

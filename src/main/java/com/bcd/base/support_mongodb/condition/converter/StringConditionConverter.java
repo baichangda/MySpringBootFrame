@@ -2,7 +2,7 @@ package com.bcd.base.support_mongodb.condition.converter;
 
 import com.bcd.base.condition.Converter;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -55,7 +55,7 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
                             return Criteria.where(fieldName).in(list);
                         }
                     } else {
-                        throw MyException.get("type[{}] not support", val.getClass().getName());
+                        throw BaseException.get("type[{}] not support", val.getClass().getName());
                     }
                 }
                 case NOT_IN: {
@@ -74,11 +74,11 @@ public class StringConditionConverter implements Converter<StringCondition, Crit
                             return Criteria.where(fieldName).nin(list);
                         }
                     } else {
-                        throw MyException.get("type[{}] not support", val.getClass().getName());
+                        throw BaseException.get("type[{}] not support", val.getClass().getName());
                     }
                 }
                 default: {
-                    throw MyException.get("handler[{}] not support", handler);
+                    throw BaseException.get("handler[{}] not support", handler);
                 }
             }
         }

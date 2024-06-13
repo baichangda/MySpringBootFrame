@@ -1,11 +1,10 @@
 package com.bcd.base.support_jdbc.dbinfo.pgsql.service;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.write.handler.AbstractSheetWriteHandler;
 import com.alibaba.excel.write.handler.SheetWriteHandler;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.base.support_jdbc.dbinfo.pgsql.bean.TablesBean;
 import com.bcd.base.support_jdbc.dbinfo.pgsql.util.DBInfoUtil;
@@ -38,7 +37,7 @@ public class PgsqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getSpringConn()) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -47,7 +46,7 @@ public class PgsqlDBServiceImpl implements DBService {
         try (Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -121,7 +120,7 @@ public class PgsqlDBServiceImpl implements DBService {
              Connection connection = DBInfoUtil.getConn(url, username, password, dbName)) {
             exportDBDesignerExcel(connection, dbName, os, null);
         } catch (IOException | SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

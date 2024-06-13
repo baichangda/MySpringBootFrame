@@ -4,7 +4,7 @@ import cn.dev33.satoken.secure.SaBase64Util;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import com.bcd.base.condition.impl.StringCondition;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.service.BaseService;
 import com.bcd.base.util.RSAUtil;
 import com.bcd.sys.bean.UserBean;
@@ -102,7 +102,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
         String key = "phoneCode:" + phone;
         long expireTimeInSeconds = redisTemplate.getExpire(key);
         if (expireTimeInSeconds > 0) {
-            throw MyException.get("等待" + expireTimeInSeconds + "秒后重试");
+            throw BaseException.get("等待" + expireTimeInSeconds + "秒后重试");
         } else {
             if (expireTimeInSeconds == -1) {
                 //如果没有过期时间,则删除异常key
@@ -117,7 +117,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
                 } else {
                     //如果有其他服务器抢先发送了验证码,则再次获取时间
                     expireTimeInSeconds = redisTemplate.getExpire(key);
-                    throw MyException.get("等待{0}秒后重试", expireTimeInSeconds);
+                    throw BaseException.get("等待{0}秒后重试", expireTimeInSeconds);
                 }
             }
         }
@@ -133,7 +133,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
     public UserBean login(String username, String encryptPassword) {
         final UserBean userBean = getUser(username);
         if (userBean == null) {
-            throw MyException.get("用户不存在");
+            throw BaseException.get("用户不存在");
         } else {
             //根据是否加密处理选择不同处理方式
             String password;
@@ -150,7 +150,7 @@ public class UserService extends BaseService<UserBean> implements ApplicationLis
                 StpUtil.login(userBean.username, "web");
                 return userBean;
             } else {
-                throw MyException.get("密码错误");
+                throw BaseException.get("密码错误");
             }
         }
     }

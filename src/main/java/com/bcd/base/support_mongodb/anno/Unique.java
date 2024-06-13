@@ -1,6 +1,6 @@
 package com.bcd.base.support_mongodb.anno;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
 
 import java.lang.annotation.ElementType;
@@ -28,7 +28,7 @@ public @interface Unique {
 
     /**
      * 错误编码
-     * 在验证失败时候设置在{@link MyException#code}中
+     * 在验证失败时候设置在{@link BaseException#code}中
      */
     int code() default 1;
 }

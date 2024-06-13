@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -45,7 +45,7 @@ public class RSAUtil {
         try {
             return Singleton.INSTANCE.keyFactory.generatePublic(x509EncodedKeySpec);
         } catch (InvalidKeySpecException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -62,7 +62,7 @@ public class RSAUtil {
             return Singleton.INSTANCE.keyFactory
                     .generatePrivate(pkcs8EncodedKeySpec);
         } catch (InvalidKeySpecException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -81,7 +81,7 @@ public class RSAUtil {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
 
     }
@@ -101,7 +101,7 @@ public class RSAUtil {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -133,7 +133,7 @@ public class RSAUtil {
                 keyPairGenerator = KeyPairGenerator.getInstance("RSA");
                 keyFactory = KeyFactory.getInstance("RSA");
             } catch (NoSuchAlgorithmException e) {
-                throw MyException.get(e);
+                throw BaseException.get(e);
             }
         }
     }

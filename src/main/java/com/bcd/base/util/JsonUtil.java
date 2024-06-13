@@ -1,6 +1,6 @@
 package com.bcd.base.util;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -86,7 +86,7 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

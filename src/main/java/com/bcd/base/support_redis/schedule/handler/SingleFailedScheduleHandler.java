@@ -1,6 +1,6 @@
 package com.bcd.base.support_redis.schedule.handler;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_redis.RedisUtil;
 import com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class SingleFailedScheduleHandler {
         //1、获取锁
         Boolean res = valueOperations.setIfAbsent(lockId, "0", aliveTime);
         if (res == null) {
-            throw MyException.get("doBeforeStart lockId[{}] res null", lockId);
+            throw BaseException.get("doBeforeStart lockId[{}] res null", lockId);
         }
         return res;
     }

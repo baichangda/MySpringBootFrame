@@ -1,6 +1,6 @@
 package com.bcd.base.support_notify;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ProducerFactory;
 import com.bcd.base.support_kafka.ext.ProducerProp;
@@ -63,7 +63,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
         try {
             future.get();
         } catch (InterruptedException | ExecutionException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
         //开始消费
         super.init();

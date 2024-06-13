@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.dbinfo.pgsql.util;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.dbinfo.data.DBInfo;
 import com.bcd.base.support_jdbc.dbinfo.pgsql.bean.ColumnsBean;
 import com.bcd.base.support_jdbc.dbinfo.pgsql.bean.TablesBean;
@@ -24,7 +24,7 @@ public class DBInfoUtil {
         try {
             return DriverManager.getConnection(dbInfo.url, dbInfo.username, dbInfo.password);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -58,7 +58,7 @@ public class DBInfoUtil {
             return new DBInfo(url, username, password, propDbName);
 
         } catch (IOException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -76,7 +76,7 @@ public class DBInfoUtil {
         try {
             return DriverManager.getConnection("jdbc:postgresql://" + url + "/" + db, username, password);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -96,7 +96,7 @@ public class DBInfoUtil {
                 res = parseResult(rs, TablesBean.class);
             }
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
         return res;
     }
@@ -122,7 +122,7 @@ public class DBInfoUtil {
                 return res;
             }
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -154,7 +154,7 @@ public class DBInfoUtil {
                 res = parseResult(rs, ColumnsBean.class);
             }
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
         return res;
     }
@@ -190,7 +190,7 @@ public class DBInfoUtil {
                 }
             }
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -239,7 +239,7 @@ public class DBInfoUtil {
             }
             return res;
         } catch (SQLException | IllegalAccessException | InstantiationException | NoSuchFieldException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 }

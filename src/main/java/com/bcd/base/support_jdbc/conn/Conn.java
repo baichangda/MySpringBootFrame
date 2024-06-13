@@ -1,6 +1,6 @@
 package com.bcd.base.support_jdbc.conn;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.base.util.StringUtil;
 
@@ -73,7 +73,7 @@ public class Conn {
                     return new ClassInfo<>(false, clazz.getConstructor(), map);
                 }
             } catch (NoSuchMethodException | SecurityException ex) {
-                throw MyException.get(ex);
+                throw BaseException.get(ex);
             }
         });
     }
@@ -84,7 +84,7 @@ public class Conn {
         try {
             this.connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -141,7 +141,7 @@ public class Conn {
                 return list;
             }
         } catch (Exception e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -153,7 +153,7 @@ public class Conn {
             }
             return ps.execute();
         } catch (SQLException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -171,7 +171,7 @@ public class Conn {
         try {
             return insertSqlResult.insertBatch(connection, ts);
         } catch (SQLException | IllegalAccessException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -189,7 +189,7 @@ public class Conn {
         try {
             return updateSqlResult.updateBatch(connection, ts);
         } catch (SQLException | IllegalAccessException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -317,7 +317,7 @@ public class Conn {
             }
         }
         if (!whereNullFieldSet.isEmpty()) {
-            throw MyException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
+            throw BaseException.get("whereField[{}] not exist", Arrays.toString(whereNullFieldSet.toArray(new String[0])));
         }
 
         final StringBuilder sb = new StringBuilder("update ");

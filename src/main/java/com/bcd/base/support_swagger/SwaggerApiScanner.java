@@ -5,7 +5,7 @@ import com.alibaba.excel.write.handler.CellWriteHandler;
 import com.alibaba.excel.write.handler.WorkbookWriteHandler;
 import com.alibaba.excel.write.handler.context.CellWriteHandlerContext;
 import com.alibaba.excel.write.metadata.holder.WriteWorkbookHolder;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.util.ClassUtil;
 import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
@@ -249,7 +249,7 @@ public class SwaggerApiScanner {
                 break;
             }
             default: {
-                throw MyException.get("type[{}] not support", type);
+                throw BaseException.get("type[{}] not support", type);
             }
         }
 

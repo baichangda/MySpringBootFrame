@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -328,7 +328,7 @@ public class RpnUtil {
                     default: {
                         final Double d = dataMap.get(ele.s);
                         if (d == null) {
-                            throw MyException.get("var[{}] not exist", ele.s);
+                            throw BaseException.get("var[{}] not exist", ele.s);
                         }
                         stack[++stackIndex] = d;
                     }
@@ -503,7 +503,7 @@ public class RpnUtil {
                 return 3;
             }
             default: {
-                throw MyException.get("symbol[" + c + "] not support");
+                throw BaseException.get("symbol[" + c + "] not support");
             }
         }
     }

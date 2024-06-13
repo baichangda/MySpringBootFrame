@@ -1,7 +1,7 @@
 package com.bcd.base.support_mongodb.code;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongodb.code.data.CodeConst;
 
 import java.nio.file.Paths;
@@ -45,7 +45,7 @@ public class CollectionConfig {
             //替换build目录下
             beanPath = classFilePath.replace(CodeConst.CLASS_BUILD_DIR_PATH, CodeConst.SOURCE_DIR_PATH);
         } else {
-            throw MyException.get("parseTargetDirPath failed,class path[" + classFilePath + "] not support");
+            throw BaseException.get("parseTargetDirPath failed,class path[" + classFilePath + "] not support");
         }
         targetDirPath = Paths.get(beanPath).getParent().toString();
     }

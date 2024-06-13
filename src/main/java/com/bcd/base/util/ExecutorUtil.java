@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 
 import java.util.ArrayList;
 import java.util.Queue;
@@ -45,7 +45,7 @@ public class ExecutorUtil {
                 cache.clear();
             }
         } catch (InterruptedException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
     }
 
@@ -75,7 +75,7 @@ public class ExecutorUtil {
                 } else if (arg instanceof BlockingQueue<?>[] queues) {
                     awaitQueueEmpty(queues);
                 } else {
-                    throw MyException.get("arg type[{}] not support", arg.getClass().getName());
+                    throw BaseException.get("arg type[{}] not support", arg.getClass().getName());
                 }
             }
         }
@@ -100,7 +100,7 @@ public class ExecutorUtil {
                 }
             }
         } catch (InterruptedException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
     }
 
@@ -119,7 +119,7 @@ public class ExecutorUtil {
                 }
             }
         } catch (InterruptedException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -138,7 +138,7 @@ public class ExecutorUtil {
                 }
             }
         } catch (InterruptedException e) {
-            throw MyException.get(e);
+            throw BaseException.get(e);
         }
     }
 

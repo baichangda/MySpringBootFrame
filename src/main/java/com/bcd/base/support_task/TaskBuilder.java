@@ -1,6 +1,6 @@
 package com.bcd.base.support_task;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
         //检查名称
         synchronized (storage) {
             if (storage.containsKey(name)) {
-                throw MyException.get("TaskBuilder[{}] [{}] exist", name, storage.get(name));
+                throw BaseException.get("TaskBuilder[{}] [{}] exist", name, storage.get(name));
             } else {
                 storage.put(name, this);
             }
@@ -72,7 +72,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
                     while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
                     }
                 } catch (InterruptedException ex) {
-                    throw MyException.get(ex);
+                    throw BaseException.get(ex);
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.bcd.base.support_excel;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import org.apache.poi.poifs.filesystem.FileMagic;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -77,7 +77,7 @@ public class ExcelUtil {
             }
         }
         if (colNum * size != all) {
-            throw MyException.get("data error");
+            throw BaseException.get("data error");
         }
         return new int[]{size, colNum};
     }
@@ -138,7 +138,7 @@ public class ExcelUtil {
             }
             workbook.write(os);
         } catch (IOException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
     }
 

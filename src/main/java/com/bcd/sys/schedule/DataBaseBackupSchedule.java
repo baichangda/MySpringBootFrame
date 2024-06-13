@@ -1,6 +1,6 @@
 package com.bcd.sys.schedule;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.util.DateZoneUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class DataBaseBackupSchedule {
             }
 
             if (Files.size(temp) == 0) {
-                throw MyException.get("backup failed,can't find temp backup file");
+                throw BaseException.get("backup failed,can't find temp backup file");
             } else {
                 try (InputStream is = Files.newInputStream(temp)) {
                     //上传文件
@@ -87,7 +87,7 @@ public class DataBaseBackupSchedule {
                 }
             }
         } catch (IOException | InterruptedException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         } finally {
             try {
                 Files.deleteIfExists(temp);

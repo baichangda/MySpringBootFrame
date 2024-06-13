@@ -1,6 +1,6 @@
 package com.bcd.base.support_redis.schedule.aop;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_redis.schedule.anno.SingleFailedSchedule;
 import com.bcd.base.support_redis.schedule.handler.SingleFailedScheduleHandler;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -76,7 +76,7 @@ public class RedisScheduleAopConfig {
         try {
             return target.getClass().getMethod(methodName, parameterTypes);
         } catch (NoSuchMethodException ex) {
-            throw MyException.get(ex);
+            throw BaseException.get(ex);
         }
     }
 }
