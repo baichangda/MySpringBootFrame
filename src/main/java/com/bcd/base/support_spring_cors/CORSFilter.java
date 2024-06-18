@@ -18,7 +18,8 @@ public class CORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
         // 支持 HTTP 1.1
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        // 支持 HTTP 1.0. response.setHeader("Expires", "0");
+        // 支持 HTTP 1.0.
+        response.setHeader("Expires", "0");
         response.setHeader("Pragma", "no-cache");
         // 编码
         response.setCharacterEncoding("UTF-8");
