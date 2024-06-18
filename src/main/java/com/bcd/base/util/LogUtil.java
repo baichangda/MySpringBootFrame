@@ -22,7 +22,7 @@ public class LogUtil {
      * 获取指定类指定字段的行号
      *
      * @param clazz
-     * @param fieldName
+     * @param fieldName null代表获取类的行号
      * @return
      */
     public static String getFieldStackTrace(Class<?> clazz, String fieldName) {
