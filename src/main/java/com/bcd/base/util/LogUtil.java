@@ -45,9 +45,13 @@ public class LogUtil {
                                 break;
                             }
                             line = line.trim();
-                            for (String endFieldStr : endFieldStrSet) {
-                                if (line.endsWith(endFieldStr)) {
-                                    resMap.put(endFieldStr.substring(1, endFieldStr.length() - 1), no);
+                            if (line.startsWith("public class")) {
+                                resMap.putIfAbsent("class", no);
+                            } else {
+                                for (String endFieldStr : endFieldStrSet) {
+                                    if (line.endsWith(endFieldStr)) {
+                                        resMap.put(endFieldStr.substring(1, endFieldStr.length() - 1), no);
+                                    }
                                 }
                             }
                             no++;
@@ -62,7 +66,9 @@ public class LogUtil {
                 fieldName_lineNo = temp;
             }
         }
-
+        if (fieldName == null) {
+            fieldName = "class";
+        }
         final Integer lineNo = fieldName_lineNo.get(fieldName);
         if (lineNo == null) {
             return "";
