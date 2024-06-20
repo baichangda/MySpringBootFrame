@@ -162,8 +162,7 @@ public class RedisQueueMQ<V> {
                             try {
                                 Thread.sleep(10000L);
                             } catch (InterruptedException e) {
-                                logger.error("redisQueueMQ queue[" + name + "] interrupted,exit ...", ex);
-                                break;
+                                throw BaseException.get(e);
                             }
                         }
                     }
