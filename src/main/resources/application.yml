@@ -8,6 +8,8 @@ server:
     session:
       timeout: 1800
 spring:
+  application:
+    name: bcd
   threads:
     virtual:
       enabled: true
@@ -112,6 +114,14 @@ spring:
     username:
     password:
     default-encoding: UTF-8
+  cloud:
+    sentinel:
+      log:
+        dir: logs/csp
+      transport:
+        port: 8889
+        dashboard: 127.0.0.1:33333
+
 
 springdoc:
   packages-to-scan:

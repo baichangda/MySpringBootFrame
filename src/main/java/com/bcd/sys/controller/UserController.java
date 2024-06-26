@@ -1,6 +1,7 @@
 package com.bcd.sys.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.condition.impl.DateCondition;
 import com.bcd.base.condition.impl.NumberCondition;
