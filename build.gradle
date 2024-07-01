@@ -9,7 +9,11 @@ buildscript {
         maven { url "${aliyunPublic}" }
         mavenCentral()
     }
+
+
 }
+
+
 
 plugins {
     id 'java-library'
@@ -64,16 +68,16 @@ configurations.configureEach {
     }
 }
 
+dependencyManagement {
+    imports {
+        mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:+"
+    }
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
-
-    // https://mvnrepository.com/artifact/com.google.code.findbugs/annotations
-//    implementation group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
-
-    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
-//    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.3'
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation group: 'com.google.guava', name: 'guava', version: "+"
@@ -150,8 +154,9 @@ dependencies {
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: "3.+"
 
     // https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-sentinel
-    implementation group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-sentinel', version: '2023.0.1.0'
+    implementation group: 'com.alibaba.cloud', name: 'spring-cloud-starter-alibaba-sentinel'
 }
+
 
 //把classpath添加到module path中、建立module-info.java后使用
 //compileJava {
