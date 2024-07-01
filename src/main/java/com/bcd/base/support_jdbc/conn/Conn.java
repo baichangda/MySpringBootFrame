@@ -16,7 +16,7 @@ import java.util.function.Function;
  * 实体类class必须满足如下要求
  * 1、主键默认为id
  * 2、可以是class或者record
- * 3、当为class时候、必须提供参数为空的构造方法、且只会处理非static或非final字段
+ * 3、当为class时候、必须提供参数为空的构造方法、且只会处理非static和非final字段
  * 4、字段映射数据库字段会将驼峰格式转换为下划线格式、例如createTime->create_time
  */
 @SuppressWarnings("unchecked")
