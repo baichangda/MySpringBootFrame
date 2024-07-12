@@ -28,10 +28,14 @@ public class ExecutorUtil {
     public static <T> void loop(BlockingQueue<T> queue, int except, Consumer<ArrayList<T>> callback, AtomicBoolean running) {
         try {
             final ArrayList<T> cache = new ArrayList<>(except);
-            while (running.get()) {
+            while (true) {
                 T t = queue.poll(3, TimeUnit.SECONDS);
                 if (t == null) {
-                    continue;
+                    if (running.get()) {
+                        continue;
+                    } else {
+                        break;
+                    }
                 }
                 do {
                     cache.add(t);
@@ -54,6 +58,7 @@ public class ExecutorUtil {
      * 1、关闭线程池、等待线程执行完毕
      * 2、关闭队列、等待队列为空
      * 3、关闭线程、等待线程执行完毕
+     *
      * @param args
      */
     public static void shutdown(Object... args) {
@@ -84,6 +89,7 @@ public class ExecutorUtil {
 
     /**
      * 关闭线程池并等待线程执行完毕
+     *
      * @param pools
      */
     public static void shutdownThenAwait(ExecutorService... pools) {
@@ -106,6 +112,7 @@ public class ExecutorUtil {
 
     /**
      * 等待队列为空
+     *
      * @param queues
      */
     public static void awaitQueueEmpty(Queue<?>... queues) {
@@ -125,6 +132,7 @@ public class ExecutorUtil {
 
     /**
      * 等待线程执行完毕
+     *
      * @param threads
      */
     public static void awaitThread(Thread... threads) {
