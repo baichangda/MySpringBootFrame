@@ -19,7 +19,7 @@ public class MySimpleKeyGenerator extends SimpleKeyGenerator {
         return new MySimpleKey(className, methodName, params);
     }
 
-    public MySimpleKey generate(Class clazz, String methodName, Object... params) {
+    public MySimpleKey generate(Class<?> clazz, String methodName, Object... params) {
         return generate(clazz.getName(), methodName, params);
     }
 }
