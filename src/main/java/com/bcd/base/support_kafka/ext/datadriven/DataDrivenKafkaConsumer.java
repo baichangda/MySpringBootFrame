@@ -176,7 +176,7 @@ public abstract class DataDrivenKafkaConsumer {
 
     public abstract WorkHandler newHandler(String id, WorkExecutor executor);
 
-    public void removeHandler(String id) {
+    public final void removeHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
         workExecutor.execute(() -> {
             WorkHandler workHandler = workExecutor.workHandlerCache.remove(id);
@@ -187,7 +187,7 @@ public abstract class DataDrivenKafkaConsumer {
         });
     }
 
-    public WorkHandler getHandler(String id) {
+    public final WorkHandler getHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
         try {
             return workExecutor.submit(() -> workExecutor.workHandlerCache.get(id)).get();

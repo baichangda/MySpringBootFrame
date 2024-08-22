@@ -22,7 +22,9 @@ public abstract class WorkHandler {
     }
 
     public abstract void onMessage(ConsumerRecord<String, byte[]> msg);
-    public void init() {}
+    public void init() {
+
+    }
     public void destroy() {
 
     }
