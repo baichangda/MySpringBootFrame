@@ -18,20 +18,10 @@ public class WorkExecutor {
     /**
      * 存储本执行器所有的handler
      */
-    final Map<String, WorkHandler> workHandlerCache = new HashMap<>();
+    final Map<String, WorkHandler> workHandlers = new HashMap<>();
 
-    public WorkExecutor(int queueSize, String threadName) {
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(queueSize)
-                , r -> new Thread(r, threadName), (r, executor) -> {
-            if (!executor.isShutdown()) {
-                try {
-//                    logger.warn("workThread[{}] RejectedExecutionHandler",threadName);
-                    executor.getQueue().put(r);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
+    public WorkExecutor(String threadName) {
+        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, threadName));
     }
 
     public void execute(Runnable runnable) {
