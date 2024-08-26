@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
@@ -49,14 +46,10 @@ public abstract class ThreadDrivenKafkaConsumer {
 
 
     /**
-     * 工作线程任务队列长度
-     */
-    public final int workQueueSize;
-    /**
      * 工作线程队列
      */
-    public final ArrayBlockingQueue<ConsumerRecord<String, byte[]>>[] queues;
-    public final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue;
+    public final LinkedBlockingQueue<ConsumerRecord<String, byte[]>>[] queues;
+    public final LinkedBlockingQueue<ConsumerRecord<String, byte[]>> queue;
     /**
      * 工作线程数量
      */
@@ -76,7 +69,7 @@ public abstract class ThreadDrivenKafkaConsumer {
     /**
      * 当前阻塞数量
      */
-    public final AtomicInteger blockingNum = new AtomicInteger();
+    public final LongAdder blockingNum = new LongAdder();
 
     /**
      * 是否自动释放阻塞、适用于工作内容为同步处理的逻辑
@@ -129,7 +122,6 @@ public abstract class ThreadDrivenKafkaConsumer {
      *                                消费时候会根据 {@link #index(ConsumerRecord)} 将消息定位到指定线程、然后提交到对应线程的队列中
      *                                实现记录关联work线程、这在某些场景可以避免线程竞争
      *                                false时候 共享一个队列
-     * @param workQueueSize           工作队列的长度
      * @param workThreadNum           工作线程个数
      * @param maxBlockingNum          最大阻塞数量、当内存中达到最大阻塞数量时候、消费者会停止消费
      * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
@@ -144,7 +136,6 @@ public abstract class ThreadDrivenKafkaConsumer {
                                      ConsumerProp consumerProp,
                                      boolean onePartitionOneConsumer,
                                      boolean oneWorkThreadOneQueue,
-                                     int workQueueSize,
                                      int workThreadNum,
                                      int maxBlockingNum,
                                      boolean autoReleaseBlocking,
@@ -155,7 +146,6 @@ public abstract class ThreadDrivenKafkaConsumer {
         this.properties = consumerProp.toProperties();
         this.onePartitionOneConsumer = onePartitionOneConsumer;
         this.oneWorkThreadOneQueue = oneWorkThreadOneQueue;
-        this.workQueueSize = workQueueSize;
         this.workThreadNum = workThreadNum;
         this.maxBlockingNum = maxBlockingNum;
         this.autoReleaseBlocking = autoReleaseBlocking;
@@ -183,15 +173,15 @@ public abstract class ThreadDrivenKafkaConsumer {
         //根据是否公用一个队列、来指定构造
         if (oneWorkThreadOneQueue) {
             this.queue = null;
-            this.queues = new ArrayBlockingQueue[workThreadNum];
+            this.queues = new LinkedBlockingQueue[workThreadNum];
             for (int i = 0; i < workThreadNum; i++) {
-                final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue = new ArrayBlockingQueue<>(workQueueSize);
+                final LinkedBlockingQueue<ConsumerRecord<String, byte[]>> queue = new LinkedBlockingQueue<>();
                 this.queues[i] = queue;
                 workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
             }
         } else {
             this.queues = null;
-            this.queue = new ArrayBlockingQueue<>(workQueueSize);
+            this.queue = new LinkedBlockingQueue<>();
             for (int i = 0; i < workThreadNum; i++) {
                 workThreads[i] = new Thread(() -> work(this.queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
             }
@@ -326,7 +316,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                 while (running_consume) {
                     try {
                         //检查阻塞
-                        if (blockingNum.get() >= maxBlockingNum) {
+                        if (blockingNum.sum() >= maxBlockingNum) {
                             TimeUnit.MILLISECONDS.sleep(100);
                             continue;
                         }
@@ -338,7 +328,7 @@ public abstract class ThreadDrivenKafkaConsumer {
 
                         //统计
                         final int count = consumerRecords.count();
-                        blockingNum.addAndGet(count);
+                        blockingNum.add(count);
                         if (monitor_period > 0) {
                             monitor_consumeCount.add(count);
                         }
@@ -371,7 +361,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                 while (running_consume) {
                     try {
                         //检查阻塞
-                        if (blockingNum.get() >= maxBlockingNum) {
+                        if (blockingNum.sum() >= maxBlockingNum) {
                             TimeUnit.MILLISECONDS.sleep(100);
                             continue;
                         }
@@ -384,7 +374,7 @@ public abstract class ThreadDrivenKafkaConsumer {
 
                         //统计
                         final int count = consumerRecords.count();
-                        blockingNum.addAndGet(count);
+                        blockingNum.add(count);
                         if (monitor_period > 0) {
                             monitor_consumeCount.add(count);
                         }
@@ -427,7 +417,7 @@ public abstract class ThreadDrivenKafkaConsumer {
      *
      * @param queue
      */
-    private void work(final ArrayBlockingQueue<ConsumerRecord<String, byte[]>> queue) {
+    private void work(final LinkedBlockingQueue<ConsumerRecord<String, byte[]>> queue) {
         try {
             while (running_work) {
                 final ConsumerRecord<String, byte[]> poll = queue.poll(1, TimeUnit.SECONDS);
@@ -441,7 +431,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         monitor_workCount.increment();
                     }
                     if (autoReleaseBlocking) {
-                        blockingNum.decrementAndGet();
+                        blockingNum.decrement();
                     }
                 }
             }
@@ -461,9 +451,9 @@ public abstract class ThreadDrivenKafkaConsumer {
     public String monitor_log() {
         return StringUtil.format("name[{}] blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
                 name,
-                blockingNum.get(), maxBlockingNum,
+                blockingNum.sum(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                oneWorkThreadOneQueue ? Arrays.stream(queues).map(e -> e.size() + "/" + workQueueSize).collect(Collectors.joining(",")) : queue.size(),
+                oneWorkThreadOneQueue ? Arrays.stream(queues).map(e -> e.size()+"").collect(Collectors.joining(",")) : queue.size(),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }
