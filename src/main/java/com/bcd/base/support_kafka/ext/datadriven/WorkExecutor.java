@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 /**
@@ -43,9 +40,34 @@ public class WorkExecutor {
      */
     final Map<String, WorkHandler> workHandlers = new HashMap<>();
 
-    public WorkExecutor(String threadName) {
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, threadName));
-        this.blockingExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, threadName + "-blocking"));
+    /**
+     * 构造任务执行器
+     *
+     * @param threadName
+     * @param queueSize  无阻塞任务线程池队列大小
+     *                   0则使用{@link LinkedBlockingQueue}
+     *                   否则使用{@link ArrayBlockingQueue}
+     */
+    public WorkExecutor(String threadName, int queueSize) {
+        BlockingQueue<Runnable> blockingQueue;
+        if (queueSize <= 0) {
+            blockingQueue = new LinkedBlockingQueue<>();
+        } else {
+            blockingQueue = new ArrayBlockingQueue<>(queueSize);
+        }
+        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, blockingQueue, r -> new Thread(r, threadName),
+                (r, executor) -> {
+                    if (!executor.isShutdown()) {
+                        try {
+//                    logger.warn("workThread[{}] RejectedExecutionHandler",threadName);
+                            executor.getQueue().put(r);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
+        String blockingThreadName = threadName + "-blocking";
+        this.blockingExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, blockingThreadName));
     }
 
     public final CompletableFuture<Void> execute(Runnable runnable) {

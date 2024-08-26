@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -46,11 +47,15 @@ public abstract class DataDrivenKafkaConsumer {
     public Thread[] consumeThreads;
 
     /**
-     * 工作线程数量
+     * 工作执行器数量
      */
     public final int workExecutorNum;
     /**
-     * 工作线程数组
+     * 工作执行器非阻塞任务线程池队列大小
+     */
+    public final int workExecutorQueueSize;
+    /**
+     * 工作执行器数组
      */
     public final WorkExecutor[] workExecutors;
 
@@ -112,6 +117,7 @@ public abstract class DataDrivenKafkaConsumer {
         this(name, consumerProp,
                 false,
                 Runtime.getRuntime().availableProcessors(),
+                0,
                 100000,
                 true,
                 0,
@@ -131,6 +137,9 @@ public abstract class DataDrivenKafkaConsumer {
      *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
      *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
      * @param workExecutorNum         工作任务执行器个数
+     * @param workExecutorQueueSize   工作任务执行器无阻塞任务线程池队列大小
+     *                                <=0代表不限制、此时使用{@link LinkedBlockingQueue}
+     *                                其他情况、则使用{@link ArrayBlockingQueue}
      * @param maxBlockingNum          最大阻塞数量(0代表不限制)、当内存中达到最大阻塞数量时候、消费者会停止消费
      *                                当不限制时候、还是会记录{@link #blockingNum}、便于监控阻塞数量
      * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
@@ -145,6 +154,7 @@ public abstract class DataDrivenKafkaConsumer {
                                    ConsumerProp consumerProp,
                                    boolean onePartitionOneConsumer,
                                    int workExecutorNum,
+                                   int workExecutorQueueSize,
                                    int maxBlockingNum,
                                    boolean autoReleaseBlocking,
                                    int maxConsumeSpeed,
@@ -154,6 +164,7 @@ public abstract class DataDrivenKafkaConsumer {
         this.properties = consumerProp.toProperties();
         this.onePartitionOneConsumer = onePartitionOneConsumer;
         this.workExecutorNum = workExecutorNum;
+        this.workExecutorQueueSize = workExecutorQueueSize;
         this.maxBlockingNum = maxBlockingNum;
         this.autoReleaseBlocking = autoReleaseBlocking;
         this.maxConsumeSpeed = maxConsumeSpeed;
@@ -179,7 +190,7 @@ public abstract class DataDrivenKafkaConsumer {
         //初始化工作任务执行器
         this.workExecutors = new WorkExecutor[workExecutorNum];
         for (int i = 0; i < workExecutorNum; i++) {
-            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i);
+            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i, workExecutorQueueSize);
         }
     }
 
@@ -416,7 +427,7 @@ public abstract class DataDrivenKafkaConsumer {
                 name, workExecutors.length, monitor_workHandlerCount.sum(),
                 blockingNum.sum(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                Arrays.stream(workExecutors).map(e -> e.executor.getActiveCount() + "/" + e.blockingExecutor.getActiveCount()).collect(Collectors.joining(",")),
+                Arrays.stream(workExecutors).map(e -> "(" + e.executor.getActiveCount() + (workExecutorQueueSize > 0 ? ("/" + workExecutorQueueSize) : "") + "," + e.blockingExecutor.getActiveCount() + ")").collect(Collectors.joining(" ")),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }
