@@ -111,7 +111,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             task.setStatus(TaskStatus.WAITING.getStatus());
             task.onCreated();
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onCreate error", e);
+            logger.error("task[{}] execute onCreate error", task.getId(), e);
         }
         return taskDao.doCreate(task);
     }
@@ -123,7 +123,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             taskDao.doUpdate(task);
             return task;
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onStart error", e);
+            logger.error("task[{}] execute onStart error", task.getId(), e);
             return task;
         }
     }
@@ -135,7 +135,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             taskDao.doUpdate(task);
             return task;
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onSucceed error", e);
+            logger.error("task[{}] execute onSucceed error", task.getId(), e);
             return task;
         }
     }
@@ -147,7 +147,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             taskDao.doUpdate(task);
             return task;
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onFailed error", e);
+            logger.error("task[{}] execute onFailed error", task.getId(), e);
             return task;
         }
     }
@@ -159,7 +159,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             taskDao.doUpdate(task);
             return task;
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onCanceled error", e);
+            logger.error("task[{}] execute onCanceled error", task.getId(), e);
             return task;
         }
     }
@@ -171,7 +171,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
             taskDao.doUpdate(task);
             return task;
         } catch (Exception e) {
-            logger.error("task[" + task.getId() + "] execute onStop error", e);
+            logger.error("task[{}] execute onStop error", task.getId(), e);
             return task;
         }
     }

@@ -150,15 +150,15 @@ public class RedisQueueMQ<V> {
                                 try {
                                     onMessageFromRedis(data);
                                 } catch (Exception e) {
-                                    logger.error(e.getMessage(), e);
+                                    logger.error("onMessageFromRedis error",e);
                                 }
                             });
                         }
                     } catch (Exception ex) {
                         if (ex instanceof QueryTimeoutException) {
-                            logger.error("redisQueueMQ queue[" + name + "] QueryTimeoutException", ex);
+                            logger.error("redisQueueMQ queue[{}] QueryTimeoutException", name, ex);
                         } else {
-                            logger.error("redisQueueMQ queue[" + name + "] error,try after 10s", ex);
+                            logger.error("redisQueueMQ queue[{}] error,try after 10s", name, ex);
                             try {
                                 Thread.sleep(10000L);
                             } catch (InterruptedException e) {

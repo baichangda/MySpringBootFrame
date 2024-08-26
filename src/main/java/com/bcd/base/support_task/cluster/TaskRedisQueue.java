@@ -70,7 +70,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
                     try {
                         onTask((TaskRunnable<T, K>) data);
                     } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
+                        logger.error("onTask error", e);
                         semaphore.release();
                     }
                 });
@@ -78,9 +78,9 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
         } catch (Exception ex) {
             semaphore.release();
             if (ex instanceof QueryTimeoutException) {
-                logger.error("SysTaskRedisQueue[" + name + "] fetchAndExecute QueryTimeoutException", ex);
+                logger.error("SysTaskRedisQueue[{}] fetchAndExecute QueryTimeoutException", name, ex);
             } else {
-                logger.error("SysTaskRedisQueue[" + name + "] fetchAndExecute error,try after 10s", ex);
+                logger.error("SysTaskRedisQueue[{}] fetchAndExecute error,try after 10s", name, ex);
                 Thread.sleep(10000L);
             }
         }
@@ -146,7 +146,7 @@ public class TaskRedisQueue<T extends Task<K>, K extends Serializable> {
                     fetchAndExecute();
                 } catch (InterruptedException ex) {
                     //处理打断情况,此时退出
-                    logger.error("SysTaskRedisQueue[" + name + "] interrupted,exit...", ex);
+                    logger.error("SysTaskRedisQueue[{}] interrupted,exit...", name, ex);
                     break;
                 }
             }

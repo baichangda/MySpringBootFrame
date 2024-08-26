@@ -88,7 +88,7 @@ public class TaskRunnable<T extends Task<K>, K extends Serializable> implements 
                 task = taskBuilder.onSucceed(task);
             }
         } catch (Exception ex) {
-            logger.error("execute task[" + task.getId() + "] failed", ex);
+            logger.error("execute task[{}] failed", task.getId(), ex);
             task = taskBuilder.onFailed(task, ex);
         } finally {
             //最后从当前服务器任务id和结果映射结果集中移除

@@ -383,7 +383,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                             queues[index(consumerRecord)].put(consumerRecord);
                         }
                     } catch (Exception ex) {
-                        logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error,Try Again After 3s", ex);
+                        logger.error("Kafka Consumer[{}] Cycle Error,Try Again After 3s", Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2), ex);
                         try {
                             TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e) {
@@ -429,7 +429,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                             queue.put(consumerRecord);
                         }
                     } catch (Exception ex) {
-                        logger.error("Kafka Consumer[" + Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2) + "] Cycle Error,Try Again After 3s", ex);
+                        logger.error("Kafka Consumer[{}] Cycle Error,Try Again After 3s", Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2), ex);
                         try {
                             TimeUnit.SECONDS.sleep(3);
                         } catch (InterruptedException e) {

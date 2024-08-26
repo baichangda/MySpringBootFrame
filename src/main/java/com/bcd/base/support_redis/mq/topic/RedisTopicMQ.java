@@ -101,7 +101,7 @@ public class RedisTopicMQ<V> {
             try {
                 onMessage(message, pattern);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("onMessage error", e);
             }
         };
     }

@@ -102,7 +102,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
                 });
                 logger.info("server subscribe type[{}] id[{}]", type, listenerInfo.id);
             } catch (IOException e) {
-                logger.error("ListenerInfo.fromString error type[{}] value:\n{}", type, value);
+                logger.error("ListenerInfo.fromString error type[{}] value:\n{}", type, value, e);
             }
         } else {
             workPool.execute(() -> {
