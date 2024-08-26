@@ -129,6 +129,7 @@ public abstract class ThreadDrivenKafkaConsumer {
      * @param name                    当前消费者的名称(用于标定线程名称)
      *                                消费者线程开头 {name}-consumer
      *                                工作任务执行器线程开头 {name}-worker
+     *                                监控线程开头 {name}-monitor
      * @param consumerProp            消费者属性
      * @param onePartitionOneConsumer 一个分区一个消费者
      *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
@@ -241,7 +242,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         }
                         //启动监控
                         if (monitor_period != 0) {
-                            monitor_pool = Executors.newSingleThreadScheduledExecutor();
+                            monitor_pool = Executors.newSingleThreadScheduledExecutor(r->new Thread(r, name + "-monitor"));
                             monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
                         }
                         //启动消费者
