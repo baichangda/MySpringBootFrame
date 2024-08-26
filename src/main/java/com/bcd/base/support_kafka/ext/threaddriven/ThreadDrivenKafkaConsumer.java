@@ -192,7 +192,7 @@ public abstract class ThreadDrivenKafkaConsumer {
 
         //初始化工作线程
         this.workThreads = new Thread[workThreadNum];
-        //根据是否公用一个队列、来指定构造
+        //是否一个工作线程一个队列
         if (oneWorkThreadOneQueue) {
             this.queue = null;
             this.queues = new BlockingQueue[workThreadNum];
