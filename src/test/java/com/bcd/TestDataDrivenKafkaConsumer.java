@@ -17,7 +17,16 @@ import java.util.concurrent.TimeUnit;
 
 public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
     public TestDataDrivenKafkaConsumer() {
-        super("Test", new ConsumerProp("192.168.23.129:9092", "test-bcd"), false, 1, 10000, 100000, true, 0, 1, "test");
+        super("Test",
+                new ConsumerProp("192.168.23.129:9092", "test-bcd"),
+                false,
+                1,
+                10000,
+                100000,
+                true,
+                0,
+                1,
+                "test");
     }
 
     @Override

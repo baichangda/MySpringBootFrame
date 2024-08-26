@@ -37,7 +37,17 @@ public abstract class AbstractNotifyClient extends ThreadDrivenKafkaConsumer {
     private final String notifyTopic;
 
     public AbstractNotifyClient(String type, RedisConnectionFactory redisConnectionFactory, NotifyProp notifyProp) {
-        super("notifyClient(" + type + ")", new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id), false, false, 100, 1, 100, true, 0, 0, "notify_" + type);
+        super("notifyClient(" + type + ")",
+                new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id),
+                false,
+                false,
+                1,
+                100,
+                100,
+                true,
+                0,
+                0,
+                "notify_" + type);
         this.subscribeTopic = "subscribe_" + type;
         this.notifyTopic = "notify_" + type;
         this.producer = ProducerFactory.newProducer(new ProducerProp(notifyProp.bootstrapServers));

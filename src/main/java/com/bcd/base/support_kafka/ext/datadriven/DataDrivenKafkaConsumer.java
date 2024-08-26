@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -118,7 +117,7 @@ public abstract class DataDrivenKafkaConsumer {
                 false,
                 Runtime.getRuntime().availableProcessors(),
                 0,
-                100000,
+                10000,
                 true,
                 0,
                 3,
@@ -413,6 +412,12 @@ public abstract class DataDrivenKafkaConsumer {
 
     }
 
+    private String getQueueLog(WorkExecutor executor) {
+        return executor.executor.getActiveCount()
+                + (workExecutorQueueSize > 0 ? ("/" + workExecutorQueueSize) : "")
+                + ","
+                + executor.blockingExecutor.getActiveCount();
+    }
 
     /**
      * 监控日志
@@ -427,7 +432,7 @@ public abstract class DataDrivenKafkaConsumer {
                 name, workExecutors.length, monitor_workHandlerCount.sum(),
                 blockingNum.sum(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                Arrays.stream(workExecutors).map(e -> "(" + e.executor.getActiveCount() + (workExecutorQueueSize > 0 ? ("/" + workExecutorQueueSize) : "") + "," + e.blockingExecutor.getActiveCount() + ")").collect(Collectors.joining(" ")),
+                Arrays.stream(workExecutors).map(this::getQueueLog).collect(Collectors.joining(" ")),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }

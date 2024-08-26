@@ -15,7 +15,17 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest(classes = Application.class)
 public class TestThreadDrivenKafkaConsumer extends ThreadDrivenKafkaConsumer {
     public TestThreadDrivenKafkaConsumer() {
-        super("Test",new ConsumerProp("192.168.23.129:9092", "test-bcd"), true,false, 100000, 1, 100000, true, 0, 1, "test");
+        super("Test",
+                new ConsumerProp("192.168.23.129:9092", "test-bcd"),
+                true,
+                false,
+                1,
+                100000,
+                100000,
+                true,
+                0,
+                1,
+                "test");
     }
 
     @Override
