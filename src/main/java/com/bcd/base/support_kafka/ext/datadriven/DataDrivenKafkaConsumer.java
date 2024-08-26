@@ -65,7 +65,7 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * 当前阻塞数量
      */
-    public final AtomicInteger blockingNum = new AtomicInteger();
+    public final LongAdder blockingNum = new LongAdder();
 
     /**
      * 是否自动释放阻塞、适用于工作内容为同步处理的逻辑
@@ -127,6 +127,7 @@ public abstract class DataDrivenKafkaConsumer {
      * @param name                    当前消费者的名称(用于标定线程名称)
      *                                消费者线程开头 {name}-consumer
      *                                工作任务执行器线程开头 {name}-worker
+     *                                监控线程开头 {name}-monitor
      * @param consumerProp            消费者属性
      * @param onePartitionOneConsumer 一个分区一个消费者
      *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
@@ -227,7 +228,7 @@ public abstract class DataDrivenKafkaConsumer {
                         }
                         //启动监控
                         if (monitor_period != 0) {
-                            monitor_pool = Executors.newSingleThreadScheduledExecutor();
+                            monitor_pool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-monitor"));
                             monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
                         }
                         //启动消费者
@@ -335,7 +336,7 @@ public abstract class DataDrivenKafkaConsumer {
                 try {
                     //检查阻塞
                     if (maxBlockingNum > 0) {
-                        if (blockingNum.get() >= maxBlockingNum) {
+                        if (blockingNum.sum() >= maxBlockingNum) {
                             TimeUnit.MILLISECONDS.sleep(100);
                             continue;
                         }
@@ -348,7 +349,7 @@ public abstract class DataDrivenKafkaConsumer {
 
                     //统计
                     final int count = consumerRecords.count();
-                    blockingNum.addAndGet(count);
+                    blockingNum.add(count);
                     if (monitor_period > 0) {
                         monitor_consumeCount.add(count);
                     }
@@ -382,7 +383,7 @@ public abstract class DataDrivenKafkaConsumer {
                                 monitor_workCount.increment();
                             }
                             if (autoReleaseBlocking) {
-                                blockingNum.decrementAndGet();
+                                blockingNum.decrement();
                             }
                         });
                     }
@@ -415,7 +416,7 @@ public abstract class DataDrivenKafkaConsumer {
                         "queues[{}] " +
                         "work[{}/s]",
                 name, workExecutors.length, monitor_workHandlerCount.sum(),
-                blockingNum.get(), maxBlockingNum,
+                blockingNum.sum(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
                 Arrays.stream(workExecutors).map(e -> e.executor.getActiveCount() + "").collect(Collectors.joining(",")),
                 monitor_workCount.sumThenReset() / monitor_period);
