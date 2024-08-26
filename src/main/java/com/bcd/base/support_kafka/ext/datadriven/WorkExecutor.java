@@ -9,11 +9,31 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
+/**
+ * 工作执行器
+ * 通过两个线程执行不同的任务
+ *
+ * - {@link #executor}执行非阻塞任务
+ *   调用如下方法
+ *   {@link #execute(Runnable)}
+ *   {@link #submit(Supplier)}
+ *
+ * - {@link #blockingExecutor}执行阻塞任务
+ *   调用如下方法
+ *   {@link #executeBlocking(Runnable)}
+ *   {@link #submitBlocking(Supplier)}
+ *
+ * 注意:
+ *   非阻塞任务线程中的任务不能阻塞、且任务之间是串行执行的、没有线程安全问题
+ *   阻塞任务线程中的任务可以阻塞、任务之间是串行执行的、没有线程安全问题
+ *   但是不同线程之间是并发执行的、有线程安全问题
+ */
 public class WorkExecutor {
 
     static Logger logger = LoggerFactory.getLogger(WorkExecutor.class);
 
     public final ThreadPoolExecutor executor;
+    public final ThreadPoolExecutor blockingExecutor;
 
     /**
      * 存储本执行器所有的handler
@@ -22,25 +42,26 @@ public class WorkExecutor {
 
     public WorkExecutor(String threadName) {
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, threadName));
+        this.blockingExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, threadName + "-blocking"));
     }
 
-    public void execute(Runnable runnable) {
-        executor.execute(runnable);
-    }
-
-    public CompletableFuture<Void> execute_cf(Runnable runnable) {
+    public final CompletableFuture<Void> execute(Runnable runnable) {
         return CompletableFuture.runAsync(runnable, executor);
     }
 
-    public <T> Future<T> submit(Callable<T> callable) {
-        return executor.submit(callable);
-    }
-
-    public <T> CompletableFuture<T> submit_cf(Supplier<T> supplier) {
+    public final <T> CompletableFuture<T> submit(Supplier<T> supplier) {
         return CompletableFuture.supplyAsync(supplier, executor);
     }
 
+    public final CompletableFuture<Void> executeBlocking(Runnable runnable) {
+        return CompletableFuture.runAsync(runnable, blockingExecutor);
+    }
+
+    public final <T> CompletableFuture<T> submitBlocking(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, blockingExecutor);
+    }
+
     public void destroy() {
-        ExecutorUtil.shutdown(executor);
+        ExecutorUtil.shutdown(executor,blockingExecutor);
     }
 }

@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Pattern;
@@ -127,6 +124,7 @@ public abstract class DataDrivenKafkaConsumer {
      * @param name                    当前消费者的名称(用于标定线程名称)
      *                                消费者线程开头 {name}-consumer
      *                                工作任务执行器线程开头 {name}-worker
+     *                                - 每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
      *                                监控线程开头 {name}-monitor
      * @param consumerProp            消费者属性
      * @param onePartitionOneConsumer 一个分区一个消费者
@@ -192,9 +190,9 @@ public abstract class DataDrivenKafkaConsumer {
 
     public abstract WorkHandler newHandler(String id, WorkExecutor executor);
 
-    public final void removeHandler(String id) {
+    public final CompletableFuture<Void> removeHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
-        workExecutor.execute(() -> {
+        return workExecutor.execute(() -> {
             WorkHandler workHandler = workExecutor.workHandlers.remove(id);
             if (workHandler != null) {
                 workHandler.destroy();
@@ -418,7 +416,7 @@ public abstract class DataDrivenKafkaConsumer {
                 name, workExecutors.length, monitor_workHandlerCount.sum(),
                 blockingNum.sum(), maxBlockingNum,
                 monitor_consumeCount.sumThenReset() / monitor_period,
-                Arrays.stream(workExecutors).map(e -> e.executor.getActiveCount() + "").collect(Collectors.joining(",")),
+                Arrays.stream(workExecutors).map(e -> e.executor.getActiveCount() + "/" + e.blockingExecutor.getActiveCount()).collect(Collectors.joining(",")),
                 monitor_workCount.sumThenReset() / monitor_period);
     }
 }
