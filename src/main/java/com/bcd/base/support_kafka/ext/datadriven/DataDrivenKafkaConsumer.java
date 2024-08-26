@@ -320,7 +320,8 @@ public abstract class DataDrivenKafkaConsumer {
                     if (shutdownHookThread != null) {
                         try {
                             Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
-                        } catch (IllegalStateException ignored) {
+                        } catch (IllegalStateException ex) {
+                            throw BaseException.get(ex);
                         }
                     }
                     //标记不可用

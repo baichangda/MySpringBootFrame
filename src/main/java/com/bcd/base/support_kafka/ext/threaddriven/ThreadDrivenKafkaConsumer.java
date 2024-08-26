@@ -242,7 +242,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         }
                         //启动监控
                         if (monitor_period != 0) {
-                            monitor_pool = Executors.newSingleThreadScheduledExecutor(r->new Thread(r, name + "-monitor"));
+                            monitor_pool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-monitor"));
                             monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
                         }
                         //启动消费者
@@ -318,7 +318,8 @@ public abstract class ThreadDrivenKafkaConsumer {
                     if (shutdownHookThread != null) {
                         try {
                             Runtime.getRuntime().removeShutdownHook(shutdownHookThread);
-                        } catch (IllegalStateException ignored) {
+                        } catch (IllegalStateException ex) {
+                            throw BaseException.get(ex);
                         }
                     }
                     //标记不可用
