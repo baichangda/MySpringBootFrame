@@ -4,7 +4,6 @@ package com.bcd.base.util;
 import com.bcd.base.exception.BaseException;
 
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -54,31 +53,42 @@ public class ExecutorUtil {
     }
 
     /**
-     * 关闭资源、包括如下情况
-     * 1、关闭线程池、等待线程执行完毕
-     * 2、关闭队列、等待队列为空
-     * 3、关闭线程、等待线程执行完毕
+     * 一个一个关闭等待结束
+     *
+     * 支持{@link ExecutorService}、{@link ExecutorService[]}
+     *  - 关闭线程池
+     *  - 等待线程池执行完毕
+     *
+     * 支持{@link Thread}、{@link Thread[]}
+     *  - 等待线程执行完毕
+     *
+     * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
+     *  - 等待队列为空
      *
      * @param args
      */
-    public static void shutdown(Object... args) {
+    public static void shutdownThenAwait(Object... args) {
         if (args == null || args.length == 0) {
             return;
         }
         for (Object arg : args) {
             if (arg != null) {
                 if (arg instanceof ExecutorService pool) {
-                    shutdownThenAwait(pool);
+                    pool.shutdown();
+                    await(pool);
                 } else if (arg instanceof ExecutorService[] pools) {
-                    shutdownThenAwait(pools);
+                    for (ExecutorService pool : pools) {
+                        pool.shutdown();
+                        await(pool);
+                    }
                 } else if (arg instanceof Thread thread) {
-                    awaitThread(thread);
+                    await(thread);
                 } else if (arg instanceof Thread[] threads) {
-                    awaitThread(threads);
+                    await((Object) threads);
                 } else if (arg instanceof BlockingQueue<?> queue) {
-                    awaitQueueEmpty(queue);
+                    await(queue);
                 } else if (arg instanceof BlockingQueue<?>[] queues) {
-                    awaitQueueEmpty(queues);
+                    await((Object) queues);
                 } else {
                     throw BaseException.get("arg type[{}] not support", arg.getClass().getName());
                 }
@@ -86,64 +96,97 @@ public class ExecutorUtil {
         }
     }
 
-
     /**
-     * 关闭线程池并等待线程执行完毕
+     * 先停止所有
+     * 然后等待关闭
      *
-     * @param pools
+     * 支持{@link ExecutorService}、{@link ExecutorService[]}
+     *  - 关闭线程池
+     *  - 等待线程池执行完毕
+     *
+     * 支持{@link Thread}、{@link Thread[]}
+     *  - 等待线程执行完毕
+     *
+     * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
+     *  - 等待队列为空
+     *
+     * @param args
      */
-    public static void shutdownThenAwait(ExecutorService... pools) {
-        if (pools == null || pools.length == 0) {
+    public static void shutdownAllThenAwait(Object... args) {
+        if (args == null || args.length == 0) {
             return;
         }
-        try {
-            for (ExecutorService pool : pools) {
-                if (pool != null && !pool.isTerminated()) {
+        for (Object arg : args) {
+            if (arg != null) {
+                if (arg instanceof ExecutorService pool) {
                     pool.shutdown();
-                    while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
-
+                } else if (arg instanceof ExecutorService[] pools) {
+                    for (ExecutorService pool : pools) {
+                        pool.shutdown();
                     }
                 }
             }
-        } catch (InterruptedException ex) {
-            throw BaseException.get(ex);
         }
+
+        for (Object arg : args) {
+            await(arg);
+        }
+
     }
 
+
     /**
-     * 等待队列为空
+     * 等待资源关闭
      *
-     * @param queues
+     * 支持{@link ExecutorService}、{@link ExecutorService[]}
+     *  - 等待线程池执行完毕
+     *
+     * 支持{@link Thread}、{@link Thread[]}
+     *  - 等待线程执行完毕
+     *
+     * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
+     *  - 等待队列为空
+     *
+     * @param args
      */
-    public static void awaitQueueEmpty(Queue<?>... queues) {
-        if (queues == null || queues.length == 0) {
+    public static void await(Object... args) {
+        if (args == null || args.length == 0) {
             return;
         }
         try {
-            for (Queue<?> queue : queues) {
-                while (queue != null && !queue.isEmpty()) {
-                    TimeUnit.MILLISECONDS.sleep(100L);
-                }
-            }
-        } catch (InterruptedException e) {
-            throw BaseException.get(e);
-        }
-    }
+            for (Object arg : args) {
+                if (arg != null) {
+                    if (arg instanceof ExecutorService pool) {
+                        while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
 
-    /**
-     * 等待线程执行完毕
-     *
-     * @param threads
-     */
-    public static void awaitThread(Thread... threads) {
-        if (threads == null || threads.length == 0) {
-            return;
-        }
-        try {
-            for (Thread thread : threads) {
-                if (thread != null) {
-                    thread.join();
+                        }
+                    } else if (arg instanceof ExecutorService[] pools) {
+                        for (ExecutorService pool : pools) {
+                            while (!pool.awaitTermination(60, TimeUnit.SECONDS)) {
+
+                            }
+                        }
+                    } else if (arg instanceof Thread thread) {
+                        thread.join();
+                    } else if (arg instanceof Thread[] threads) {
+                        for (Thread thread : threads) {
+                            thread.join();
+                        }
+                    } else if (arg instanceof BlockingQueue<?> queue) {
+                        while (!queue.isEmpty()) {
+                            TimeUnit.MILLISECONDS.sleep(100L);
+                        }
+                    } else if (arg instanceof BlockingQueue<?>[] queues) {
+                        for (BlockingQueue<?> queue : queues) {
+                            while (!queue.isEmpty()) {
+                                TimeUnit.MILLISECONDS.sleep(100L);
+                            }
+                        }
+                    } else {
+                        throw BaseException.get("arg type[{}] not support", arg.getClass().getName());
+                    }
                 }
+
             }
         } catch (InterruptedException e) {
             throw BaseException.get(e);

@@ -6,27 +6,30 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
  * 工作执行器
  * 通过两个线程执行不同的任务
- *
+ * <p>
  * - {@link #executor}执行非阻塞任务
- *   调用如下方法
- *   {@link #execute(Runnable)}
- *   {@link #submit(Supplier)}
- *
+ * 调用如下方法
+ * {@link #execute(Runnable)}
+ * {@link #submit(Supplier)}
+ * <p>
  * - {@link #blockingExecutor}执行阻塞任务
- *   调用如下方法
- *   {@link #executeBlocking(Runnable)}
- *   {@link #submitBlocking(Supplier)}
- *
+ * 调用如下方法
+ * {@link #executeBlocking(Runnable)}
+ * {@link #submitBlocking(Supplier)}
+ * <p>
  * 注意:
- *   非阻塞任务线程中的任务不能阻塞、且任务之间是串行执行的、没有线程安全问题
- *   阻塞任务线程中的任务可以阻塞、任务之间是串行执行的、没有线程安全问题
- *   但是不同线程之间是并发执行的、有线程安全问题
+ * 非阻塞任务线程中的任务不能阻塞、且任务之间是串行执行的、没有线程安全问题
+ * 阻塞任务线程中的任务可以阻塞、任务之间是串行执行的、没有线程安全问题
+ * 但是不同线程之间是并发执行的、有线程安全问题
  */
 public class WorkExecutor {
 
@@ -62,6 +65,6 @@ public class WorkExecutor {
     }
 
     public void destroy() {
-        ExecutorUtil.shutdown(executor,blockingExecutor);
+        ExecutorUtil.shutdownAllThenAwait(executor, blockingExecutor);
     }
 }

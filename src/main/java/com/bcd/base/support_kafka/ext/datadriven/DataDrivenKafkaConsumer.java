@@ -294,7 +294,7 @@ public abstract class DataDrivenKafkaConsumer {
                 if (available) {
                     //打上退出标记、等待消费线程退出
                     running_consume = false;
-                    ExecutorUtil.shutdown(consumeThread, consumeThreads, resetConsumeCountPool);
+                    ExecutorUtil.shutdownThenAwait(consumeThread, consumeThreads, resetConsumeCountPool);
                     //等待工作执行器退出
                     for (WorkExecutor workExecutor : workExecutors) {
                         //先销毁所有handler
