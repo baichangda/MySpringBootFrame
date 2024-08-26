@@ -98,7 +98,7 @@ public class TaskBuilder<T extends Task<K>, K extends Serializable> {
                     //此时找不到任务
                     stopResults[i] = StopResult.WAIT_OR_IN_EXECUTING_NOT_FOUND;
                 } else {
-                    logger.info("stop{},{}", ids[i], runnable.getExecutor());
+                    logger.info("stop[{},{}]", ids[i], runnable.getExecutor());
                     stopResults[i] = runnable.stop();
                 }
             }
