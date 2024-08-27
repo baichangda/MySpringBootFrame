@@ -54,16 +54,16 @@ public class ExecutorUtil {
 
     /**
      * 一个一个关闭等待结束
-     *
+     * <p>
      * 支持{@link ExecutorService}、{@link ExecutorService[]}
-     *  - 关闭线程池
-     *  - 等待线程池执行完毕
-     *
+     * - 关闭线程池
+     * - 等待线程池执行完毕
+     * <p>
      * 支持{@link Thread}、{@link Thread[]}
-     *  - 等待线程执行完毕
-     *
+     * - 等待线程执行完毕
+     * <p>
      * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
-     *  - 等待队列为空
+     * - 等待队列为空
      *
      * @param args
      */
@@ -99,16 +99,16 @@ public class ExecutorUtil {
     /**
      * 先停止所有
      * 然后等待关闭
-     *
+     * <p>
      * 支持{@link ExecutorService}、{@link ExecutorService[]}
-     *  - 关闭线程池
-     *  - 等待线程池执行完毕
-     *
+     * - 关闭线程池
+     * - 等待线程池执行完毕
+     * <p>
      * 支持{@link Thread}、{@link Thread[]}
-     *  - 等待线程执行完毕
-     *
+     * - 等待线程执行完毕
+     * <p>
      * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
-     *  - 等待队列为空
+     * - 等待队列为空
      *
      * @param args
      */
@@ -137,15 +137,15 @@ public class ExecutorUtil {
 
     /**
      * 等待资源关闭
-     *
+     * <p>
      * 支持{@link ExecutorService}、{@link ExecutorService[]}
-     *  - 等待线程池执行完毕
-     *
+     * - 等待线程池执行完毕
+     * <p>
      * 支持{@link Thread}、{@link Thread[]}
-     *  - 等待线程执行完毕
-     *
+     * - 等待线程执行完毕
+     * <p>
      * 支持{@link java.util.Queue}、{@link java.util.Queue[]}
-     *  - 等待队列为空
+     * - 等待队列为空
      *
      * @param args
      */

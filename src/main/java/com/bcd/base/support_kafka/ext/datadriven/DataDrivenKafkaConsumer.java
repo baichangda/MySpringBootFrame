@@ -128,8 +128,7 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * @param name                    当前消费者的名称(用于标定线程名称)
      *                                消费者线程开头 {name}-consumer
-     *                                工作任务执行器线程开头 {name}-worker
-     *                                - 每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
+     *                                工作任务执行器线程开头 {name}-worker、每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
      *                                监控线程开头 {name}-monitor
      * @param consumerProp            消费者属性
      * @param onePartitionOneConsumer 一个分区一个消费者
