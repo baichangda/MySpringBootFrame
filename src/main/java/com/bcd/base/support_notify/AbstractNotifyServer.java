@@ -1,6 +1,5 @@
 package com.bcd.base.support_notify;
 
-import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ProducerFactory;
 import com.bcd.base.support_kafka.ext.ProducerProp;
@@ -10,6 +9,7 @@ import com.bcd.base.util.ExecutorUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +30,11 @@ import java.util.concurrent.*;
  * 1、启动时候会从redis中加载所有订阅信息
  * 2、kafka监听订阅和取消订阅请求
  * 3、每隔1min检查订阅信息是否有变化
+ * 主要是为了解决客户端掉线、未主动取消订阅导致服务端无法更新缓存
+ * <p>
+ * 通过调用{@link #sendNotify(byte[])}发送通知
+ * <p>
+ * 所有的方法调用都由{@link #workPool}完成、避免了线程安全性问题
  */
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
@@ -69,12 +74,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
     public void init() {
         workPool = Executors.newSingleThreadScheduledExecutor();
         //初始化redis订阅数据到缓存
-        Future<?> future = checkAndUpdateCache();
-        try {
-            future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw BaseException.get(e);
-        }
+        checkAndUpdateCache().join();
         //开始消费
         super.init();
         startUpdateCacheFromRedis();
@@ -122,7 +122,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
     }
 
 
-    private Future<?> checkAndUpdateCache() {
+    private CompletableFuture<Void> checkAndUpdateCache() {
         Map<String, ListenerInfo> aliveMap = new HashMap<>();
         Map<String, String> entries = boundHashOperations.entries();
         if (entries != null) {
@@ -138,7 +138,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
                 }
             }
         }
-        return workPool.submit(() -> {
+        return CompletableFuture.runAsync(() -> {
             boolean update;
             if (aliveMap.size() == cache.size()) {
                 update = aliveMap.entrySet().stream().anyMatch(e -> !cache.containsKey(e.getKey()));
@@ -149,19 +149,37 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
                 cache = aliveMap;
                 onListenerInfoUpdate(cache.values().toArray(new ListenerInfo[0]));
             }
-        });
+        }, workPool);
     }
 
     /**
+     * 当监控信息发生变更后的回调方法
      * 注意不要阻塞此方法
      * 因为针对该类所有操作都是由单线程完成
      *
      * @param listenerInfos 全量有效的订阅信息
      */
-    public abstract void onListenerInfoUpdate(ListenerInfo[] listenerInfos);
+    public void onListenerInfoUpdate(ListenerInfo[] listenerInfos) {
 
-    public void sendNotify(final byte[] bytes) {
-        producer.send(new ProducerRecord<>(notifyTopic, bytes));
+    }
+
+    /**
+     * 发送通知(异步)
+     * 会先判断是否有订阅者，有则发送，无则不发送
+     * 如果不发送、则{@link CompletableFuture#get()}结果为null
+     *
+     * @param bytes
+     * @return
+     */
+    public CompletableFuture<Future<RecordMetadata>> sendNotify(final byte[] bytes) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (cache.isEmpty()) {
+                return null;
+            } else {
+                return producer.send(new ProducerRecord<>(notifyTopic, bytes));
+            }
+        }, workPool);
+
     }
 
 }
