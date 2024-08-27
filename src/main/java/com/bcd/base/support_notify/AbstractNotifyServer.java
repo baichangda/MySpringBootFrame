@@ -33,8 +33,6 @@ import java.util.concurrent.*;
  * 主要是为了解决客户端掉线、未主动取消订阅导致服务端无法更新缓存
  * <p>
  * 通过调用{@link #sendNotify(byte[])}发送通知
- * <p>
- * 所有的方法调用都由{@link #workPool}完成、避免了线程安全性问题
  */
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
@@ -43,7 +41,8 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
     public final String type;
     public final BoundHashOperations<String, String, String> boundHashOperations;
     public final NotifyProp notifyProp;
-    public ScheduledExecutorService workPool;
+    public ExecutorService workPool;
+    public ScheduledExecutorService scheduledPool;
     private final Producer<String, byte[]> producer;
     private final String subscribeTopic;
     private final String notifyTopic;
@@ -72,11 +71,13 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
 
 
     public void init() {
-        workPool = Executors.newSingleThreadScheduledExecutor();
+        workPool = Executors.newSingleThreadExecutor();
+        scheduledPool = Executors.newSingleThreadScheduledExecutor();
         //初始化redis订阅数据到缓存
         checkAndUpdateCache().join();
         //开始消费
         super.init();
+        //启动线程定时更新缓存
         startUpdateCacheFromRedis();
     }
 
@@ -84,8 +85,9 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
         //停止消费
         super.destroy();
         //停止工作线程池
-        ExecutorUtil.shutdownThenAwait(workPool);
+        ExecutorUtil.shutdownAllThenAwait(workPool, scheduledPool);
         workPool = null;
+        scheduledPool = null;
     }
 
     @Override
@@ -118,7 +120,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
      * 从redis中获取所有的监听信息、更新本地缓存
      */
     private void startUpdateCacheFromRedis() {
-        workPool.scheduleWithFixedDelay(this::checkAndUpdateCache, 1, 1, TimeUnit.MINUTES);
+        scheduledPool.scheduleWithFixedDelay(this::checkAndUpdateCache, 1, 1, TimeUnit.MINUTES);
     }
 
 
