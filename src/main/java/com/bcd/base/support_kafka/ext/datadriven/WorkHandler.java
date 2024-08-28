@@ -1,5 +1,6 @@
 package com.bcd.base.support_kafka.ext.datadriven;
 
+import com.bcd.base.util.DateUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 /**
@@ -16,13 +17,19 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 public abstract class WorkHandler {
     public final String id;
     public final WorkExecutor executor;
+    /**
+     * 创建时间(秒)
+     */
     public final long createTime;
+    /**
+     * 最后一条信息时间(秒)
+     */
     public long lastMessageTime;
 
     public WorkHandler(String id, WorkExecutor executor) {
         this.id = id;
         this.executor = executor;
-        this.createTime = System.currentTimeMillis();
+        this.createTime = DateUtil.CacheSecond.current();
     }
 
     public abstract void onMessage(ConsumerRecord<String, byte[]> msg);

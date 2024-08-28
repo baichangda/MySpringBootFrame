@@ -417,7 +417,7 @@ public abstract class DataDrivenKafkaConsumer {
                                 }
                                 return temp;
                             });
-                            workHandler.lastMessageTime = DateUtil.CacheMillisecond.current();
+                            workHandler.lastMessageTime = DateUtil.CacheSecond.current();
                             workHandler.onMessage(consumerRecord);
                             if (monitor_period > 0) {
                                 monitor_workCount.increment();
@@ -474,7 +474,7 @@ public abstract class DataDrivenKafkaConsumer {
      * @param expiredInSecond 过期时间
      */
     public final void scanAndDestroyWorkHandler(int expiredInSecond) {
-        long ts = DateUtil.CacheMillisecond.current() - expiredInSecond * 1000L;
+        long ts = DateUtil.CacheSecond.current() - expiredInSecond;
         for (WorkExecutor workExecutor : workExecutors) {
             workExecutor.execute(() -> {
                 for (WorkHandler workHandler : workExecutor.workHandlers.values()) {
