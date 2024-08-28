@@ -3,6 +3,7 @@ package com.bcd.base.support_kafka.ext.datadriven;
 import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_kafka.ext.ConsumerProp;
 import com.bcd.base.support_kafka.ext.ConsumerRebalanceLogger;
+import com.bcd.base.util.DateUtil;
 import com.bcd.base.util.ExecutorUtil;
 import com.bcd.base.util.StringUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -81,6 +82,12 @@ public abstract class DataDrivenKafkaConsumer {
     public ScheduledExecutorService resetConsumeCountPool;
 
     /**
+     * 扫描过期{@link WorkHandler}参数
+     */
+    public final ScanParam scanParam;
+    public ScheduledExecutorService scanPool;
+
+    /**
      * 消费topic
      */
     public final String[] topics;
@@ -94,6 +101,7 @@ public abstract class DataDrivenKafkaConsumer {
      * 控制退出线程标志
      */
     public volatile boolean running_consume = true;
+
     /**
      * 监控信息
      */
@@ -104,6 +112,15 @@ public abstract class DataDrivenKafkaConsumer {
     public ScheduledExecutorService monitor_pool;
 
     private Thread shutdownHookThread;
+
+
+    /**
+     * @param periodInSecond  定时任务扫描周期(秒)
+     * @param expiredInSecond 判断workHandler过期的时间(秒)
+     */
+    public record ScanParam(int periodInSecond, int expiredInSecond) {
+
+    }
 
     /**
      * 构造一个默认的消费者
@@ -120,6 +137,7 @@ public abstract class DataDrivenKafkaConsumer {
                 10000,
                 true,
                 0,
+                null,
                 3,
                 topics);
     }
@@ -145,6 +163,8 @@ public abstract class DataDrivenKafkaConsumer {
      *                                每消费一次的数据量大小取决于如下消费者参数
      *                                {@link ConsumerConfig#MAX_POLL_RECORDS_CONFIG} 一次poll消费最大数据量
      *                                {@link ConsumerConfig#MAX_PARTITION_FETCH_BYTES_CONFIG} 每个分区最大拉取字节数
+     * @param scanParam               定时任务扫描{@link WorkHandler}过期参数
+     *                                null则代表不启动扫描
      * @param monitor_period          监控信息打印周期(秒)、0则代表不打印
      * @param topics                  消费的topic
      */
@@ -156,6 +176,7 @@ public abstract class DataDrivenKafkaConsumer {
                                    int maxBlockingNum,
                                    boolean autoReleaseBlocking,
                                    int maxConsumeSpeed,
+                                   ScanParam scanParam,
                                    int monitor_period,
                                    String... topics) {
         this.name = name;
@@ -166,6 +187,7 @@ public abstract class DataDrivenKafkaConsumer {
         this.maxBlockingNum = maxBlockingNum;
         this.autoReleaseBlocking = autoReleaseBlocking;
         this.maxConsumeSpeed = maxConsumeSpeed;
+        this.scanParam = scanParam;
         this.monitor_period = monitor_period;
         this.topics = topics;
 
@@ -190,6 +212,7 @@ public abstract class DataDrivenKafkaConsumer {
         for (int i = 0; i < workExecutorNum; i++) {
             this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i, workExecutorQueueSize);
         }
+
     }
 
     public WorkExecutor getWorkExecutor(String id) {
@@ -237,6 +260,11 @@ public abstract class DataDrivenKafkaConsumer {
                         if (monitor_period != 0) {
                             monitor_pool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-monitor"));
                             monitor_pool.scheduleAtFixedRate(() -> logger.info(monitor_log()), monitor_period, monitor_period, TimeUnit.SECONDS);
+                        }
+                        //启动扫描过期数据
+                        if (scanParam != null) {
+                            scanPool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-scan"));
+                            scanPool.scheduleAtFixedRate(() -> scanAndDestroyWorkHandler(scanParam.expiredInSecond), scanParam.periodInSecond, scanParam.periodInSecond, TimeUnit.SECONDS);
                         }
                         //启动消费者
                         if (onePartitionOneConsumer) {
@@ -315,6 +343,9 @@ public abstract class DataDrivenKafkaConsumer {
                         });
                         workExecutor.destroy();
                     }
+                    //取消监控、扫描过期线程
+                    ExecutorUtil.shutdownAllThenAwait(monitor_pool, scanPool);
+
                     //取消shutdownHook
                     if (shutdownHookThread != null) {
                         try {
@@ -386,6 +417,7 @@ public abstract class DataDrivenKafkaConsumer {
                                 }
                                 return temp;
                             });
+                            workHandler.lastMessageTime = DateUtil.CacheMillisecond.current();
                             workHandler.onMessage(consumerRecord);
                             if (monitor_period > 0) {
                                 monitor_workCount.increment();
@@ -434,6 +466,24 @@ public abstract class DataDrivenKafkaConsumer {
                 monitor_consumeCount.sumThenReset() / monitor_period,
                 Arrays.stream(workExecutors).map(this::getQueueLog).collect(Collectors.joining(" ")),
                 monitor_workCount.sumThenReset() / monitor_period);
+    }
+
+    /**
+     * 扫描并销毁过期的workHandler
+     *
+     * @param expiredInSecond 过期时间
+     */
+    public final void scanAndDestroyWorkHandler(int expiredInSecond) {
+        long ts = DateUtil.CacheMillisecond.current() - expiredInSecond * 1000L;
+        for (WorkExecutor workExecutor : workExecutors) {
+            workExecutor.execute(() -> {
+                for (WorkHandler workHandler : workExecutor.workHandlers.values()) {
+                    if (workHandler.lastMessageTime < ts) {
+                        workHandler.destroy();
+                    }
+                }
+            });
+        }
     }
 }
 

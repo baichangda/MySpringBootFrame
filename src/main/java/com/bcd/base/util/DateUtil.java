@@ -4,13 +4,16 @@ import com.bcd.base.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 日期帮助类
@@ -311,6 +314,52 @@ public class DateUtil {
         }
     }
 
+    /**
+     * 缓存方式获取毫秒级时间戳
+     * {@link System#currentTimeMillis()}在多线程环境下,性能过低
+     */
+    public enum CacheMillisecond {
+        instance;
+        private volatile long l;
+
+        CacheMillisecond() {
+            System.out.println("CacheMillisecond init");
+            new ScheduledThreadPoolExecutor(1, r -> {
+                Thread thread = new Thread(r, "CacheMillisecond");
+                thread.setDaemon(true);
+                return thread;
+            }).scheduleAtFixedRate(() -> l = System.currentTimeMillis(),
+                    0, 1, TimeUnit.MILLISECONDS);
+        }
+
+        public static long current() {
+            return instance.l;
+        }
+    }
+
+    /**
+     * 缓存方式获取秒级时间戳
+     * {@link System#currentTimeMillis()}在多线程环境下,性能过低
+     */
+    public enum CacheSecond {
+        instance;
+        private volatile long l;
+
+        CacheSecond() {
+            System.out.println("CacheSecond init");
+            new ScheduledThreadPoolExecutor(1, r -> {
+                Thread thread = new Thread(r, "CacheSecond");
+                thread.setDaemon(true);
+                return thread;
+            }).scheduleAtFixedRate(() -> l = System.currentTimeMillis() / 1000L,
+                    0, 1, TimeUnit.SECONDS);
+        }
+
+        public static long current() {
+            return instance.l;
+        }
+    }
+
     public static void main(String[] args) {
 //        LocalDateTime ldt1 = LocalDateTime.of(2023, 8, 16, 6, 10, 10, 0);
 //        LocalDateTime ldt2 = ldt1.plusDays(20);
@@ -320,16 +369,37 @@ public class DateUtil {
 //            System.out.println(dates[0] + "," + dates[1]);
 //        }
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("+8"));
-        LocalDateTime ldt = LocalDateTime.now();
-        OffsetDateTime odt = LocalDateTime.now().atOffset(ZoneOffset.of("+4"));
-        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of("+0"));
-        System.out.println(ldt.format(dtf));
-        System.out.println(odt.format(dtf));
-        System.out.println(zdt.format(dtf));
-        System.out.println(dtf.format(new Date().toInstant()));
-        System.out.println(Instant.from(dtf.parse("20220101010101")).atOffset(ZoneOffset.of("+8")));
-
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.of("+8"));
+//        LocalDateTime ldt = LocalDateTime.now();
+//        OffsetDateTime odt = LocalDateTime.now().atOffset(ZoneOffset.of("+4"));
+//        ZonedDateTime zdt = LocalDateTime.now().atZone(ZoneId.of("+0"));
+//        System.out.println(ldt.format(dtf));
+//        System.out.println(odt.format(dtf));
+//        System.out.println(zdt.format(dtf));
+//        System.out.println(dtf.format(new Date().toInstant()));
+//        System.out.println(Instant.from(dtf.parse("20220101010101")).atOffset(ZoneOffset.of("+8")));
+        int n = 100000000;
+        long t1 = System.currentTimeMillis();
+        for (int i = 0; i < n; i++) {
+            long l = System.currentTimeMillis();
+        }
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1);
+        for (int i = 0; i < n; i++) {
+            long l = DateUtil.CacheMillisecond.current();
+        }
+        long t3 = System.currentTimeMillis();
+        System.out.println(t3 - t2);
+        for (int i = 0; i < n; i++) {
+            long l = System.currentTimeMillis() / 1000L;
+        }
+        long t4 = System.currentTimeMillis();
+        System.out.println(t4 - t3);
+        for (int i = 0; i < n; i++) {
+            long l = DateUtil.CacheSecond.current();
+        }
+        long t5 = System.currentTimeMillis();
+        System.out.println(t5 - t4);
     }
 
 }
