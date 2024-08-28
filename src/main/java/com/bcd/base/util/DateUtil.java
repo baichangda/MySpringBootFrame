@@ -316,7 +316,8 @@ public class DateUtil {
 
     /**
      * 缓存方式获取毫秒级时间戳
-     * {@link System#currentTimeMillis()}在多线程环境下,性能过低
+     * {@link System#currentTimeMillis()}在高频率调用下,性能过低
+     * 单线程大概300倍差距、多线程差距更大
      */
     public enum CacheMillisecond {
         instance;
@@ -339,7 +340,8 @@ public class DateUtil {
 
     /**
      * 缓存方式获取秒级时间戳
-     * {@link System#currentTimeMillis()}在多线程环境下,性能过低
+     * {@link System#currentTimeMillis()}在高频率调用下,性能过低
+     * 单线程大概300倍差距、多线程差距更大
      */
     public enum CacheSecond {
         instance;
@@ -378,7 +380,7 @@ public class DateUtil {
 //        System.out.println(zdt.format(dtf));
 //        System.out.println(dtf.format(new Date().toInstant()));
 //        System.out.println(Instant.from(dtf.parse("20220101010101")).atOffset(ZoneOffset.of("+8")));
-        int n = 100000000;
+        int n = 1000000000;
         long t1 = System.currentTimeMillis();
         for (int i = 0; i < n; i++) {
             long l = System.currentTimeMillis();
