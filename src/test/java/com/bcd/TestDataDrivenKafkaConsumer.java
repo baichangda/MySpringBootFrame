@@ -1,19 +1,12 @@
 package com.bcd;
 
 import com.bcd.base.support_kafka.ext.ConsumerProp;
-import com.bcd.base.support_kafka.ext.ProducerFactory;
-import com.bcd.base.support_kafka.ext.ProducerProp;
 import com.bcd.base.support_kafka.ext.datadriven.DataDrivenKafkaConsumer;
 import com.bcd.base.support_kafka.ext.datadriven.WorkExecutor;
 import com.bcd.base.support_kafka.ext.datadriven.WorkHandler;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
     public TestDataDrivenKafkaConsumer() {
@@ -25,6 +18,7 @@ public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
                 100000,
                 true,
                 0,
+                null,
                 1,
                 "test");
     }
