@@ -117,7 +117,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                 false,
                 false,
                 Runtime.getRuntime().availableProcessors(),
-                10000,
+                0,
                 10000,
                 true,
                 0,
