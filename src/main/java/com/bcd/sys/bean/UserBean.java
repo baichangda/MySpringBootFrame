@@ -3,6 +3,7 @@ package com.bcd.sys.bean;
 import com.bcd.base.support_jdbc.anno.Table;
 import com.bcd.base.support_jdbc.anno.Unique;
 import com.bcd.base.support_jdbc.bean.BaseBean;
+import com.bcd.base.support_jdbc.bean.UserInterface;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +22,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table("t_sys_user")
-public class UserBean extends BaseBean{
+public class UserBean extends BaseBean implements UserInterface {
     @Serial
     private final static long serialVersionUID = 1L;
 

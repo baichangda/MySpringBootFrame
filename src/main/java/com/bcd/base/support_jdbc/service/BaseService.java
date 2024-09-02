@@ -4,10 +4,10 @@ import com.bcd.base.condition.Condition;
 import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_jdbc.bean.BaseBean;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
+import com.bcd.base.support_jdbc.bean.UserInterface;
 import com.bcd.base.support_jdbc.condition.ConditionUtil;
 import com.bcd.base.support_jdbc.condition.ConvertRes;
 import com.bcd.base.support_satoken.SaTokenUtil;
-import com.bcd.sys.bean.UserBean;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -603,7 +603,7 @@ public class BaseService<T extends SuperBaseBean> {
     private void setCreateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.createTime = new Date();
-        UserBean user = SaTokenUtil.getLoginUser_cache();
+        UserInterface user = getLoginUser();
         if (user != null) {
             bean.createUserId = user.getId();
             bean.createUserName = user.getUsername();
@@ -613,7 +613,7 @@ public class BaseService<T extends SuperBaseBean> {
     private void setUpdateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.updateTime = new Date();
-        UserBean user = SaTokenUtil.getLoginUser_cache();
+        UserInterface user = getLoginUser();
         if (user != null) {
             bean.updateUserId = user.getId();
             bean.updateUserName = user.getUsername();
@@ -625,7 +625,7 @@ public class BaseService<T extends SuperBaseBean> {
             if (!paramMap.containsKey("createTime")) {
                 paramMap.put("createTime", new Date());
             }
-            UserBean user = SaTokenUtil.getLoginUser_cache();
+            UserInterface user = getLoginUser();
             if (user != null) {
                 if (!paramMap.containsKey("createUserId")) {
                     paramMap.put("createUserId", user.getId());
@@ -642,7 +642,7 @@ public class BaseService<T extends SuperBaseBean> {
             if (!paramMap.containsKey("updateTime")) {
                 paramMap.put("updateTime", new Date());
             }
-            UserBean user = SaTokenUtil.getLoginUser_cache();
+            UserInterface user = getLoginUser();
             if (user != null) {
                 if (!paramMap.containsKey("updateUserId")) {
                     paramMap.put("updateUserId", user.getId());
@@ -652,5 +652,16 @@ public class BaseService<T extends SuperBaseBean> {
                 }
             }
         }
+    }
+
+    /**
+     * 此方法主要是给内部创建信息、更新信息获取当前登陆用户使用
+     * 不允许调用
+     * 其内容在代码创建之初就已经确定下来
+     * 如果没有用户体系、则实现返回null即可
+     * @return
+     */
+    private static UserInterface getLoginUser(){
+        return SaTokenUtil.getLoginUser_cache();
     }
 }
