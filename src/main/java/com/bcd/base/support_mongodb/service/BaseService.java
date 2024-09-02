@@ -5,6 +5,7 @@ import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongodb.anno.Unique;
 import com.bcd.base.support_mongodb.bean.BaseBean;
 import com.bcd.base.support_mongodb.bean.SuperBaseBean;
+import com.bcd.base.support_mongodb.bean.UserInterface;
 import com.bcd.base.support_mongodb.util.ConditionUtil;
 import com.mongodb.bulk.BulkWriteResult;
 import org.springframework.aop.framework.AopContext;
@@ -228,11 +229,11 @@ public class BaseService<T extends SuperBaseBean> {
         BaseBean bean = (BaseBean) t;
         bean.createTime = new Date();
         //todo 在这里获取本地用户设置更新信息
-//        UserBean user = SaTokenUtil.getLoginUser_cache();
-//        if (user != null) {
-//            bean.updateUserId = user.getId();
-//            bean.updateUserName = user.getUsername();
-//        }
+        UserInterface user = getLoginUser();
+        if (user != null) {
+            bean.updateUserId = user.getId();
+            bean.updateUserName = user.getUsername();
+        }
     }
 
     private void validateUniqueBeforeSave(List<T> list) {
@@ -298,5 +299,16 @@ public class BaseService<T extends SuperBaseBean> {
                 }
             }
         }
+    }
+
+    /**
+     * 此方法主要是给内部创建信息、更新信息获取当前登陆用户使用
+     * 不允许调用
+     * 其内容在代码创建之初就已经确定下来
+     * 如果没有用户体系、则实现返回null即可
+     * @return
+     */
+    private static UserInterface getLoginUser(){
+        return null;
     }
 }

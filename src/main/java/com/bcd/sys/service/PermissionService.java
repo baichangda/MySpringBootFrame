@@ -49,7 +49,7 @@ public class PermissionService extends BaseService<PermissionBean> implements Ap
         });
 
         //2、清空权限表
-        delete();
+        deleteAll();
 
         //3、转换成实体类并保存
         List<PermissionBean> permissionBeanList = permissionSet.stream().map(e -> {
