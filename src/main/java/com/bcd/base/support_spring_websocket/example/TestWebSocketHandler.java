@@ -34,6 +34,6 @@ public class TestWebSocketHandler extends PathTextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        logger.info("open");
+        logger.info("afterConnectionEstablished");
     }
 }
