@@ -135,10 +135,12 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public T save(T t) {
         validateUniqueBeforeSave(Collections.singletonList(t));
-        if (getBeanInfo().isBaseBean) {
-            if (t.getId() == null) {
+        if (t.getId() == null) {
+            if (getBeanInfo().autoSetCreateInfo) {
                 setCreateInfo(t);
-            } else {
+            }
+        } else {
+            if (getBeanInfo().autoSetUpdateInfo) {
                 setUpdateInfo(t);
             }
         }
@@ -154,7 +156,7 @@ public class BaseService<T extends SuperBaseBean> {
      */
     public List<T> insertAll(List<T> collection) {
         validateUniqueBeforeSave(collection);
-        if (getBeanInfo().isBaseBean) {
+        if (getBeanInfo().autoSetCreateInfo) {
             for (T t : collection) {
                 setCreateInfo(t);
             }
@@ -165,7 +167,7 @@ public class BaseService<T extends SuperBaseBean> {
     /**
      * 删除所有数据
      */
-    public void delete() {
+    public void deleteAll() {
         getMongoTemplate().remove(getBeanInfo().clazz);
     }
 
@@ -197,7 +199,8 @@ public class BaseService<T extends SuperBaseBean> {
 
 
     /**
-     * 批量修改、不会修改更新时间
+     * 批量修改
+     * 不会修改更新时间
      *
      * @param condition
      * @param updates
@@ -217,18 +220,16 @@ public class BaseService<T extends SuperBaseBean> {
     private void setCreateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.createTime = new Date();
-        //todo 在这里获取本地用户设置创建信息
-//        UserBean user = SaTokenUtil.getLoginUser_cache();
-//        if (user != null) {
-//            bean.createUserId = user.getId();
-//            bean.createUserName = user.getUsername();
-//        }
+        UserInterface user = getLoginUser();
+        if (user != null) {
+            bean.createUserId = user.getId();
+            bean.createUserName = user.getUsername();
+        }
     }
 
     private void setUpdateInfo(T t) {
         BaseBean bean = (BaseBean) t;
         bean.createTime = new Date();
-        //todo 在这里获取本地用户设置更新信息
         UserInterface user = getLoginUser();
         if (user != null) {
             bean.updateUserId = user.getId();
@@ -306,9 +307,10 @@ public class BaseService<T extends SuperBaseBean> {
      * 不允许调用
      * 其内容在代码创建之初就已经确定下来
      * 如果没有用户体系、则实现返回null即可
+     *
      * @return
      */
-    private static UserInterface getLoginUser(){
+    private static UserInterface getLoginUser() {
         return null;
     }
 }

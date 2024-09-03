@@ -49,11 +49,11 @@ public final class BeanInfo<T> {
     /**
      * 是否在新增时候自动设置创建信息
      */
-    public final boolean autoSetCreateInfoBeforeInsert;
+    public final boolean autoSetCreateInfo;
     /**
      * 是否在更新时候自动设置更新信息
      */
-    public final boolean autoSetUpdateInfoBeforeUpdate;
+    public final boolean autoSetUpdateInfo;
     /**
      * 唯一字段集合
      */
@@ -69,11 +69,11 @@ public final class BeanInfo<T> {
         tableName = table.value();
 
         if (BaseBean.class.isAssignableFrom(clazz)) {
-            autoSetCreateInfoBeforeInsert = table.autoSetCreateInfoBeforeInsert();
-            autoSetUpdateInfoBeforeUpdate = table.autoSetUpdateInfoBeforeUpdate();
+            autoSetCreateInfo = table.autoSetCreateInfo();
+            autoSetUpdateInfo = table.autoSetUpdateInfo();
         } else {
-            autoSetCreateInfoBeforeInsert = false;
-            autoSetUpdateInfoBeforeUpdate = false;
+            autoSetCreateInfo = false;
+            autoSetUpdateInfo = false;
         }
 
         final Field[] allFields = FieldUtils.getAllFields(clazz);

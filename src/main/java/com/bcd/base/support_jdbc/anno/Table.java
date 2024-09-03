@@ -3,7 +3,6 @@ package com.bcd.base.support_jdbc.anno;
 import com.bcd.base.condition.Condition;
 import com.bcd.base.support_jdbc.bean.SuperBaseBean;
 
-import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -31,7 +30,7 @@ public @interface Table {
      * {@link com.bcd.base.support_jdbc.service.BaseService#insert(Map)}
      * {@link com.bcd.base.support_jdbc.service.BaseService#insertBatch(List)}
      */
-    boolean autoSetCreateInfoBeforeInsert() default true;
+    boolean autoSetCreateInfo() default true;
 
     /**
      * 此属性指定是否在更新时候自动设置更新信息
@@ -46,5 +45,5 @@ public @interface Table {
      * {@link com.bcd.base.support_jdbc.service.BaseService#update(Condition, Map)}
      * {@link com.bcd.base.support_jdbc.service.BaseService#updateBatch(List)}
      */
-    boolean autoSetUpdateInfoBeforeUpdate() default true;
+    boolean autoSetUpdateInfo() default true;
 }

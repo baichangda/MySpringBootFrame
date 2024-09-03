@@ -217,7 +217,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (!info.uniqueInfoList.isEmpty()) {
             validateUnique(Collections.singletonList(t));
         }
-        if (info.autoSetCreateInfoBeforeInsert) {
+        if (info.autoSetCreateInfo) {
             setCreateInfo(t);
         }
         if (t.getId() == null) {
@@ -281,7 +281,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (!info.uniqueInfoList.isEmpty()) {
             validateUnique(list);
         }
-        if (info.autoSetCreateInfoBeforeInsert) {
+        if (info.autoSetCreateInfo) {
             for (T t : list) {
                 setCreateInfo(t);
             }
@@ -310,7 +310,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (!info.uniqueInfoList.isEmpty()) {
             validateUnique(Collections.singletonList(t));
         }
-        if (info.autoSetUpdateInfoBeforeUpdate) {
+        if (info.autoSetUpdateInfo) {
             setUpdateInfo(t);
         }
         final String sql = info.updateSql_noId + " where id=?";
@@ -401,7 +401,7 @@ public class BaseService<T extends SuperBaseBean> {
         if (!info.uniqueInfoList.isEmpty()) {
             validateUnique(list);
         }
-        if (info.autoSetUpdateInfoBeforeUpdate) {
+        if (info.autoSetUpdateInfo) {
             for (T t : list) {
                 setUpdateInfo(t);
             }
@@ -621,7 +621,7 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     private void setCreateInfo(Map<String, Object> paramMap) {
-        if (getBeanInfo().autoSetCreateInfoBeforeInsert) {
+        if (getBeanInfo().autoSetCreateInfo) {
             if (!paramMap.containsKey("createTime")) {
                 paramMap.put("createTime", new Date());
             }
@@ -638,7 +638,7 @@ public class BaseService<T extends SuperBaseBean> {
     }
 
     private void setUpdateInfo(Map<String, Object> paramMap) {
-        if (getBeanInfo().autoSetUpdateInfoBeforeUpdate) {
+        if (getBeanInfo().autoSetUpdateInfo) {
             if (!paramMap.containsKey("updateTime")) {
                 paramMap.put("updateTime", new Date());
             }
