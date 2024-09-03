@@ -93,8 +93,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     //springboot web支持
     implementation("org.springframework.boot:spring-boot-starter-web")
-
-
+    //springboot websocket支持
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     //springboot log4j2支持
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
     // 此为log4j2的桥接器、用于System.getLogger
