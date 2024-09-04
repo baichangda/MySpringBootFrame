@@ -6,10 +6,8 @@ import com.bcd.base.util.ExceptionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -26,9 +24,6 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ExceptionConfig {
     private final static Logger logger = LoggerFactory.getLogger(ExceptionConfig.class);
-
-    @Autowired
-    private HttpMessageConverter<Object> converter;
 
     @ExceptionHandler
     public void handlerException(HttpServletResponse response, Exception exception) {
@@ -62,9 +57,7 @@ public class ExceptionConfig {
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
         Throwable realException = ExceptionUtil.parseException(throwable);
         Result<?> result;
-        if (realException instanceof NotLoginException) {
-            result = Result.fail(ExceptionCode.not_login.code).message(ExceptionCode.not_login.msg);
-        } else if (realException instanceof MethodArgumentNotValidException) {
+        if (realException instanceof MethodArgumentNotValidException) {
             final BindingResult bindingResult = ((MethodArgumentNotValidException) realException).getBindingResult();
             final List<ObjectError> allErrors = bindingResult.getAllErrors();
             final List<Map<String, String>> errorList = allErrors.stream().map(e -> {
@@ -79,9 +72,8 @@ public class ExceptionConfig {
         } else {
             result = Result.from(realException);
         }
-        ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
-        converter.write(result,
-                MediaType.APPLICATION_JSON,
-                servletServerHttpResponse);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(result.toJson());
+        response.getWriter().flush();
     }
 }
