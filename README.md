@@ -46,3 +46,15 @@
 - 引入新的三方库采用support_xxx格式命名包
 ### 业务模块
 - com.bcd.xxx命令新的业务模块包
+
+
+## 代码生成工具
+### mysql/pgsql代码生成
+- 首先创建表、表主键必须是id、long类型、表字段必须都有注释
+- 如果需要创建信息、更新信息、则字段必须如下创建时间(create_time)、创建人id(create_user_id)、创建人名称(create_user_name)、更新时间(update_time)、更新人id(update_user_id)、更新人名称(update_user_name)
+- 调用com.bcd.base.support_jdbc.code.CodeGenerator中main方法示例
+### mongodb代码生成
+- 首先创建bean
+- bean必须注解@Document(collection = "test")
+- bean字段必须@Schema(description = "vin")
+- 在bean中写main方法、代码参考com.bcd.base.support_mongodb.test.bean.TestBean中main方法
