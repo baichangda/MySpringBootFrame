@@ -32,7 +32,7 @@ import java.util.concurrent.*;
  * 3、每隔1min检查订阅信息是否有变化
  * 主要是为了解决客户端掉线、未主动取消订阅导致服务端无法更新缓存
  * <p>
- * 通过调用{@link #sendNotify(byte[])}发送通知
+ * 通过调用{@link #notify(byte[])}发送通知
  */
 @ConditionalOnProperty("server.id")
 @EnableConfigurationProperties(NotifyProp.class)
@@ -173,7 +173,7 @@ public abstract class AbstractNotifyServer extends ThreadDrivenKafkaConsumer {
      * @param bytes
      * @return
      */
-    public CompletableFuture<Future<RecordMetadata>> sendNotify(final byte[] bytes) {
+    public CompletableFuture<Future<RecordMetadata>> notify(final byte[] bytes) {
         return CompletableFuture.supplyAsync(() -> {
             if (cache.isEmpty()) {
                 return null;
