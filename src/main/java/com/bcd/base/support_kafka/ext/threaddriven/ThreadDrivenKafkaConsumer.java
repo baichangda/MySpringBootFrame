@@ -136,6 +136,7 @@ public abstract class ThreadDrivenKafkaConsumer {
      *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
      * @param oneWorkThreadOneQueue   一个工作线程一个队列
      *                                true时候
+     *                                每个工作线程都有自己的队列
      *                                消费时候会根据 {@link #index(ConsumerRecord)} 将消息定位到指定线程、然后提交到对应线程的队列中
      *                                实现记录关联work线程、这在某些场景可以避免线程竞争
      *                                false时候 共享一个队列

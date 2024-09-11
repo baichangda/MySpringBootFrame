@@ -156,6 +156,7 @@ public abstract class DataDrivenKafkaConsumer {
      * @param workExecutorQueueSize   工作任务执行器无阻塞任务线程池队列大小
      *                                <=0代表不限制、此时使用{@link LinkedBlockingQueue}
      *                                其他情况、则使用{@link ArrayBlockingQueue}
+     *                                每个工作任务执行器都有一个自己的队列
      * @param maxBlockingNum          最大阻塞数量(0代表不限制)、当内存中达到最大阻塞数量时候、消费者会停止消费
      *                                当不限制时候、还是会记录{@link #blockingNum}、便于监控阻塞数量
      * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
