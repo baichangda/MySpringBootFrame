@@ -178,7 +178,7 @@ public abstract class DataDrivenKafkaConsumer {
      *                              每消费一次的数据量大小取决于如下消费者参数
      *                              {@link ConsumerConfig#MAX_POLL_RECORDS_CONFIG} 一次poll消费最大数据量
      *                              {@link ConsumerConfig#MAX_PARTITION_FETCH_BYTES_CONFIG} 每个分区最大拉取字节数
-     * @param scanParam             定时扫描并销毁过期的{@link WorkHandler}
+     * @param scanParam             定时扫描并销毁过期的{@link WorkHandler}、销毁时候会执行其{@link WorkHandler#destroy()}方法、由对应的工作任务执行器执行
      *                              null则代表不启动扫描
      * @param monitor_period        监控信息打印周期(秒)、0则代表不打印
      * @param topic                 消费的topic
