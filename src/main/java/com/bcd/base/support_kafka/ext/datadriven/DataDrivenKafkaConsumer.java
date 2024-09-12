@@ -315,7 +315,7 @@ public abstract class DataDrivenKafkaConsumer {
                                 final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
                                 consumer.subscribe(Collections.singletonList(topic), new ConsumerRebalanceLogger(consumer));
                                 //初始化消费线程、提交消费任务
-                                consumeThread = new Thread(() -> consume(consumer), name + "-consumer(1/1)-0");
+                                consumeThread = new Thread(() -> consume(consumer), name + "-consumer(1/1)-partition(all)");
                                 consumeThread.start();
                                 logger.info("start consumer for topic[{}]", topic);
                                 break;
