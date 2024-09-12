@@ -138,27 +138,6 @@ public abstract class DataDrivenKafkaConsumer {
 
     }
 
-    /**
-     * 构造一个默认的消费者
-     *
-     * @param name
-     * @param consumerProp
-     * @param topic
-     * @param partitions
-     */
-    public DataDrivenKafkaConsumer(String name, ConsumerProp consumerProp, String topic, int... partitions) {
-        this(name, consumerProp,
-                Runtime.getRuntime().availableProcessors(),
-                0,
-                10000,
-                true,
-                0,
-                ScanParam.get(10 * 60, 10 * 60),
-                3,
-                topic,
-                partitions);
-    }
-
 
     /**
      * @param name                  当前消费者的名称(用于标定线程名称)
