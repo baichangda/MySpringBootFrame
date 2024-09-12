@@ -94,7 +94,10 @@ public abstract class ThreadDrivenKafkaConsumer {
     public final int[] partitions;
 
     /**
-     * 消费模式、依据{@link #partitions}
+     * 消费模式、由{@link #partitions}生成
+     * 1、启动一个线程消费topic所有的分区
+     * 2、获取topic所有的分区、每个分区启动一个线程消费指定分区
+     * 3、依据{@link #partitions}、启动对应个数的线程消费指定的分区
      */
     public final int consumeMode;
 
