@@ -36,10 +36,7 @@ public abstract class DataDrivenKafkaConsumer {
 
     public final String name;
     public final Properties properties;
-    /**
-     * 是否每个分区一个消费者
-     */
-    public final boolean onePartitionOneConsumer;
+
     /**
      * 消费线程
      */
@@ -90,7 +87,17 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * 消费topic
      */
-    public final String[] topics;
+    public final String topic;
+
+    /**
+     * 消费topic的partition
+     */
+    public final int[] partitions;
+
+    /**
+     * 消费模式、依据{@link #partitions}
+     */
+    public final int consumeMode;
 
     /**
      * 当前消费者是否可用
@@ -127,11 +134,11 @@ public abstract class DataDrivenKafkaConsumer {
      *
      * @param name
      * @param consumerProp
-     * @param topics
+     * @param topic
+     * @param partitions
      */
-    public DataDrivenKafkaConsumer(String name, ConsumerProp consumerProp, String... topics) {
+    public DataDrivenKafkaConsumer(String name, ConsumerProp consumerProp, String topic, int... partitions) {
         this(name, consumerProp,
-                false,
                 Runtime.getRuntime().availableProcessors(),
                 0,
                 10000,
@@ -139,39 +146,40 @@ public abstract class DataDrivenKafkaConsumer {
                 0,
                 new ScanParam(10 * 60, 10 * 60),
                 3,
-                topics);
+                topic,
+                partitions);
     }
 
 
     /**
-     * @param name                    当前消费者的名称(用于标定线程名称)
-     *                                消费者线程开头 {name}-consumer
-     *                                工作任务执行器线程开头 {name}-worker、每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
-     *                                监控线程开头 {name}-monitor
-     * @param consumerProp            消费者属性
-     * @param onePartitionOneConsumer 一个分区一个消费者
-     *                                true时候、会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
-     *                                false时候、会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
-     * @param workExecutorNum         工作任务执行器个数
-     * @param workExecutorQueueSize   工作任务执行器无阻塞任务线程池队列大小
-     *                                <=0代表不限制、此时使用{@link LinkedBlockingQueue}
-     *                                其他情况、则使用{@link ArrayBlockingQueue}
-     *                                每个工作任务执行器都有一个自己的队列
-     * @param maxBlockingNum          最大阻塞数量(0代表不限制)、当内存中达到最大阻塞数量时候、消费者会停止消费
-     *                                当不限制时候、还是会记录{@link #blockingNum}、便于监控阻塞数量
-     * @param autoReleaseBlocking     是否自动释放阻塞、适用于工作内容为同步处理的逻辑
-     * @param maxConsumeSpeed         最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
-     *                                每消费一次的数据量大小取决于如下消费者参数
-     *                                {@link ConsumerConfig#MAX_POLL_RECORDS_CONFIG} 一次poll消费最大数据量
-     *                                {@link ConsumerConfig#MAX_PARTITION_FETCH_BYTES_CONFIG} 每个分区最大拉取字节数
-     * @param scanParam               定时扫描并销毁过期的{@link WorkHandler}
-     *                                null则代表不启动扫描
-     * @param monitor_period          监控信息打印周期(秒)、0则代表不打印
-     * @param topics                  消费的topic
+     * @param name                  当前消费者的名称(用于标定线程名称)
+     *                              消费者线程开头 {name}-consumer
+     *                              工作任务执行器线程开头 {name}-worker、每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
+     *                              监控线程开头 {name}-monitor
+     * @param consumerProp          消费者属性
+     * @param workExecutorNum       工作任务执行器个数
+     * @param workExecutorQueueSize 工作任务执行器无阻塞任务线程池队列大小
+     *                              <=0代表不限制、此时使用{@link LinkedBlockingQueue}
+     *                              其他情况、则使用{@link ArrayBlockingQueue}
+     *                              每个工作任务执行器都有一个自己的队列
+     * @param maxBlockingNum        最大阻塞数量(0代表不限制)、当内存中达到最大阻塞数量时候、消费者会停止消费
+     *                              当不限制时候、还是会记录{@link #blockingNum}、便于监控阻塞数量
+     * @param autoReleaseBlocking   是否自动释放阻塞、适用于工作内容为同步处理的逻辑
+     * @param maxConsumeSpeed       最大消费速度每秒(0代表不限制)、kafka一次消费一批数据、设置过小会导致不起作用、此时会每秒处理一批数据
+     *                              每消费一次的数据量大小取决于如下消费者参数
+     *                              {@link ConsumerConfig#MAX_POLL_RECORDS_CONFIG} 一次poll消费最大数据量
+     *                              {@link ConsumerConfig#MAX_PARTITION_FETCH_BYTES_CONFIG} 每个分区最大拉取字节数
+     * @param scanParam             定时扫描并销毁过期的{@link WorkHandler}
+     *                              null则代表不启动扫描
+     * @param monitor_period        监控信息打印周期(秒)、0则代表不打印
+     * @param topic                 消费的topic
+     * @param partitions            消费的topic的分区、不同的情况消费策略不一样
+     *                              如果partitions为空、则会启动单线程即一个消费者使用{@link KafkaConsumer#subscribe(Pattern)}完成订阅
+     *                              如果partitions不为空、且partitions[0]<0、则会首先通过{@link KafkaConsumer#partitionsFor(String)}获取分区个数、然后启动对应的消费线程、每一个线程一个消费者使用{@link KafkaConsumer#assign(Collection)}完成分配
+     *                              其他情况、则根据指定分区个数启动对应个数的线程、每个线程负责消费一个分区
      */
     public DataDrivenKafkaConsumer(String name,
                                    ConsumerProp consumerProp,
-                                   boolean onePartitionOneConsumer,
                                    int workExecutorNum,
                                    int workExecutorQueueSize,
                                    int maxBlockingNum,
@@ -179,10 +187,10 @@ public abstract class DataDrivenKafkaConsumer {
                                    int maxConsumeSpeed,
                                    ScanParam scanParam,
                                    int monitor_period,
-                                   String... topics) {
+                                   String topic,
+                                   int... partitions) {
         this.name = name;
         this.properties = consumerProp.toProperties();
-        this.onePartitionOneConsumer = onePartitionOneConsumer;
         this.workExecutorNum = workExecutorNum;
         this.workExecutorQueueSize = workExecutorQueueSize;
         this.maxBlockingNum = maxBlockingNum;
@@ -190,7 +198,17 @@ public abstract class DataDrivenKafkaConsumer {
         this.maxConsumeSpeed = maxConsumeSpeed;
         this.scanParam = scanParam;
         this.monitor_period = monitor_period;
-        this.topics = topics;
+        this.topic = topic;
+        this.partitions = partitions;
+        if (partitions.length == 0) {
+            consumeMode = 1;
+        } else {
+            if (partitions[0] < 0) {
+                consumeMode = 2;
+            } else {
+                consumeMode = 3;
+            }
+        }
 
         if (monitor_period == 0) {
             monitor_workHandlerCount = null;
@@ -243,6 +261,42 @@ public abstract class DataDrivenKafkaConsumer {
         }
     }
 
+    private void startConsumePartitions(KafkaConsumer<String, byte[]> consumer, int[] ps) {
+        if (ps.length == 0) {
+            consumer.close();
+        } else {
+            int partitionSize = ps.length;
+            KafkaConsumer<String, byte[]>[] consumers = new KafkaConsumer[partitionSize];
+            try {
+                int firstPartition = ps[0];
+                consumer.assign(Collections.singletonList(new TopicPartition(topic, firstPartition)));
+                consumers[0] = consumer;
+                for (int i = 1; i < partitionSize; i++) {
+                    int partition = ps[i];
+                    final KafkaConsumer<String, byte[]> cur = new KafkaConsumer<>(properties);
+                    cur.assign(Collections.singletonList(new TopicPartition(topic, partition)));
+                    consumers[i] = cur;
+                }
+            } catch (Exception ex) {
+                //发生异常则关闭之前构造的消费者
+                for (KafkaConsumer<String, byte[]> cur : consumers) {
+                    if (cur != null) {
+                        cur.close();
+                    }
+                }
+                throw BaseException.get(ex);
+            }
+            consumeThreads = new Thread[partitionSize];
+            for (int i = 0; i < partitionSize; i++) {
+                final KafkaConsumer<String, byte[]> cur = consumers[i];
+                Thread thread = new Thread(() -> consume(cur), name + "-consumer(" + (i + 1) + "/" + partitionSize + ")-partition(" + i + ")");
+                consumeThreads[i] = thread;
+                thread.start();
+            }
+        }
+        logger.info("start consumers[{}] for partitions[{}]", partitions.length, Arrays.stream(partitions).mapToObj(e -> topic + ":" + e).collect(Collectors.joining(",")));
+    }
+
     public void init() {
         if (!available) {
             synchronized (this) {
@@ -268,49 +322,27 @@ public abstract class DataDrivenKafkaConsumer {
                             scanPool.scheduleAtFixedRate(() -> scanAndDestroyWorkHandler(scanParam.expiredInSecond), scanParam.periodInSecond, scanParam.periodInSecond, TimeUnit.SECONDS);
                         }
                         //启动消费者
-                        if (onePartitionOneConsumer) {
-                            final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
-                            List<PartitionInfo> partitions = Arrays.stream(topics).flatMap(e -> consumer.partitionsFor(e).stream()).toList();
-                            if (partitions.isEmpty()) {
-                                consumer.close();
-                            } else {
-                                int partitionSize = partitions.size();
-                                KafkaConsumer<String, byte[]>[] consumers = new KafkaConsumer[partitionSize];
-                                try {
-                                    PartitionInfo firstPartitionInfo = partitions.get(0);
-                                    consumer.assign(Collections.singletonList(new TopicPartition(firstPartitionInfo.topic(), firstPartitionInfo.partition())));
-                                    consumers[0] = consumer;
-                                    for (int i = 1; i < partitionSize; i++) {
-                                        PartitionInfo partitionInfo = partitions.get(i);
-                                        final KafkaConsumer<String, byte[]> cur = new KafkaConsumer<>(properties);
-                                        cur.assign(Collections.singletonList(new TopicPartition(partitionInfo.topic(), partitionInfo.partition())));
-                                        consumers[i] = cur;
-                                    }
-                                } catch (Exception ex) {
-                                    //发生异常则关闭之前构造的消费者
-                                    for (KafkaConsumer<String, byte[]> cur : consumers) {
-                                        if (cur != null) {
-                                            cur.close();
-                                        }
-                                    }
-                                    throw BaseException.get(ex);
-                                }
-                                consumeThreads = new Thread[partitionSize];
-                                for (int i = 0; i < partitionSize; i++) {
-                                    final KafkaConsumer<String, byte[]> cur = consumers[i];
-                                    Thread thread = new Thread(() -> consume(cur), name + "-consumer" + "(" + partitionSize + ")-" + i);
-                                    consumeThreads[i] = thread;
-                                    thread.start();
-                                }
+                        switch (consumeMode) {
+                            case 1: {
+                                final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
+                                consumer.subscribe(Collections.singletonList(topic), new ConsumerRebalanceLogger(consumer));
+                                //初始化消费线程、提交消费任务
+                                consumeThread = new Thread(() -> consume(consumer), name + "-consumer(1/1)-0");
+                                consumeThread.start();
+                                logger.info("start consumer for topic[{}]", topic);
+                                break;
                             }
-                            logger.info("start consumers[{}] for partitions[{}]", partitions.size(), partitions.stream().map(e -> e.topic() + ":" + e.partition()).collect(Collectors.joining(",")));
-                        } else {
-                            final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
-                            consumer.subscribe(Arrays.asList(topics), new ConsumerRebalanceLogger(consumer));
-                            //初始化消费线程、提交消费任务
-                            consumeThread = new Thread(() -> consume(consumer), name + "-consumer(1)-0");
-                            consumeThread.start();
-                            logger.info("start consumer for topics[{}]", String.join(",", topics));
+                            case 2: {
+                                final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
+                                int[] ps = consumer.partitionsFor(topic).stream().mapToInt(PartitionInfo::partition).toArray();
+                                startConsumePartitions(consumer, ps);
+                                break;
+                            }
+                            default: {
+                                final KafkaConsumer<String, byte[]> consumer = new KafkaConsumer<>(properties);
+                                startConsumePartitions(consumer, partitions);
+                                break;
+                            }
                         }
                         //增加销毁回调
                         shutdownHookThread = new Thread(this::destroy);
@@ -429,7 +461,7 @@ public abstract class DataDrivenKafkaConsumer {
                         });
                     }
                 } catch (Exception ex) {
-                    logger.error("Kafka Consumer[{}] Cycle Error,Try Again After 3s", Arrays.stream(topics).reduce((e1, e2) -> e1 + "," + e2), ex);
+                    logger.error("kafka consumer topic[{}] cycle error,try again after 3s", topic, ex);
                     try {
                         TimeUnit.SECONDS.sleep(3);
                     } catch (InterruptedException e) {

@@ -12,7 +12,6 @@ public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
     public TestDataDrivenKafkaConsumer() {
         super("Test",
                 new ConsumerProp("192.168.23.129:9092", "test-bcd"),
-                false,
                 1,
                 10000,
                 100000,

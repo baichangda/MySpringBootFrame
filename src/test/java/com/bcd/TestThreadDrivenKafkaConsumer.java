@@ -17,7 +17,6 @@ public class TestThreadDrivenKafkaConsumer extends ThreadDrivenKafkaConsumer {
     public TestThreadDrivenKafkaConsumer() {
         super("Test",
                 new ConsumerProp("192.168.23.129:9092", "test-bcd"),
-                true,
                 false,
                 1,
                 100000,

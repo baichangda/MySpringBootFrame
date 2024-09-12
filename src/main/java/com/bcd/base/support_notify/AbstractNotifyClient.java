@@ -40,7 +40,6 @@ public abstract class AbstractNotifyClient extends ThreadDrivenKafkaConsumer {
         super("notifyClient(" + type + ")",
                 new ConsumerProp(notifyProp.bootstrapServers, type + "_" + notifyProp.id),
                 false,
-                false,
                 1,
                 100,
                 100,
