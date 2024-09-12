@@ -121,8 +121,8 @@ public abstract class DataDrivenKafkaConsumer {
     private Thread shutdownHookThread;
 
     public static class ScanParam {
-        public int periodInSecond;
-        public int expiredInSecond;
+        public final int periodInSecond;
+        public final int expiredInSecond;
         private ScanParam(int periodInSecond, int expiredInSecond) {
             this.periodInSecond = periodInSecond;
             this.expiredInSecond = expiredInSecond;
