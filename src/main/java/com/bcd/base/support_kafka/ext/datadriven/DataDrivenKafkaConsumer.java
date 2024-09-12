@@ -120,12 +120,21 @@ public abstract class DataDrivenKafkaConsumer {
 
     private Thread shutdownHookThread;
 
+    public static class ScanParam {
+        public int periodInSecond;
+        public int expiredInSecond;
+        private ScanParam(int periodInSecond, int expiredInSecond) {
+            this.periodInSecond = periodInSecond;
+            this.expiredInSecond = expiredInSecond;
+        }
 
-    /**
-     * @param periodInSecond  定时任务扫描周期(秒)
-     * @param expiredInSecond 判断workHandler过期的时间(秒)
-     */
-    public record ScanParam(int periodInSecond, int expiredInSecond) {
+        /**
+         * @param periodInSecond  定时任务扫描周期(秒)
+         * @param expiredInSecond 判断workHandler过期的时间(秒)
+         */
+        public static ScanParam get(int periodInSecond, int expiredInSecond) {
+            return new ScanParam(periodInSecond, expiredInSecond);
+        }
 
     }
 
@@ -144,7 +153,7 @@ public abstract class DataDrivenKafkaConsumer {
                 10000,
                 true,
                 0,
-                new ScanParam(10 * 60, 10 * 60),
+                ScanParam.get(10 * 60, 10 * 60),
                 3,
                 topic,
                 partitions);
