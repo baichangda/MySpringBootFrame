@@ -158,7 +158,7 @@ public abstract class DataDrivenKafkaConsumer {
      *                                          <=0代表不限制、此时使用{@link LinkedBlockingQueue}
      *                                          其他情况、则使用{@link ArrayBlockingQueue}
      *                                          每个工作任务执行器都有一个自己的队列
-     * @param workExecutorBlockingCheckerPeriod 工作任务执行器阻塞监控任务执行周期
+     * @param workExecutorBlockingCheckerPeriod 工作任务执行器阻塞检查周期(秒)
      *                                          >0会启动阻塞检查、每一个执行器会启动一个周期任务线程池、周期进行检查操作
      *                                          <=0代表不启动阻塞检查
      *                                          检查逻辑为
