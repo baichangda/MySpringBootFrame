@@ -14,7 +14,7 @@ public class TestDataDrivenKafkaConsumer extends DataDrivenKafkaConsumer {
                 new ConsumerProp("192.168.23.129:9092", "test-bcd"),
                 1,
                 10000,
-                0,
+                null,
                 100000,
                 true,
                 0,
