@@ -18,22 +18,14 @@ import java.util.function.Supplier;
  * {@link #execute(Runnable)}
  * {@link #submit(Supplier)}
  * <p>
- * - {@link #blockingExecutor}执行阻塞任务
- * 调用如下方法
- * {@link #executeBlocking(Runnable)}
- * {@link #submitBlocking(Supplier)}
- * <p>
  * 注意:
  * 非阻塞任务线程中的任务不能阻塞、且任务之间是串行执行的、没有线程安全问题
- * 阻塞任务线程中的任务可以阻塞、任务之间是串行执行的、没有线程安全问题
- * 但是不同线程之间是并发执行的、有线程安全问题
  */
 public class WorkExecutor {
 
     static Logger logger = LoggerFactory.getLogger(WorkExecutor.class);
 
     public final ThreadPoolExecutor executor;
-    public final ThreadPoolExecutor blockingExecutor;
 
     /**
      * 存储本执行器所有的handler
@@ -66,8 +58,6 @@ public class WorkExecutor {
                         }
                     }
                 });
-        String blockingThreadName = threadName + "-blocking";
-        this.blockingExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), r -> new Thread(r, blockingThreadName));
     }
 
     public final CompletableFuture<Void> execute(Runnable runnable) {
@@ -78,15 +68,7 @@ public class WorkExecutor {
         return CompletableFuture.supplyAsync(supplier, executor);
     }
 
-    public final CompletableFuture<Void> executeBlocking(Runnable runnable) {
-        return CompletableFuture.runAsync(runnable, blockingExecutor);
-    }
-
-    public final <T> CompletableFuture<T> submitBlocking(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, blockingExecutor);
-    }
-
     public void destroy() {
-        ExecutorUtil.shutdownAllThenAwait(executor, blockingExecutor);
+        ExecutorUtil.shutdownAllThenAwait(executor);
     }
 }
