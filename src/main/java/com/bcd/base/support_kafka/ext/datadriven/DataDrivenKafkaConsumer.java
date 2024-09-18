@@ -238,13 +238,39 @@ public abstract class DataDrivenKafkaConsumer {
 
     }
 
+    /**
+     * 根据消费的数据获取其id
+     * 可以由子类重写
+     * @param consumerRecord
+     * @return
+     */
+    protected String id(ConsumerRecord<String, byte[]> consumerRecord) {
+        return consumerRecord.key();
+    }
+
+    /**
+     * 根据id分配到对应的工作执行者上
+     * @param id
+     * @return
+     */
     public WorkExecutor getWorkExecutor(String id) {
         int index = Math.floorMod(id.hashCode(), workExecutorNum);
         return workExecutors[index];
     }
 
+    /**
+     * 根据id和分配的执行器构造WorkHandler
+     * @param id
+     * @param executor
+     * @return
+     */
     public abstract WorkHandler newHandler(String id, WorkExecutor executor);
 
+    /**
+     * 移除workHandler
+     * @param id
+     * @return
+     */
     public final CompletableFuture<Void> removeHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
         return workExecutor.execute(() -> {
@@ -256,6 +282,11 @@ public abstract class DataDrivenKafkaConsumer {
         });
     }
 
+    /**
+     * 根据id获取对应WorkHandler
+     * @param id
+     * @return
+     */
     public final WorkHandler getHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
         try {
@@ -265,6 +296,13 @@ public abstract class DataDrivenKafkaConsumer {
         }
     }
 
+    /**
+     * 根据分区个数
+     * 启动多个消费者线程
+     * 分区-消费者-线程 一一对应
+     * @param consumer
+     * @param ps
+     */
     private void startConsumePartitions(KafkaConsumer<String, byte[]> consumer, int[] ps) {
         if (ps.length == 0) {
             consumer.close();
@@ -301,6 +339,12 @@ public abstract class DataDrivenKafkaConsumer {
         logger.info("start consumers[{}] for partitions[{}]", partitions.length, Arrays.stream(partitions).mapToObj(e -> topic + ":" + e).collect(Collectors.joining(",")));
     }
 
+    /**
+     * 初始化
+     * 构造线程池
+     * 启动线程
+     * 注册销毁狗子
+     */
     public void init() {
         if (!available) {
             synchronized (this) {
@@ -365,7 +409,9 @@ public abstract class DataDrivenKafkaConsumer {
         }
     }
 
-
+    /**
+     * 销毁资源
+     */
     public void destroy() {
         if (available) {
             synchronized (this) {
@@ -409,9 +455,7 @@ public abstract class DataDrivenKafkaConsumer {
         }
     }
 
-    protected String id(ConsumerRecord<String, byte[]> consumerRecord) {
-        return consumerRecord.key();
-    }
+
 
     /**
      * 消费
