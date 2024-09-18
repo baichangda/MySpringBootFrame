@@ -27,7 +27,6 @@ public class WorkExecutor {
     static Logger logger = LoggerFactory.getLogger(WorkExecutor.class);
 
     public final ThreadPoolExecutor executor;
-    public final ScheduledExecutorService executor_monitor;
 
     /**
      * 存储本执行器所有的handler
@@ -48,19 +47,11 @@ public class WorkExecutor {
      *                   否则使用{@link ArrayBlockingQueue}
      */
     public WorkExecutor(String threadName, int queueSize) {
-        int blockingSecond = 3;
         BlockingQueue<Runnable> blockingQueue;
         if (queueSize <= 0) {
             blockingQueue = new LinkedBlockingQueue<>();
-            this.executor_monitor = null;
         } else {
             blockingQueue = new ArrayBlockingQueue<>(queueSize);
-            this.executor_monitor = Executors.newSingleThreadScheduledExecutor();
-            this.executor_monitor.scheduleAtFixedRate(() -> {
-                if (DateUtil.CacheSecond.current() - lastTime >= blockingSecond) {
-                    logger.warn("WorkExecutor[{}] blocking more than {}s,queue[{}/{}],verify if there is blocking logic", blockingSecond, threadName, blockingQueue.size(), queueSize);
-                }
-            }, 3, 3, TimeUnit.SECONDS);
         }
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, blockingQueue, r -> new Thread(r, threadName),
                 (r, executor) -> {
@@ -86,6 +77,6 @@ public class WorkExecutor {
     }
 
     public void destroy() {
-        ExecutorUtil.shutdownAllThenAwait(executor, executor_monitor);
+        ExecutorUtil.shutdownAllThenAwait(executor);
     }
 }
