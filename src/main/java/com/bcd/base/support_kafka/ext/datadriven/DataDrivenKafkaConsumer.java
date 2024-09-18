@@ -373,6 +373,9 @@ public abstract class DataDrivenKafkaConsumer {
                     //打上退出标记、等待消费线程退出
                     running_consume = false;
                     ExecutorUtil.shutdownThenAwait(consumeThread, consumeThreads, resetConsumeCountPool);
+                    consumeThread = null;
+                    consumeThreads = null;
+                    resetConsumeCountPool = null;
                     //等待工作执行器退出
                     for (WorkExecutor workExecutor : workExecutors) {
                         //先销毁所有handler
@@ -386,6 +389,8 @@ public abstract class DataDrivenKafkaConsumer {
                     }
                     //取消监控、扫描过期线程
                     ExecutorUtil.shutdownAllThenAwait(monitor_pool, scanPool);
+                    monitor_pool = null;
+                    scanPool = null;
 
                     //取消shutdownHook
                     if (shutdownHookThread != null) {
@@ -395,6 +400,7 @@ public abstract class DataDrivenKafkaConsumer {
                             throw BaseException.get(ex);
                         }
                     }
+                    shutdownHookThread = null;
                     //标记不可用
                     available = false;
 
@@ -492,7 +498,7 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * 监控日志
      * 如果需要修改日志、可以重写此方法
-     *
+     * <p>
      * workExecutor 任务执行器个数
      * workHandler 任务处理器个数
      * blocking 当前阻塞数量/最大阻塞数量

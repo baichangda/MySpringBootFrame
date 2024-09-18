@@ -54,7 +54,6 @@ public class WorkExecutor {
     public final Map<String, WorkHandler> workHandlers = new HashMap<>();
 
 
-
     public static final class BlockingChecker {
         public final int periodInSecond;
         public final int expiredInSecond;
@@ -145,5 +144,8 @@ public class WorkExecutor {
 
     public void destroy() {
         ExecutorUtil.shutdownAllThenAwait(executor, executor_blockingChecker);
+        this.executor = null;
+        this.executor_blockingChecker = null;
+        blockingQueue.clear();
     }
 }
