@@ -52,9 +52,9 @@ public abstract class DataDrivenKafkaConsumer {
      */
     public final int workExecutorQueueSize;
     /**
-     * 工作执行器阻塞监控任务执行周期
+     * 工作执行器阻塞检查任务执行周期
      */
-    public final int workExecutorBlockingMonitorPeriod;
+    public final int workExecutorBlockingCheckerPeriod;
     /**
      * 工作执行器数组
      */
@@ -158,8 +158,12 @@ public abstract class DataDrivenKafkaConsumer {
      *                                          <=0代表不限制、此时使用{@link LinkedBlockingQueue}
      *                                          其他情况、则使用{@link ArrayBlockingQueue}
      *                                          每个工作任务执行器都有一个自己的队列
-     * @param workExecutorBlockingMonitorPeriod 工作任务执行器阻塞监控任务执行周期
-     *                                          <=0代表不启动阻塞监控
+     * @param workExecutorBlockingCheckerPeriod 工作任务执行器阻塞监控任务执行周期
+     *                                          >0会启动阻塞检查、每一个执行器会启动一个周期任务线程池、周期进行检查操作
+     *                                          <=0代表不启动阻塞检查
+     *                                          检查逻辑为
+     *                                          向执行器中写入一个空任务、然后等待{@link WorkExecutor#expiredSecond}后
+     *                                          检查任务是否完成、如果未完成、则告警并每秒执行一次检查、直到完成
      * @param maxBlockingNum                    最大阻塞数量(0代表不限制)、当内存中达到最大阻塞数量时候、消费者会停止消费
      *                                          当不限制时候、还是会记录{@link #blockingNum}、便于监控阻塞数量
      * @param autoReleaseBlocking               是否自动释放阻塞、适用于工作内容为同步处理的逻辑
@@ -180,7 +184,7 @@ public abstract class DataDrivenKafkaConsumer {
                                    ConsumerProp consumerProp,
                                    int workExecutorNum,
                                    int workExecutorQueueSize,
-                                   int workExecutorBlockingMonitorPeriod,
+                                   int workExecutorBlockingCheckerPeriod,
                                    int maxBlockingNum,
                                    boolean autoReleaseBlocking,
                                    int maxConsumeSpeed,
@@ -192,7 +196,7 @@ public abstract class DataDrivenKafkaConsumer {
         this.properties = consumerProp.toProperties();
         this.workExecutorNum = workExecutorNum;
         this.workExecutorQueueSize = workExecutorQueueSize;
-        this.workExecutorBlockingMonitorPeriod = workExecutorBlockingMonitorPeriod;
+        this.workExecutorBlockingCheckerPeriod = workExecutorBlockingCheckerPeriod;
         this.maxBlockingNum = maxBlockingNum;
         this.autoReleaseBlocking = autoReleaseBlocking;
         this.maxConsumeSpeed = maxConsumeSpeed;
@@ -229,7 +233,7 @@ public abstract class DataDrivenKafkaConsumer {
         //初始化工作任务执行器
         this.workExecutors = new WorkExecutor[workExecutorNum];
         for (int i = 0; i < workExecutorNum; i++) {
-            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i, workExecutorQueueSize, workExecutorBlockingMonitorPeriod);
+            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i, workExecutorQueueSize, workExecutorBlockingCheckerPeriod);
         }
 
     }

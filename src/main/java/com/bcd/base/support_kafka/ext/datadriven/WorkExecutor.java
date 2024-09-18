@@ -44,7 +44,7 @@ public class WorkExecutor {
     /**
      * 阻塞报警时间(秒)
      */
-    private final static int expiredSecond = 5;
+    final static int expiredSecond = 3;
 
     /**
      * 构造任务执行器
@@ -53,13 +53,13 @@ public class WorkExecutor {
      * @param queueSize             无阻塞任务线程池队列大小
      *                              0则使用{@link LinkedBlockingQueue}
      *                              否则使用{@link ArrayBlockingQueue}
-     * @param blockingMonitorPeriod 阻塞监控周期任务的执行周期(秒)
+     * @param blockingCheckerPeriod 阻塞检查周期任务的执行周期(秒)
      *                              如果<=0则不启动阻塞检查
      *                              开启后会启动周期任务
      *                              检查逻辑为
      *                              向执行器中提交一个空任务、等待{@link #expiredSecond}秒后检查任务是否完成、如果没有完成则警告、且此后每一秒检查一次任务情况并警告
      */
-    public WorkExecutor(String threadName, int queueSize, int blockingMonitorPeriod) {
+    public WorkExecutor(String threadName, int queueSize, int blockingCheckerPeriod) {
         BlockingQueue<Runnable> blockingQueue;
         if (queueSize <= 0) {
             blockingQueue = new LinkedBlockingQueue<>();
@@ -78,9 +78,9 @@ public class WorkExecutor {
                     }
                 });
 
-        if (blockingMonitorPeriod > 0) {
+        if (blockingCheckerPeriod > 0) {
             //开启阻塞监控
-            this.executor_blockingMonitor = new ScheduledThreadPoolExecutor(1, r -> new Thread(r, threadName + "-blockingMonitor"));
+            this.executor_blockingMonitor = new ScheduledThreadPoolExecutor(1, r -> new Thread(r, threadName + "-blockingChecker"));
             this.executor_blockingMonitor.scheduleWithFixedDelay(() -> {
                 long expired = DateUtil.CacheMillisecond.current() + expiredSecond;
                 CompletableFuture<Void> future = execute(() -> {
@@ -97,7 +97,7 @@ public class WorkExecutor {
                 } catch (InterruptedException ex) {
                     throw BaseException.get(ex);
                 }
-            }, blockingMonitorPeriod, blockingMonitorPeriod, TimeUnit.SECONDS);
+            }, blockingCheckerPeriod, blockingCheckerPeriod, TimeUnit.SECONDS);
         } else {
             this.executor_blockingMonitor = null;
         }
