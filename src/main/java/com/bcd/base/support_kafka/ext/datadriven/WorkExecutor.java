@@ -131,7 +131,7 @@ public class WorkExecutor {
                     while (!future.isDone()) {
                         long blockingSecond = DateUtil.CacheMillisecond.current() - expired;
                         if (blockingSecond >= 0) {
-                            logger.warn("WorkExecutor blocking too long threadName[{}] blockingTime[{}s>={}s] queueSize[{}]", threadName, blockingSecond + expiredInSecond, expiredInSecond, executor.getQueue().size());
+                            logger.warn("WorkExecutor blocking threadName[{}] blockingTime[{}s>={}s] queueSize[{}]", threadName, blockingSecond + expiredInSecond, expiredInSecond, executor.getQueue().size());
                         }
                         TimeUnit.SECONDS.sleep(1);
                     }
