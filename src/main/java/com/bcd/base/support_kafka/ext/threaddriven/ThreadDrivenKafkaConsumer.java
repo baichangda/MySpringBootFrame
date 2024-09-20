@@ -479,7 +479,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                     try {
                         onMessage(poll);
                     } catch (Exception ex) {
-                        logger.error("work error", ex);
+                        logger.error("onMessage error", ex);
                     }
                     if (monitor_period > 0) {
                         monitor_workCount.increment();

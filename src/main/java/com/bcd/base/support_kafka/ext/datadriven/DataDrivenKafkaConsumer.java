@@ -122,6 +122,7 @@ public abstract class DataDrivenKafkaConsumer {
     public final int monitor_period;
     public final LongAdder monitor_workHandlerCount;
     public final LongAdder monitor_consumeCount;
+    //处理数据数量(无论是否发生异常)
     public final LongAdder monitor_workCount;
     public ScheduledExecutorService monitor_pool;
 
@@ -241,6 +242,7 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * 根据消费的数据获取其id
      * 可以由子类重写
+     *
      * @param consumerRecord
      * @return
      */
@@ -250,6 +252,7 @@ public abstract class DataDrivenKafkaConsumer {
 
     /**
      * 根据id分配到对应的工作执行者上
+     *
      * @param id
      * @return
      */
@@ -260,6 +263,7 @@ public abstract class DataDrivenKafkaConsumer {
 
     /**
      * 根据id和分配的执行器构造WorkHandler
+     *
      * @param id
      * @param executor
      * @return
@@ -268,6 +272,7 @@ public abstract class DataDrivenKafkaConsumer {
 
     /**
      * 移除workHandler
+     *
      * @param id
      * @return
      */
@@ -276,21 +281,30 @@ public abstract class DataDrivenKafkaConsumer {
         return workExecutor.execute(() -> {
             WorkHandler workHandler = workExecutor.workHandlers.remove(id);
             if (workHandler != null) {
-                workHandler.destroy();
-                monitor_workHandlerCount.decrement();
+                try {
+                    workHandler.destroy();
+                } catch (Exception ex) {
+                    logger.error("workHandler destroy error id[{}]", id, ex);
+                }
+                if (monitor_period > 0) {
+                    monitor_workHandlerCount.decrement();
+                }
+
             }
         });
     }
 
     /**
      * 根据id获取对应WorkHandler
+     *
      * @param id
      * @return
      */
-    public final WorkHandler getHandler(String id) {
+    @SuppressWarnings("unchecked")
+    public final <V extends WorkHandler> V getHandler(String id) {
         WorkExecutor workExecutor = getWorkExecutor(id);
         try {
-            return workExecutor.submit(() -> workExecutor.workHandlers.get(id)).get();
+            return (V) workExecutor.submit(() -> workExecutor.workHandlers.get(id)).get();
         } catch (InterruptedException | ExecutionException e) {
             throw BaseException.get(e);
         }
@@ -300,6 +314,7 @@ public abstract class DataDrivenKafkaConsumer {
      * 根据分区个数
      * 启动多个消费者线程
      * 分区-消费者-线程 一一对应
+     *
      * @param consumer
      * @param ps
      */
@@ -456,7 +471,6 @@ public abstract class DataDrivenKafkaConsumer {
     }
 
 
-
     /**
      * 消费
      */
@@ -500,21 +514,37 @@ public abstract class DataDrivenKafkaConsumer {
                         WorkExecutor workExecutor = getWorkExecutor(id);
                         //交给执行器处理
                         workExecutor.execute(() -> {
+                            //首先获取workHandler
                             WorkHandler workHandler = workExecutor.workHandlers.computeIfAbsent(id, k -> {
-                                WorkHandler temp = newHandler(id, workExecutor);
-                                temp.init();
-                                if (monitor_period > 0) {
-                                    monitor_workHandlerCount.increment();
+                                //初始化workHandler
+                                try {
+                                    WorkHandler temp = newHandler(id, workExecutor);
+                                    temp.init();
+                                    if (monitor_period > 0) {
+                                        monitor_workHandlerCount.increment();
+                                    }
+                                    return temp;
+                                } catch (Exception ex) {
+                                    //初始化workHandler失败时候、释放阻塞
+                                    blockingNum.decrement();
+                                    logger.error("workHandler init error id[{}]", id, ex);
+                                    return null;
                                 }
-                                return temp;
                             });
-                            workHandler.lastMessageTime = DateUtil.CacheSecond.current();
-                            workHandler.onMessage(consumerRecord);
-                            if (monitor_period > 0) {
-                                monitor_workCount.increment();
-                            }
-                            if (autoReleaseBlocking) {
-                                blockingNum.decrement();
+                            //处理数据
+                            if (workHandler != null) {
+                                workHandler.lastMessageTime = DateUtil.CacheSecond.current();
+                                try {
+                                    workHandler.onMessage(consumerRecord);
+                                } catch (Exception ex) {
+                                    logger.error("workHandler onMessage error id[{}]", id, ex);
+                                }
+                                if (autoReleaseBlocking) {
+                                    blockingNum.decrement();
+                                }
+                                if (monitor_period > 0) {
+                                    monitor_workCount.increment();
+                                }
                             }
                         });
                     }
@@ -578,7 +608,14 @@ public abstract class DataDrivenKafkaConsumer {
             workExecutor.execute(() -> {
                 for (WorkHandler workHandler : workExecutor.workHandlers.values()) {
                     if (workHandler.lastMessageTime < ts) {
-                        workHandler.destroy();
+                        try {
+                            workHandler.destroy();
+                        } catch (Exception ex) {
+                            logger.error("workHandler destroy error id[{}]", workHandler.id, ex);
+                        }
+                        if (monitor_period > 0) {
+                            monitor_workHandlerCount.decrement();
+                        }
                     }
                 }
             });
