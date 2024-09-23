@@ -86,7 +86,7 @@ public abstract class DataDrivenKafkaConsumer {
      * 扫描过期{@link WorkHandler}参数
      */
     public final WorkHandlerScanner workHandlerScanner;
-    public ScheduledExecutorService scanPool;
+    public ScheduledExecutorService scannerPool;
 
     /**
      * 消费topic
@@ -150,9 +150,36 @@ public abstract class DataDrivenKafkaConsumer {
 
     /**
      * @param name                  当前消费者的名称(用于标定线程名称)
-     *                              消费者线程开头 {name}-consumer
-     *                              工作任务执行器线程开头 {name}-worker、每个executor中有两种线程、分别用于运行非阻塞逻辑(无后缀)、阻塞逻辑(以-blocking后缀结尾)
-     *                              监控线程开头 {name}-monitor
+     *                              <p>
+     *                              消费者线程有多个、开头为 {name}-consumer
+     *                              例如test-consumer(1/3)-partition(0)
+     *                              consumer(1/3)代表有3个消费线程、这是第一个
+     *                              partition(0)代表这个消费线程消费哪个分区
+     *                              <p>
+     *                              工作任务执行器线程有多个、开头为 {name}-worker
+     *                              例如test-worker(1/3)
+     *                              worker(1/3)代表有3个工作线程、这是第一个
+     *                              <p>
+     *                              销毁资源钩子线程只有一个、开头为 {name}-shutdown
+     *                              例如test-shutdown
+     *                              <p>
+     *                              监控信息线程只有一个、开头为 {name}-monitor
+     *                              需要开启{@link #monitor_period}才会有
+     *                              例如test-monitor
+     *                              <p>
+     *                              工作任务执行器中的阻塞检查线程开头 {name}-worker、以 -blockingChecker 结尾
+     *                              需要开启{@link #blockingChecker}才会有
+     *                              例如test-worker(1/3)-blockingChecker
+     *                              其中test-worker(1/3)即工作线程名称、接后缀 -blockingChecker
+     *                              <p>
+     *                              限速重置消费计数线程只有一个、开头为 {name}-reset
+     *                              需要开启{@link #maxConsumeSpeed}才会有
+     *                              例如test-reset
+     *                              <p>
+     *                              定时扫描过期workHandler线程只有一个、开头为 {name}-scanner
+     *                              需要开启{@link #workHandlerScanner}才会有
+     *                              例如test-scanner
+     *                              <p>
      * @param consumerProp          消费者属性
      * @param workExecutorNum       工作任务执行器个数
      * @param workExecutorQueueSize 工作任务执行器无阻塞任务线程池队列大小
@@ -234,7 +261,7 @@ public abstract class DataDrivenKafkaConsumer {
         //初始化工作任务执行器
         this.workExecutors = new WorkExecutor[workExecutorNum];
         for (int i = 0; i < workExecutorNum; i++) {
-            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + workExecutorNum + ")-" + i, workExecutorQueueSize, blockingChecker);
+            this.workExecutors[i] = new WorkExecutor(name + "-worker(" + (i + 1) + "/" + workExecutorNum + ")", workExecutorQueueSize, blockingChecker);
         }
 
     }
@@ -373,7 +400,7 @@ public abstract class DataDrivenKafkaConsumer {
                         available = true;
                         //初始化重置消费计数线程池(如果有限制最大消费速度)、提交工作任务、每秒重置消费数量
                         if (maxConsumeSpeed > 0) {
-                            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
+                            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-reset"));
                             resetConsumeCountPool.scheduleAtFixedRate(() -> {
                                 consumeCount.set(0);
                             }, 1, 1, TimeUnit.SECONDS);
@@ -385,8 +412,8 @@ public abstract class DataDrivenKafkaConsumer {
                         }
                         //启动扫描过期数据
                         if (workHandlerScanner != null) {
-                            scanPool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-scan"));
-                            scanPool.scheduleAtFixedRate(() -> scanAndDestroyWorkHandler(workHandlerScanner.expiredInSecond), workHandlerScanner.periodInSecond, workHandlerScanner.periodInSecond, TimeUnit.SECONDS);
+                            scannerPool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-scanner"));
+                            scannerPool.scheduleAtFixedRate(() -> scanAndDestroyWorkHandler(workHandlerScanner.expiredInSecond), workHandlerScanner.periodInSecond, workHandlerScanner.periodInSecond, TimeUnit.SECONDS);
                         }
                         //启动任务执行器
                         for (WorkExecutor workExecutor : this.workExecutors) {
@@ -416,7 +443,7 @@ public abstract class DataDrivenKafkaConsumer {
                             }
                         }
                         //增加销毁回调
-                        shutdownHookThread = new Thread(this::destroy);
+                        shutdownHookThread = new Thread(this::destroy, name + "-shutdown");
                         Runtime.getRuntime().addShutdownHook(shutdownHookThread);
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源
@@ -453,9 +480,9 @@ public abstract class DataDrivenKafkaConsumer {
                         workExecutor.destroy();
                     }
                     //取消监控、扫描过期线程
-                    ExecutorUtil.shutdownAllThenAwait(monitor_pool, scanPool);
+                    ExecutorUtil.shutdownAllThenAwait(monitor_pool, scannerPool);
                     monitor_pool = null;
-                    scanPool = null;
+                    scannerPool = null;
 
                     //取消shutdownHook
                     if (shutdownHookThread != null) {
