@@ -15,7 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Properties;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
@@ -123,9 +126,27 @@ public abstract class ThreadDrivenKafkaConsumer {
 
     /**
      * @param name                  当前消费者的名称(用于标定线程名称)
-     *                              消费者线程开头 {name}-consumer
-     *                              工作任务执行器线程开头 {name}-worker
-     *                              监控线程开头 {name}-monitor
+     *                              <p>
+     *                              消费者线程可能有多个、开头为 {name}-consumer
+     *                              例如test-consumer(1/3)-partition(0)
+     *                              consumer(1/3)代表有3个消费线程、这是第一个
+     *                              partition(0)代表这个消费线程消费哪个分区
+     *                              <p>
+     *                              工作任务执行器线程可能有多个、开头为 {name}-worker
+     *                              例如test-worker(1/3)
+     *                              worker(1/3)代表有3个工作线程、这是第一个
+     *                              <p>
+     *                              销毁资源钩子线程只有一个、开头为 {name}-shutdown
+     *                              例如test-shutdown
+     *                              <p>
+     *                              监控信息线程只有一个、开头为 {name}-monitor
+     *                              需要开启{@link #monitor_period}才会有
+     *                              例如test-monitor
+     *                              <p>
+     *                              限速重置消费计数线程只有一个、开头为 {name}-reset
+     *                              需要开启{@link #maxConsumeSpeed}才会有
+     *                              例如test-reset
+     *                              <p>
      * @param consumerProp          消费者属性
      * @param oneWorkThreadOneQueue 一个工作线程一个队列
      *                              true时候
@@ -210,7 +231,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                     queue = new ArrayBlockingQueue<>(workThreadQueueSize);
                 }
                 this.queues[i] = queue;
-                workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
+                workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + (i + 1) + "/" + workThreadNum + ")");
             }
         } else {
             this.queues = null;
@@ -222,7 +243,7 @@ public abstract class ThreadDrivenKafkaConsumer {
             }
             this.queue = queue;
             for (int i = 0; i < workThreadNum; i++) {
-                workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + workThreadNum + ")-" + i);
+                workThreads[i] = new Thread(() -> work(queue), name + "-worker" + "(" + (i + 1) + "/" + workThreadNum + ")");
             }
         }
 
@@ -273,7 +294,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                         available = true;
                         //初始化重置消费计数线程池(如果有限制最大消费速度)、提交工作任务、每秒重置消费数量
                         if (maxConsumeSpeed > 0) {
-                            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor();
+                            resetConsumeCountPool = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, name + "-reset"));
                             resetConsumeCountPool.scheduleAtFixedRate(() -> {
                                 consumeCount.set(0);
                             }, 1, 1, TimeUnit.SECONDS);
@@ -311,7 +332,7 @@ public abstract class ThreadDrivenKafkaConsumer {
                             }
                         }
                         //增加销毁回调
-                        shutdownHookThread = new Thread(this::destroy);
+                        shutdownHookThread = new Thread(this::destroy, name + "-shutdown");
                         Runtime.getRuntime().addShutdownHook(shutdownHookThread);
                     } catch (Exception ex) {
                         //初始化异常、则销毁资源

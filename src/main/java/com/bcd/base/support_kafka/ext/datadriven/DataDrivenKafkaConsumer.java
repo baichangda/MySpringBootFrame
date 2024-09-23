@@ -151,12 +151,12 @@ public abstract class DataDrivenKafkaConsumer {
     /**
      * @param name                  当前消费者的名称(用于标定线程名称)
      *                              <p>
-     *                              消费者线程有多个、开头为 {name}-consumer
+     *                              消费者线程可能有多个、开头为 {name}-consumer
      *                              例如test-consumer(1/3)-partition(0)
      *                              consumer(1/3)代表有3个消费线程、这是第一个
      *                              partition(0)代表这个消费线程消费哪个分区
      *                              <p>
-     *                              工作任务执行器线程有多个、开头为 {name}-worker
+     *                              工作任务执行器线程可能有多个、开头为 {name}-worker
      *                              例如test-worker(1/3)
      *                              worker(1/3)代表有3个工作线程、这是第一个
      *                              <p>
@@ -167,7 +167,7 @@ public abstract class DataDrivenKafkaConsumer {
      *                              需要开启{@link #monitor_period}才会有
      *                              例如test-monitor
      *                              <p>
-     *                              工作任务执行器中的阻塞检查线程开头 {name}-worker、以 -blockingChecker 结尾
+     *                              工作任务执行器中的阻塞检查线程可能有多个、开头为 {name}-worker、以 -blockingChecker 结尾
      *                              需要开启{@link #blockingChecker}才会有
      *                              例如test-worker(1/3)-blockingChecker
      *                              其中test-worker(1/3)即工作线程名称、接后缀 -blockingChecker
