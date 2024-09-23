@@ -280,18 +280,22 @@ public abstract class DataDrivenKafkaConsumer {
         WorkExecutor workExecutor = getWorkExecutor(id);
         return workExecutor.execute(() -> {
             WorkHandler workHandler = workExecutor.workHandlers.remove(id);
-            if (workHandler != null) {
-                try {
-                    workHandler.destroy();
-                } catch (Exception ex) {
-                    logger.error("workHandler destroy error id[{}]", id, ex);
-                }
-                if (monitor_period > 0) {
-                    monitor_workHandlerCount.decrement();
-                }
-
-            }
+            removeHandlerInExecutor(workHandler);
         });
+    }
+
+    private void removeHandlerInExecutor(WorkHandler workHandler) {
+        if (workHandler != null) {
+            try {
+                workHandler.destroy();
+            } catch (Exception ex) {
+                logger.error("workHandler destroy error id[{}]", workHandler.id, ex);
+            }
+            if (monitor_period > 0) {
+                monitor_workHandlerCount.decrement();
+            }
+
+        }
     }
 
     /**
@@ -608,14 +612,7 @@ public abstract class DataDrivenKafkaConsumer {
             workExecutor.execute(() -> {
                 for (WorkHandler workHandler : workExecutor.workHandlers.values()) {
                     if (workHandler.lastMessageTime < ts) {
-                        try {
-                            workHandler.destroy();
-                        } catch (Exception ex) {
-                            logger.error("workHandler destroy error id[{}]", workHandler.id, ex);
-                        }
-                        if (monitor_period > 0) {
-                            monitor_workHandlerCount.decrement();
-                        }
+                        removeHandlerInExecutor(workHandler);
                     }
                 }
             });
