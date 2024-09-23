@@ -3,9 +3,6 @@ package com.bcd.base.support_kafka.ext.datadriven;
 import com.bcd.base.util.DateUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-
 /**
  * 本类中所有的方法为了保证数据并发安全，都是在executor中执行的、包括
  * {@link #WorkHandler(String, WorkExecutor)}
@@ -37,11 +34,11 @@ public abstract class WorkHandler {
 
     public abstract void onMessage(ConsumerRecord<String, byte[]> msg) throws Exception;
 
-    public void init() throws Exception{
+    public void init() throws Exception {
 
     }
 
-    public void destroy() throws Exception{
+    public void destroy() throws Exception {
 
     }
 }
