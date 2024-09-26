@@ -229,7 +229,7 @@ public class BaseService<T extends SuperBaseBean> {
 
     private void setUpdateInfo(T t) {
         BaseBean bean = (BaseBean) t;
-        bean.createTime = new Date();
+        bean.updateTime = new Date();
         UserInterface user = getLoginUser();
         if (user != null) {
             bean.updateUserId = user.getId();
