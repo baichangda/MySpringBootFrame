@@ -31,6 +31,30 @@ import java.util.stream.Collectors;
  * - 消费线程
  * - 阻塞队列
  * - 工作线程
+ *
+ * 此类会产生如下线程
+ * <p>
+ * 消费者线程可能有多个、开头为 {name}-consumer
+ * 例如test-consumer(1/3)-partition(0)
+ * consumer(1/3)代表有3个消费线程、这是第一个
+ * partition(0)代表这个消费线程消费哪个分区
+ * <p>
+ * 工作任务执行器线程可能有多个、开头为 {name}-worker
+ * 例如test-worker(1/3)
+ * worker(1/3)代表有3个工作线程、这是第一个
+ * <p>
+ * 销毁资源钩子线程只有一个、开头为 {name}-shutdown
+ * 例如test-shutdown
+ * <p>
+ * 监控信息线程只有一个、开头为 {name}-monitor
+ * 需要开启{@link #monitor_period}才会有
+ * 例如test-monitor
+ * <p>
+ * 限速重置消费计数线程只有一个、开头为 {name}-reset
+ * 需要开启{@link #maxConsumeSpeed}才会有
+ * 例如test-reset
+ * <p>
+ *
  */
 public abstract class ThreadDrivenKafkaConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -126,27 +150,6 @@ public abstract class ThreadDrivenKafkaConsumer {
 
     /**
      * @param name                  当前消费者的名称(用于标定线程名称)
-     *                              <p>
-     *                              消费者线程可能有多个、开头为 {name}-consumer
-     *                              例如test-consumer(1/3)-partition(0)
-     *                              consumer(1/3)代表有3个消费线程、这是第一个
-     *                              partition(0)代表这个消费线程消费哪个分区
-     *                              <p>
-     *                              工作任务执行器线程可能有多个、开头为 {name}-worker
-     *                              例如test-worker(1/3)
-     *                              worker(1/3)代表有3个工作线程、这是第一个
-     *                              <p>
-     *                              销毁资源钩子线程只有一个、开头为 {name}-shutdown
-     *                              例如test-shutdown
-     *                              <p>
-     *                              监控信息线程只有一个、开头为 {name}-monitor
-     *                              需要开启{@link #monitor_period}才会有
-     *                              例如test-monitor
-     *                              <p>
-     *                              限速重置消费计数线程只有一个、开头为 {name}-reset
-     *                              需要开启{@link #maxConsumeSpeed}才会有
-     *                              例如test-reset
-     *                              <p>
      * @param consumerProp          消费者属性
      * @param oneWorkThreadOneQueue 一个工作线程一个队列
      *                              true时候
