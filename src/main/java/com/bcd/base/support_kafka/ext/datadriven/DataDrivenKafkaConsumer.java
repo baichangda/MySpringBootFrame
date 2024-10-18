@@ -606,28 +606,31 @@ public abstract class DataDrivenKafkaConsumer {
      * 监控日志
      * 如果需要修改日志、可以重写此方法
      * <p>
+     * period 周期时长(秒)
      * workExecutor 任务执行器个数
      * workHandler 任务处理器个数
      * blocking 当前阻塞数量/最大阻塞数量
-     * consume 所有的消费者合计消费速度(每秒)
+     * consume 周期内所有的消费者合计消费数量
      * queues 所有执行器的队列情况、每个执行器 当前队列大小/最大队列大小(如果有最大队列大小)
-     * work 所有的任务执行器合计处理速度(每秒)
+     * work 周期内所有的任务执行器合计处理数量
      */
     public String monitor_log() {
         return StringUtil.format("name[{}] " +
+                        "period[{}] " +
                         "workExecutor[{}] " +
                         "workHandler[{}] " +
                         "blocking[{}/{}] " +
-                        "consume[{}/{}s] " +
+                        "consume[{}] " +
                         "queues[{}] " +
-                        "work[{}/{}s]",
+                        "work[{}]",
                 name,
+                monitor_period,
                 workExecutors.length,
                 monitor_workHandlerCount.sum(),
                 blockingNum.sum(), maxBlockingNum,
-                monitor_consumeCount.sumThenReset(), monitor_period,
+                monitor_consumeCount.sumThenReset(),
                 Arrays.stream(workExecutors).map(this::getQueueLog).collect(Collectors.joining(" ")),
-                monitor_workCount.sumThenReset(), monitor_period);
+                monitor_workCount.sumThenReset());
     }
 
     /**
