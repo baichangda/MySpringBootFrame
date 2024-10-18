@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * 同时会通过{@link #newHandler(String, WorkExecutor)}构造数据对象
  * 后续{@link WorkHandler}中所有的操作都会由分配的{@link WorkExecutor}来执行
  * 这样做的好处是能保证{@link WorkHandler}所有方法都是线程安全的
- *
+ * <p>
  * 此类会产生如下线程
  * <p>
  * 消费者线程可能有多个、开头为 {name}-consumer
@@ -618,16 +618,16 @@ public abstract class DataDrivenKafkaConsumer {
                         "workExecutor[{}] " +
                         "workHandler[{}] " +
                         "blocking[{}/{}] " +
-                        "consume[{}/s] " +
+                        "consume[{}/{}s] " +
                         "queues[{}] " +
-                        "work[{}/s]",
+                        "work[{}/{}s]",
                 name,
                 workExecutors.length,
                 monitor_workHandlerCount.sum(),
                 blockingNum.sum(), maxBlockingNum,
-                monitor_consumeCount.sumThenReset() / monitor_period,
+                monitor_consumeCount.sumThenReset(), monitor_period,
                 Arrays.stream(workExecutors).map(this::getQueueLog).collect(Collectors.joining(" ")),
-                monitor_workCount.sumThenReset() / monitor_period);
+                monitor_workCount.sumThenReset(), monitor_period);
     }
 
     /**

@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * - 消费线程
  * - 阻塞队列
  * - 工作线程
- *
+ * <p>
  * 此类会产生如下线程
  * <p>
  * 消费者线程可能有多个、开头为 {name}-consumer
@@ -54,7 +54,6 @@ import java.util.stream.Collectors;
  * 需要开启{@link #maxConsumeSpeed}才会有
  * 例如test-reset
  * <p>
- *
  */
 public abstract class ThreadDrivenKafkaConsumer {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -531,12 +530,12 @@ public abstract class ThreadDrivenKafkaConsumer {
      * 如果需要修改日志、可以重写此方法
      */
     public String monitor_log() {
-        return StringUtil.format("name[{}] blocking[{}/{}] consume[{}/s] queues[{}] work[{}/s]",
+        return StringUtil.format("name[{}] blocking[{}/{}] consume[{}/{}s] queues[{}] work[{}/{}s]",
                 name,
                 blockingNum.sum(), maxBlockingNum,
-                monitor_consumeCount.sumThenReset() / monitor_period,
+                monitor_consumeCount.sumThenReset(), monitor_period,
                 oneWorkThreadOneQueue ? Arrays.stream(queues).map(this::getQueueLog).collect(Collectors.joining(",")) : getQueueLog(queue),
-                monitor_workCount.sumThenReset() / monitor_period);
+                monitor_workCount.sumThenReset(), monitor_period);
     }
 }
 
