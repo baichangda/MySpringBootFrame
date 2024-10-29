@@ -19,13 +19,6 @@ public class DateCondition implements Condition {
         this.handler = handler;
     }
 
-    @Override
-    public String toAnalysis() {
-        return val == null ? null : fieldName +
-                " " +
-                handler.toString();
-    }
-
     public static DateCondition EQUAL(String fieldName, Date val) {
         return new DateCondition(fieldName, val, DateCondition.Handler.EQUAL);
     }

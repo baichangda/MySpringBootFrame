@@ -28,6 +28,4 @@ public interface Condition extends Serializable {
     static Condition or(Condition... conditions) {
         return or(Arrays.asList(conditions));
     }
-
-    String toAnalysis();
 }

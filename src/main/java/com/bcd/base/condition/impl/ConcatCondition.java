@@ -17,26 +17,6 @@ public class ConcatCondition implements Condition {
         this.conditions = conditions;
     }
 
-    @Override
-    public String toAnalysis() {
-        List<String> list = new ArrayList<>();
-        for (Condition condition : conditions) {
-            String cur = condition.toAnalysis();
-            if (cur != null) {
-                list.add(cur);
-            }
-        }
-        if (list.isEmpty()) {
-            return null;
-        } else if (list.size() == 1) {
-            return list.get(0);
-        } else {
-            return "(" +
-                    list.stream().reduce((e1, e2) -> e1 + " " + concatWay.toString() + " " + e2).orElse("") +
-                    ")";
-        }
-    }
-
     public enum ConcatWay {
         AND,
         OR

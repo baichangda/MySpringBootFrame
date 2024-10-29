@@ -15,13 +15,6 @@ public class NullCondition implements Condition {
         this.handler = handler;
     }
 
-    @Override
-    public String toAnalysis() {
-        return fieldName +
-                " " +
-                handler.toString();
-    }
-
     public static NullCondition NULL(String fieldName) {
         return new NullCondition(fieldName, Handler.NULL);
     }

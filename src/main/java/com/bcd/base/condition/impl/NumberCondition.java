@@ -18,13 +18,6 @@ public class NumberCondition implements Condition {
         this.handler = handler;
     }
 
-    @Override
-    public String toAnalysis() {
-        return val == null ? null : fieldName +
-                " " +
-                handler.toString();
-    }
-
     public static NumberCondition EQUAL(String fieldName, Number val) {
         return new NumberCondition(fieldName, val, NumberCondition.Handler.EQUAL);
     }

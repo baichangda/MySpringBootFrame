@@ -18,13 +18,6 @@ public class StringCondition implements Condition {
         this.handler = handler;
     }
 
-    @Override
-    public String toAnalysis() {
-        return val == null || "".equals(val) ? null : fieldName +
-                " " +
-                handler.toString();
-    }
-
     public static StringCondition EQUAL(String fieldName, String val) {
         return new StringCondition(fieldName, val, Handler.EQUAL);
     }
