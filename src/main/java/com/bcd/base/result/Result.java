@@ -89,7 +89,7 @@ public class Result<T> implements Serializable {
         if (realException instanceof BaseException ex) {
             return Result.fail(ex.code).message(ex.getMessage());
         } else {
-            return Result.fail().message(throwable.getMessage());
+            return Result.fail().message(realException.getMessage());
         }
     }
 
