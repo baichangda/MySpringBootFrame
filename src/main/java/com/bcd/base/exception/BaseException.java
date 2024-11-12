@@ -1,6 +1,10 @@
 package com.bcd.base.exception;
 
 import com.bcd.base.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 建造此异常类的目的:
@@ -10,12 +14,41 @@ import com.bcd.base.util.StringUtil;
 public class BaseException extends RuntimeException {
     public int code = 1;
 
+    private final Throwable target;
+
     private BaseException(String message) {
         super(message);
+        this.target = null;
     }
 
-    private BaseException(Throwable e) {
-        super(e);
+    private BaseException(Throwable target) {
+        super(null, (Throwable) null);
+        this.target = target;
+    }
+
+    private BaseException(String message, Throwable target) {
+        super(message, (Throwable) null);
+        this.target = target;
+    }
+
+    public Throwable getTargetException() {
+        return target;
+    }
+
+    @Override
+    public Throwable getCause() {
+        return target;
+    }
+
+    @Override
+    public String getMessage() {
+        return super.getMessage();
+    }
+
+
+    public BaseException code(int code) {
+        this.code = code;
+        return this;
     }
 
     public static BaseException get(String message) {
@@ -44,17 +77,45 @@ public class BaseException extends RuntimeException {
         return new BaseException(StringUtil.format(message, arg1, arg2));
     }
 
+    public static BaseException get(String message, Throwable e) {
+        return new BaseException(message, e);
+    }
+
     public static BaseException get(Throwable e) {
         return new BaseException(e);
     }
 
-    public static void main(String[] args) {
-        throw BaseException.get("[{}]-[{}]", null, 100000);
-    }
+    static Logger logger = LoggerFactory.getLogger(BaseException.class);
 
-    public BaseException code(int code) {
-        this.code = code;
-        return this;
+    public static void main(String[] args) {
+//        throw BaseException.get("[{}]-[{}]", null, 100000);
+
+        try {
+            String s = null;
+            s.getBytes();
+        } catch (Exception e) {
+            BaseException e1 = BaseException.get(e);
+            BaseException e2 = BaseException.get(e1);
+            logger.error("error", e2);
+            logger.info(e2.getMessage());
+        }
+
+
+        BaseException e = BaseException.get("测试");
+        BaseException e1 = BaseException.get(e);
+        BaseException e2 = BaseException.get(e1);
+        logger.error("error", e2);
+        logger.info(e2.getMessage());
+
+        InvocationTargetException e3 = new InvocationTargetException(e);
+        BaseException e4 = BaseException.get(e3);
+        logger.error("error", e4);
+        logger.info(e4.getMessage());
+
+        BaseException e5 = BaseException.get(e);
+        InvocationTargetException e6 = new InvocationTargetException(e5);
+        logger.error("error", e6);
+        logger.info(e6.getMessage());
     }
 
 }

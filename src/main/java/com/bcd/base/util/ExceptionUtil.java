@@ -38,56 +38,32 @@ public class ExceptionUtil {
 
 
     /**
-     * 根据异常打印异常信息
+     * 获取真实的异常
      *
      * @param throwable
      * @return
      */
-    public static void printException(Throwable throwable) {
-        Objects.requireNonNull(throwable);
-        Throwable realException = parseException(throwable);
-        logger.error("Error", realException);
-    }
-
-    /**
-     * 获取异常的信息
-     * @param throwable
-     * @return
-     */
-    public static String getMessage(Throwable throwable) {
-        Objects.requireNonNull(throwable);
-        Throwable realException = parseException(throwable);
-        return realException.getMessage();
-    }
-
-
-    /**
-     * 遇到如下两种情况继续深入取出异常信息:
-     * 1、getCause()==null
-     * 2、InvocationTargetException
-     *
-     * @param throwable
-     * @return
-     */
-    public static Throwable parseException(Throwable throwable) {
-        //1、如果异常为空,返回null
+    public static Throwable getRealException(Throwable throwable) {
         if (throwable == null) {
             return null;
         }
-        //2、获取其真实异常
-        Throwable realException = throwable.getCause();
-        //3、如果真实异常为当前异常
-        if (realException == null) {
-            //4、如果真实异常为InvocationTargetException,则获取其目标异常
-            if (throwable instanceof InvocationTargetException) {
-                return parseException(((InvocationTargetException) throwable).getTargetException());
+        Throwable temp = throwable;
+        while (true) {
+            if (temp instanceof BaseException ex) {
+                if (ex.getTargetException() == null) {
+                    return temp;
+                } else {
+                    temp = ex.getTargetException();
+                }
+            } else if (temp instanceof InvocationTargetException ex) {
+                if (ex.getTargetException() == null) {
+                    return temp;
+                } else {
+                    temp = ex.getTargetException();
+                }
             } else {
-                //5、否则直接返回
-                return throwable;
+                return temp;
             }
-        } else {
-            //6、如果真实异常不为当前异常,则继续解析其真实异常
-            return parseException(realException);
         }
     }
 }

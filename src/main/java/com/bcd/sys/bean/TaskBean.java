@@ -107,8 +107,8 @@ public class TaskBean extends SuperBaseBean implements Task<Long> {
     @Override
     public void onFailed(Exception ex) {
         finishTime = new Date();
-        Throwable realException = ExceptionUtil.parseException(ex);
-        message = ExceptionUtil.getMessage(realException);
+        Throwable realException = ExceptionUtil.getRealException(ex);
+        message = realException.getMessage();
         stackMessage = ExceptionUtil.getStackTraceMessage(realException);
     }
 

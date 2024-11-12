@@ -1,6 +1,5 @@
 package com.bcd.base.support_spring_exception;
 
-import cn.dev33.satoken.exception.NotLoginException;
 import com.bcd.base.result.Result;
 import com.bcd.base.util.ExceptionUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,10 +54,10 @@ public class ExceptionConfig {
     }
 
     public void handle(HttpServletResponse response, Throwable throwable) throws IOException {
-        Throwable realException = ExceptionUtil.parseException(throwable);
         Result<?> result;
-        if (realException instanceof MethodArgumentNotValidException) {
-            final BindingResult bindingResult = ((MethodArgumentNotValidException) realException).getBindingResult();
+        Throwable realException = ExceptionUtil.getRealException(throwable);
+        if (realException instanceof MethodArgumentNotValidException ex) {
+            final BindingResult bindingResult = ex.getBindingResult();
             final List<ObjectError> allErrors = bindingResult.getAllErrors();
             final List<Map<String, String>> errorList = allErrors.stream().map(e -> {
                 Map<String, String> msgMap = new HashMap<>();
