@@ -1,5 +1,6 @@
 package com.bcd.base.exception;
 
+import com.bcd.base.util.ExceptionUtil;
 import com.bcd.base.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
  * 建造此异常类的目的:
  * 1、在所有需要抛非运行时异常的地方,用此异常包装,避免方法调用时候需要捕获异常
  *    此时打印堆栈会打印完整的调用链、包括包装异常的调用链
- *    此时异常信息为null、如果需要获取真实异常信息、需要通过{@link com.bcd.base.util.ExceptionUtil#getRealException(Throwable)}先获取真实异常、再获取异常信息
+ *    此时异常信息为null、如果需要获取真实异常信息、调用{@link #getRealExceptionMessage()}
  * 2、在业务需要出异常的时候,定义异常并且抛出
  */
 public class BaseException extends RuntimeException {
@@ -45,6 +46,10 @@ public class BaseException extends RuntimeException {
     @Override
     public String getMessage() {
         return super.getMessage();
+    }
+
+    public String getRealExceptionMessage(){
+        return ExceptionUtil.getRealException(this).getMessage();
     }
 
 
