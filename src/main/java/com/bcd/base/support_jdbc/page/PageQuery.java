@@ -16,8 +16,8 @@ import java.util.List;
  * 可以{@link #PageQuery(String)}直接传入常规sql、会自动转换为countSql和pageSql、例如
  * select a,b,c from t_vehicle where vin =? and vehicle_type like ? order by create_time desc
  * 会生成
- * SELECT COUNT(*) FROM T_VEHICLE WHERE VIN =? AND VEHICLE_TYPE LIKE ?
- * SELECT A,B,C FROM T_VEHICLE WHERE VIN =? AND VEHICLE_TYPE LIKE ? ORDER BY CREATE_TIME DESC LIMIT ?,?
+ * select count(*) from t_vehicle where vin =? and vehicle_type like ?
+ * select a,b,c from t_vehicle where vin =? and vehicle_type like ? order by create_time desc limit ?,?
  * 转换逻辑参考方法{@link #toCountSql(String)}、{@link #toPageSql(String)}
  * sql必须满足如下条件
  * 1、格式必须为 select ... from ... order by ...
@@ -56,16 +56,16 @@ public final class PageQuery {
      * @return
      */
     public static String toCountSql(String sql) {
-        String upperCase = sql.toLowerCase().trim();
-        int i1 = upperCase.indexOf("select");
-        int i2 = upperCase.indexOf("from");
+        String lowercase = sql.toLowerCase().trim();
+        int i1 = lowercase.indexOf("select");
+        int i2 = lowercase.indexOf("from");
         if (i1 == -1 || i2 == -1) {
             throw BaseException.get("toCountSql not support:\n{}", sql);
         }
-        int i3 = upperCase.lastIndexOf("order by");
-        return upperCase.substring(0, i1 + 6) +
+        int i3 = lowercase.lastIndexOf("order by");
+        return lowercase.substring(0, i1 + 6) +
                 " count(*) " +
-                (i3 == -1 ? upperCase.substring(i2) : upperCase.substring(i2, i3));
+                (i3 == -1 ? lowercase.substring(i2) : lowercase.substring(i2, i3));
     }
 
 
