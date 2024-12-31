@@ -22,7 +22,6 @@ public class ExecutorUtil {
      * @param except   期望数量
      * @param callback 回调方法
      * @param running  是否运行中、通过设置此为false打断循环
-     * @param <T>
      */
     public static <T> void loop(BlockingQueue<T> queue, int except, Consumer<ArrayList<T>> callback, AtomicBoolean running) {
         try {
