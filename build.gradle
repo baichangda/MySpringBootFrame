@@ -20,7 +20,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id "io.spring.dependency-management" version "1.+"
-    id 'org.springframework.boot' version "3.+"
+    id 'org.springframework.boot' version "3.3.+"
 }
 
 

@@ -21,7 +21,7 @@ public class SwaggerConfig {
                 .info(
                         new Info().title("API")
                                 .description("bcd application")
-                                .version("v0.0.1")
+                                .version("1.0")
                 )
                 //全局参数设置
 //                .components(
