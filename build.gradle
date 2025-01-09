@@ -72,6 +72,7 @@ configurations.configureEach {
 
 dependencyManagement {
     imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:+"
         mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:+"
     }
 }
