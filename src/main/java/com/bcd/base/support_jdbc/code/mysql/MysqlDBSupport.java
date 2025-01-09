@@ -21,7 +21,7 @@ public class MysqlDBSupport implements DBSupport {
 
     @Override
     public DBInfo getSpringDBConfig() {
-        return DBInfoUtil.getDBProps();
+        return DBInfoUtil.getDBInfo();
     }
 
     @Override

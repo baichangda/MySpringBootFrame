@@ -35,6 +35,9 @@ public class MysqlDBServiceImpl implements DBService {
     }
 
     public void exportSpringDBDesignerExcel(String dbName, OutputStream os, Runnable doBeforeWrite) throws IOException {
+        if (dbName == null) {
+            dbName = DBInfoUtil.getDBInfo().db;
+        }
         try (Connection connection = DBInfoUtil.getSpringConn()) {
             exportDBDesignerExcel(connection, dbName, os, doBeforeWrite);
         } catch (SQLException e) {

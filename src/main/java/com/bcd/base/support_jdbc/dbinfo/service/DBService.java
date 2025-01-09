@@ -14,7 +14,7 @@ public interface DBService {
     /**
      * 导出application.yml中配置的url中指定数据库配置
      *
-     * @param dbName
+     * @param dbName null则代表使用spring配置默认数据库
      * @param os
      * @param doBeforeWrite
      * @throws IOException

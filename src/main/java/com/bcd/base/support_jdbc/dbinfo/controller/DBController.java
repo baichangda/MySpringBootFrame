@@ -2,6 +2,7 @@ package com.bcd.base.support_jdbc.dbinfo.controller;
 
 import com.bcd.base.controller.BaseController;
 import com.bcd.base.exception.BaseException;
+import com.bcd.base.support_jdbc.dbinfo.data.DBInfo;
 import com.bcd.base.support_jdbc.dbinfo.service.DBService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ public class DBController extends BaseController {
     @Operation(summary = "导出spring数据库设计")
     @ApiResponse(responseCode = "200", description = "导出结果")
     public void exportSpringDBDesignerExcel(
-            @Parameter(description = "数据库名称") @RequestParam String dbName,
+            @Parameter(description = "数据库名称、默认为spring配置数据库") @RequestParam(required = false) String dbName,
             HttpServletResponse response) {
         try {
             dbService.exportSpringDBDesignerExcel(dbName, response.getOutputStream(), () -> {

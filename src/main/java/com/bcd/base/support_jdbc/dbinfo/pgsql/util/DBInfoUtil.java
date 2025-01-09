@@ -20,7 +20,7 @@ public class DBInfoUtil {
      * @return
      */
     public static Connection getSpringConn() {
-        DBInfo dbInfo = getDBProps();
+        DBInfo dbInfo = getDBInfo();
         try {
             return DriverManager.getConnection(dbInfo.url, dbInfo.username, dbInfo.password);
         } catch (SQLException e) {
@@ -39,7 +39,7 @@ public class DBInfoUtil {
      *
      * @return
      */
-    public static DBInfo getDBProps() {
+    public static DBInfo getDBInfo() {
         try {
             final JsonNode[] props = SpringUtil.getSpringPropsInYml("spring.datasource.url"
                     , "spring.datasource.username"
