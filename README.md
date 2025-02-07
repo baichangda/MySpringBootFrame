@@ -58,6 +58,3 @@
 - bean必须注解@Document(collection = "test")
 - bean字段必须@Schema(description = "vin")
 - 在bean中写main方法、代码参考com.bcd.base.support_mongodb.test.bean.TestBean中main方法
-
-## 感谢开源支持
-https://www.ej-technologies.com/jprofiler
