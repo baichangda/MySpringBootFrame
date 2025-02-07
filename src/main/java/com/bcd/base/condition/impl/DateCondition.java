@@ -24,19 +24,19 @@ public class DateCondition implements Condition {
     }
 
     public static DateCondition LE(String fieldName, Date val) {
-        return new DateCondition(fieldName, val, DateCondition.Handler.EQUAL);
+        return new DateCondition(fieldName, val, DateCondition.Handler.LE);
     }
 
     public static DateCondition LT(String fieldName, Date val) {
-        return new DateCondition(fieldName, val, DateCondition.Handler.EQUAL);
+        return new DateCondition(fieldName, val, DateCondition.Handler.LT);
     }
 
     public static DateCondition GE(String fieldName, Date val) {
-        return new DateCondition(fieldName, val, DateCondition.Handler.EQUAL);
+        return new DateCondition(fieldName, val, DateCondition.Handler.GE);
     }
 
     public static DateCondition GT(String fieldName, Date val) {
-        return new DateCondition(fieldName, val, DateCondition.Handler.EQUAL);
+        return new DateCondition(fieldName, val, DateCondition.Handler.GT);
     }
 
     public static DateCondition BETWEEN(String fieldName, Date start, Date end) {
